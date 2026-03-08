@@ -8,10 +8,7 @@ A free, open-source study guide for the **Life in the UK citizenship test** (3rd
 
 ## 🌐 Live Site
 
-Once published to GitHub Pages:
-```
-https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/
-```
+[Life In UK Guide](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
 
 ---
 
