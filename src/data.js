@@ -598,4 +598,5 @@ const TABS = [
   { id:"anthem",        label:"Symbols",      icon:"🎵" },
   { id:"quickfacts",    label:"Quick Facts",  icon:"⚡" },
   { id:"quiz",          label:"QUIZ ME",      icon:"🧠" },
+  { id:"rapidfire",     label:"Rapid Fire",   icon:"🔥" },
 ];
