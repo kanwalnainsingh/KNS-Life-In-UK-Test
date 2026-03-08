@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Life in the UK — Complete Study Guide</title>
+  <meta name="description" content="Free, open-source study guide for the Life in the UK citizenship test. 100+ practice questions, memory aids, all topics from the 3rd edition handbook." />
+  <meta property="og:title" content="Life in the UK — Complete Study Guide" />
+  <meta property="og:description" content="Free study guide: 100+ questions, memory hooks, all 3rd edition topics. Pass your test!" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇧</text></svg>" />
+  <!-- React + Babel (CDN — no build step needed, works on GitHub Pages) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js" crossorigin></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #080c14; color: #e8e4dc; font-family: 'Georgia', serif; }
+    /* hide scrollbars on tab rows */
+    .noscroll::-webkit-scrollbar { display: none; }
+    .noscroll { -ms-overflow-style: none; scrollbar-width: none; }
+    /* smooth tab transitions */
+    .tabcontent { animation: fadein 0.18s ease; }
+    @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    /* hover states */
+    button:hover { opacity: 0.9; }
+    /* progress bar fill animation */
+    .bar-fill { transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- ═══════════════════════════════════
+       DATA — edit this file to add facts
+       ═══════════════════════════════════ -->
+  <script type="text/babel" src="src/data.js"></script>
+
+  <!-- ═══════════════════════════════════
+       APP — edit for UI changes
+       ═══════════════════════════════════ -->
+  <script type="text/babel" src="src/app.jsx"></script>
+</body>
+</html>
