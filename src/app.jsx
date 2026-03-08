@@ -10,10 +10,10 @@ const Badge = ({ text, color = "#3b82f6" }) => (
   <span style={{ background: color + "22", color, border: `1px solid ${color}44`, borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, letterSpacing: 0.5, fontFamily: "monospace" }}>{text}</span>
 );
 const Card = ({ children, style = {} }) => (
-  <div style={{ background: "#111827", border: "1px solid #1f2937", borderRadius: 12, padding: 16, marginBottom: 12, ...style }}>{children}</div>
+  <div style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", borderRadius: 12, padding: 16, marginBottom: 12, ...style }}>{children}</div>
 );
 const SectionTitle = ({ children, icon }) => (
-  <h2 style={{ fontSize: 20, fontWeight: 700, color: "#f9fafb", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+  <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-strong)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
     {icon && <span>{icon}</span>}{children}
   </h2>
 );
@@ -29,35 +29,52 @@ const TrapAlert = ({ text }) => (
 );
 
 // ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen }) => (
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark }) => (
   <>
-    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderBottom: "1px solid #1f2937", background: "#0d1117", position: "sticky", top: 0, zIndex: 100 }}>
-      <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: "#1f2937", border: "none", color: "#f9fafb", borderRadius: 8, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>☰</button>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100 }}>
+      <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 8, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>☰</button>
       <span style={{ color: "#60a5fa", fontWeight: 700, fontSize: 16 }}>🇬🇧 Life in the UK</span>
-      <span style={{ marginLeft: "auto", color: "#6b7280", fontSize: 12 }}>Study Guide 2025</span>
-    </div>
-    <div className="noscroll" style={{ display: "flex", overflowX: "auto", background: "#0d1117", borderBottom: "2px solid #1f2937", padding: "0 8px" }}>
-      {TABS.map(t => (
-        <button key={t.id} onClick={() => { setActive(t.id); setMenuOpen(false); }}
-          style={{ flexShrink: 0, padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active === t.id ? 700 : 400,
-            color: active === t.id ? "#60a5fa" : "#9ca3af", borderBottom: active === t.id ? "2px solid #60a5fa" : "2px solid transparent",
-            transition: "all 0.15s", whiteSpace: "nowrap" }}>
-          {t.icon} {t.label}
+      <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
+        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
+          style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none", padding: "5px 8px", borderRadius: 6, border: "1px solid var(--card-border)", background: "var(--card-bg)", whiteSpace: "nowrap" }}>
+          ⭐ GitHub
+        </a>
+        <button onClick={toggleDark} title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
+          {isDark ? "☀️" : "🌙"}
         </button>
-      ))}
+      </div>
+    </div>
+    <div className="tab-strip-wrap">
+      <div className="noscroll" style={{ display: "flex", overflowX: "auto", background: "var(--header-bg)", borderBottom: "2px solid var(--card-border)", padding: "0 8px" }}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => { setActive(t.id); setMenuOpen(false); }}
+            style={{ flexShrink: 0, padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active === t.id ? 700 : 400,
+              color: active === t.id ? "#60a5fa" : "var(--text-muted)", borderBottom: active === t.id ? "2px solid #60a5fa" : "2px solid transparent",
+              transition: "all 0.15s", whiteSpace: "nowrap" }}>
+            {t.icon} {t.label}
+          </button>
+        ))}
+      </div>
     </div>
     {menuOpen && (
       <div style={{ position: "fixed", inset: 0, background: "#000000cc", zIndex: 200 }} onClick={() => setMenuOpen(false)}>
-        <div style={{ background: "#111827", width: 280, height: "100%", overflowY: "auto", padding: 16 }} onClick={e => e.stopPropagation()}>
+        <div style={{ background: "var(--card-bg)", width: 280, height: "100%", overflowY: "auto", padding: 16 }} onClick={e => e.stopPropagation()}>
           <div style={{ color: "#60a5fa", fontWeight: 700, marginBottom: 16, fontSize: 18 }}>🇬🇧 Topics</div>
           {TABS.map(t => (
             <button key={t.id} onClick={() => { setActive(t.id); setMenuOpen(false); }}
               style={{ display: "block", width: "100%", padding: "12px 16px", background: active === t.id ? "#1e3a5f" : "none",
-                border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#60a5fa" : "#d1d5db",
+                border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#60a5fa" : "var(--text)",
                 borderRadius: 8, marginBottom: 4, fontSize: 15 }}>
               {t.icon} {t.label}
             </button>
           ))}
+          <div style={{ marginTop: 16, padding: "12px 16px", borderTop: "1px solid var(--card-border)" }}>
+            <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
+              style={{ color: "#60a5fa", fontSize: 13, textDecoration: "none" }}>
+              ⭐ View on GitHub →
+            </a>
+          </div>
         </div>
       </div>
     )}
@@ -69,7 +86,7 @@ const HomeTab = ({ setActive }) => (
   <div style={{ padding: 20 }}>
     <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
       <div style={{ fontSize: 64, marginBottom: 12 }}>🇬🇧</div>
-      <h1 style={{ fontSize: 28, fontWeight: 800, color: "#f9fafb", marginBottom: 8 }}>Life in the UK</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Life in the UK</h1>
       <p style={{ color: "#60a5fa", fontSize: 18, marginBottom: 4 }}>Complete Study Guide</p>
       <p style={{ color: "#6b7280", fontSize: 14 }}>Based on the 3rd Edition Official Handbook</p>
       <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
@@ -83,7 +100,7 @@ const HomeTab = ({ setActive }) => (
       {TABS.filter(t => t.id !== "home").map(t => (
         <button key={t.id} onClick={() => setActive(t.id)}
           style={{ background: "#111827", border: "1px solid #1f2937", borderRadius: 12, padding: "16px 8px", cursor: "pointer",
-            color: "#d1d5db", fontSize: 13, textAlign: "center" }}>
+            color: "var(--text)", fontSize: 13, textAlign: "center" }}>
           <div style={{ fontSize: 28, marginBottom: 6 }}>{t.icon}</div>
           <div style={{ fontWeight: 600 }}>{t.label}</div>
         </button>
@@ -108,8 +125,11 @@ const HomeTab = ({ setActive }) => (
       ))}
     </Card>
     <div style={{ textAlign: "center", marginTop: 16, padding: 12, background: "#1a1a2e", borderRadius: 10, border: "1px solid #312e81" }}>
-      <div style={{ fontSize: 12, color: "#818cf8" }}>🔓 Open Source — Share Freely</div>
-      <div style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>github.com/giuli007/life-in-the-uk-test</div>
+      <div style={{ fontSize: 12, color: "#818cf8" }}>🔓 Open Source — Fork it, share it, improve it</div>
+      <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
+        style={{ display: "inline-block", marginTop: 6, fontSize: 12, color: "#60a5fa", textDecoration: "none", fontWeight: 600 }}>
+        ⭐ github.com/kanwalnainsingh/KNS-Life-In-UK-Test →
+      </a>
     </div>
   </div>
 );
@@ -127,7 +147,7 @@ const TimelineTab = () => {
     <div style={{ padding: 20 }}>
       <SectionTitle icon="📅">British History Timeline</SectionTitle>
       <input placeholder="Search events..." value={search} onChange={e => setSearch(e.target.value)}
-        style={{ width: "100%", background: "#1f2937", border: "1px solid #374151", borderRadius: 8, padding: "8px 12px", color: "#f9fafb", marginBottom: 12, fontSize: 14 }} />
+        style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--input-border)", borderRadius: 8, padding: "8px 12px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14 }} />
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {eras.map(e => (
           <button key={e} onClick={() => setEra(e)}
@@ -149,7 +169,7 @@ const TimelineTab = () => {
             <div style={{ width: 2, flexGrow: 1, background: "#1f2937", marginTop: 2 }} />
           </div>
           <div style={{ flex: 1, background: "#111827", border: `1px solid ${ev.color}33`, borderRadius: 10, padding: 12, marginBottom: 4 }}>
-            <div style={{ fontWeight: 600, color: "#f9fafb", fontSize: 14 }}>{ev.event}</div>
+            <div style={{ fontWeight: 600, color: "var(--text-strong)", fontSize: 14 }}>{ev.event}</div>
             <MemoryHook text={ev.memory} />
           </div>
         </div>
@@ -167,11 +187,11 @@ const NationsTab = () => (
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
         <div style={{ background: "#1e3a5f33", borderRadius: 8, padding: 10 }}>
           <div style={{ fontWeight: 700, color: "#93c5fd", marginBottom: 4 }}>Great Britain</div>
-          <div style={{ color: "#d1d5db", fontSize: 13 }}>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England + 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland + 🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales = 3 nations</div>
+          <div style={{ color: "var(--text)", fontSize: 13 }}>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England + 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland + 🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales = 3 nations</div>
         </div>
         <div style={{ background: "#dc262633", borderRadius: 8, padding: 10 }}>
           <div style={{ fontWeight: 700, color: "#fca5a5", marginBottom: 4 }}>United Kingdom</div>
-          <div style={{ color: "#d1d5db", fontSize: 13 }}>GB + 🇬🇧 Northern Ireland = 4 nations</div>
+          <div style={{ color: "var(--text)", fontSize: 13 }}>GB + 🇬🇧 Northern Ireland = 4 nations</div>
         </div>
       </div>
       <MemoryHook text="UK = GB + NI. One extra nation." />
@@ -235,13 +255,13 @@ const ConfuseTab = () => (
     <SectionTitle icon="⚠️">Don't Confuse These!</SectionTitle>
     {CONFUSABLES.map((c, i) => (
       <Card key={i} style={{ border: "1px solid #374151" }}>
-        <div style={{ fontWeight: 700, color: "#f9fafb", fontSize: 16, marginBottom: 12 }}>{c.icon} {c.title}</div>
+        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 16, marginBottom: 12 }}>{c.icon} {c.title}</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
           {[c.left, c.right].map((side, si) => (
             <div key={si} style={{ background: side.color+"11", border: `1px solid ${side.color}44`, borderRadius: 10, padding: 12 }}>
               <div style={{ fontWeight: 700, color: side.color, marginBottom: 8, fontSize: 13 }}>{side.label}</div>
               {side.points.map((p, pi) => (
-                <div key={pi} style={{ fontSize: 13, color: "#d1d5db", padding: "3px 0", borderBottom: pi < side.points.length-1 ? `1px solid ${side.color}22` : "none" }}>{p}</div>
+                <div key={pi} style={{ fontSize: 13, color: "var(--text)", padding: "3px 0", borderBottom: pi < side.points.length-1 ? `1px solid ${side.color}22` : "none" }}>{p}</div>
               ))}
             </div>
           ))}
@@ -276,12 +296,12 @@ const InventorsTab = () => {
             <div style={{ fontSize: 36, flexShrink: 0 }}>{inv.icon}</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-                <span style={{ fontWeight: 700, color: "#f9fafb", fontSize: 15 }}>{inv.who}</span>
+                <span style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{inv.who}</span>
                 <Badge text={inv.nation} color="#6b7280" />
                 <Badge text={inv.link} color="#3b82f6" />
                 {inv.when && <Badge text={inv.when} color="#d97706" />}
               </div>
-              <div style={{ color: "#d1d5db", fontSize: 14, marginBottom: 6 }}>{inv.what}</div>
+              <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6 }}>{inv.what}</div>
               <MemoryHook text={inv.memory} />
             </div>
           </div>
@@ -310,11 +330,11 @@ const SportsTab = () => (
           <div style={{ fontSize: 32, flexShrink: 0 }}>{s.icon}</div>
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, color: "#f9fafb", fontSize: 15 }}>{s.name}</span>
+              <span style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{s.name}</span>
               <Badge text={s.sport} color="#f59e0b" />
               {s.year && <Badge text={s.year} color="#6b7280" />}
             </div>
-            <div style={{ color: "#d1d5db", fontSize: 14, marginBottom: 6 }}>{s.achievement}</div>
+            <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6 }}>{s.achievement}</div>
             <MemoryHook text={s.memory} />
           </div>
         </div>
@@ -332,12 +352,12 @@ const FiguresTab = () => (
         <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 8 }}>
           <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
           <div>
-            <div style={{ fontWeight: 700, color: "#f9fafb", fontSize: 15 }}>{f.name}</div>
+            <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
             <div style={{ color: f.color, fontSize: 12, fontWeight: 600 }}>{f.role}</div>
           </div>
         </div>
         {f.facts.map((fact, fi) => (
-          <div key={fi} style={{ fontSize: 13, color: "#d1d5db", padding: "4px 0", borderBottom: fi < f.facts.length-1 ? "1px solid #1f2937" : "none" }}>• {fact}</div>
+          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "4px 0", borderBottom: fi < f.facts.length-1 ? "1px solid #1f2937" : "none" }}>• {fact}</div>
         ))}
       </Card>
     ))}
@@ -353,7 +373,7 @@ const ReligionTab = () => (
       {RELIGIONS.map(r => (
         <div key={r.faith} style={{ marginBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-            <span style={{ fontSize: 15 }}>{r.icon} <span style={{ color: "#f9fafb", fontWeight: 600 }}>{r.faith}</span></span>
+            <span style={{ fontSize: 15 }}>{r.icon} <span style={{ color: "var(--text-strong)", fontWeight: 600 }}>{r.faith}</span></span>
             <Badge text={r.pct} color={r.color} />
           </div>
           <div style={{ background: "#1f2937", borderRadius: 6, height: 8, overflow: "hidden" }}>
@@ -375,11 +395,11 @@ const ReligionTab = () => (
     {FESTIVALS.map((f, i) => (
       <Card key={i}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-          <span style={{ fontWeight: 700, color: "#f9fafb", fontSize: 15 }}>{f.name}</span>
+          <span style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</span>
           <Badge text={f.date} color="#d97706" />
         </div>
         <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 4 }}>{f.faith}</div>
-        <div style={{ fontSize: 13, color: "#d1d5db" }}>{f.detail}</div>
+        <div style={{ fontSize: 13, color: "var(--text)" }}>{f.detail}</div>
       </Card>
     ))}
   </div>
@@ -391,9 +411,9 @@ const LandmarksTab = () => (
     <SectionTitle icon="🏛️">Landmarks & Places</SectionTitle>
     {LANDMARKS.map((l, i) => (
       <Card key={i}>
-        <div style={{ fontWeight: 700, color: "#f9fafb", fontSize: 15, marginBottom: 4 }}>{l.name}</div>
+        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15, marginBottom: 4 }}>{l.name}</div>
         <Badge text={l.where} color="#6b7280" />
-        <div style={{ color: "#d1d5db", fontSize: 14, marginTop: 8 }}>{l.fact}</div>
+        <div style={{ color: "var(--text)", fontSize: 14, marginTop: 8 }}>{l.fact}</div>
         <TrapAlert text={l.trap} />
       </Card>
     ))}
@@ -408,13 +428,13 @@ const InternationalTab = () => (
     <div style={{ marginTop: 16 }}>
       {INT_ORGS.map((o, i) => (
         <Card key={i}>
-          <div style={{ fontWeight: 700, color: "#f9fafb", fontSize: 16, marginBottom: 6 }}>{o.name}</div>
+          <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 16, marginBottom: 6 }}>{o.name}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
             <Badge text={o.members} color="#3b82f6" />
             <Badge text={o.power} color={o.power.includes("CANNOT") ? "#ef4444" : "#10b981"} />
           </div>
-          <div style={{ fontSize: 13, color: "#d1d5db", marginBottom: 4 }}><strong style={{ color: "#9ca3af" }}>Purpose:</strong> {o.purpose}</div>
-          <div style={{ fontSize: 13, color: "#d1d5db", marginBottom: 8 }}><strong style={{ color: "#9ca3af" }}>UK's role:</strong> {o.ukRole}</div>
+          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 4 }}><strong style={{ color: "#9ca3af" }}>Purpose:</strong> {o.purpose}</div>
+          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8 }}><strong style={{ color: "#9ca3af" }}>UK's role:</strong> {o.ukRole}</div>
           <MemoryHook text={o.memory} />
         </Card>
       ))}
@@ -449,7 +469,7 @@ const ArtsTab = () => {
       {(ARTS[active] || []).map((item, i) => (
         <Card key={i}>
           <div style={{ fontWeight: 700, color: sec ? sec.color : "#f9fafb", fontSize: 14, marginBottom: 4 }}>{item.who}</div>
-          <div style={{ color: "#d1d5db", fontSize: 13, marginBottom: 6 }}>{item.what}</div>
+          <div style={{ color: "var(--text)", fontSize: 13, marginBottom: 6 }}>{item.what}</div>
           <MemoryHook text={item.mem} />
         </Card>
       ))}
@@ -506,7 +526,7 @@ const QuickFactsTab = () => (
       <Card key={si} style={{ border: `1px solid ${section.color}33` }}>
         <div style={{ fontWeight: 700, color: section.color, marginBottom: 10, fontSize: 15 }}>{section.icon} {section.cat}</div>
         {section.facts.map((f, fi) => (
-          <div key={fi} style={{ fontSize: 13, color: "#d1d5db", padding: "5px 0", borderBottom: fi < section.facts.length-1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>
+          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < section.facts.length-1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>
             <span style={{ color: section.color, marginRight: 6 }}>▸</span>{f}
           </div>
         ))}
@@ -550,7 +570,7 @@ const QuizTab = () => {
       <SectionTitle icon="🧠">Quiz Me!</SectionTitle>
       <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", textAlign: "center" }}>
         <div style={{ fontSize: 48, marginBottom: 12 }}>🎯</div>
-        <div style={{ color: "#f9fafb", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Test your knowledge!</div>
+        <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Test your knowledge!</div>
         <div style={{ color: "#9ca3af", fontSize: 14, marginBottom: 20 }}>{ALL_QUIZ.length} questions available</div>
         <div style={{ marginBottom: 20 }}>
           <div style={{ color: "#9ca3af", fontSize: 13, marginBottom: 10 }}>How many questions?</div>
@@ -558,7 +578,7 @@ const QuizTab = () => {
             {[10, 24, 50, ALL_QUIZ.length].map(n => (
               <button key={n} onClick={() => setCount(n)}
                 style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid", cursor: "pointer",
-                  background: count === n ? "#3b82f6" : "#1f2937", borderColor: count === n ? "#3b82f6" : "#374151", color: "#f9fafb", fontSize: 14 }}>
+                  background: count === n ? "#3b82f6" : "#1f2937", borderColor: count === n ? "#3b82f6" : "#374151", color: "var(--text-strong)", fontSize: 14 }}>
                 {n === ALL_QUIZ.length ? `All (${n})` : n}
               </button>
             ))}
@@ -579,7 +599,7 @@ const QuizTab = () => {
         <Card style={{ textAlign: "center", border: `2px solid ${pass ? "#22c55e" : "#ef4444"}` }}>
           <div style={{ fontSize: 56, marginBottom: 8 }}>{pass ? "🎉" : "📚"}</div>
           <div style={{ fontSize: 24, fontWeight: 800, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "PASSED!" : "Keep Studying"}</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "#f9fafb" }}>{score}/{questions.length}</div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--text-strong)" }}>{score}/{questions.length}</div>
           <div style={{ fontSize: 20, color: pass ? "#4ade80" : "#f87171", marginBottom: 16 }}>{pct}%</div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={startQuiz} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}>Try Again</button>
@@ -589,7 +609,7 @@ const QuizTab = () => {
         </Card>
         {reviewMode && wrong.map((w, i) => (
           <Card key={i} style={{ border: "1px solid #7f1d1d", background: "#1a0a0a" }}>
-            <div style={{ fontWeight: 600, color: "#f9fafb", marginBottom: 8 }}>Q: {w.q}</div>
+            <div style={{ fontWeight: 600, color: "var(--text-strong)", marginBottom: 8 }}>Q: {w.q}</div>
             <div style={{ color: "#f87171", marginBottom: 4 }}>✗ You chose: {w.opts[w.chosen]}</div>
             <div style={{ color: "#4ade80", marginBottom: 8 }}>✓ Correct: {w.opts[w.a]}</div>
             <MemoryHook text={w.tip} />
@@ -610,7 +630,7 @@ const QuizTab = () => {
         <div style={{ background: "#3b82f6", height: "100%", borderRadius: 6, width: `${((current+1)/questions.length)*100}%`, transition: "width 0.3s" }} />
       </div>
       <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f" }}>
-        <div style={{ fontWeight: 700, color: "#f9fafb", fontSize: 17, lineHeight: 1.5 }}>{q.q}</div>
+        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{q.q}</div>
       </Card>
       <div style={{ display: "grid", gap: 8, marginBottom: 16 }}>
         {q.opts.map((opt, oi) => {
@@ -650,9 +670,15 @@ const QuizTab = () => {
 };
 
 // ── ROOT ──────────────────────────────────────────────────────
+const { useEffect } = React;
 const App = () => {
   const [active, setActive] = useState("home");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(true);
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+  const toggleDark = () => setIsDark(d => !d);
   const renderTab = () => {
     switch (active) {
       case "home":          return <HomeTab setActive={setActive} />;
@@ -674,10 +700,14 @@ const App = () => {
   };
   return (
     <div style={{ minHeight: "100vh", maxWidth: 900, margin: "0 auto" }}>
-      <TabBar active={active} setActive={setActive} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <TabBar active={active} setActive={setActive} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} />
       <div className="tabcontent">{renderTab()}</div>
-      <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid #1f2937", color: "#374151", fontSize: 12 }}>
-        🔓 Open Source — Share Freely · github.com/giuli007/life-in-the-uk-test
+      <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>
+        🔓 Open Source — Share Freely ·{" "}
+        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
+          style={{ color: "#60a5fa", textDecoration: "none" }}>
+          github.com/kanwalnainsingh/KNS-Life-In-UK-Test
+        </a>
       </div>
     </div>
   );
