@@ -14,7 +14,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js" crossorigin></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #080c14; color: #e8e4dc; font-family: 'Georgia', serif; }
+    :root {
+      --page-bg: #080c14; --card-bg: #111827; --card-border: #1f2937;
+      --header-bg: #0d1117; --text: #e8e4dc; --text-strong: #f9fafb;
+      --text-muted: #9ca3af; --input-bg: #1f2937; --input-border: #374151;
+    }
+    [data-theme="light"] {
+      --page-bg: #f1f5f9; --card-bg: #ffffff; --card-border: #e2e8f0;
+      --header-bg: #ffffff; --text: #1e293b; --text-strong: #0f172a;
+      --text-muted: #64748b; --input-bg: #f8fafc; --input-border: #cbd5e1;
+    }
+    body { background: var(--page-bg); color: var(--text); font-family: 'Georgia', serif; }
     /* hide scrollbars on tab rows */
     .noscroll::-webkit-scrollbar { display: none; }
     .noscroll { -ms-overflow-style: none; scrollbar-width: none; }
@@ -25,6 +35,13 @@
     button:hover { opacity: 0.9; }
     /* progress bar fill animation */
     .bar-fill { transition: width 1.2s cubic-bezier(.4,0,.2,1); }
+    /* Tab strip scroll fade indicator */
+    .tab-strip-wrap { position: relative; }
+    .tab-strip-wrap::after {
+      content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 44px;
+      background: linear-gradient(to right, transparent, var(--header-bg));
+      pointer-events: none; z-index: 5;
+    }
   </style>
 </head>
 <body>
