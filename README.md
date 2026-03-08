@@ -8,7 +8,34 @@ A free, open-source study guide for the **Life in the UK citizenship test** (3rd
 
 ## 🌐 Live Site
 
-[Life In UK Guide](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
+[**→ Open the Study Guide**](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
+
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshots/home-dark.png" width="48%" alt="Home — dark mode" />
+  &nbsp;
+  <img src="screenshots/home-light.png" width="48%" alt="Home — light mode" />
+</p>
+<p align="center">
+  <img src="screenshots/quiz.png" width="48%" alt="Quiz mode" />
+  &nbsp;
+  <img src="screenshots/timeline.png" width="48%" alt="History Timeline" />
+</p>
+
+---
+
+## 📱 How to Use
+
+1. **Open the app** at the live link above — works on any device, no install needed
+2. **Browse sections** using the tab bar at the top, or tap ☰ to see all sections
+3. **Toggle dark / light mode** with the ☀️ / 🌙 button in the header
+4. **Study each section** — every fact has a 💡 Memory hook to help you remember, and a 🚨 Exam trap to warn about common mistakes
+5. **Test yourself** with 🧠 QUIZ ME — choose 10, 24, 50 or all 100+ questions, review wrong answers at the end
+6. **Try Rapid Fire** 🔥 — 10 questions, 20 seconds each, auto-advances when time runs out — simulates real exam pressure
+7. **Star the repo** ⭐ if it helps you — and share it with others studying for the test
 
 ---
 
@@ -16,45 +43,21 @@ A free, open-source study guide for the **Life in the UK citizenship test** (3rd
 
 | Tab | What's in it |
 |---|---|
-| 🏠 Home | Test info, tips, jump links |
-| 📅 Timeline | All events 10,000 BC → 2020, filterable by era |
-| 🏴 4 Nations | England, Scotland, Wales, N. Ireland — all details |
-| ⚠️ Don't Confuse | 8 most-confused topic pairs |
+| 🏠 Home | Test info, top 10 facts, quick jump links |
+| 📅 Timeline | All events 10,000 BC → present, filterable by era |
+| 🏴 4 Nations | England, Scotland, Wales, N. Ireland — saints, flags, parliaments |
+| ⚠️ Traps | 8 most-confused topic pairs with side-by-side comparison |
 | 💡 Inventors | 24 inventors with categories + memory hooks |
-| 🏅 Sports Stars | 22 athletes with achievements |
+| 🏅 Sports | 22 athletes with achievements |
 | 👑 Key People | 21 historical figures |
 | ⛪ Religion | 2011 Census stats + 16 festivals |
 | 🏛️ Landmarks | 20 places with exam traps |
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe |
-| 🎭 Arts & Culture | Literature, Music, Art, Architecture, Fashion, Film |
-| 🎵 Anthem & Symbols | National anthem, Union Jack, population history |
+| 🎭 Arts | Literature, Music, Art, Architecture, Fashion, Film |
+| 🎵 Symbols | National anthem, Union Jack, population history |
 | ⚡ Quick Facts | Government, Law, Everyday Life, Currency |
-| 🧠 QUIZ ME | 100+ randomised questions with tips |
-
----
-
-## 🚀 How to Host on GitHub Pages (5 minutes)
-
-### Step 1 — Upload to GitHub
-1. Create a new **public** repository on GitHub
-2. Upload all these files maintaining the folder structure:
-   ```
-   index.html
-   src/
-     data.js
-     app.jsx
-   README.md
-   .nojekyll
-   ```
-
-### Step 2 — Enable GitHub Pages
-1. Go to your repository → **Settings** → **Pages**
-2. Under **Source**, select **Deploy from a branch**
-3. Choose **main** branch, **/ (root)** folder
-4. Click **Save**
-5. Wait ~1 minute, then visit your live URL
-
-✅ No build step needed. No Node.js. No npm. Pure HTML + CDN React.
+| 🧠 QUIZ ME | 100+ randomised questions with memory tips |
+| 🔥 Rapid Fire | 10 questions · 20 sec each · auto-advance on timeout |
 
 ---
 
@@ -81,25 +84,25 @@ To add a quiz question:
 
 ### To change the UI → `src/app.jsx`
 
-Each tab has its own function (e.g., `TimelineTab`, `QuizTab`). Edit independently.
+Each tab has its own function (e.g., `TimelineTab`, `QuizTab`, `RapidFireTab`). Edit independently.
 
 ### All categories in `src/data.js`:
 | Variable | Tab |
 |---|---|
 | `TIMELINE` | Timeline tab |
 | `NATIONS` | 4 Nations tab |
-| `CONFUSABLES` | Don't Confuse tab |
+| `CONFUSABLES` | Traps tab |
 | `INVENTORS` | Inventors tab |
-| `SPORTS_STARS` | Sports Stars tab |
+| `SPORTS_STARS` | Sports tab |
 | `KEY_FIGURES` | Key People tab |
 | `RELIGIONS` / `FESTIVALS` | Religion tab |
 | `LANDMARKS` | Landmarks tab |
 | `INT_ORGS` | World Orgs tab |
-| `ARTS` | Arts & Culture tab |
+| `ARTS` | Arts tab |
 | `QUICK_FACTS` | Quick Facts tab |
-| `ALL_QUIZ` | Quiz tab |
-| `POPULATION_HISTORY` | Anthem & Symbols tab |
-| `ANTHEM` | Anthem & Symbols tab |
+| `ALL_QUIZ` | Quiz + Rapid Fire tabs |
+| `POPULATION_HISTORY` | Symbols tab |
+| `ANTHEM` | Symbols tab |
 
 ---
 

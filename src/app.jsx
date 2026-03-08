@@ -3,7 +3,7 @@
    Edit data.js to change content. Edit this file for UI changes.
    ============================================================= */
 
-const { useState } = React;
+const { useState, useRef } = React;
 
 // ── HELPERS ──────────────────────────────────────────────────
 const Badge = ({ text, color = "#3b82f6" }) => (
@@ -669,6 +669,152 @@ const QuizTab = () => {
   );
 };
 
+// ── RAPID FIRE ───────────────────────────────────────────────
+const RapidFireTab = () => {
+  const TOTAL = 10, TIME_PER_Q = 20;
+  const [started, setStarted] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIME_PER_Q);
+  const [score, setScore] = useState(0);
+  const [results, setResults] = useState([]);
+  const [finished, setFinished] = useState(false);
+  const { useEffect } = React;
+  const timerRef = useRef(null);
+  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+
+  const startGame = () => {
+    setQuestions(shuffle(ALL_QUIZ).slice(0, TOTAL));
+    setCurrent(0); setSelected(null); setConfirmed(false);
+    setScore(0); setResults([]); setFinished(false); setTimeLeft(TIME_PER_Q);
+    setStarted(true);
+  };
+
+  const advance = (isCorrect, chosen, q) => {
+    setResults(r => [...r, { ...q, chosen, correct: isCorrect }]);
+    const next = current + 1;
+    if (next >= TOTAL) { setFinished(true); setStarted(false); return; }
+    setCurrent(next); setSelected(null); setConfirmed(false); setTimeLeft(TIME_PER_Q);
+  };
+
+  const handleSelect = (oi) => {
+    if (confirmed) return;
+    clearInterval(timerRef.current);
+    const q = questions[current];
+    const isCorrect = oi === q.a;
+    if (isCorrect) setScore(s => s + 1);
+    setSelected(oi); setConfirmed(true);
+    setTimeout(() => advance(isCorrect, oi, q), 1000);
+  };
+
+  useEffect(() => {
+    if (!started || confirmed || finished) return;
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft(t => { if (t <= 1) { clearInterval(timerRef.current); return 0; } return t - 1; });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [started, current, confirmed, finished]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && !confirmed && started && !finished) {
+      clearInterval(timerRef.current);
+      const q = questions[current];
+      setConfirmed(true);
+      setTimeout(() => advance(false, -1, q), 800);
+    }
+  }, [timeLeft]);
+
+  if (!started && !finished) return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="🔥">Rapid Fire</SectionTitle>
+      <Card style={{ background: "#0f172a", border: "1px solid #7f1d1d", textAlign: "center" }}>
+        <div style={{ fontSize: 56, marginBottom: 12 }}>⏱️</div>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>10 Questions · 20 Seconds Each</div>
+        <div style={{ color: "#9ca3af", fontSize: 14, marginBottom: 6 }}>Pick an answer before time runs out!</div>
+        <div style={{ color: "#f59e0b", fontSize: 13, marginBottom: 24 }}>⚡ No time to think — go with your gut</div>
+        <button onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 10, padding: "14px 36px", fontSize: 17, fontWeight: 700, cursor: "pointer" }}>
+          Start Rapid Fire 🔥
+        </button>
+      </Card>
+    </div>
+  );
+
+  if (finished) {
+    const pct = Math.round((score / TOTAL) * 100);
+    const pass = pct >= 75;
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="🔥">Rapid Fire — Results</SectionTitle>
+        <Card style={{ textAlign: "center", border: `2px solid ${pass ? "#22c55e" : "#ef4444"}` }}>
+          <div style={{ fontSize: 56, marginBottom: 8 }}>{pass ? "🏆" : "💪"}</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "On Fire!" : "Keep Practising"}</div>
+          <div style={{ fontSize: 36, fontWeight: 700, color: "var(--text-strong)", margin: "8px 0" }}>{score}/{TOTAL}</div>
+          <div style={{ fontSize: 20, color: pass ? "#4ade80" : "#f87171", marginBottom: 20 }}>{pct}%</div>
+          <button onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 8, padding: "12px 28px", cursor: "pointer", fontWeight: 700, fontSize: 15 }}>Try Again 🔥</button>
+          {" "}
+          <button onClick={() => { setFinished(false); setStarted(false); }} style={{ background: "var(--card-bg)", color: "var(--text-muted)", border: "1px solid var(--card-border)", borderRadius: 8, padding: "12px 20px", cursor: "pointer", marginLeft: 6 }}>Back</button>
+        </Card>
+        {results.map((r, i) => (
+          <Card key={i} style={{ border: `1px solid ${r.correct ? "#166534" : "#7f1d1d"}`, background: r.correct ? "#0f1f0f" : "#1a0808" }}>
+            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Q{i + 1}</div>
+            <div style={{ fontWeight: 600, color: "var(--text-strong)", fontSize: 13, marginBottom: 6 }}>{r.q}</div>
+            <div style={{ fontSize: 13, color: r.correct ? "#4ade80" : "#f87171" }}>
+              {r.correct ? "✓" : "✗"} {r.chosen === -1 ? "⏱️ Time ran out" : r.opts[r.chosen]}
+            </div>
+            {!r.correct && <div style={{ fontSize: 13, color: "#4ade80", marginTop: 2 }}>✓ {r.opts[r.a]}</div>}
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  const q = questions[current];
+  const timerPct = (timeLeft / TIME_PER_Q) * 100;
+  const timerColor = timeLeft > 10 ? "#22c55e" : timeLeft > 5 ? "#f59e0b" : "#ef4444";
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+        <Badge text={`${current + 1} / ${TOTAL}`} color="#6b7280" />
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 16 }}>⏱️</span>
+          <span style={{ fontSize: 26, fontWeight: 800, color: timerColor, minWidth: 32, textAlign: "center" }}>{timeLeft}</span>
+        </div>
+        <Badge text={`Score: ${score}`} color="#22c55e" />
+      </div>
+      <div style={{ background: "#1f2937", borderRadius: 6, height: 10, marginBottom: 16, overflow: "hidden" }}>
+        <div style={{ background: timerColor, height: "100%", borderRadius: 6, width: `${timerPct}%`, transition: "width 1s linear, background 0.3s" }} />
+      </div>
+      <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", marginBottom: 12 }}>
+        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{q.q}</div>
+      </Card>
+      <div style={{ display: "grid", gap: 8 }}>
+        {q.opts.map((opt, oi) => {
+          let bg = "var(--card-bg)", border = "var(--card-border)", color = "var(--text)";
+          if (confirmed) {
+            if (oi === q.a) { bg = "#0f1f0f"; border = "#22c55e"; color = "#4ade80"; }
+            else if (oi === selected && oi !== q.a) { bg = "#1a0808"; border = "#ef4444"; color = "#f87171"; }
+          } else if (selected === oi) { bg = "#1e3a5f"; border = "#3b82f6"; color = "#60a5fa"; }
+          return (
+            <button key={oi} onClick={() => handleSelect(oi)}
+              style={{ padding: "14px 16px", borderRadius: 10, border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer",
+                background: bg, color, textAlign: "left", fontSize: 14, transition: "all 0.15s" }}>
+              <span style={{ marginRight: 8, opacity: 0.6 }}>{["A","B","C","D"][oi]}.</span>{opt}
+              {confirmed && oi === q.a && " ✓"}
+              {confirmed && oi === selected && oi !== q.a && " ✗"}
+            </button>
+          );
+        })}
+      </div>
+      {confirmed && timeLeft === 0 && (
+        <div style={{ marginTop: 10, textAlign: "center", color: "#f59e0b", fontWeight: 700 }}>⏱️ Time's up!</div>
+      )}
+    </div>
+  );
+};
+
 // ── ROOT ──────────────────────────────────────────────────────
 const { useEffect } = React;
 const App = () => {
@@ -695,6 +841,7 @@ const App = () => {
       case "anthem":        return <AnthemTab />;
       case "quickfacts":    return <QuickFactsTab />;
       case "quiz":          return <QuizTab />;
+      case "rapidfire":     return <RapidFireTab />;
       default:              return <HomeTab setActive={setActive} />;
     }
   };
