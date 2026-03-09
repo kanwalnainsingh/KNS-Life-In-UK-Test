@@ -526,6 +526,7 @@ const QUICK_FACTS = [
   ]},
   { cat:"Britain Beyond the UK", icon:"🌐", color:"#14b8a6", facts:[
     "British Isles = geographical term, not the same as the UK",
+    "The Republic of Ireland is not part of the UK",
     "The Crown Dependencies are Jersey, Guernsey and the Isle of Man",
     "Jersey and Guernsey are the Channel Islands usually named in this topic",
     "Crown Dependencies are NOT part of the UK",
@@ -535,7 +536,7 @@ const QUICK_FACTS = [
     "There are 14 British Overseas Territories",
     "British Overseas Territories are also NOT part of the UK",
     "Examples: Gibraltar, Falkland Islands, Bermuda and St Helena",
-    "Memory clue: British Isles = geography. UK = state. Dependencies = Channel Islands + Isle of Man. Territories = Gibraltar and Falklands",
+    "Memory clue: British Isles = geography. Republic of Ireland is separate. Dependencies = Channel Islands + Isle of Man. Territories = Gibraltar and Falklands",
   ]},
   { cat:"Government & Parliament", icon:"🏛️", color:"#3b82f6", facts:[
     "UK = constitutional monarchy. Monarch = head of state. Prime Minister = head of government.",
@@ -664,6 +665,7 @@ const STORY_CHAPTERS = [
     items:[
       { title:"Great Britain and the UK", fact:"Great Britain = England, Scotland and Wales. United Kingdom = Great Britain plus Northern Ireland.", context:"This is one of the most common confusion points in the test.", memory:"UK = GB + Northern Ireland." },
       { title:"British Isles boundary", fact:"The British Isles is a geographical term, not the same thing as the United Kingdom.", context:"Use this only as a geography label. The UK is the political state made of 4 nations.", memory:"British Isles = geography. UK = state." },
+      { title:"Ireland and the Channel Islands", fact:"The Republic of Ireland is not part of the UK. Jersey and Guernsey are the Channel Islands and are Crown Dependencies, not part of the UK.", context:"This helps close the last common boundary gap around the UK and the islands around it.", memory:"Ireland separate. Channel Islands = Jersey and Guernsey." },
       { title:"England", fact:"England: London, St George, rose.", context:"England has no separate parliament, which is one of the easiest facts to miss when rushing.", memory:"England = London + St George + rose + no separate parliament." },
       { title:"Scotland", fact:"Scotland: Edinburgh, St Andrew, thistle, Scottish Parliament at Holyrood.", context:"Also remember that the Church of Scotland is independent and Scotland uses Highers instead of A-levels.", memory:"Scotland = Edinburgh + St Andrew + thistle + Holyrood." },
       { title:"Wales and Northern Ireland", fact:"Wales: Cardiff, Welsh language, Senedd. Northern Ireland: Belfast, Stormont.", context:"Wales is strongly linked with the Welsh language. Northern Ireland is linked with Stormont and Good Friday Agreement context.", memory:"Wales = Cardiff + Welsh. Northern Ireland = Belfast + Stormont." },
@@ -674,6 +676,7 @@ const STORY_CHAPTERS = [
     recap:[
       "Know capitals, saints, flowers, and devolved bodies.",
       "British Isles is a geographical term, not the same as the UK.",
+      "Republic of Ireland is separate from the UK; Channel Islands are Crown Dependencies.",
       "England has no separate parliament.",
       "Crown Dependencies are not part of the UK.",
       "Big Ben is the bell; UK = GB + Northern Ireland.",
@@ -901,7 +904,9 @@ const ALL_QUIZ = [
   { q:"What is Great Britain?", opts:["England and Wales","England, Scotland and Wales (3 nations)","England, Scotland, Wales + N.Ireland","All British Isles"], a:1, tip:"⭐ Exam favourite — Great Britain = 3 nations only. Add Northern Ireland = United Kingdom (4)." },
   { q:"What is the United Kingdom?", opts:["England, Scotland and Wales only","Great Britain plus Northern Ireland","All the British Isles","England and Northern Ireland only"], a:1, tip:"⭐ Exam favourite — United Kingdom = Great Britain + Northern Ireland. Great Britain alone is only 3 nations." },
   { q:"What are the British Isles?", opts:["Another name for the UK","A geographical term including Great Britain and Ireland","Only the 4 nations of the UK","Great Britain plus the Channel Islands only"], a:1, tip:"📌 Often tested — British Isles is a geographical term, not the same as the UK. The UK is the political state." },
+  { q:"Is the Republic of Ireland part of the United Kingdom?", opts:["Yes","No","Only historically","Only for trade"], a:1, tip:"📌 Often tested — The Republic of Ireland is not part of the UK. The UK is England, Scotland, Wales and Northern Ireland." },
   { q:"Which are the Crown Dependencies?", opts:["Jersey, Guernsey and the Isle of Man","England, Scotland and Wales","Gibraltar, Falklands and Bermuda","Wales, Jersey and Northern Ireland"], a:0, tip:"📌 Often tested — Crown Dependencies = Jersey, Guernsey and the Isle of Man. They are linked to the Crown but are not part of the UK." },
+  { q:"Which islands are known as the Channel Islands in this context?", opts:["Jersey and Guernsey","Isle of Man and Anglesey","Orkney and Shetland","Wight and Man"], a:0, tip:"💡 Good to know — Jersey and Guernsey are the Channel Islands usually named with the Crown Dependencies topic." },
   { q:"Are the Crown Dependencies part of the United Kingdom?", opts:["Yes, fully part of the UK","Only Jersey is","No, they are not part of the UK","Only for tax law"], a:2, tip:"📌 Often tested — Crown Dependencies are not part of the UK. They are self-governing dependencies of the Crown." },
   { q:"Why is Wales NOT in the Union Jack?", opts:["Wales refused","Wales already united with England when flag designed","Wales has its own dragon flag","Wales chose not to join"], a:1, tip:"⭐ Exam favourite — Wales was already part of England when the flag was designed, so wasn't added." },
   { q:"What is the patron saint of Scotland?", opts:["St George","St David","St Andrew","St Patrick"], a:2, tip:"⭐ Exam favourite — St Andrew = 30 Nov. White X on blue = Saltire. 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
