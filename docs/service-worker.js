@@ -1,4 +1,4 @@
-const CACHE_VERSION = "lifeuk-static-v1.0.0";
+const CACHE_VERSION = "lifeuk-static-v1.0.1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,6 +6,11 @@ const APP_SHELL = [
   "./robots.txt",
   "./sitemap.xml",
 ];
+const NETWORK_FIRST_PATHS = new Set([
+  "/",
+  "/index.html",
+  "/assets/app.js",
+]);
 
 const CDN_ASSETS = [
   "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
@@ -42,6 +47,7 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   const isSameOrigin = url.origin === self.location.origin;
   const isCdnAsset = CDN_ASSETS.includes(url.href);
+  const path = url.pathname.endsWith("/") ? `${url.pathname}index.html` : url.pathname;
 
   if (event.request.mode === "navigate") {
     event.respondWith(
@@ -58,6 +64,20 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (!isSameOrigin && !isCdnAsset) return;
+
+  if (isSameOrigin && NETWORK_FIRST_PATHS.has(path)) {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(async () => {
+        const cached = await caches.match(event.request);
+        return cached || Response.error();
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

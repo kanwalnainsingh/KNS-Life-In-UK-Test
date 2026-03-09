@@ -118,6 +118,15 @@ const readStore = (key, fallback) => {
 
 const forceLatestAppReload = async () => {
   try {
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    }
+  } catch (err) {
+    // Ignore service worker cleanup failures and still force a hard reload path.
+  }
+
+  try {
     if ("caches" in window) {
       const cacheKeys = await caches.keys();
       await Promise.all(cacheKeys.map((key) => caches.delete(key)));
@@ -1152,7 +1161,6 @@ const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
         <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
-        <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Not seeing updates? Refresh the latest version.</div>
       </div>
       <button
         aria-label="Get latest app version"
