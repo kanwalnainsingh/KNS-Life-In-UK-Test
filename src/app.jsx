@@ -1683,8 +1683,11 @@ const RapidFireTab = () => {
   const [results, setResults] = useState([]);
   const [finished, setFinished] = useState(false);
   const timerRef = useRef(null);
+  const advanceRef = useRef(null);
 
   const startGame = () => {
+    clearInterval(timerRef.current);
+    clearTimeout(advanceRef.current);
     const pool = includeCompare === "yes" ? [...ALL_QUIZ, ...buildConfusionDeck()] : ALL_QUIZ;
     setQuestions(pickRandomNoRepeat(pool, total, STORAGE_KEYS.recentRapid, 180));
     setCurrent(0);
@@ -1711,6 +1714,12 @@ const RapidFireTab = () => {
     setTimeLeft(timePerQuestion);
   };
 
+  const scheduleAdvance = (isCorrect, chosen, q, timedOut = false) => {
+    clearTimeout(advanceRef.current);
+    const holdMs = answerMode !== "instant" ? (timedOut ? 3200 : 2600) : isCorrect ? 1000 : 3200;
+    advanceRef.current = setTimeout(() => advance(isCorrect, chosen, q), holdMs);
+  };
+
   const handleSelect = (oi) => {
     if (confirmed) return;
     clearInterval(timerRef.current);
@@ -1719,7 +1728,7 @@ const RapidFireTab = () => {
     if (isCorrect) setScore((s) => s + 1);
     setSelected(oi);
     setConfirmed(true);
-    setTimeout(() => advance(isCorrect, oi, q), answerMode === "instant" ? 1000 : 350);
+    scheduleAdvance(isCorrect, oi, q, false);
   };
 
   useEffect(() => {
@@ -1742,13 +1751,18 @@ const RapidFireTab = () => {
       clearInterval(timerRef.current);
       const q = questions[current];
       setConfirmed(true);
-      setTimeout(() => advance(false, -1, q), 800);
+      scheduleAdvance(false, -1, q, true);
     }
   }, [timeLeft, confirmed, started, finished, current, questions]);
 
   useEffect(() => {
     if (finished) saveWrongQuestions(results.filter((x) => !x.correct));
   }, [finished, results]);
+
+  useEffect(() => () => {
+    clearInterval(timerRef.current);
+    clearTimeout(advanceRef.current);
+  }, []);
 
   if (!started && !finished) {
     return (
@@ -1847,6 +1861,8 @@ const RapidFireTab = () => {
   const q = questions[current];
   const timerPct = (timeLeft / timePerQuestion) * 100;
   const timerColor = timeLeft > 10 ? "#22c55e" : timeLeft > 5 ? "#f59e0b" : "#ef4444";
+  const isTimedOut = confirmed && selected === null && timeLeft === 0;
+  const isWrong = confirmed && selected !== null && selected !== q.a;
   return (
     <div style={{ padding: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
@@ -1860,12 +1876,27 @@ const RapidFireTab = () => {
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {answerMode === "instant" && confirmed && (
         <>
+          <div style={{ marginTop: 10, textAlign: "center", color: isWrong || isTimedOut ? "#fca5a5" : "#86efac", fontWeight: 800 }}>
+            {isTimedOut ? `Time's up. Correct answer: ${q.opts[q.a]}` : isWrong ? `Wrong. Correct answer: ${q.opts[q.a]}` : "Correct"}
+          </div>
           {showContext && <MemoryHook text={q.tip} />}
-          {timeLeft === 0 && <div style={{ marginTop: 10, textAlign: "center", color: "#f59e0b", fontWeight: 800 }}>Time's up</div>}
+          {(isWrong || isTimedOut) && (
+            <div style={{ marginTop: 8, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
+              Holding a little longer so you can read the clue before the next question.
+            </div>
+          )}
         </>
       )}
-      {answerMode !== "instant" && confirmed && timeLeft === 0 && (
-        <div style={{ marginTop: 10, textAlign: "center", color: "#f59e0b", fontWeight: 800 }}>Time's up</div>
+      {answerMode !== "instant" && confirmed && (
+        <>
+          <div style={{ marginTop: 10, textAlign: "center", color: isTimedOut ? "#f59e0b" : selected === q.a ? "#86efac" : "#fca5a5", fontWeight: 800 }}>
+            {isTimedOut ? `Time's up. Correct answer: ${q.opts[q.a]}` : selected === q.a ? "Correct" : `Wrong. Correct answer: ${q.opts[q.a]}`}
+          </div>
+          {showContext && <MemoryHook text={q.tip} />}
+          <div style={{ marginTop: 8, textAlign: "center", color: "var(--text-muted)", fontSize: 13 }}>
+            Next question starts automatically after a short review pause.
+          </div>
+        </>
       )}
     </div>
   );
