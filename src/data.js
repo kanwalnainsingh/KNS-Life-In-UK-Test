@@ -663,15 +663,18 @@ const STORY_CHAPTERS = [
     tab:"quickfacts",
     items:[
       { title:"Parliament basics", fact:"House of Commons = elected and more powerful. House of Lords = appointed and can delay laws.", context:"You also need 650 MPs, secret-ballot Speaker, and Prime Minister from the party with the most Commons seats.", memory:"Commons elected, Lords appointed." },
+      { title:"Parliament in action", fact:"The Speaker is chosen by secret ballot of MPs and stays politically neutral. Hansard is the official written record of what is said in Parliament.", context:"These facts show how Parliament works in practice and are tested directly in short recall questions.", memory:"Speaker = secret ballot. Hansard = official record." },
       { title:"Voting and elections", fact:"Voting age is 18. General elections use First Past the Post. UK, Commonwealth and Irish citizens in the UK can vote in all elections.", context:"These are practical exam facts and often appear as one-line questions.", memory:"18 + FPTP + UK/Commonwealth/Irish vote." },
       { title:"Law and justice", fact:"Rule of law, innocent until proven guilty, equality before the law, jury service when called.", context:"This is the civic-values core of the test, not just legal procedure.", memory:"Nobody is above the law." },
       { title:"Everyday life rules", fact:"Emergency numbers are 999 and 112. Drive on the left. Minimum car-driving age is 17, moped 16.", context:"These are easy marks but also easy to drop when revising only history.", memory:"999 and 112. Car 17. Moped 16." },
       { title:"Education, tax and contribution", fact:"School age is 5 to 16, but young people usually stay in education or training until 18. National Insurance helps fund services like the NHS and state pension.", context:"These questions check practical knowledge about life in the UK today.", memory:"5 to 16, training to 18, NI funds services." },
+      { title:"Ceremony and government", fact:"At the State Opening of Parliament, the monarch reads the government's plans. The Prime Minister normally comes from the party with the most Commons seats.", context:"These two facts are easy to confuse with each other unless you separate ceremonial role from political role.", memory:"State Opening = monarch reads. PM = Commons majority leader." },
     ],
     recap:[
-      "Commons elected, Lords appointed, Speaker neutral.",
+      "Commons elected, Lords appointed, Speaker neutral, Hansard records proceedings.",
       "18 + FPTP + rule of law are core civic anchors.",
       "999 and 112 are emergency numbers; NI helps fund services.",
+      "State Opening is ceremonial; the PM leads the government.",
     ],
   },
   {
@@ -767,12 +770,15 @@ const STORY_CHAPTERS = [
       { title:"NATO", fact:"NATO is the military alliance based on collective defence.", context:"This is the easiest way to separate NATO from the Commonwealth or Council of Europe.", memory:"NATO = defence alliance." },
       { title:"Commonwealth", fact:"The Commonwealth is a voluntary association of member states.", context:"It is not a military alliance and does not act like a court.", memory:"Commonwealth = voluntary association." },
       { title:"Council of Europe", fact:"The Council of Europe focuses on human rights and is separate from the EU.", context:"This is one of the biggest confusion traps in the whole course.", memory:"Council of Europe = human rights, not EU." },
+      { title:"Council of Europe and ECHR", fact:"The European Convention on Human Rights comes from the Council of Europe, which has 47 member countries and cannot make laws.", context:"This is where many people slip: the ECHR is not an EU law and the Council of Europe is bigger than the EU.", memory:"47 members, ECHR, no law-making power." },
+      { title:"European Union compare", fact:"The EU had 27 member states and could make laws affecting its members before the UK left.", context:"This contrast is useful because many test questions ask what the Council of Europe cannot do rather than asking directly about the EU.", memory:"EU = 27 and law-making. Council of Europe = 47 and rights." },
       { title:"Final compare clue", fact:"UN = global peace body. NATO = military alliance. Commonwealth = voluntary group. Council of Europe = human-rights body.", context:"If you can say these four labels cleanly, most world-organisation questions become easy.", memory:"Four organisations, four different jobs." },
     ],
     recap:[
       "UN = global peace body, NATO = defence alliance.",
       "Commonwealth = voluntary group, not military.",
       "Council of Europe = human rights and separate from the EU.",
+      "ECHR comes from the Council of Europe, not the EU.",
     ],
   },
 ];
@@ -868,6 +874,7 @@ const ALL_QUIZ = [
   { q:"Who improved the steam engine and gave his name to a unit of power?", opts:["George Stephenson","Isambard Brunel","James Watt","Robert Watson-Watt"], a:2, tip:"📌 Often tested — James Watt = improved steam engine. Scottish. 'Watt' = unit of power." },
   // ── 4 NATIONS ───────────────────────────────────────────────
   { q:"What is Great Britain?", opts:["England and Wales","England, Scotland and Wales (3 nations)","England, Scotland, Wales + N.Ireland","All British Isles"], a:1, tip:"⭐ Exam favourite — Great Britain = 3 nations only. Add Northern Ireland = United Kingdom (4)." },
+  { q:"What is the United Kingdom?", opts:["England, Scotland and Wales only","Great Britain plus Northern Ireland","All the British Isles","England and Northern Ireland only"], a:1, tip:"⭐ Exam favourite — United Kingdom = Great Britain + Northern Ireland. Great Britain alone is only 3 nations." },
   { q:"Why is Wales NOT in the Union Jack?", opts:["Wales refused","Wales already united with England when flag designed","Wales has its own dragon flag","Wales chose not to join"], a:1, tip:"⭐ Exam favourite — Wales was already part of England when the flag was designed, so wasn't added." },
   { q:"What is the patron saint of Scotland?", opts:["St George","St David","St Andrew","St Patrick"], a:2, tip:"⭐ Exam favourite — St Andrew = 30 Nov. White X on blue = Saltire. 🏴󠁧󠁢󠁳󠁣󠁴󠁿" },
   { q:"When is St George's Day (England)?", opts:["1 March","17 March","23 April","30 November"], a:2, tip:"⭐ Exam favourite — 23 April. Also Shakespeare's birthday AND death day! 🏴󠁧󠁢󠁥󠁮󠁧󠁿" },
@@ -880,6 +887,7 @@ const ALL_QUIZ = [
   { q:"What food is associated with Scotland?", opts:["Welsh cakes","Ulster fry","Haggis","Roast beef"], a:2, tip:"💡 Good to know — Haggis = sheep's stomach stuffed with offal, oatmeal. Eaten on Burns Night (25 Jan)." },
   // ── GOVERNMENT & LAW ────────────────────────────────────────
   { q:"Which church does the monarch head?", opts:["Church of Scotland","Catholic Church","Church of England","Church of Wales"], a:2, tip:"⭐ Exam favourite — Church of England ONLY. Monarch has NO role in Church of Scotland (Presbyterian)." },
+  { q:"Which church is Presbyterian and does NOT have the monarch as its head?", opts:["Church of England","Church of Scotland","Catholic Church","Church of Wales"], a:1, tip:"📌 Often tested — Church of Scotland = Presbyterian and independent. The monarch has no leadership role in it." },
   { q:"How many MPs are in the House of Commons?", opts:["500","600","650","700"], a:2, tip:"⭐ Exam favourite — 650 MPs = 650 constituencies. Each MP represents one area." },
   { q:"How is the House of Lords chosen?", opts:["Elected by public","Appointed — not elected","Elected by MPs","Chosen by monarch alone"], a:1, tip:"⭐ Exam favourite — Lords = appointed, NOT elected. Includes life peers, bishops, hereditary peers." },
   { q:"What does habeas corpus mean?", opts:["Right to vote","Right to free speech","Cannot be imprisoned without charge","Right to fair trial"], a:2, tip:"⭐ Exam favourite — Habeas Corpus 1679 = cannot be imprisoned without charge. Still law today." },
@@ -894,6 +902,7 @@ const ALL_QUIZ = [
   { q:"What is the minimum age to stand as an MP?", opts:["16","18","21","25"], a:1, tip:"💡 Good to know — 18 years old. Same age as voting. Must be UK/Irish/Commonwealth citizen." },
   { q:"What type of state is the UK?", opts:["Republic","Federal state","Constitutional monarchy","Absolute monarchy"], a:2, tip:"⭐ Exam favourite — Constitutional monarchy = monarch is head of state but Parliament makes laws." },
   { q:"What happens at the State Opening of Parliament?", opts:["PM gives a speech","Monarch reads the government's plans","New MPs are elected","Lords are appointed"], a:1, tip:"💡 Good to know — Monarch reads the Queen's/King's Speech = government's planned legislation." },
+  { q:"What is Hansard?", opts:["A court report","The official written record of Parliamentary proceedings","A government department","A police report"], a:1, tip:"📌 Often tested — Hansard is the official written record of what is said in Parliament." },
   // ── RELIGION & CULTURE ──────────────────────────────────────
   { q:"What % identified as Christian in the 2011 Census?", opts:["45%","52%","59%","70%"], a:2, tip:"⭐ Exam favourite — 59% Christian. 25% no religion. 4.8% Muslim. Census is every 10 years." },
   { q:"On what date is Vaisakhi celebrated?", opts:["1 March","14 April","25 April","1 May"], a:1, tip:"📌 Often tested — Vaisakhi = 14 April = Sikh festival. Founding of the Khalsa by Guru Gobind Singh." },
@@ -936,6 +945,7 @@ const ALL_QUIZ = [
   { q:"Which cricketer captained England and was known for major Test batting and bowling records?", opts:["Ian Botham","Geoff Boycott","Alastair Cook","Ben Stokes"], a:0, tip:"💡 Good to know — Ian Botham was one of England's great all-rounders, with major batting and bowling records." },
   // ── LANDMARKS ───────────────────────────────────────────────
   { q:"What exactly is 'Big Ben'?", opts:["The clock tower","The Elizabeth Tower","The large bell inside the tower","The whole Palace of Westminster"], a:2, tip:"⭐ Exam favourite — Big Ben = THE BELL inside the Elizabeth Tower. NOT the clock or the tower! 🔔" },
+  { q:"What is the name of the tower that contains Big Ben?", opts:["Clock Tower","Victoria Tower","Elizabeth Tower","Westminster Tower"], a:2, tip:"📌 Often tested — The tower is the Elizabeth Tower. Big Ben is only the large bell inside it." },
   { q:"Where is the Giant's Causeway?", opts:["Scotland","Wales","Northern Ireland","Cornwall"], a:2, tip:"⭐ Exam favourite — Giant's Causeway = NE coast of Northern Ireland. Volcanic basalt columns." },
   { q:"England's largest national park is?", opts:["New Forest","Dartmoor","Lake District","Yorkshire Dales"], a:2, tip:"📌 Often tested — Lake District = England's largest national park. Windermere = biggest lake." },
   { q:"Where is Skara Brae?", opts:["Cornwall","Wiltshire","Orkney, Scotland","Wales"], a:2, tip:"💡 Good to know — Skara Brae = Orkney, Scotland = Stone Age village. Older than Stonehenge!" },
@@ -995,6 +1005,7 @@ const ALL_QUIZ = [
   { q:"Rose, Thistle, Daffodil, Shamrock — which is SCOTLAND's flower?", opts:["Rose","Thistle","Daffodil","Shamrock"], a:1, tip:"⭐ Exam favourite — 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Thistle = Scotland. Rose = England 🏴󠁧󠁢󠁥󠁮󠁧󠁿. Daffodil = Wales 🏴󠁧󠁢󠁷󠁬󠁳󠁿. Shamrock = Ireland ☘️." },
   { q:"Edinburgh, Cardiff, Belfast — which has the SCOTTISH Parliament?", opts:["Cardiff","Belfast","Edinburgh","Glasgow"], a:2, tip:"⭐ Exam favourite — Edinburgh = Holyrood (129 MSPs). Cardiff = Senedd (60 SMs). Belfast = Stormont (90 MLAs)." },
   { q:"Council of Europe (47) vs EU (27) — which one CANNOT make laws?", opts:["EU","Council of Europe","Both can make laws","Neither can"], a:1, tip:"📌 Often tested — Council of Europe = 47 countries = created ECHR = CANNOT make laws. EU = CAN make laws." },
+  { q:"Which organisation created the European Convention on Human Rights?", opts:["European Union","United Nations","Council of Europe","Commonwealth"], a:2, tip:"📌 Often tested — The ECHR comes from the Council of Europe, not the EU. This is a major compare trap." },
   { q:"The monarch is head of the Church of England. What about Church of Scotland?", opts:["Also head of it","Has NO special role","Head of it too but different title","Banned from it"], a:1, tip:"⭐ Exam favourite — Monarch = head of Church of England ONLY. Church of Scotland = Presbyterian = no monarch role." },
   { q:"Commonwealth (54) vs EU (27) — which is the UK still a member of?", opts:["EU","Commonwealth","Both","Neither"], a:1, tip:"⭐ Exam favourite — UK left EU in 2020 (Brexit). UK is still in the Commonwealth (54 countries)." },
   // ── INVENTORS (additional) ──────────────────────────────────
@@ -1076,7 +1087,6 @@ const ALL_QUIZ = [
   { q:"Who became James I of England in 1603?", opts:["James VI of Scotland","Charles I","William of Orange","Henry VIII"], a:0, tip:"📌 Often tested — 1603 = Union of Crowns. James VI of Scotland became James I of England." },
   { q:"Which queen came to the throne in 1837 at the age of 18?", opts:["Elizabeth I","Mary I","Queen Victoria","Elizabeth II"], a:2, tip:"📌 Often tested — Queen Victoria became queen in 1837 aged 18 and reigned for nearly 64 years." },
   { q:"Who is remembered for the 1942 report that helped shape the welfare state?", opts:["Clement Attlee","William Beveridge","Aneurin Bevan","Winston Churchill"], a:1, tip:"⭐ Exam favourite — William Beveridge wrote the 1942 report that became a blueprint for the welfare state." },
-  { q:"What is Hansard?", opts:["A court report","The official written record of Parliamentary proceedings","A government department","A police report"], a:1, tip:"📌 Often tested — Hansard is the official written record of what is said in Parliament." },
   { q:"When are Prime Minister's Questions (PMQs) usually held when Parliament is sitting?", opts:["Every Monday","Every Wednesday","Every Thursday","Once a month"], a:1, tip:"💡 Good to know — PMQs usually take place on Wednesday when Parliament is sitting." },
   { q:"In which part of the UK must voters show photo ID at the polling station?", opts:["England","Scotland","Wales","Northern Ireland"], a:3, tip:"📌 Often tested — Photo ID is required at polling stations in Northern Ireland, unlike the rest of the UK handbook wording." },
   { q:"What is the official child-hearing system used in Scotland called?", opts:["Youth Court","Children's Hearing System","Magistrates' Family Court","Sheriff Youth Panel"], a:1, tip:"💡 Good to know — Scotland uses the Children's Hearing System rather than the standard Youth Court model." },
@@ -1090,7 +1100,7 @@ const ALL_QUIZ = [
   { q:"What is the minimum driving age for a car in the UK?", opts:["16","17","18","21"], a:1, tip:"⭐ Exam favourite — Minimum driving age is 17 for a car. A moped can be ridden from 16." },
   { q:"What is the minimum driving age for a moped in the UK?", opts:["15","16","17","18"], a:1, tip:"💡 Good to know — You can ride a moped from age 16, before the car-driving age of 17." },
   { q:"Who is responsible for the economy in the UK government?", opts:["Home Secretary","Foreign Secretary","Chancellor of the Exchequer","Speaker of the House"], a:2, tip:"📌 Often tested — The Chancellor of the Exchequer is responsible for the economy." },
-  { q:"How is the Speaker of the House of Commons chosen?", opts:["Appointed by the monarch","Chosen by secret ballot of MPs","Elected by the public","Appointed by the Prime Minister"], a:1, tip:"💡 Good to know — The Speaker is chosen by secret ballot of MPs and then remains politically neutral." },
+  { q:"Which body can delay bills and ask the government to think again, but usually cannot block a bill forever?", opts:["House of Commons","House of Lords","Supreme Court","Cabinet"], a:1, tip:"💡 Good to know — The House of Lords mainly scrutinises and delays legislation, but the elected House of Commons is stronger." },
 ];
 
 // ── TABS ─────────────────────────────────────────────────────

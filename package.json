@@ -1,12 +1,14 @@
 {
   "name": "life-in-the-uk-test-practice",
-  "version": "1.10.2",
+  "version": "1.10.3",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
     "test:smoke": "node tests/smoke-check.cjs",
-    "test:coverage": "node tests/coverage-audit.cjs"
+    "test:coverage": "node tests/coverage-audit.cjs",
+    "test:regression": "node tests/regression-check.cjs",
+    "test": "npm run test:smoke && npm run test:coverage && npm run test:regression"
   },
   "dependencies": {
     "react": "18.2.0",
