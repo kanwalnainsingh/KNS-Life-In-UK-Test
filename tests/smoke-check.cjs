@@ -26,6 +26,7 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "mock"), "Mock tab missing");
   assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
   assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
+  assert(data.TABS.some((tab) => tab.id === "story"), "Story mode tab missing");
   assert(data.TABS.some((tab) => tab.id === "wars"), "Wars tab missing");
   assert(data.TABS.some((tab) => tab.id === "daily10"), "Daily 10 tab missing");
   assert(data.TABS.some((tab) => tab.id === "sprint"), "Sprint tab missing");
@@ -34,6 +35,7 @@ const assert = (condition, message) => {
   assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
+  assert(/StoryModeTab/.test(appSource), "Story mode UI missing");
   assert(/WarsTab/.test(appSource), "Wars revision UI missing");
   assert(/DailyTenTab/.test(appSource), "Daily 10 UI missing");
   assert(/TrueFalseSprintTab/.test(appSource), "Sprint UI missing");
@@ -42,6 +44,7 @@ const assert = (condition, message) => {
   assert(/MOCK_PAPER_COUNT = 30/.test(appSource), "Expected 30 fixed mock papers");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
   assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
+  assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");
   assert(/Show details/.test(appSource), "Quick revision inline details control missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
   assert(/↻ Latest/.test(appSource), "Latest-version button missing");
