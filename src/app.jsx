@@ -23,6 +23,7 @@ import {
   RELIGIONS,
   SPORTS_FACTS,
   SPORTS_STARS,
+  STORY_CHAPTERS,
   TABS,
   TIMELINE,
   VISUAL_MNEMONICS,
@@ -70,7 +71,6 @@ const SEO_COPY = {
 };
 
 const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "story", "quiz", "mock", "timeline"];
-const PRIMARY_MOBILE_TABS = ["home", "quickrev", "story", "mock", "timeline"];
 const NAV_GROUPS = [
   { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "quickrev", "story", "daily10", "sprint", "mock", "cram", "tracker", "quiz", "rapidfire", "revise"] },
   { title: "History & Society", hint: "Timeline, wars, nations, law, traps, landmarks", ids: ["timeline", "wars", "nations", "quickfacts", "confuse", "landmarks", "international"] },
@@ -285,165 +285,6 @@ const buildComparisonContext = (item) => {
   const left = item.left.points.slice(0, 2).join(" ");
   const right = item.right.points.slice(0, 2).join(" ");
   return `${left} ${right}`;
-};
-
-const pickStoryLandmark = (namePattern) =>
-  LANDMARKS.find((item) => new RegExp(namePattern, "i").test(item.name));
-
-const buildStoryChapters = () => {
-  const chapter = (id, title, icon, color, intro, items, tab) => ({ id, title, icon, color, intro, items, tab });
-  const byYear = (value) => TIMELINE.find((item) => item.year === value);
-  const allFigures = [...KEY_FIGURES, ...EXTRA_KEY_FIGURES];
-  const byFigure = (namePattern) => allFigures.find((item) => new RegExp(namePattern, "i").test(item.name));
-  const byOrg = (namePattern) => INT_ORGS.find((item) => new RegExp(namePattern, "i").test(item.name));
-  const byBattle = (namePattern) => BATTLES_AND_WARS.find((item) => new RegExp(namePattern, "i").test(item.name));
-  const nation = (name) => NATIONS.find((item) => item.name === name);
-  const sportFact = (namePattern) => SPORTS_FACTS.find((item) => new RegExp(namePattern, "i").test(item.name));
-  const sportStar = (namePattern) => SPORTS_STARS.find((item) => new RegExp(namePattern, "i").test(item.name));
-  const inventor = (namePattern) => INVENTORS.find((item) => new RegExp(namePattern, "i").test(item.who));
-  const artPool = Object.values(ARTS).flat();
-  const art = (namePattern) => artPool.find((item) => new RegExp(namePattern, "i").test(item.who));
-  const religion = (namePattern) => RELIGIONS.find((item) => new RegExp(namePattern, "i").test(item.faith));
-  const festival = (namePattern) => FESTIVALS.find((item) => new RegExp(namePattern, "i").test(item.name));
-  const quickSection = (namePattern) => QUICK_FACTS.find((item) => new RegExp(namePattern, "i").test(item.cat));
-
-  return [
-    chapter(
-      "britain-begins",
-      "Chapter 1: Britain Begins",
-      "🌊",
-      "#0ea5e9",
-      "Start with the shape of Britain itself, then anchor the first invaders and the first major dates that show up again and again in the test.",
-      [
-        { title: "Island Britain", fact: byYear("~10,000 BC").event, context: "Britain becomes an island after sea levels rise. This sets up all later history and geography questions.", memory: byYear("~10,000 BC").memory },
-        { title: "Romans arrive", fact: byYear("43 AD").event, context: "This is the successful Roman invasion date. Do not mix it up with Julius Caesar's failed attempt in 55 BC.", memory: byYear("43 AD").memory },
-        { title: "Roman frontier", fact: byYear("122 AD").event, context: "Hadrian's Wall is a favourite location question and a clean Roman anchor for northern England.", memory: byYear("122 AD").memory },
-        { title: "Christian England grows", fact: byYear("597 AD").event, context: "St Augustine links early English Christianity with Kent and Anglo-Saxon England.", memory: byYear("597 AD").memory },
-        { title: "United England", fact: byYear("927 AD").event, context: "Athelstan matters because he is remembered as the first king of a united England.", memory: byYear("927 AD").memory },
-      ],
-      "timeline"
-    ),
-    chapter(
-      "conquest-crown-law",
-      "Chapter 2: Conquest, Crown and Law",
-      "👑",
-      "#f97316",
-      "The test often jumps from 1066 into Parliament, Magna Carta, the Reformation, and the Union dates. This chapter gives that spine in order.",
-      [
-        { title: "Norman Conquest", fact: byYear("1066").event, context: "1066 is one of the most tested dates in the whole course. It is also the last successful invasion of England.", memory: byYear("1066").memory },
-        { title: "Nobody above the law", fact: byYear("1215").event, context: "Magna Carta is a law-and-rights anchor. It connects medieval history to modern democracy questions.", memory: byYear("1215").memory },
-        { title: "Church of England", fact: byYear("1534").event, context: "Henry VIII and the break from Rome are central because they affect monarchy, religion, and later national identity.", memory: byYear("1534").memory },
-        { title: "Crowns then union", fact: `${byYear("1603").event} ${byYear("1707").event}`, context: "Keep 1603 and 1707 separate. First the crowns share one monarch, then the parliaments unite.", memory: `${byYear("1603").memory} ${byYear("1707").memory}` },
-        { title: "Parliament grows stronger", fact: `${byYear("1688").event} ${byYear("1689").event}`, context: "These dates explain why the UK is a constitutional monarchy rather than rule by the monarch alone.", memory: `${byYear("1688").memory} ${byYear("1689").memory}` },
-      ],
-      "quickfacts"
-    ),
-    chapter(
-      "nations-symbols-places",
-      "Chapter 3: Nations, Symbols and Places",
-      "🗺️",
-      "#22c55e",
-      "When nation questions appear, they are usually fast marks: capital, saint, flower, parliament, symbol, or landmark.",
-      [
-        { title: "England", fact: `${nation("England").capital} · ${nation("England").saint} · ${nation("England").flower}`, context: "England has no separate parliament. That is one of the easiest marks to miss if you rush.", memory: nation("England").tricks.join(" ") },
-        { title: "Scotland", fact: `${nation("Scotland").capital} · ${nation("Scotland").saint} · ${nation("Scotland").parliament}`, context: "Remember Holyrood and the Church of Scotland. Scotland also uses Highers rather than A-levels.", memory: nation("Scotland").tricks.join(" ") },
-        { title: "Wales and Northern Ireland", fact: `${nation("Wales").capital} · ${nation("Wales").lang}. ${nation("Northern Ireland").capital} · ${nation("Northern Ireland").parliament}`, context: "Wales is linked with the Welsh language and the Senedd. Northern Ireland links to Stormont and the Good Friday Agreement context.", memory: `${nation("Wales").tricks.join(" ")} ${nation("Northern Ireland").tricks.join(" ")}` },
-        { title: "Union Jack and anthem", fact: `${ANTHEM.title}. The Union Jack combines the crosses of St George, St Andrew and St Patrick.`, context: "Questions here are short and direct: anthem wording, the crosses in the flag, and why Wales is not represented separately.", memory: ANTHEM.memory },
-        { title: "Landmark anchors", fact: `${pickStoryLandmark("Big Ben|Elizabeth Tower").fact} ${pickStoryLandmark("Hadrian's Wall").fact}`, context: "Big Ben vs Elizabeth Tower is a classic trap. Hadrian's Wall is the clean Roman landmark.", memory: `${pickStoryLandmark("Big Ben|Elizabeth Tower").memory} ${pickStoryLandmark("Hadrian's Wall").memory}` },
-      ],
-      "nations"
-    ),
-    chapter(
-      "rights-duties-everyday",
-      "Chapter 4: Rights, Duties and Everyday Life",
-      "⚖️",
-      "#3b82f6",
-      "A big part of the test is modern civic life: Parliament, voting, law, tax, jury service, driving ages, and what citizens are expected to do.",
-      [
-        { title: "Parliament basics", fact: quickSection("Government").facts.slice(0, 3).join(" "), context: "Know Commons versus Lords, the 650 MPs, and the Speaker. These are repeated across quiz and mock papers.", memory: "Commons elected, Lords appointed, Speaker neutral." },
-        { title: "Voting and democracy", fact: quickSection("Government").facts.slice(3, 7).join(" "), context: "These are practical test facts. The exam often checks who can vote, the voting age, and election structure.", memory: "1918 partial, 1928 equal, 1969 age 18." },
-        { title: "Law and public duty", fact: quickSection("Law").facts.slice(0, 3).join(" "), context: "Rule of law, jury service, and obeying the law are all central to Life in the UK questions.", memory: "Nobody above the law. Jury service is a public duty." },
-        { title: "Daily life facts", fact: quickSection("Rights").facts.slice(0, 4).join(" "), context: "These questions feel simple but are easy to drop under pressure, especially emergency numbers and driving ages.", memory: "999 and 112 emergency. 101 is not." },
-        { title: "Education and contribution", fact: `${quickSection("Rights").facts.slice(8, 11).join(" ")} ${quickSection("Currency").facts.slice(3, 6).join(" ")}`, context: "Education, National Insurance, and tax sit in the everyday citizenship part of the syllabus.", memory: "School 5 to 16, training to 18, NI helps fund services." },
-      ],
-      "quickfacts"
-    ),
-    chapter(
-      "faith-community",
-      "Chapter 5: Faith and Community",
-      "⛪",
-      "#a855f7",
-      "Religion questions are usually fast recall. Learn the 2011 census anchor, the main Christian festivals, and a few non-Christian festival clues.",
-      [
-        { title: "2011 census anchor", fact: `${religion("Christian").pct} Christian. ${religion("No religion").pct} no religion. ${religion("Muslim").pct} Muslim.`, context: "The test expects the headline figures rather than deep theology. Christianity is the largest group, with a significant non-religious population too.", memory: religion("Christian").note },
-        { title: "Main Christian festivals", fact: `${festival("Christmas").detail} ${festival("Easter").detail}`, context: "Christmas and Easter are the core Christian festival facts. Boxing Day also appears in the wider revision content.", memory: "Christmas = birth of Jesus. Easter = death and resurrection." },
-        { title: "Major non-Christian festivals", fact: `${festival("Diwali").detail} ${festival("Vaisakhi").detail}`, context: "These are not random extras. They appear because the test covers modern British society and shared public life.", memory: "Diwali = lights. Vaisakhi = Khalsa, 14 April." },
-        { title: "Eid and Hanukkah", fact: `${festival("Eid al-Fitr").detail} ${festival("Hanukkah").detail}`, context: "Eid al-Fitr ends Ramadan. Hanukkah is the Jewish festival of lights. Short clue recall is enough.", memory: "Eid al-Fitr ends Ramadan. Hanukkah lasts 8 days." },
-        { title: "Community life", fact: quickSection("Community").facts.slice(0, 3).join(" "), context: "Respect, volunteering, and participation matter because the test is about how people live together in the UK now.", memory: "Rights come with duties and respect for others." },
-      ],
-      "religion"
-    ),
-    chapter(
-      "people-who-shaped-britain",
-      "Chapter 6: People Who Shaped Britain",
-      "👥",
-      "#ef4444",
-      "People are easier to remember when you attach each one to one clear thing: conquest, law, welfare, science, votes, or war.",
-      [
-        { title: "William and John", fact: `${byFigure("William the Conqueror").facts[0]} ${byFigure("King John").facts[0]}`, context: "William the Conqueror anchors 1066. King John anchors Magna Carta. Those two names unlock several history questions.", memory: `${FIGURE_MEMORY["William the Conqueror"]} ${FIGURE_MEMORY["King John"]}` },
-        { title: "Elizabeth I and Churchill", fact: `${byFigure("Elizabeth I").facts[0]} ${byFigure("Winston Churchill").facts[0]}`, context: "Elizabeth I links to the Armada. Churchill links to WWII. Both are major historical leadership anchors.", memory: `${FIGURE_MEMORY["Elizabeth I"]} ${FIGURE_MEMORY["Winston Churchill"]}` },
-        { title: "Votes and welfare", fact: `${byFigure("Emmeline Pankhurst").facts[1]} ${byFigure("Aneurin").facts[0]}`, context: "Pankhurst connects to women's suffrage. Bevan connects to the NHS in 1948.", memory: `${FIGURE_MEMORY["Emmeline Pankhurst"]} ${FIGURE_MEMORY["Aneurin (Nye) Bevan"]}` },
-        { title: "Science and invention", fact: `${inventor("Tim Berners-Lee").what} ${inventor("Alexander Fleming").what}`, context: "Science names often appear as quick one-line questions rather than long explanations.", memory: `${inventor("Tim Berners-Lee").memory} ${inventor("Alexander Fleming").memory}` },
-        { title: "Modern society voices", fact: `${byFigure("William Beveridge").facts[0]} ${byFigure("Margaret Thatcher").facts[1]}`, context: "Beveridge matters for the welfare-state story. Thatcher matters as the first woman Prime Minister.", memory: `${FIGURE_MEMORY["William Beveridge"]} ${FIGURE_MEMORY["Margaret Thatcher"]}` },
-      ],
-      "figures"
-    ),
-    chapter(
-      "culture-sport-arts",
-      "Chapter 7: Culture, Sport and the Things Britain Is Known For",
-      "🎭",
-      "#06b6d4",
-      "These questions are usually short and factual. The easiest method is one event or one achievement per name.",
-      [
-        { title: "Sport anchors", fact: `${sportFact("Wimbledon").fact} ${sportFact("FA Cup").fact}`, context: "Wimbledon and the FA Cup are classic handbook facts because they are old, famous, and easy to test in one line.", memory: `${sportFact("Wimbledon").memory} ${sportFact("FA Cup").memory}` },
-        { title: "Sport stars", fact: `${sportStar("Mo Farah").achievement} ${sportStar("Andy Murray").achievement}`, context: "Use one sport plus one achievement. That is usually enough for exam recall.", memory: `${sportStar("Mo Farah").memory} ${sportStar("Andy Murray").memory}` },
-        { title: "Writers and stage", fact: `${art("William Shakespeare").what} ${art("Laurence Olivier").what}`, context: "Arts questions are not deep literature questions. They are name-recognition anchors.", memory: `${art("William Shakespeare").mem} ${art("Laurence Olivier").mem}` },
-        { title: "Music and design", fact: `${art("The Beatles").what} ${art("Alexander McQueen").what}`, context: "Mix one music clue with one design clue and the answers become easier to separate.", memory: `${art("The Beatles").mem} ${art("Alexander McQueen").mem}` },
-        { title: "National memory strip", fact: VISUAL_MNEMONICS.slice(0, 2).map((item) => `${item.code}: ${item.clue}`).join(" "), context: "These compressed codes are useful right before mocks or when revising on the phone in short bursts.", memory: VISUAL_MNEMONICS.slice(0, 2).map((item) => item.visual).join(" ") },
-      ],
-      "arts"
-    ),
-    chapter(
-      "wars-modern-britain",
-      "Chapter 8: Wars and Modern Britain",
-      "⚔️",
-      "#f59e0b",
-      "Finish with the battle and war anchors that commonly appear in the test, especially the clean WWII distinctions people often mix up.",
-      [
-        { title: "Sea and land anchors", fact: `${byBattle("Trafalgar").fact} ${byBattle("Waterloo").fact}`, context: "Trafalgar links to Nelson and the sea. Waterloo links to Wellington and Napoleon on land.", memory: `${byBattle("Trafalgar").memory} ${byBattle("Waterloo").memory}` },
-        { title: "World War I", fact: byBattle("^World War I$").fact, context: "Use WWI for dates, trench-era memory, and the Armistice connection to 11 November 1918.", memory: byBattle("^World War I$").memory },
-        { title: "World War II", fact: byBattle("^World War II$").fact, context: "Churchill in the war years and Attlee after the war are the clean political anchors to keep in mind.", memory: byBattle("^World War II$").memory },
-        { title: "Battle of Britain vs Blitz", fact: `${byBattle("Battle of Britain").fact} ${byBattle("Blitz").fact}`, context: "The Battle of Britain is an air battle. The Blitz is a bombing campaign on cities. That distinction matters.", memory: `${byBattle("Battle of Britain").memory} ${byBattle("Blitz").memory}` },
-        { title: "Dunkirk and D-Day", fact: `${byBattle("Dunkirk").fact} ${byBattle("D-Day").fact}`, context: "Dunkirk is evacuation; D-Day is the Allied landing in Normandy in 1944. Those are different moments in the war.", memory: `${byBattle("Dunkirk").memory} ${byBattle("D-Day").memory}` },
-      ],
-      "wars"
-    ),
-    chapter(
-      "world-stage",
-      "Chapter 9: Britain in the World",
-      "🌍",
-      "#14b8a6",
-      "The international questions are mostly about not mixing organisations up. Treat them as compare traps with one clear purpose each.",
-      [
-        { title: "United Nations", fact: byOrg("United Nations").fact, context: "The UN is the broad global body. In the test, it is often contrasted with NATO or the Commonwealth.", memory: byOrg("United Nations").memory },
-        { title: "NATO", fact: byOrg("NATO").fact, context: "NATO is the military alliance. That is the fastest way to separate it from the other organisations.", memory: byOrg("NATO").memory },
-        { title: "Commonwealth", fact: byOrg("Commonwealth").fact, context: "The Commonwealth is a voluntary association, not a military alliance and not a rights court.", memory: byOrg("Commonwealth").memory },
-        { title: "Council of Europe", fact: byOrg("Council of Europe").fact, context: "This is a major trap because it is separate from the EU and linked to human rights.", memory: byOrg("Council of Europe").memory },
-        { title: "Final compare clue", fact: "UN = global body. NATO = military alliance. Commonwealth = voluntary association. Council of Europe = human-rights body.", context: "If you remember just those four labels, you can answer most world-organisation questions correctly.", memory: "UN, NATO, Commonwealth, Council of Europe: each has a different job." },
-      ],
-      "international"
-    ),
-  ];
 };
 
 const buildQuickRevisionDeck = () => {
@@ -1195,7 +1036,7 @@ const buildMockCategoryBreakdown = (questions, answers) =>
     .filter((row) => row.total > 0);
 
 // ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel }) => {
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel, isMobile }) => {
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === "Escape") setMenuOpen(false);
@@ -1209,11 +1050,19 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
+  const handleMenuButton = () => {
+    if (isMobile) {
+      openQuickPanel();
+      return;
+    }
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <>
       <div style={{ borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px" }}>
-        <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
+        <button aria-label={isMobile ? "Open quick panel" : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={handleMenuButton} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
           ☰
         </button>
         <button aria-label="Go to home" className="focus-ring" onClick={() => setActive("home")} style={{ background: "none", border: "none", color: "#60a5fa", fontWeight: 800, fontSize: 18, cursor: "pointer", padding: 0 }}>
@@ -1227,9 +1076,6 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
           <button aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} className="focus-ring" onClick={toggleDark} title={isDark ? "Switch to light mode" : "Switch to dark mode"}
             style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
             {isDark ? "☀️" : "🌙"}
-          </button>
-          <button aria-label="Open quick panel" className="focus-ring mobile-only" onClick={openQuickPanel} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
-            ⋯
           </button>
         </div>
         </div>
@@ -1279,23 +1125,8 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
             </div>
           ))}
         </div>
-        <div className="mobile-primary-strip mobile-only noscroll">
-          {TABS.filter((tab) => PRIMARY_MOBILE_TABS.includes(tab.id)).map((tab) => (
-            <button
-              key={tab.id}
-              className="focus-ring mobile-primary-chip"
-              onClick={() => setActive(tab.id)}
-              data-active={active === tab.id ? "true" : "false"}
-            >
-              {tab.icon} {tab.label}
-            </button>
-          ))}
-          <button className="focus-ring mobile-primary-chip" onClick={openQuickPanel}>
-            ☰ Topics
-          </button>
-        </div>
       </div>
-      {menuOpen && (
+      {!isMobile && menuOpen && (
         <div role="dialog" aria-modal="true" aria-label="Topics menu" style={{ position: "fixed", inset: 0, background: "#020617cc", zIndex: 200 }} onClick={() => setMenuOpen(false)}>
           <div style={{ background: "var(--card-bg)", width: 340, maxWidth: "86vw", height: "100%", overflowY: "auto", padding: 18, borderRight: "1px solid var(--card-border)" }} onClick={(e) => e.stopPropagation()}>
             <div style={{ color: "#60a5fa", fontWeight: 800, marginBottom: 6, fontSize: 18 }}>🇬🇧 Study navigation</div>
@@ -1923,9 +1754,11 @@ const QuickRevisionTab = ({ setActive }) => {
 };
 
 const StoryModeTab = ({ setActive }) => {
-  const chapters = useMemo(() => buildStoryChapters(), []);
+  const chapters = useMemo(() => STORY_CHAPTERS, []);
   const [chapterIndex, setChapterIndex] = useState(0);
   const current = chapters[chapterIndex];
+
+  if (!current) return null;
 
   return (
     <div style={{ padding: 20 }}>
@@ -3990,7 +3823,7 @@ const App = () => {
 
   return (
     <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 112 : 12 }}>
-      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} />
+      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} isMobile={isMobile} />
       <div className="tabcontent">{renderTab()}</div>
       <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />
       <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>

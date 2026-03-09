@@ -23,6 +23,7 @@ const assert = (condition, message) => {
   assert(Array.isArray(data.CONFUSABLES) && data.CONFUSABLES.length >= 6, "Expected confusion pairs");
   assert(Array.isArray(data.TABS) && data.TABS.length >= 16, "Expected expanded tab list");
   assert(Array.isArray(data.VISUAL_MNEMONICS) && data.VISUAL_MNEMONICS.length >= 4, "Expected mnemonic packs");
+  assert(Array.isArray(data.STORY_CHAPTERS) && data.STORY_CHAPTERS.length >= 6, "Expected stable story chapters");
   assert(data.TABS.some((tab) => tab.id === "mock"), "Mock tab missing");
   assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
   assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
@@ -36,6 +37,7 @@ const assert = (condition, message) => {
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
   assert(/StoryModeTab/.test(appSource), "Story mode UI missing");
+  assert(/STORY_CHAPTERS/.test(appSource), "Story mode should use stable chapter data");
   assert(/WarsTab/.test(appSource), "Wars revision UI missing");
   assert(/DailyTenTab/.test(appSource), "Daily 10 UI missing");
   assert(/TrueFalseSprintTab/.test(appSource), "Sprint UI missing");
@@ -57,7 +59,6 @@ const assert = (condition, message) => {
   assert(/mobile-bottom-nav/.test(indexSource), "Mobile bottom nav styling missing");
   assert(/BottomNav/.test(appSource), "Bottom navigation component missing");
   assert(/MobileQuickPanel/.test(appSource), "Quick panel component missing");
-  assert(/mobile-primary-strip/.test(indexSource), "Mobile primary strip styling missing");
   assert(/desktop-nav-panel/.test(indexSource), "Desktop grouped navigation styling missing");
   assert(/AppFooterBar/.test(appSource), "Footer version bar missing");
   assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");
@@ -80,6 +81,17 @@ const assert = (condition, message) => {
     assert(pair.left && pair.right, `Confusion pair ${index + 1} missing sides`);
     assert(Array.isArray(pair.left.points) && pair.left.points.length >= 3, `Confusion pair ${index + 1} left side incomplete`);
     assert(Array.isArray(pair.right.points) && pair.right.points.length >= 3, `Confusion pair ${index + 1} right side incomplete`);
+  });
+
+  data.STORY_CHAPTERS.forEach((chapter, index) => {
+    assert(typeof chapter.title === "string" && chapter.title.length > 8, `Story chapter ${index + 1} title invalid`);
+    assert(Array.isArray(chapter.items) && chapter.items.length >= 4, `Story chapter ${index + 1} needs multiple cards`);
+    chapter.items.forEach((item, itemIndex) => {
+      assert(typeof item.title === "string" && item.title.length > 3, `Story chapter ${index + 1} item ${itemIndex + 1} title invalid`);
+      assert(typeof item.fact === "string" && item.fact.length > 8, `Story chapter ${index + 1} item ${itemIndex + 1} fact invalid`);
+      assert(typeof item.context === "string" && item.context.length > 8, `Story chapter ${index + 1} item ${itemIndex + 1} context invalid`);
+      assert(typeof item.memory === "string" && item.memory.length > 4, `Story chapter ${index + 1} item ${itemIndex + 1} memory invalid`);
+    });
   });
 
   console.log("Smoke check passed:");
