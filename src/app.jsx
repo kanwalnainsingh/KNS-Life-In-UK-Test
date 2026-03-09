@@ -547,49 +547,87 @@ const QuizTab = () => {
   const [count, setCount] = useState(24);
   const [questions, setQuestions] = useState([]);
   const [reviewMode, setReviewMode] = useState(false);
+  const [filter, setFilter] = useState("all");
+  const advanceRef = useRef(null);
+  const { useEffect } = React;
   const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+  const FILTERS = [
+    { id:"all", label:"All Topics", icon:"🎯" },
+    { id:"star", label:"Exam Favourites", icon:"⭐" },
+    { id:"pin", label:"Often Tested", icon:"📌" },
+    { id:"bulb", label:"Good to Know", icon:"💡" },
+  ];
+  const filterQuestions = () => {
+    if (filter === "all") return ALL_QUIZ;
+    const prefix = { star:"⭐", pin:"📌", bulb:"💡" }[filter];
+    return ALL_QUIZ.filter(q => q.tip.startsWith(prefix));
+  };
   const startQuiz = () => {
-    setQuestions(shuffle(ALL_QUIZ).slice(0, count));
+    const pool = filterQuestions();
+    const n = Math.min(count, pool.length);
+    setQuestions(shuffle(pool).slice(0, n));
     setCurrent(0); setSelected(null); setConfirmed(false);
     setScore(0); setWrong([]); setFinished(false); setReviewMode(false);
     setStarted(true);
   };
-  const confirmAnswer = () => {
-    if (selected === null) return;
-    setConfirmed(true);
-    if (selected === questions[current].a) setScore(s => s + 1);
-    else setWrong(w => [...w, { ...questions[current], chosen: selected }]);
+  const handleSelect = (oi) => {
+    if (confirmed) return;
+    setSelected(oi); setConfirmed(true);
+    if (oi === questions[current].a) setScore(s => s + 1);
+    else setWrong(w => [...w, { ...questions[current], chosen: oi }]);
+    if (advanceRef.current) clearTimeout(advanceRef.current);
+    advanceRef.current = setTimeout(() => {
+      if (current + 1 >= questions.length) { setFinished(true); return; }
+      setCurrent(c => c + 1); setSelected(null); setConfirmed(false);
+    }, 1500);
   };
-  const nextQ = () => {
+  useEffect(() => { return () => { if (advanceRef.current) clearTimeout(advanceRef.current); }; }, []);
+  const skipToNext = () => {
+    if (advanceRef.current) clearTimeout(advanceRef.current);
     if (current + 1 >= questions.length) { setFinished(true); return; }
     setCurrent(c => c + 1); setSelected(null); setConfirmed(false);
   };
 
-  if (!started) return (
-    <div style={{ padding: 20 }}>
-      <SectionTitle icon="🧠">Quiz Me!</SectionTitle>
-      <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", textAlign: "center" }}>
-        <div style={{ fontSize: 48, marginBottom: 12 }}>🎯</div>
-        <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Test your knowledge!</div>
-        <div style={{ color: "#9ca3af", fontSize: 14, marginBottom: 20 }}>{ALL_QUIZ.length} questions available</div>
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ color: "#9ca3af", fontSize: 13, marginBottom: 10 }}>How many questions?</div>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            {[10, 24, 50, ALL_QUIZ.length].map(n => (
-              <button key={n} onClick={() => setCount(n)}
-                style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid", cursor: "pointer",
-                  background: count === n ? "#3b82f6" : "#1f2937", borderColor: count === n ? "#3b82f6" : "#374151", color: "var(--text-strong)", fontSize: 14 }}>
-                {n === ALL_QUIZ.length ? `All (${n})` : n}
-              </button>
-            ))}
+  if (!started) {
+    const pool = filterQuestions();
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="🧠">Quiz Me!</SectionTitle>
+        <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>🎯</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Test your knowledge!</div>
+          <div style={{ color: "#9ca3af", fontSize: 14, marginBottom: 20 }}>{pool.length} questions available</div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ color: "#9ca3af", fontSize: 13, marginBottom: 10 }}>Filter by frequency</div>
+            <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
+              {FILTERS.map(f => (
+                <button key={f.id} onClick={() => setFilter(f.id)}
+                  style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid", cursor: "pointer", fontSize: 13,
+                    background: filter === f.id ? "#3b82f6" : "#1f2937", borderColor: filter === f.id ? "#3b82f6" : "#374151", color: "var(--text-strong)" }}>
+                  {f.icon} {f.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-        <button onClick={startQuiz} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
-          Start Quiz →
-        </button>
-      </Card>
-    </div>
-  );
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ color: "#9ca3af", fontSize: 13, marginBottom: 10 }}>How many questions?</div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+              {[10, 24, 50, pool.length].map(n => (
+                <button key={n} onClick={() => setCount(n)}
+                  style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid", cursor: "pointer",
+                    background: count === n ? "#3b82f6" : "#1f2937", borderColor: count === n ? "#3b82f6" : "#374151", color: "var(--text-strong)", fontSize: 14 }}>
+                  {n === pool.length ? `All (${n})` : n}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button onClick={startQuiz} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+            Start Quiz →
+          </button>
+        </Card>
+      </div>
+    );
+  }
 
   if (finished) {
     const pct = Math.round((score / questions.length) * 100);
@@ -634,13 +672,14 @@ const QuizTab = () => {
       </Card>
       <div style={{ display: "grid", gap: 8, marginBottom: 16 }}>
         {q.opts.map((opt, oi) => {
-          let bg = "#111827", border = "#374151", color = "#d1d5db";
+          let bg = "#111827", border = "#374151", color = "var(--text)";
           if (confirmed) {
             if (oi === q.a) { bg = "#0f1f0f"; border = "#22c55e"; color = "#4ade80"; }
             else if (oi === selected && oi !== q.a) { bg = "#1a0a0a"; border = "#ef4444"; color = "#f87171"; }
-          } else if (selected === oi) { bg = "#1e3a5f"; border = "#3b82f6"; color = "#60a5fa"; }
+            else { bg = "#111827"; border = "#374151"; color = "var(--text-muted)"; }
+          }
           return (
-            <button key={oi} onClick={() => !confirmed && setSelected(oi)}
+            <button key={oi} onClick={() => handleSelect(oi)}
               style={{ padding: "14px 16px", borderRadius: 10, border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer",
                 background: bg, color, textAlign: "left", fontSize: 14, transition: "all 0.15s" }}>
               <span style={{ marginRight: 8, opacity: 0.6 }}>{["A","B","C","D"][oi]}.</span>{opt}
@@ -650,21 +689,15 @@ const QuizTab = () => {
           );
         })}
       </div>
-      {confirmed && <MemoryHook text={q.tip} />}
-      <div style={{ marginTop: 16 }}>
-        {!confirmed ? (
-          <button onClick={confirmAnswer} disabled={selected === null}
-            style={{ width: "100%", padding: "14px", borderRadius: 10, background: selected === null ? "#374151" : "#3b82f6",
-              color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: selected === null ? "not-allowed" : "pointer" }}>
-            Confirm Answer
+      {confirmed && (
+        <>
+          <MemoryHook text={q.tip} />
+          <button onClick={skipToNext}
+            style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 10, background: "#22c55e22", color: "#4ade80", border: "1px solid #22c55e44", fontSize: 14, cursor: "pointer" }}>
+            {current+1 < questions.length ? "Next →" : "See Results 🎯"}
           </button>
-        ) : (
-          <button onClick={nextQ}
-            style={{ width: "100%", padding: "14px", borderRadius: 10, background: "#22c55e", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-            {current+1 < questions.length ? "Next Question →" : "See Results 🎯"}
-          </button>
-        )}
-      </div>
+        </>
+      )}
     </div>
   );
 };
