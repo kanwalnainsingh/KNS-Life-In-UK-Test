@@ -41,6 +41,12 @@ Current validated quiz bank: `223` questions.
 
 ## Screenshots
 
+Mobile view:
+
+<p align="center">
+  <img src="screenshots/mobile-guide.png" width="32%" alt="Mobile home and revision hub" />
+</p>
+
 <p align="center">
   <img src="screenshots/home-light.png" width="48%" alt="Home and revision hub" />
   &nbsp;
