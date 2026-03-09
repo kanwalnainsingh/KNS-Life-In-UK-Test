@@ -240,6 +240,18 @@ const CONFUSABLES = [
     left:{ label:"ENGLAND + SCOTLAND", color:"#2563eb", points:["St George = 23 April = England","St Andrew = 30 November = Scotland","Rose = England","Thistle = Scotland"] },
     right:{ label:"WALES + N. IRELAND", color:"#16a34a", points:["St David = 1 March = Wales","St Patrick = 17 March = N. Ireland","Daffodil / leek = Wales","Shamrock = N. Ireland"] },
     memory:"Date order helps: 1 Mar David, 17 Mar Patrick, 23 Apr George, 30 Nov Andrew.", alert:"These questions often mix saints, dates, flowers, and nations in one multiple-choice item." },
+  { title:"Emergency numbers vs non-emergency police", icon:"☎️",
+    left:{ label:"EMERGENCY", color:"#22c55e", points:["999 = emergency services","112 also works","Use for urgent police, fire or ambulance","Immediate danger or urgent help"] },
+    right:{ label:"NON-EMERGENCY POLICE", color:"#f97316", points:["101 = non-emergency police","Not for immediate danger","Used for less urgent reporting","Do not confuse with 999/112"] },
+    memory:"999 and 112 = urgent. 101 = police, but not urgent.", alert:"If the question asks for emergency services, the safe answer is 999 or 112, not 101." },
+  { title:"Commonwealth & Irish voting rights vs EU citizens", icon:"🗳️",
+    left:{ label:"UK / COMMONWEALTH / IRISH", color:"#22c55e", points:["Can vote in all elections if living in the UK","Includes general elections","Grouped together in handbook-style questions","Common citizenship fact"] },
+    right:{ label:"EU CITIZENS", color:"#3b82f6", points:["Can vote in local elections","Cannot vote in UK general elections","Different from Commonwealth and Irish citizens","Easy exam mix-up"] },
+    memory:"All elections = UK, Commonwealth, Irish. Local only = EU citizens.", alert:"The trap is assuming all residents can vote in general elections. They cannot." },
+  { title:"Highers vs A-levels", icon:"🎓",
+    left:{ label:"HIGHERS", color:"#3b82f6", points:["Used in Scotland","Not the same name as A-levels","Linked with the Scottish education system","Good 4 nations compare point"] },
+    right:{ label:"A-LEVELS", color:"#f97316", points:["Used in England, Wales and Northern Ireland","Taken after GCSEs","Part of the non-Scottish school route","Easy compare with Highers"] },
+    memory:"Scotland = Highers. Elsewhere = A-levels.", alert:"If the question asks what Scotland uses instead of A-levels, answer Highers." },
 ];
 
 // ── RELIGION & FESTIVALS ─────────────────────────────────────

@@ -1695,7 +1695,7 @@ const InventorsTab = () => {
 // ── SPORTS ───────────────────────────────────────────────────
 const SportsTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="🏅">British Sports Stars</SectionTitle>
+    <SectionTitle icon="🏅" meta="Use a few anchor names and dates rather than trying to memorise every sporting detail.">British Sports Stars</SectionTitle>
     <Card style={{ background: "#0f1f0f", border: "1px solid #166534", marginBottom: 16 }}>
       <div style={{ fontWeight: 800, color: "#4ade80", marginBottom: 8 }}>🏟️ Olympics Key Facts</div>
       <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.8 }}>
@@ -1704,6 +1704,16 @@ const SportsTab = () => (
         • Scotland has 5 ski resorts
       </div>
       <MemoryHook text="Three times: 1908, 1948, 2012." />
+    </Card>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Quick sports recall</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `Mo Farah` = double long-distance Olympic gold in 2012<br />
+        • `Jessica Ennis-Hill` = heptathlon gold in London 2012<br />
+        • `Andy Murray` = first British men's Wimbledon winner in 77 years (2013)<br />
+        • `Bradley Wiggins` = first British Tour de France winner (2012)
+      </div>
+      <MemoryHook text="2012 Olympics is the easiest sports memory spine: Farah, Ennis-Hill, Wiggins, then Murray in 2013." />
     </Card>
     {SPORTS_STARS.map((s, i) => (
       <Card key={i}>
@@ -1789,6 +1799,17 @@ const FiguresTab = () => {
           ))}
         </div>
       </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Figure date anchors</div>
+        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+          • `1066` William the Conqueror<br />
+          • `1215` King John and Magna Carta<br />
+          • `1534` Henry VIII and Church of England<br />
+          • `1918 / 1928` Emmeline Pankhurst and votes for women<br />
+          • `1942 / 1948` Beveridge and Bevan
+        </div>
+        <MemoryHook text="Link people to dates, not just names. Date-linked people are much easier to recall in mocks." />
+      </Card>
       {figures.map((f) => (
         <Card key={f.name} style={{ border: `1px solid ${f.color}33` }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
@@ -1813,7 +1834,7 @@ const FiguresTab = () => {
 // ── RELIGION ─────────────────────────────────────────────────
 const ReligionTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="⛪">Religion & Festivals</SectionTitle>
+    <SectionTitle icon="⛪" meta="This section is mostly short factual recall: census proportions, major Christian dates, and key non-Christian festivals.">Religion & Festivals</SectionTitle>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>📊 2011 Census — Religious Identity</div>
       {RELIGIONS.map((r) => (
@@ -1828,6 +1849,17 @@ const ReligionTab = () => (
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, lineHeight: 1.5 }}>{r.note}</div>
         </div>
       ))}
+    </Card>
+    <Card style={{ background: "color-mix(in srgb, #f59e0b 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Festival memory clues</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `Christmas` and `Easter` are the main Christian festivals<br />
+        • `Diwali` = festival of lights<br />
+        • `Vaisakhi` = Sikh New Year / Khalsa<br />
+        • `Hanukkah` = Jewish festival of lights<br />
+        • `Eid al-Fitr` ends Ramadan
+      </div>
+      <MemoryHook text="If a festival name appears in a question, first identify the faith, then the key clue or season." />
     </Card>
     {FESTIVALS.map((f, i) => (
       <Card key={i}>
@@ -1846,6 +1878,17 @@ const ReligionTab = () => (
 const LandmarksTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🏛️" meta="Use location + one distinctive clue for each landmark.">Landmarks & Places</SectionTitle>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Landmark anchor clues</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `Big Ben` = bell, not tower<br />
+        • `Buckingham Palace` = monarch's London home<br />
+        • `Windsor Castle` = outside London, weekends and ceremonies<br />
+        • `Severn` = longest in UK, `Thames` = longest in England<br />
+        • `Hadrian's Wall` = Roman, not Norman or Tudor
+      </div>
+      <MemoryHook text="For landmarks, pair each place with one test clue: location, superlative, or why it is famous." />
+    </Card>
     {LANDMARKS.map((l, i) => (
       <Card key={i}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
@@ -1862,8 +1905,18 @@ const LandmarksTab = () => (
 // ── INTERNATIONAL ────────────────────────────────────────────
 const InternationalTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="🌍">International Organisations</SectionTitle>
+    <SectionTitle icon="🌍" meta="Most questions here are compare traps: voluntary group, military alliance, human-rights body, or UN role.">International Organisations</SectionTitle>
     <TrapAlert text="Council of Europe ≠ EU. Council has 47 members and cannot make laws. EU has 27 and can." />
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>World organisations quick map</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `UN` = international peace and security<br />
+        • `NATO` = military alliance<br />
+        • `Commonwealth` = voluntary association<br />
+        • `Council of Europe` = human rights, cannot make laws
+      </div>
+      <MemoryHook text="Ask one question first: is this a military alliance, a voluntary network, or a human-rights organisation?" />
+    </Card>
     <div style={{ marginTop: 16 }}>
       {INT_ORGS.map((o, i) => (
         <Card key={i}>
@@ -1895,10 +1948,21 @@ const ArtsTab = () => {
   const sec = sections.find((s) => s.key === active);
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="🎭">Arts & Culture</SectionTitle>
+      <SectionTitle icon="🎭" meta="This section works best through anchor names: one writer, one composer, one artist, one architect, one fashion name, one film clue.">Arts & Culture</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {sections.map((s) => <TabButton key={s.key} active={active === s.key} onClick={() => setActive(s.key)}>{s.label}</TabButton>)}
       </div>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Arts memory anchors</div>
+        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+          • `Shakespeare` = plays and Stratford-upon-Avon<br />
+          • `Dickens` = Victorian poverty<br />
+          • `Burns` = Scotland and Burns Night<br />
+          • `Beatles` = Liverpool<br />
+          • `BAFTA` = British film and television awards
+        </div>
+        <MemoryHook text="If you forget an arts fact, first place it under literature, music, art, architecture, fashion, or film." />
+      </Card>
       {(ARTS[active] || []).map((item, i) => (
         <Card key={i}>
           <div style={{ fontWeight: 800, color: sec ? sec.color : "#f9fafb", fontSize: 14, marginBottom: 4 }}>{item.who}</div>
@@ -1913,7 +1977,7 @@ const ArtsTab = () => {
 // ── ANTHEM & SYMBOLS ─────────────────────────────────────────
 const AnthemTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="🎵">National Anthem & Symbols</SectionTitle>
+    <SectionTitle icon="🎵" meta="Keep this section very compressed: anthem, monarch wording, Union Jack crosses, and why Wales is not shown.">National Anthem & Symbols</SectionTitle>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 4 }}>{ANTHEM.title}</div>
       <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>{ANTHEM.note}</div>
@@ -1923,6 +1987,15 @@ const AnthemTab = () => (
         ))}
       </div>
       <MemoryHook text={ANTHEM.memory} />
+    </Card>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Symbols quick recall</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `God Save the King` changes to `Queen` depending on the monarch<br />
+        • Union Jack = St George + St Andrew + St Patrick<br />
+        • Wales is not separately shown because it was already united with England
+      </div>
+      <MemoryHook text="Song = monarch's gender. Flag = three crosses. Wales = already joined to England." />
     </Card>
     <Card style={{ background: "color-mix(in srgb, #ef4444 8%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
       <div style={{ fontWeight: 800, color: "#fca5a5", marginBottom: 10 }}>🇬🇧 The Union Jack</div>
@@ -1940,7 +2013,18 @@ const AnthemTab = () => (
 // ── QUICK FACTS ──────────────────────────────────────────────
 const QuickFactsTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="⚡">Quick Facts</SectionTitle>
+    <SectionTitle icon="⚡" meta="These are the fast marks: government jobs, law basics, voting, school, driving, taxes, and daily-life rules.">Quick Facts</SectionTitle>
+    <Card style={{ background: "color-mix(in srgb, #22c55e 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Fast civic recall</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `Hansard` = official written record of Parliament<br />
+        • `PMQs` = Wednesday when Parliament is sitting<br />
+        • `National Insurance` = NHS, state pension, benefits<br />
+        • `Council tax` = local services<br />
+        • `999 / 112` = emergency, `101` = non-emergency police
+      </div>
+      <MemoryHook text="Use one keyword per fact: Hansard-record, PMQs-Wednesday, NI-benefits, council tax-local, 999-emergency." />
+    </Card>
     {QUICK_FACTS.map((section, si) => (
       <Card key={si} style={{ border: `1px solid ${section.color}33` }}>
         <div style={{ fontWeight: 800, color: section.color, marginBottom: 10, fontSize: 15 }}>{section.icon} {section.cat}</div>

@@ -38,6 +38,8 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added `↻ Latest` refresh action to help mobile users pull the newest deployed version.
 - Added timeline checkpoint saving so learners can jump back to the point they last remembered.
 - Expanded fixed mock papers from 20 to 30 and added more handbook-style civics/everyday-life questions.
+- Added more revision-anchor cards across sports, arts, symbols, religion, landmarks, world organisations, figures, and quick facts.
+- Expanded `CONFUSABLES` with emergency-number, voting-rights, and Highers vs A-levels compare cards.
 - Added coverage checklist on home so users can see no major area is skipped.
 - Added visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`.
 - Added `Mock Test`, `Revise`, and better mobile quick panel navigation.
