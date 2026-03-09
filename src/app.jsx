@@ -2150,6 +2150,16 @@ const WarsTab = () => {
           </div>
           <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
           <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
+          {Array.isArray(item.points) && item.points.length > 0 && (
+            <div style={{ display: "grid", gap: 6, marginBottom: 10 }}>
+              {item.points.map((point) => (
+                <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>
+                  <span style={{ color: item.color, fontWeight: 800 }}>•</span>
+                  <span>{point}</span>
+                </div>
+              ))}
+            </div>
+          )}
           <MemoryHook text={item.memory} />
         </Card>
       ))}

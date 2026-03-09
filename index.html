@@ -217,6 +217,11 @@
       border: 1px solid var(--card-border);
       border-radius: 24px 24px 18px 18px;
       padding: 14px;
+      padding-bottom: max(14px, env(safe-area-inset-bottom));
+      max-height: min(78vh, 720px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       box-shadow: 0 -16px 36px rgba(2, 6, 23, 0.2);
     }
     .mobile-sheet-grid {
