@@ -563,6 +563,102 @@ const HeroIllustration = ({ variant = "study" }) => {
   );
 };
 
+const VisualMemoryStrip = ({ title, subtitle, items, accent = "#3b82f6" }) => (
+  <Card style={{ background: `linear-gradient(135deg, ${accent}12, var(--surface-strong))`, border: `1px solid ${accent}33` }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+      <div>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>{title}</div>
+        {subtitle && <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 3 }}>{subtitle}</div>}
+      </div>
+      <Badge text="Visual memory" color={accent} />
+    </div>
+    <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+      {items.map((item) => (
+        <div key={item.label} style={{ borderRadius: 14, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+            <span style={{ fontSize: 20 }}>{item.icon}</span>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 13 }}>{item.label}</div>
+          </div>
+          <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>{item.text}</div>
+        </div>
+      ))}
+    </div>
+  </Card>
+);
+
+const TimelineVisual = () => (
+  <svg viewBox="0 0 360 140" role="img" aria-label="History anchor timeline" style={{ width: "100%", height: "auto", display: "block" }}>
+    <rect x="22" y="68" width="316" height="4" rx="2" fill="#334155" />
+    {[
+      { x: 38, color: "#7c3aed", year: "55 BC", label: "Caesar" },
+      { x: 94, color: "#b45309", year: "43", label: "Claudius" },
+      { x: 152, color: "#dc2626", year: "1066", label: "Normans" },
+      { x: 210, color: "#d97706", year: "1215", label: "Carta" },
+      { x: 266, color: "#065f46", year: "1603", label: "Crowns" },
+      { x: 322, color: "#0284c7", year: "1948", label: "NHS" },
+    ].map((item) => (
+      <g key={item.year}>
+        <circle cx={item.x} cy="70" r="11" fill={item.color} />
+        <text x={item.x} y="44" fill="#cbd5e1" fontSize="11" fontWeight="700" textAnchor="middle">{item.year}</text>
+        <text x={item.x} y="102" fill="#94a3b8" fontSize="10" fontWeight="700" textAnchor="middle">{item.label}</text>
+      </g>
+    ))}
+  </svg>
+);
+
+const LandmarkVisual = () => (
+  <svg viewBox="0 0 360 170" role="img" aria-label="Landmark memory diagram" style={{ width: "100%", height: "auto", display: "block" }}>
+    <rect width="360" height="170" rx="22" fill="#0f172a" />
+    <rect x="40" y="88" width="44" height="50" rx="4" fill="#1d4ed8" />
+    <rect x="52" y="38" width="20" height="52" rx="4" fill="#2563eb" />
+    <circle cx="62" cy="34" r="12" fill="#f59e0b" />
+    <text x="62" y="154" fill="#cbd5e1" fontSize="11" fontWeight="700" textAnchor="middle">Big Ben</text>
+    <path d="M140 118 L188 86 L236 118" fill="none" stroke="#64748b" strokeWidth="6" strokeLinecap="round" />
+    <path d="M156 118 L188 64 L220 118" fill="none" stroke="#94a3b8" strokeWidth="6" strokeLinecap="round" />
+    <text x="188" y="154" fill="#cbd5e1" fontSize="11" fontWeight="700" textAnchor="middle">Stonehenge</text>
+    <rect x="274" y="52" width="40" height="86" rx="4" fill="#475569" />
+    <rect x="264" y="42" width="60" height="12" rx="6" fill="#64748b" />
+    <rect x="270" y="80" width="48" height="10" rx="5" fill="#0ea5e9" />
+    <text x="294" y="154" fill="#cbd5e1" fontSize="11" fontWeight="700" textAnchor="middle">Palace</text>
+  </svg>
+);
+
+const OrgVisual = () => (
+  <svg viewBox="0 0 360 180" role="img" aria-label="World organisations memory diagram" style={{ width: "100%", height: "auto", display: "block" }}>
+    <rect width="360" height="180" rx="24" fill="#0f172a" />
+    <circle cx="88" cy="60" r="30" fill="#0ea5e9" opacity="0.25" stroke="#0ea5e9" />
+    <circle cx="180" cy="60" r="30" fill="#ef4444" opacity="0.22" stroke="#ef4444" />
+    <circle cx="272" cy="60" r="30" fill="#8b5cf6" opacity="0.22" stroke="#8b5cf6" />
+    <rect x="130" y="118" width="100" height="36" rx="18" fill="#f59e0b" opacity="0.18" stroke="#f59e0b" />
+    <text x="88" y="65" fill="#e2e8f0" fontSize="14" fontWeight="800" textAnchor="middle">UN</text>
+    <text x="180" y="65" fill="#e2e8f0" fontSize="14" fontWeight="800" textAnchor="middle">NATO</text>
+    <text x="272" y="65" fill="#e2e8f0" fontSize="12" fontWeight="800" textAnchor="middle">Common.</text>
+    <text x="180" y="141" fill="#e2e8f0" fontSize="12" fontWeight="800" textAnchor="middle">Council of Europe</text>
+    <text x="88" y="96" fill="#94a3b8" fontSize="10" textAnchor="middle">peace</text>
+    <text x="180" y="96" fill="#94a3b8" fontSize="10" textAnchor="middle">defence</text>
+    <text x="272" y="96" fill="#94a3b8" fontSize="10" textAnchor="middle">voluntary</text>
+    <text x="180" y="164" fill="#94a3b8" fontSize="10" textAnchor="middle">rights, no laws</text>
+  </svg>
+);
+
+const SymbolVisual = () => (
+  <svg viewBox="0 0 360 180" role="img" aria-label="Symbols memory diagram" style={{ width: "100%", height: "auto", display: "block" }}>
+    <rect width="360" height="180" rx="24" fill="#0f172a" />
+    <rect x="28" y="36" width="132" height="90" rx="12" fill="#1e3a8a" />
+    <path d="M28 36 L160 126 M160 36 L28 126" stroke="#fff" strokeWidth="16" />
+    <path d="M28 36 L160 126 M160 36 L28 126" stroke="#ef4444" strokeWidth="8" />
+    <rect x="79" y="36" width="30" height="90" fill="#fff" />
+    <rect x="28" y="66" width="132" height="30" fill="#fff" />
+    <rect x="84" y="36" width="20" height="90" fill="#ef4444" />
+    <rect x="28" y="71" width="132" height="20" fill="#ef4444" />
+    <text x="94" y="148" fill="#cbd5e1" fontSize="11" fontWeight="700" textAnchor="middle">Union Jack</text>
+    <rect x="214" y="40" width="96" height="64" rx="14" fill="#1d4ed8" opacity="0.22" stroke="#3b82f6" />
+    <text x="262" y="68" fill="#e2e8f0" fontSize="13" fontWeight="800" textAnchor="middle">God Save</text>
+    <text x="262" y="88" fill="#f59e0b" fontSize="13" fontWeight="800" textAnchor="middle">the King</text>
+    <text x="262" y="124" fill="#94a3b8" fontSize="10" textAnchor="middle">King / Queen changes</text>
+  </svg>
+);
+
 const StatTile = ({ label, value, color }) => (
   <div style={{ borderRadius: 16, padding: 13, background: color + "10", border: `1px solid ${color}26` }}>
     <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
@@ -1486,6 +1582,13 @@ const TimelineTab = () => {
         </div>
         <MemoryHook text="Work in pairs: 55 BC vs 43 AD, 1603 vs 1707, and 1918 vs 1928 vs 1969 are classic exam traps." />
       </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16, marginBottom: 10 }}>See the date spine</div>
+        <TimelineVisual />
+        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
+          Read this left to right as a memory chain: failed invasion, successful invasion, conquest, law, crowns, then NHS.
+        </div>
+      </Card>
       <input className="focus-ring" placeholder="Search events, years, or people..." value={search} onChange={(e) => setSearch(e.target.value)}
         style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--input-border)", borderRadius: 14, padding: "11px 14px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14 }} />
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
@@ -1879,6 +1982,13 @@ const LandmarksTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🏛️" meta="Use location + one distinctive clue for each landmark.">Landmarks & Places</SectionTitle>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16, marginBottom: 10 }}>See the place clues</div>
+      <LandmarkVisual />
+      <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
+        Use shape memory: bell and tower, stone circle, royal building. Add the one exam clue for each.
+      </div>
+    </Card>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Landmark anchor clues</div>
       <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
         • `Big Ben` = bell, not tower<br />
@@ -1907,6 +2017,13 @@ const InternationalTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🌍" meta="Most questions here are compare traps: voluntary group, military alliance, human-rights body, or UN role.">International Organisations</SectionTitle>
     <TrapAlert text="Council of Europe ≠ EU. Council has 47 members and cannot make laws. EU has 27 and can." />
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16, marginBottom: 10 }}>See the organisation map</div>
+      <OrgVisual />
+      <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
+        Start with the role, not the name: peace, defence, voluntary network, or human rights.
+      </div>
+    </Card>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>World organisations quick map</div>
       <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
@@ -1978,6 +2095,13 @@ const ArtsTab = () => {
 const AnthemTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🎵" meta="Keep this section very compressed: anthem, monarch wording, Union Jack crosses, and why Wales is not shown.">National Anthem & Symbols</SectionTitle>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16, marginBottom: 10 }}>See the symbol memory board</div>
+      <SymbolVisual />
+      <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
+        Flag memory = three crosses. Anthem memory = the monarch word changes with King or Queen.
+      </div>
+    </Card>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 4 }}>{ANTHEM.title}</div>
       <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>{ANTHEM.note}</div>
