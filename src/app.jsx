@@ -898,11 +898,21 @@ const NationsTab = () => (
 const ConfuseTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam traps.">Don't Confuse These</SectionTitle>
+    <Card style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.14), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+        <div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Comparison revision pack</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Best for facts that are similar enough to confuse, but different enough to cost marks.</div>
+        </div>
+        <Badge text={`${CONFUSABLES.length} comparison cards`} color="#f97316" />
+      </div>
+      <MemoryHook text="Use these in pairs: read the left side, cover the right side, then say the difference out loud before checking." />
+    </Card>
     {CONFUSABLES.map((c, i) => (
       <Card key={i} style={{ border: "1px solid #374151" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
           <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{c.icon} {c.title}</div>
-          <Badge text="High-confusion pair" color="#f97316" />
+          <Badge text="Exam trap comparison" color="#f97316" />
         </div>
         <div className="compare-grid" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
           {[c.left, c.right].map((side, si) => (
