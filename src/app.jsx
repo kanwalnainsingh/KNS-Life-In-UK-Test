@@ -723,6 +723,14 @@ const TimelineTab = () => {
   const eras = ["All", "Ancient", "Roman", "Medieval", "Tudor", "Stuart", "Georgian", "Victorian", "Modern"];
   const [era, setEra] = useState("All");
   const [search, setSearch] = useState("");
+  const anchors = [
+    { year: "55 BC", clue: "Caesar fails", color: "#7c3aed" },
+    { year: "43 AD", clue: "Claudius succeeds", color: "#b45309" },
+    { year: "1066", clue: "Norman Conquest", color: "#dc2626" },
+    { year: "1215", clue: "Magna Carta", color: "#d97706" },
+    { year: "1603 / 1707", clue: "Crowns vs Union", color: "#065f46" },
+    { year: "1918 / 1928 / 1969", clue: "Votes timeline", color: "#be185d" },
+  ];
   const filtered = TIMELINE.filter((e) =>
     (era === "All" || e.era === era) &&
     (!search || e.event.toLowerCase().includes(search.toLowerCase()) || e.year.toString().includes(search))
@@ -731,6 +739,24 @@ const TimelineTab = () => {
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="📅" meta="Use short date anchors first, then the memory clue.">British History Timeline</SectionTitle>
+      <Card style={{ background: "linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>History anchors to memorise first</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These dates unlock a lot of common compare questions in the test.</div>
+          </div>
+          <Badge text={`${TIMELINE.length} timeline facts`} color="#38bdf8" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {anchors.map((item) => (
+            <div key={item.year} style={{ borderRadius: 14, padding: 12, background: `${item.color}14`, border: `1px solid ${item.color}33` }}>
+              <div style={{ color: item.color, fontWeight: 800, fontSize: 13 }}>{item.year}</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 700, marginTop: 4 }}>{item.clue}</div>
+            </div>
+          ))}
+        </div>
+        <MemoryHook text="Work in pairs: 55 BC vs 43 AD, 1603 vs 1707, and 1918 vs 1928 vs 1969 are classic exam traps." />
+      </Card>
       <input className="focus-ring" placeholder="Search events, years, or people..." value={search} onChange={(e) => setSearch(e.target.value)}
         style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--input-border)", borderRadius: 14, padding: "11px 14px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14 }} />
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
