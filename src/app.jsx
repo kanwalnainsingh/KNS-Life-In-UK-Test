@@ -1591,50 +1591,92 @@ const TimelineTab = () => {
 };
 
 // ── WARS ─────────────────────────────────────────────────────
-const WarsTab = () => (
-  <div style={{ padding: 20 }}>
-    <SectionTitle icon="⚔️" meta="Use war anchors as a separate memory spine: battle name, year, person, and why it mattered.">Wars & Battles</SectionTitle>
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>War memory spine</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `1066` = Hastings = William the Conqueror<br />
-        • `1588` = Spanish Armada = Elizabeth I / Francis Drake<br />
-        • `1805` = Trafalgar = Nelson<br />
-        • `1815` = Waterloo = Wellington<br />
-        • `1914–18` = WWI = Armistice on 11 November 1918<br />
-        • `1939–45` = WWII = Churchill in war, Attlee after war
-      </div>
-      <MemoryHook text="When a war question appears, first lock the date, then attach the person: Hastings-William, Trafalgar-Nelson, Waterloo-Wellington." />
-    </Card>
-    <Card style={{ background: "color-mix(in srgb, #ef4444 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>WWII quick anchors</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `1939` = war begins after Germany invades Poland<br />
-        • `1940` = Battle of Britain, Blitz, Dunkirk<br />
-        • `1944` = D-Day in Normandy<br />
-        • `1945` = war ends
-      </div>
-      <MemoryHook text="WWII sequence: 1939 start, 1940 defend Britain, 1944 land in Normandy, 1945 end." />
-    </Card>
-    {BATTLES_AND_WARS.map((item) => (
-      <Card key={item.name} style={{ border: `1px solid ${item.color}33` }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 28 }}>{item.icon}</span>
-            <div>
-              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
-              <div style={{ color: item.color, fontSize: 12, fontWeight: 700 }}>{item.years}</div>
-            </div>
-          </div>
-          <Badge text={item.years} color={item.color} />
+const WarsTab = () => {
+  const battleCards = BATTLES_AND_WARS.filter((item) => /battle|revolt|armada|dunkirk|blitz|d-day/i.test(item.name));
+  const widerWarCards = BATTLES_AND_WARS.filter((item) => !battleCards.includes(item));
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="⚔️" meta="Use war anchors as a separate memory spine: battle name, year, person, and why it mattered.">Wars & Battles</SectionTitle>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>War memory spine</div>
+        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+          • `1066` = Hastings = William the Conqueror<br />
+          • `1588` = Spanish Armada = Elizabeth I / Francis Drake<br />
+          • `1805` = Trafalgar = Nelson<br />
+          • `1815` = Waterloo = Wellington<br />
+          • `1914–18` = WWI = Armistice on 11 November 1918<br />
+          • `1939–45` = WWII = Churchill in war, Attlee after war
         </div>
-        <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
-        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
-        <MemoryHook text={item.memory} />
+        <MemoryHook text="When a war question appears, first lock the date, then attach the person: Hastings-William, Trafalgar-Nelson, Waterloo-Wellington." />
       </Card>
-    ))}
-  </div>
-);
+      <Card style={{ background: "color-mix(in srgb, #ef4444 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>WWII quick anchors</div>
+        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+          • `1939` = war begins after Germany invades Poland<br />
+          • `1940` = Dunkirk, Battle of Britain, Blitz<br />
+          • `1944` = D-Day in Normandy<br />
+          • `1945` = war ends
+        </div>
+        <MemoryHook text="WWII sequence: 1939 start, 1940 defend and evacuate, 1944 land in Normandy, 1945 end." />
+      </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Battle compare tip</div>
+        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+          • `Trafalgar` = sea battle = Nelson<br />
+          • `Waterloo` = land battle = Wellington<br />
+          • `Battle of Britain` = air battle = 1940<br />
+          • `Dunkirk` = evacuation, not the Normandy landing
+        </div>
+        <MemoryHook text="Sea = Nelson. Land = Wellington. Air = Battle of Britain. Evacuation = Dunkirk." />
+      </Card>
+
+      <div style={{ marginTop: 20, marginBottom: 10 }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Key Battles</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Each battle card gives the date, what happened, why it matters for the test, and a memory tip.</div>
+      </div>
+      {battleCards.map((item) => (
+        <Card key={item.name} style={{ border: `1px solid ${item.color}33` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 28 }}>{item.icon}</span>
+              <div>
+                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
+                <div style={{ color: item.color, fontSize: 12, fontWeight: 700 }}>{item.years}</div>
+              </div>
+            </div>
+            <Badge text={item.years} color={item.color} />
+          </div>
+          <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
+          <MemoryHook text={item.memory} />
+        </Card>
+      ))}
+
+      <div style={{ marginTop: 20, marginBottom: 10 }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Wider Wars & Wartime Anchors</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use these cards for the bigger conflict picture behind the named battles.</div>
+      </div>
+      {widerWarCards.map((item) => (
+        <Card key={item.name} style={{ border: `1px solid ${item.color}33` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 28 }}>{item.icon}</span>
+              <div>
+                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
+                <div style={{ color: item.color, fontSize: 12, fontWeight: 700 }}>{item.years}</div>
+              </div>
+            </div>
+            <Badge text={item.years} color={item.color} />
+          </div>
+          <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
+          <MemoryHook text={item.memory} />
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 // ── 4 NATIONS ────────────────────────────────────────────────
 const NationsTab = () => (
