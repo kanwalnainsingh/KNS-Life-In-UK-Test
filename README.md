@@ -4,6 +4,8 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 242 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
+Current release: `v1.8.0`
+
 ---
 
 ## 🌐 Live Site
@@ -112,6 +114,16 @@ python3 -m http.server 4173
 ```
 
 Then open `http://localhost:4173`
+
+---
+
+## 🚀 Release Versioning
+
+- The visible app release version lives in `src/app.jsx` as `APP_VERSION`
+- Bump that value for each user-facing release
+- The current version is shown in the header and on the home screen
+- Users can tap `↻ Latest` in the app header to force-refresh cached mobile pages
+- Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point
 
 ---
 

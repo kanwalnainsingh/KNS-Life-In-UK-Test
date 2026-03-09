@@ -14,7 +14,10 @@ const STORAGE_KEYS = {
   recentMock: "lifeuk-recent-mock",
   recentRapid: "lifeuk-recent-rapid",
   recentQuickRev: "lifeuk-recent-quickrev",
+  timelineCheckpoint: "lifeuk-timeline-checkpoint",
 };
+
+const APP_VERSION = "v1.8.0";
 
 const SEO_COPY = {
   home: {
@@ -900,12 +903,17 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
         <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
           ☰
         </button>
-        <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
-          ←
-        </button>
+        {active !== "home" && (
+          <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
+            ←
+          </button>
+        )}
         <button aria-label="Go to home" className="focus-ring" onClick={() => setActive("home")} style={{ background: "none", border: "none", color: "#60a5fa", fontWeight: 800, fontSize: 18, cursor: "pointer", padding: 0 }}>
           🇬🇧 Life in the UK
         </button>
+        <span style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 800, border: "1px solid var(--card-border)", borderRadius: 999, padding: "4px 8px", background: "var(--chip-bg)", whiteSpace: "nowrap" }}>
+          {APP_VERSION}
+        </span>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
           <button
             aria-label="Get latest app version"
@@ -1056,6 +1064,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
           <Badge text="45 minutes" color="#10b981" />
           <Badge text="75% to pass" color="#f59e0b" />
           <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
+          <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
         </div>
         <div style={{ color: "var(--hero-copy)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
           Not seeing the newest changes on your phone? Use the <strong>↻ Latest</strong> button in the header to force a fresh reload.
@@ -1348,6 +1357,8 @@ const TimelineTab = () => {
   const eras = ["All", "Ancient", "Roman", "Medieval", "Tudor", "Stuart", "Georgian", "Victorian", "Modern"];
   const [era, setEra] = useState("All");
   const [search, setSearch] = useState("");
+  const [checkpoint, setCheckpoint] = useState(() => readStore(STORAGE_KEYS.timelineCheckpoint, null));
+  const [pendingJumpId, setPendingJumpId] = useState(null);
   const anchors = [
     { year: "55 BC", clue: "Caesar fails", color: "#7c3aed" },
     { year: "43 AD", clue: "Claudius succeeds", color: "#b45309" },
@@ -1407,9 +1418,56 @@ const TimelineTab = () => {
     (!search || e.event.toLowerCase().includes(search.toLowerCase()) || e.year.toString().includes(search))
   );
 
+  useEffect(() => {
+    if (!pendingJumpId) return;
+    const element = document.getElementById(pendingJumpId);
+    if (!element) return;
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+    setPendingJumpId(null);
+  }, [pendingJumpId, era, search]);
+
+  const saveCheckpoint = (ev) => {
+    const id = `timeline-${TIMELINE.indexOf(ev)}`;
+    const nextCheckpoint = { id, year: ev.year, era: ev.era, event: ev.event };
+    setCheckpoint(nextCheckpoint);
+    writeStore(STORAGE_KEYS.timelineCheckpoint, nextCheckpoint);
+  };
+
+  const jumpToCheckpoint = () => {
+    if (!checkpoint) return;
+    setSearch("");
+    setEra("All");
+    setPendingJumpId(checkpoint.id);
+  };
+
+  const clearCheckpoint = () => {
+    setCheckpoint(null);
+    writeStore(STORAGE_KEYS.timelineCheckpoint, null);
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="📅" meta="Use short date anchors first, then the memory clue.">British History Timeline</SectionTitle>
+      <Card style={{ background: "color-mix(in srgb, #3b82f6 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #3b82f6 35%, var(--card-border))" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 4 }}>Remembered up to here</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
+              {checkpoint ? `${checkpoint.year} · ${checkpoint.event}` : "Set a checkpoint on any timeline card so you can come back to the same point later."}
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={jumpToCheckpoint} disabled={!checkpoint} style={{ background: checkpoint ? "var(--accent)" : "var(--chip-bg)", color: checkpoint ? "#fff" : "var(--text-muted)", border: "none", borderRadius: 12, padding: "10px 14px", cursor: checkpoint ? "pointer" : "default", fontWeight: 800 }}>
+              Jump to checkpoint
+            </button>
+            {checkpoint && (
+              <button className="focus-ring" onClick={clearCheckpoint} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      </Card>
       <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), var(--surface-strong))", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
@@ -1449,8 +1507,11 @@ const TimelineTab = () => {
         </div>
       </Card>
       <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 12 }}>{filtered.length} events</div>
-      {filtered.map((ev, i) => (
-        <div key={`${ev.year}-${i}`} className="timeline-item" style={{ display: "grid", gridTemplateColumns: "90px 26px 1fr", gap: 12, marginBottom: 14, alignItems: "flex-start" }}>
+      {filtered.map((ev, i) => {
+        const timelineId = `timeline-${TIMELINE.indexOf(ev)}`;
+        const isCheckpoint = checkpoint?.id === timelineId;
+        return (
+        <div id={timelineId} key={`${ev.year}-${i}`} className="timeline-item" style={{ display: "grid", gridTemplateColumns: "90px 26px 1fr", gap: 12, marginBottom: 14, alignItems: "flex-start", scrollMarginTop: 90 }}>
           <div className="timeline-year" style={{ textAlign: "right" }}>
             <div style={{ fontSize: 13, fontWeight: 800, color: ev.color }}>{ev.year}</div>
             <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 3 }}>{ev.era}</div>
@@ -1459,10 +1520,11 @@ const TimelineTab = () => {
             <div style={{ width: 22, height: 22, borderRadius: "50%", background: ev.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>{ev.icon}</div>
             <div style={{ width: 2, flexGrow: 1, background: "var(--surface-muted)", marginTop: 2, minHeight: 38 }} />
           </div>
-          <Card style={{ marginBottom: 0, background: "color-mix(in srgb, var(--surface-soft) 88%, var(--card-bg))", border: `1px solid ${ev.color}33` }}>
+          <Card style={{ marginBottom: 0, background: "color-mix(in srgb, var(--surface-soft) 88%, var(--card-bg))", border: `1px solid ${isCheckpoint ? "#3b82f6" : `${ev.color}33`}` }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
               <Badge text={ev.era} color={ev.color} />
               <Badge text={ev.year} color="#64748b" />
+              {isCheckpoint && <Badge text="Your checkpoint" color="#3b82f6" />}
             </div>
             <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 14, lineHeight: 1.6 }}>{ev.event}</div>
             <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
@@ -1474,9 +1536,14 @@ const TimelineTab = () => {
               ))}
             </div>
             <MemoryHook text={ev.memory} />
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+              <button className="focus-ring" onClick={() => saveCheckpoint(ev)} style={{ background: isCheckpoint ? "#1d4ed8" : "var(--chip-bg)", color: isCheckpoint ? "#fff" : "var(--text)", border: `1px solid ${isCheckpoint ? "#3b82f6" : "var(--card-border)"}`, borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>
+                {isCheckpoint ? "Checkpoint saved" : "Set checkpoint here"}
+              </button>
+            </div>
           </Card>
         </div>
-      ))}
+      )})}
     </div>
   );
 };
