@@ -975,7 +975,7 @@ const QuickRevisionTab = ({ setActive }) => {
   const topics = useMemo(() => ["All", ...Array.from(new Set(deck.map((item) => item.topic)))], [deck]);
   const [topic, setTopic] = useState("All");
   const [index, setIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
+  const [revealed, setRevealed] = useState(false);
   const touchStartRef = useRef(null);
   const filteredDeck = useMemo(() => topic === "All" ? deck : deck.filter((item) => item.topic === topic), [deck, topic]);
   const current = filteredDeck[index] || filteredDeck[0];
@@ -986,13 +986,13 @@ const QuickRevisionTab = ({ setActive }) => {
       if (direction === "next") return (value + 1) % filteredDeck.length;
       return (value - 1 + filteredDeck.length) % filteredDeck.length;
     });
-    setFlipped(false);
+    setRevealed(false);
   };
 
   const jumpRandom = () => {
     if (!filteredDeck.length) return;
     setIndex(Math.floor(Math.random() * filteredDeck.length));
-    setFlipped(false);
+    setRevealed(false);
   };
 
   const onTouchStart = (event) => {
@@ -1008,7 +1008,7 @@ const QuickRevisionTab = ({ setActive }) => {
 
   useEffect(() => {
     setIndex(0);
-    setFlipped(false);
+    setRevealed(false);
   }, [topic]);
 
   if (!current) return null;
@@ -1019,7 +1019,7 @@ const QuickRevisionTab = ({ setActive }) => {
       <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
         <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Rapid revision with more detail</div>
         <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
-          Flip each card for the answer, then use the context and memory clue to lock it in. Filter by topic if you want focused revision.
+          Read the prompt first, then reveal the answer, context, and memory clue when you are ready. Filter by topic if you want focused revision.
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
@@ -1035,35 +1035,38 @@ const QuickRevisionTab = ({ setActive }) => {
       </Card>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <button className="focus-ring" onClick={() => move("prev")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>← Previous</button>
-        <button className="focus-ring" onClick={() => setFlipped((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{flipped ? "Show front" : "Flip card"}</button>
+        <button className="focus-ring" onClick={() => setRevealed((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{revealed ? "Hide answer" : "Show answer"}</button>
         <button className="focus-ring" onClick={jumpRandom} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Random</button>
         <button className="focus-ring" onClick={() => move("next")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Next →</button>
         <div style={{ marginLeft: "auto" }}><Badge text={`${index + 1} / ${filteredDeck.length}`} color={current.color} /></div>
       </div>
-      <Card
-        className="quick-revision-card"
-        onClick={() => setFlipped((v) => !v)}
-        style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}1f, var(--surface-soft))`, cursor: "pointer", userSelect: "none" }}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
+      <Card className="quick-revision-card" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
           <Badge text={current.topic} color={current.color} />
-          <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{flipped ? "Back of card" : "Front of card"}</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{revealed ? "Answer shown" : "Question only"}</div>
         </div>
-        <div style={{ minHeight: 220, display: "flex", flexDirection: "column", justifyContent: "center" }}>
-          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: flipped ? 24 : 28, lineHeight: 1.35, marginBottom: 10 }}>
-            {flipped ? current.back : current.front}
+        <div style={{ display: "grid", gap: 10 }}>
+          <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "12px 13px" }}>
+            <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 5 }}>PROMPT</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, lineHeight: 1.35 }}>{current.front}</div>
           </div>
-          {!flipped && <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7 }}>Tap to reveal the answer, then read the extra context and memory clue.</div>}
-          {flipped && (
-            <div style={{ display: "grid", gap: 10 }}>
+          {!revealed && (
+            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, padding: "2px 2px 0" }}>
+              Think of the answer first, then use <strong style={{ color: "var(--text-strong)" }}>Show answer</strong> to check yourself.
+            </div>
+          )}
+          {revealed && (
+            <>
+              <div style={{ background: "color-mix(in srgb, var(--accent) 10%, var(--panel-bg))", borderRadius: 14, padding: "12px 13px", border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--card-border))" }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 5 }}>ANSWER</div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 20, lineHeight: 1.45 }}>{current.back}</div>
+              </div>
               <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "10px 12px" }}>
                 <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>WHY THIS MATTERS</div>
                 <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.65 }}>{current.context}</div>
               </div>
               <MemoryHook text={current.memory} />
-            </div>
+            </>
           )}
         </div>
       </Card>
