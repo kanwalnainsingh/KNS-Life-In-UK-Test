@@ -606,6 +606,11 @@ const STORY_CHAPTERS = [
       { title:"Christianity grows in England", fact:"597 AD = St Augustine came to Kent and helped establish Christianity in Anglo-Saxon England.", context:"This gives you a clean early church anchor before Henry VIII and the Reformation.", memory:"597 = Augustine to Kent = Christianity spreads." },
       { title:"United England", fact:"927 AD = Athelstan recognised as the first king of a united England.", context:"This helps separate Athelstan from Alfred the Great, who fought the Vikings earlier.", memory:"Athelstan = 927 = united England." },
     ],
+    recap:[
+      "55 BC Caesar fails, 43 AD Claudius succeeds.",
+      "597 AD = Augustine to Kent, 927 AD = Athelstan and united England.",
+      "Hadrian's Wall is Roman, 122 AD, and in northern England.",
+    ],
   },
   {
     id:"conquest-crown-law",
@@ -617,9 +622,15 @@ const STORY_CHAPTERS = [
     items:[
       { title:"Norman Conquest", fact:"1066 = William of Normandy defeated King Harold at the Battle of Hastings.", context:"This is one of the highest-yield dates in the whole test and the last successful invasion of England.", memory:"1066 = Hastings = William the Conqueror." },
       { title:"Magna Carta", fact:"1215 = Magna Carta signed by King John at Runnymede.", context:"It matters because it established that nobody, not even the king, is above the law.", memory:"King John had no choice in 1215." },
+      { title:"Model Parliament", fact:"1295 = Model Parliament under Edward I, seen as the forerunner of the modern Parliament.", context:"This is a useful bridge from medieval monarchy to modern parliamentary government.", memory:"1295 = Model Parliament = Edward I." },
       { title:"Church of England", fact:"1534 = Henry VIII broke from Rome and created the Church of England.", context:"This links monarchy, religion, and later British identity questions.", memory:"1534 = Henry VIII breaks from Rome." },
       { title:"Crowns then union", fact:"1603 = Union of the Crowns. 1707 = Act of Union creates Great Britain.", context:"1603 means one monarch for England and Scotland. 1707 means one parliament.", memory:"1603 crowns. 1707 parliament." },
       { title:"Parliament stronger than the monarch", fact:"1688 Glorious Revolution and 1689 Bill of Rights limited royal power and strengthened Parliament.", context:"This is the core reason the UK is a constitutional monarchy.", memory:"1688 to 1689 = Parliament comes first." },
+    ],
+    recap:[
+      "1066, 1215, 1295, 1534, 1603, 1707 are major political/legal anchors.",
+      "Magna Carta = nobody above the law.",
+      "1603 is crowns; 1707 is parliament and Great Britain.",
     ],
   },
   {
@@ -630,11 +641,17 @@ const STORY_CHAPTERS = [
     intro:"Nation questions are usually fast marks: capital, saint, flower, parliament, symbol, or landmark.",
     tab:"nations",
     items:[
+      { title:"Great Britain and the UK", fact:"Great Britain = England, Scotland and Wales. United Kingdom = Great Britain plus Northern Ireland.", context:"This is one of the most common confusion points in the test.", memory:"UK = GB + Northern Ireland." },
       { title:"England", fact:"England: London, St George, rose.", context:"England has no separate parliament, which is one of the easiest facts to miss when rushing.", memory:"England = London + St George + rose + no separate parliament." },
       { title:"Scotland", fact:"Scotland: Edinburgh, St Andrew, thistle, Scottish Parliament at Holyrood.", context:"Also remember that the Church of Scotland is independent and Scotland uses Highers instead of A-levels.", memory:"Scotland = Edinburgh + St Andrew + thistle + Holyrood." },
       { title:"Wales and Northern Ireland", fact:"Wales: Cardiff, Welsh language, Senedd. Northern Ireland: Belfast, Stormont.", context:"Wales is strongly linked with the Welsh language. Northern Ireland is linked with Stormont and Good Friday Agreement context.", memory:"Wales = Cardiff + Welsh. Northern Ireland = Belfast + Stormont." },
       { title:"Union Jack and anthem", fact:"The national anthem is God Save the King. The Union Jack combines the crosses of St George, St Andrew and St Patrick.", context:"Wales is not represented separately in the Union Jack because when the first Union Flag was created, Wales was already united with England.", memory:"King, not Queen at present. Wales not shown separately." },
       { title:"Landmark traps", fact:"Big Ben is the bell, not the tower. Hadrian's Wall is Roman and dates from 122 AD.", context:"These are classic landmark recall and confusion-trap questions.", memory:"Big Ben = bell. Elizabeth Tower = tower. Hadrian's Wall = 122 AD." },
+    ],
+    recap:[
+      "Know capitals, saints, flowers, and devolved bodies.",
+      "England has no separate parliament.",
+      "Big Ben is the bell; UK = GB + Northern Ireland.",
     ],
   },
   {
@@ -651,6 +668,11 @@ const STORY_CHAPTERS = [
       { title:"Everyday life rules", fact:"Emergency numbers are 999 and 112. Drive on the left. Minimum car-driving age is 17, moped 16.", context:"These are easy marks but also easy to drop when revising only history.", memory:"999 and 112. Car 17. Moped 16." },
       { title:"Education, tax and contribution", fact:"School age is 5 to 16, but young people usually stay in education or training until 18. National Insurance helps fund services like the NHS and state pension.", context:"These questions check practical knowledge about life in the UK today.", memory:"5 to 16, training to 18, NI funds services." },
     ],
+    recap:[
+      "Commons elected, Lords appointed, Speaker neutral.",
+      "18 + FPTP + rule of law are core civic anchors.",
+      "999 and 112 are emergency numbers; NI helps fund services.",
+    ],
   },
   {
     id:"faith-community",
@@ -666,6 +688,11 @@ const STORY_CHAPTERS = [
       { title:"Eid and Hanukkah", fact:"Eid al-Fitr marks the end of Ramadan. Hanukkah is the Jewish festival of lights and lasts 8 days.", context:"These are usually tested through one clear clue, not deep religious detail.", memory:"Eid ends Ramadan. Hanukkah = 8 days." },
       { title:"Community life", fact:"Good citizenship includes volunteering, local participation, fundraising, jury service, and respect for different backgrounds and beliefs.", context:"The course is about how people live together in modern Britain, not only facts and dates.", memory:"Rights come with duties and respect." },
     ],
+    recap:[
+      "2011 census: 59% Christian, 25% no religion, 4.8% Muslim.",
+      "Christmas and Easter are the main Christian festivals.",
+      "Diwali, Vaisakhi, Eid al-Fitr, and Hanukkah are high-yield festival facts.",
+    ],
   },
   {
     id:"people-who-shaped-britain",
@@ -678,8 +705,14 @@ const STORY_CHAPTERS = [
       { title:"William and King John", fact:"William the Conqueror = 1066. King John = Magna Carta 1215.", context:"Those two names unlock a large part of the medieval section.", memory:"William = Hastings. John = Magna Carta." },
       { title:"Elizabeth I and Churchill", fact:"Elizabeth I is linked to the Spanish Armada in 1588. Churchill is the wartime Prime Minister of WWII.", context:"Both are leadership anchors that appear often in revision and mocks.", memory:"Elizabeth = Armada. Churchill = WWII." },
       { title:"Pankhurst and Bevan", fact:"Emmeline Pankhurst led the fight for votes for women. Aneurin Bevan created the NHS in 1948.", context:"These two names connect democratic change and the welfare state.", memory:"Pankhurst = votes. Bevan = NHS." },
+      { title:"Nightingale and Seacole", fact:"Florence Nightingale and Mary Seacole are both linked to care for soldiers in the Crimean War.", context:"This is a useful pair because the test may expect you to recognise both names, not just Nightingale alone.", memory:"Crimean War = Nightingale and Seacole." },
       { title:"Beveridge and Thatcher", fact:"William Beveridge wrote the 1942 report behind the welfare state. Margaret Thatcher became the first woman Prime Minister in 1979.", context:"These are key modern-society figures rather than old monarchy figures.", memory:"Beveridge = five giants. Thatcher = first woman PM." },
       { title:"Science names", fact:"Tim Berners-Lee developed the World Wide Web. Alexander Fleming discovered penicillin.", context:"Science questions are usually short and direct, so one invention per person is enough.", memory:"Web = Berners-Lee. Penicillin = Fleming." },
+    ],
+    recap:[
+      "Attach each person to one anchor: William-1066, John-1215, Churchill-WWII.",
+      "Pankhurst = votes, Bevan = NHS, Beveridge = welfare state.",
+      "Nightingale and Seacole both connect to the Crimean War.",
     ],
   },
   {
@@ -696,6 +729,11 @@ const STORY_CHAPTERS = [
       { title:"Music and design", fact:"The Beatles are the most famous Liverpool band. Alexander McQueen is a leading British fashion designer.", context:"This helps separate music, fashion, and literature in your memory.", memory:"Beatles = Liverpool. McQueen = fashion." },
       { title:"Visual mnemonics", fact:"LECB = London, Edinburgh, Cardiff, Belfast. DRIM = Democracy, Rule of law, Individual liberty, Mutual respect.", context:"These compressed codes are useful right before mocks or when revising for a few minutes on your phone.", memory:"Use short codes to compress the course." },
     ],
+    recap:[
+      "One event or achievement per name is enough for this section.",
+      "Wimbledon and the FA Cup are both 'oldest' anchors.",
+      "Shakespeare, the Beatles, and McQueen are broad-recognition culture names.",
+    ],
   },
   {
     id:"wars-modern-britain",
@@ -711,6 +749,11 @@ const STORY_CHAPTERS = [
       { title:"Battle of Britain and the Blitz", fact:"The Battle of Britain was an air battle. The Blitz was the bombing of cities.", context:"This is one of the most useful wartime distinctions to keep clear.", memory:"Battle of Britain = air. Blitz = bombing." },
       { title:"Dunkirk and D-Day", fact:"Dunkirk was an evacuation. D-Day was the Allied landing in Normandy in 1944.", context:"These are different moments in WWII and should not be mixed up.", memory:"Dunkirk = evacuation. D-Day = landing." },
     ],
+    recap:[
+      "Trafalgar = Nelson at sea. Waterloo = Wellington on land.",
+      "WWI = 1914 to 1918, Armistice on 11 November 1918.",
+      "WWII key sequence: 1939 start, 1940 defend/evacuate, 1944 D-Day, 1945 end.",
+    ],
   },
   {
     id:"world-stage",
@@ -725,6 +768,11 @@ const STORY_CHAPTERS = [
       { title:"Commonwealth", fact:"The Commonwealth is a voluntary association of member states.", context:"It is not a military alliance and does not act like a court.", memory:"Commonwealth = voluntary association." },
       { title:"Council of Europe", fact:"The Council of Europe focuses on human rights and is separate from the EU.", context:"This is one of the biggest confusion traps in the whole course.", memory:"Council of Europe = human rights, not EU." },
       { title:"Final compare clue", fact:"UN = global peace body. NATO = military alliance. Commonwealth = voluntary group. Council of Europe = human-rights body.", context:"If you can say these four labels cleanly, most world-organisation questions become easy.", memory:"Four organisations, four different jobs." },
+    ],
+    recap:[
+      "UN = global peace body, NATO = defence alliance.",
+      "Commonwealth = voluntary group, not military.",
+      "Council of Europe = human rights and separate from the EU.",
     ],
   },
 ];

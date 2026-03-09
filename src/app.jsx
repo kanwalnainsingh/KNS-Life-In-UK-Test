@@ -881,7 +881,7 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
 
 const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
   <>
-    <Card style={{ background: "linear-gradient(180deg, rgba(15,23,42,0.9), rgba(8,12,20,0.92))", border: "1px solid #1e3a5f" }}>
+    <Card style={{ background: "linear-gradient(180deg, color-mix(in srgb, var(--surface-soft) 92%, var(--card-bg)), color-mix(in srgb, var(--surface-strong) 86%, var(--card-bg)))", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{question.q}</div>
       <div style={{ marginTop: 10 }}><Badge text={inferTopic(question)} color="#60a5fa" /></div>
     </Card>
@@ -1813,6 +1813,23 @@ const StoryModeTab = ({ setActive }) => {
           </Card>
         ))}
       </div>
+
+      {Array.isArray(current.recap) && current.recap.length > 0 && (
+        <Card style={{ border: `1px solid ${current.color}44`, background: "var(--surface-strong)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Chapter recap</div>
+            <Badge text={`${current.recap.length} lock-in points`} color={current.color} />
+          </div>
+          <div style={{ display: "grid", gap: 8 }}>
+            {current.recap.map((point) => (
+              <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 14, lineHeight: 1.6 }}>
+                <span style={{ color: current.color, fontWeight: 800 }}>•</span>
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
