@@ -2495,7 +2495,7 @@ const MockExamTab = () => {
 
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="📝" meta={`${selectedPaper.title} is fixed, so you can retake it later and measure whether recall improved.`}>Mock Results</SectionTitle>
+        <SectionTitle icon="📝" meta="Review your answers, check weak areas, and use the memory clues to lock in corrections.">Mock Results</SectionTitle>
         <Card style={{ textAlign: "center", border: `2px solid ${passed ? "#22c55e" : "#ef4444"}` }}>
           <div style={{ fontSize: 54, marginBottom: 8 }}>{passed ? "✅" : "📘"}</div>
           <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 4 }}>{selectedPaper.title}</div>
@@ -2634,7 +2634,7 @@ const MockExamTab = () => {
               <div>
                 <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 4 }}>Finish this paper</div>
                 <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>
-                  {finishConfirm ? "Tap confirm only if you are ready to end the paper and see results." : "Kept separate from Next to avoid accidental taps on mobile."}
+                  {finishConfirm ? "Tap confirm only if you are ready to end the paper and see results." : "End the paper whenever you are ready to see results."}
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -2756,7 +2756,7 @@ const ReviseTab = () => {
   if (!bank.length) {
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="🧩" meta="This space fills automatically from quiz and mock mistakes.">Revise Mistakes</SectionTitle>
+        <SectionTitle icon="🧩" meta="Your wrong answers appear here for targeted revision.">Revise Mistakes</SectionTitle>
         <Card style={{ textAlign: "center", background: "linear-gradient(135deg, rgba(34,197,94,0.1), rgba(15,23,42,0.9))", border: "1px solid #166534" }}>
           <div style={{ fontSize: 48, marginBottom: 10 }}>✅</div>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 20, marginBottom: 8 }}>No saved mistakes yet</div>
