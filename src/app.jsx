@@ -2103,6 +2103,7 @@ const MockExamTab = () => {
   const [showContext, setShowContext] = useState(true);
   const [timerMode, setTimerMode] = useState("strict");
   const [reviewFilter, setReviewFilter] = useState("wrong");
+  const [finishConfirm, setFinishConfirm] = useState(false);
   const [mockHistory, setMockHistory] = useState(() => readStore(STORAGE_KEYS.mockHistory, []));
   const timerRef = useRef(null);
 
@@ -2129,6 +2130,7 @@ const MockExamTab = () => {
     setCurrent(0);
     setTimeLeft(MOCK_LIMIT_SECONDS);
     setReviewFilter("wrong");
+    setFinishConfirm(false);
     setStarted(true);
     setFinished(false);
   };
@@ -2407,8 +2409,37 @@ const MockExamTab = () => {
           <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={() => setCurrent((value) => Math.max(0, value - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
             <button className="focus-ring" onClick={() => setCurrent((value) => Math.min(MOCK_TOTAL - 1, value + 1))} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
-            <button className="focus-ring" onClick={() => setFinished(true)} style={{ marginLeft: "auto", background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}>Finish paper</button>
           </div>
+          <Card style={{ marginTop: 12, border: `1px solid ${finishConfirm ? "#ef4444" : "var(--card-border)"}`, background: finishConfirm ? "color-mix(in srgb, #ef4444 10%, var(--card-bg))" : "var(--panel-bg)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+              <div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 4 }}>Finish this paper</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>
+                  {finishConfirm ? "Tap confirm only if you are ready to end the paper and see results." : "Kept separate from Next to avoid accidental taps on mobile."}
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {finishConfirm && (
+                  <button className="focus-ring" onClick={() => setFinishConfirm(false)} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+                    Keep going
+                  </button>
+                )}
+                <button
+                  className="focus-ring"
+                  onClick={() => {
+                    if (!finishConfirm) {
+                      setFinishConfirm(true);
+                      return;
+                    }
+                    setFinished(true);
+                  }}
+                  style={{ background: finishConfirm ? "#ef4444" : "color-mix(in srgb, #ef4444 10%, var(--card-bg))", color: finishConfirm ? "#fff" : "#dc2626", border: `1px solid ${finishConfirm ? "#ef4444" : "color-mix(in srgb, #ef4444 35%, var(--card-border))"}`, borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 800 }}
+                >
+                  {finishConfirm ? "Confirm finish" : "Finish paper"}
+                </button>
+              </div>
+            </div>
+          </Card>
         </div>
         <Card>
           <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Paper navigator</div>

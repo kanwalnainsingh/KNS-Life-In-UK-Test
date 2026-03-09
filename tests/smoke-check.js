@@ -43,6 +43,7 @@ assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
 assert(/ReviseTab/.test(appSource), "Revision UI missing");
 assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
 assert(/MOCK_PAPER_COUNT = 20/.test(appSource), "Expected 20 fixed mock papers");
+assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
 assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
 assert(/Show details/.test(appSource), "Quick revision inline details control missing");
 assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
