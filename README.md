@@ -1,6 +1,6 @@
-# 🇬🇧 Life in the UK — Complete Study Guide
+# 🇬🇧 Life in the UK Test Practice for ILR and Citizenship
 
-A free, mobile-friendly study guide for the **Life in the UK citizenship test**.
+A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
 > 📖 242 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
@@ -11,6 +11,14 @@ A free, mobile-friendly study guide for the **Life in the UK citizenship test**.
 [**→ Open the Study Guide**](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
 
 Official test info: https://www.gov.uk/life-in-the-uk-test
+
+---
+
+## 🎯 Who This Is For
+
+- People preparing for the Life in the UK test for `ILR`
+- People applying for `British citizenship / naturalisation`
+- Learners who want quick revision, mock tests, and memory clues instead of reading dense notes
 
 ---
 

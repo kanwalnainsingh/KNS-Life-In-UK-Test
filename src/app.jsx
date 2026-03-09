@@ -15,6 +15,24 @@ const STORAGE_KEYS = {
   recentRapid: "lifeuk-recent-rapid",
 };
 
+const SEO_COPY = {
+  home: {
+    title: "Life in the UK Test Practice for ILR and Citizenship",
+    description: "Free Life in the UK test revision app with mock tests, practice questions, memory clues, history timeline, and UK citizenship study topics.",
+  },
+  quickrev: { title: "Quick Revision Cards | Life in the UK Test Practice" },
+  quiz: { title: "Quiz Practice | Life in the UK Test Practice" },
+  mock: { title: "Mock Test | Life in the UK Test Practice" },
+  rapidfire: { title: "Rapid Fire Revision | Life in the UK Test Practice" },
+  timeline: { title: "History Timeline | Life in the UK Test Practice" },
+  nations: { title: "4 Nations Revision | Life in the UK Test Practice" },
+  confuse: { title: "Confusing Topics and Comparisons | Life in the UK Test Practice" },
+  quickfacts: { title: "Quick Facts | Life in the UK Test Practice" },
+  landmarks: { title: "Landmarks and Places | Life in the UK Test Practice" },
+  religion: { title: "Religion and Festivals | Life in the UK Test Practice" },
+  figures: { title: "Key Historical Figures | Life in the UK Test Practice" },
+};
+
 const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "quiz", "mock", "rapidfire", "timeline"];
 const PRIMARY_MOBILE_TABS = ["home", "quickrev", "quiz", "mock", "timeline"];
 const NAV_GROUPS = [
@@ -699,8 +717,8 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
       <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.7))", border: "1px solid #1d4ed8" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
           <div>
-            <div style={{ color: "#eff6ff", fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Life in the UK revision hub</div>
-            <div style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.6 }}>Study by topic, compare traps, run mocks, and revise mistakes quickly.</div>
+            <h1 style={{ color: "#eff6ff", fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Life in the UK test practice for ILR and citizenship</h1>
+            <p style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.6 }}>Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.</p>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", fontWeight: 800, cursor: "pointer" }}>Mock Test</button>
@@ -721,6 +739,13 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
         <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
         <StatTile label="Best recent result" value={mockHistory.length ? `${Math.max(...mockHistory.map((x) => x.percent))}%` : "0%"} color="#f59e0b" />
       </div>
+
+      <Card style={{ border: "1px solid #334155" }}>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>What this app covers for the Life in the UK test</div>
+        <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7 }}>
+          This free Life in the UK study guide is built for people preparing for the official test as part of British citizenship or ILR applications. It covers British history, the 4 nations, government and Parliament, British values, religion and festivals, landmarks, key historical figures, world organisations, and exam-style practice questions.
+        </div>
+      </Card>
 
       <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.92), rgba(8,145,178,0.16))", border: "1px solid #0ea5e9" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
@@ -2194,6 +2219,10 @@ const App = () => {
     if (window.location.hash !== `#${active}`) {
       window.history.replaceState(null, "", `#${active}`);
     }
+    const seo = SEO_COPY[active] || SEO_COPY.home;
+    document.title = seo.title;
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription && seo.description) metaDescription.setAttribute("content", seo.description);
     setWrongQuestions(readStore(STORAGE_KEYS.wrongQuestions, []));
     setMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
   }, [active]);
