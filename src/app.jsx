@@ -29,6 +29,7 @@ const SEO_COPY = {
   mock: { title: "Mock Test | Life in the UK Test Practice" },
   rapidfire: { title: "Rapid Fire Revision | Life in the UK Test Practice" },
   timeline: { title: "History Timeline | Life in the UK Test Practice" },
+  wars: { title: "Wars and Battles Revision | Life in the UK Test Practice" },
   nations: { title: "4 Nations Revision | Life in the UK Test Practice" },
   confuse: { title: "Confusing Topics and Comparisons | Life in the UK Test Practice" },
   quickfacts: { title: "Quick Facts | Life in the UK Test Practice" },
@@ -41,11 +42,12 @@ const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "quiz", "mock", "rapidfire", "
 const PRIMARY_MOBILE_TABS = ["home", "quickrev", "quiz", "mock", "timeline"];
 const NAV_GROUPS = [
   { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "quickrev", "quiz", "mock", "rapidfire", "revise"] },
-  { title: "History & Society", hint: "Timeline, nations, law, traps, landmarks", ids: ["timeline", "nations", "quickfacts", "confuse", "landmarks", "international"] },
+  { title: "History & Society", hint: "Timeline, wars, nations, law, traps, landmarks", ids: ["timeline", "wars", "nations", "quickfacts", "confuse", "landmarks", "international"] },
   { title: "People & Culture", hint: "Figures, religion, inventors, sports, arts", ids: ["figures", "religion", "inventors", "sports", "arts", "anthem"] },
 ];
 const COVERAGE_AREAS = [
   { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
+  { title: "Wars and battles", detail: "Major conflicts, battle dates, WWI and WWII anchors", tab: "wars", icon: "⚔️" },
   { title: "Government and Parliament", detail: "Constitution, Commons, Lords, elections", tab: "quickfacts", icon: "🏛️" },
   { title: "Laws, rights and values", detail: "Rule of law, courts, equality, British values", tab: "quickfacts", icon: "⚖️" },
   { title: "Countries, geography and landmarks", detail: "Capitals, rivers, mountains, places", tab: "nations", icon: "🗺️" },
@@ -133,6 +135,7 @@ const buildRevisionBuckets = (items) => {
 
 const COVERAGE_CONTEXT = {
   timeline: "Key test anchors include 43 AD, 1066, 1215, 1534, 1603/1707, 1918/1928/1969, and 1948. Use the timeline for dates, people, and compare traps.",
+  wars: "Use this section for battle names, war dates, wartime leaders, and WWI/WWII sub-topics like Armistice Day, the Blitz, Dunkirk, and D-Day.",
   quickfacts: "This area links Parliament, law, rights, voting, daily life, and community duties. Expect short factual questions and principle-based questions.",
   nations: "Know capitals, saints, flowers, languages, and devolved parliaments. England has no separate parliament, and Wales is not in the Union Jack.",
   religion: "Focus on the 2011 census, the largest groups, and major festivals like Christmas, Easter, Diwali, Vaisakhi, Hanukkah, and the Eids.",
@@ -193,6 +196,17 @@ const buildQuickRevisionDeck = () => {
       context: buildTimelineDetails(item).slice(0, 2).join(" "),
       memory: item.memory,
       topic: "History",
+      color: item.color,
+    });
+  });
+
+  BATTLES_AND_WARS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.name}`,
+      back: `${item.years} · ${item.fact}`,
+      context: item.context,
+      memory: item.memory,
+      topic: "Wars",
       color: item.color,
     });
   });
@@ -1575,6 +1589,52 @@ const TimelineTab = () => {
     </div>
   );
 };
+
+// ── WARS ─────────────────────────────────────────────────────
+const WarsTab = () => (
+  <div style={{ padding: 20 }}>
+    <SectionTitle icon="⚔️" meta="Use war anchors as a separate memory spine: battle name, year, person, and why it mattered.">Wars & Battles</SectionTitle>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>War memory spine</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `1066` = Hastings = William the Conqueror<br />
+        • `1588` = Spanish Armada = Elizabeth I / Francis Drake<br />
+        • `1805` = Trafalgar = Nelson<br />
+        • `1815` = Waterloo = Wellington<br />
+        • `1914–18` = WWI = Armistice on 11 November 1918<br />
+        • `1939–45` = WWII = Churchill in war, Attlee after war
+      </div>
+      <MemoryHook text="When a war question appears, first lock the date, then attach the person: Hastings-William, Trafalgar-Nelson, Waterloo-Wellington." />
+    </Card>
+    <Card style={{ background: "color-mix(in srgb, #ef4444 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>WWII quick anchors</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `1939` = war begins after Germany invades Poland<br />
+        • `1940` = Battle of Britain, Blitz, Dunkirk<br />
+        • `1944` = D-Day in Normandy<br />
+        • `1945` = war ends
+      </div>
+      <MemoryHook text="WWII sequence: 1939 start, 1940 defend Britain, 1944 land in Normandy, 1945 end." />
+    </Card>
+    {BATTLES_AND_WARS.map((item) => (
+      <Card key={item.name} style={{ border: `1px solid ${item.color}33` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 28 }}>{item.icon}</span>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
+              <div style={{ color: item.color, fontSize: 12, fontWeight: 700 }}>{item.years}</div>
+            </div>
+          </div>
+          <Badge text={item.years} color={item.color} />
+        </div>
+        <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
+        <MemoryHook text={item.memory} />
+      </Card>
+    ))}
+  </div>
+);
 
 // ── 4 NATIONS ────────────────────────────────────────────────
 const NationsTab = () => (
@@ -3174,6 +3234,7 @@ const App = () => {
       case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
       case "timeline": return <TimelineTab />;
+      case "wars": return <WarsTab />;
       case "nations": return <NationsTab />;
       case "confuse": return <ConfuseTab />;
       case "inventors": return <InventorsTab />;

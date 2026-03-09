@@ -39,9 +39,11 @@ assert(Array.isArray(data.VISUAL_MNEMONICS) && data.VISUAL_MNEMONICS.length >= 4
 assert(data.TABS.some((tab) => tab.id === "mock"), "Mock tab missing");
 assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
 assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
+assert(data.TABS.some((tab) => tab.id === "wars"), "Wars tab missing");
 assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
 assert(/ReviseTab/.test(appSource), "Revision UI missing");
 assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
+assert(/WarsTab/.test(appSource), "Wars revision UI missing");
 assert(/MOCK_PAPER_COUNT = 30/.test(appSource), "Expected 30 fixed mock papers");
 assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
 assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
