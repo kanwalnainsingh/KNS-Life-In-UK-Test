@@ -1,0 +1,73 @@
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+
+const assert = (condition, message) => {
+  if (!condition) throw new Error(message);
+};
+
+const root = path.resolve(__dirname, "..");
+const dataPath = path.join(root, "src", "data.js");
+const appPath = path.join(root, "src", "app.jsx");
+const indexPath = path.join(root, "index.html");
+
+const dataSource = fs.readFileSync(dataPath, "utf8");
+const appSource = fs.readFileSync(appPath, "utf8");
+const indexSource = fs.readFileSync(indexPath, "utf8");
+
+const exportedNames = [
+  "ALL_QUIZ",
+  "CONFUSABLES",
+  "TABS",
+  "TIMELINE",
+  "NATIONS",
+  "RELIGIONS",
+  "FESTIVALS",
+  "VISUAL_MNEMONICS",
+];
+
+const context = {};
+vm.createContext(context);
+vm.runInContext(`${dataSource}\nthis.__exports = { ${exportedNames.join(", ")} };`, context);
+const data = context.__exports;
+
+assert(Array.isArray(data.ALL_QUIZ), "ALL_QUIZ should be defined");
+assert(data.ALL_QUIZ.length >= 180, "Expected at least 180 quiz questions");
+assert(Array.isArray(data.CONFUSABLES) && data.CONFUSABLES.length >= 6, "Expected confusion pairs");
+assert(Array.isArray(data.TABS) && data.TABS.length >= 16, "Expected expanded tab list");
+assert(Array.isArray(data.VISUAL_MNEMONICS) && data.VISUAL_MNEMONICS.length >= 4, "Expected mnemonic packs");
+assert(data.TABS.some((tab) => tab.id === "mock"), "Mock tab missing");
+assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
+assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
+assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
+assert(/ReviseTab/.test(appSource), "Revision UI missing");
+assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
+assert(/Back to quiz setup/.test(appSource), "Quiz back button missing");
+assert(/Go to home/.test(appSource), "Header home button missing");
+assert(/mobile-bottom-nav/.test(indexSource), "Mobile bottom nav styling missing");
+assert(/BottomNav/.test(appSource), "Bottom navigation component missing");
+assert(/MobileQuickPanel/.test(appSource), "Quick panel component missing");
+assert(/mobile-utility-strip/.test(indexSource), "Mobile utility strip styling missing");
+assert(/Go back/.test(appSource), "Header back button missing");
+assert(/Visual memory clues/.test(appSource), "Mnemonic home panel missing");
+assert(/Coverage checklist/.test(appSource), "Coverage checklist missing");
+assert(/focus-ring/.test(indexSource), "Focus-visible styling missing");
+assert(/@media \(max-width: 820px\)/.test(indexSource), "Responsive breakpoint missing");
+
+data.ALL_QUIZ.forEach((question, index) => {
+  assert(typeof question.q === "string" && question.q.length > 10, `Question ${index + 1} text invalid`);
+  assert(Array.isArray(question.opts) && question.opts.length === 4, `Question ${index + 1} must have 4 options`);
+  assert(Number.isInteger(question.a) && question.a >= 0 && question.a < 4, `Question ${index + 1} answer index invalid`);
+  assert(typeof question.tip === "string" && question.tip.length > 8, `Question ${index + 1} tip missing`);
+});
+
+data.CONFUSABLES.forEach((pair, index) => {
+  assert(pair.left && pair.right, `Confusion pair ${index + 1} missing sides`);
+  assert(Array.isArray(pair.left.points) && pair.left.points.length >= 3, `Confusion pair ${index + 1} left side incomplete`);
+  assert(Array.isArray(pair.right.points) && pair.right.points.length >= 3, `Confusion pair ${index + 1} right side incomplete`);
+});
+
+console.log("Smoke check passed:");
+console.log(`- ${data.ALL_QUIZ.length} quiz questions validated`);
+console.log(`- ${data.CONFUSABLES.length} confusion pairs validated`);
+console.log(`- ${data.TABS.length} tabs validated`);

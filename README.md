@@ -1,126 +1,174 @@
-# 🇬🇧 Life in the UK — Complete Study Guide
+# Life in the UK Test Prep App
 
-A free, open-source study guide for the **Life in the UK citizenship test** (3rd Edition).
+Mobile-first revision app for the UK citizenship test. It is built to help learners revise quickly, compare confusing facts, and practise under exam-style conditions without wading through long pages.
 
-> 📖 100+ quiz questions · 💡 Memory hooks on every fact · 📅 Full timeline · ⚠️ Don't-confuse section
+## What is in the app
 
----
+- `Quick Revise` flash cards for left/right tap revision and fast fact recall
+- `Quiz` practice with configurable answer reveal:
+  - show answer instantly
+  - show answer at the end
+  - optionally include context and memory clues
+- `Mock Test` mode for a more official-style run
+- `Rapid Fire` for timed, high-randomness recall
+- `Revise Mistakes` flow to revisit weak questions
+- `Confusing Topics` side-by-side comparisons for facts people often mix up
+- visual mnemonics and memory hooks such as `LECB`, `BSLH`, and `DRIM`
+- grouped topic sections covering history, values, law, government, nations, landmarks, religion, sports, inventors, arts, symbols, and international organisations
 
-## 🌐 Live Site
+## Why this app is different
 
-[**→ Open the Study Guide**](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
+The app is not just a fact list. It is designed around revision behaviour:
 
----
+- short cards instead of dense text
+- memory cues attached to facts and answers
+- compare-first layouts for high-confusion topics
+- mobile navigation that stays usable on long pages
+- practice modes that reduce repeated questions across sessions
 
-## 📸 Screenshots
+## Current coverage
+
+The content is organised so the major official handbook areas are not skipped:
+
+- values and principles of the UK
+- what is the UK
+- history of the UK
+- modern British society
+- government, law, and your role as a citizen
+- geography, landmarks, symbols, religion, arts, sport, and notable people
+
+Current validated quiz bank: `223` questions.
+
+## Screenshots
 
 <p align="center">
-  <img src="screenshots/home-dark.png" width="48%" alt="Home — dark mode" />
+  <img src="screenshots/home-light.png" width="48%" alt="Home and revision hub" />
   &nbsp;
-  <img src="screenshots/home-light.png" width="48%" alt="Home — light mode" />
+  <img src="screenshots/quiz.png" width="48%" alt="Quiz mode with answer review" />
 </p>
 <p align="center">
-  <img src="screenshots/quiz.png" width="48%" alt="Quiz mode" />
+  <img src="screenshots/timeline.png" width="48%" alt="Timeline and history revision" />
   &nbsp;
-  <img src="screenshots/timeline.png" width="48%" alt="History Timeline" />
+  <img src="screenshots/home-dark.png" width="48%" alt="Dark mode home view" />
 </p>
 
----
+## Main study modes
 
-## 📱 How to Use
+### Quick Revise
 
-1. **Open the app** at the live link above — works on any device, no install needed
-2. **Browse sections** using the tab bar at the top, or tap ☰ to see all sections
-3. **Toggle dark / light mode** with the ☀️ / 🌙 button in the header
-4. **Study each section** — every fact has a 💡 Memory hook to help you remember, and a 🚨 Exam trap to warn about common mistakes
-5. **Test yourself** with 🧠 QUIZ ME — choose 10, 24, 50 or all 100+ questions, review wrong answers at the end
-6. **Try Rapid Fire** 🔥 — 10 questions, 20 seconds each, auto-advances when time runs out — simulates real exam pressure
-7. **Star the repo** ⭐ if it helps you — and share it with others studying for the test
+Use this for fast revision. Cards are designed for quick recall, flipping, and swipe-like study on mobile. It is the fastest way to cover broad content before a mock.
 
----
+### Quiz
 
-## ✨ Features
+Use this for normal practice. You can choose whether to:
 
-| Tab | What's in it |
-|---|---|
-| 🏠 Home | Test info, top 10 facts, quick jump links |
-| 📅 Timeline | All events 10,000 BC → present, filterable by era |
-| 🏴 4 Nations | England, Scotland, Wales, N. Ireland — saints, flags, parliaments |
-| ⚠️ Traps | 8 most-confused topic pairs with side-by-side comparison |
-| 💡 Inventors | 24 inventors with categories + memory hooks |
-| 🏅 Sports | 22 athletes with achievements |
-| 👑 Key People | 21 historical figures |
-| ⛪ Religion | 2011 Census stats + 16 festivals |
-| 🏛️ Landmarks | 20 places with exam traps |
-| 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe |
-| 🎭 Arts | Literature, Music, Art, Architecture, Fashion, Film |
-| 🎵 Symbols | National anthem, Union Jack, population history |
-| ⚡ Quick Facts | Government, Law, Everyday Life, Currency |
-| 🧠 QUIZ ME | 100+ randomised questions with memory tips |
-| 🔥 Rapid Fire | 10 questions · 20 sec each · auto-advance on timeout |
+- see the answer immediately
+- see the answer only at the end
+- include memory/context tips
 
----
+This is the best mode for learning and checking understanding at the same time.
 
-## ✏️ How to Maintain & Update Facts
+### Mock Test
 
-The app is split into two files intentionally:
+Use this for exam-style practice. It is intended to feel closer to the real test and works best with answer reveal at the end.
 
-### To add or edit a fact → `src/data.js`
+### Rapid Fire
 
-Each section is clearly labelled. For example, to add a timeline event:
-```javascript
-// In TIMELINE array, add:
-{ year:"1945", era:"Modern", event:"Your new event here", icon:"🕊️", color:"#065f46",
-  memory:"Memory hook to help remember this." },
+Use this for pressure practice. It pulls from a broad question pool and avoids recent repeats so the mode stays useful over multiple sessions.
+
+### Revise Mistakes
+
+Use this after any quiz or mock. Wrong answers are saved so you can revisit weak areas instead of restarting everything.
+
+## Mobile navigation
+
+The app is designed to stay usable on a phone:
+
+- the `Life in the UK` header takes you back home
+- a header back action is available in study flows
+- mobile bottom navigation keeps major modes close
+- a quick panel gives access to grouped sections without long scrolling
+- a floating `Top` button helps on long pages
+
+## Topic map
+
+The menu is grouped to make navigation simpler on both desktop and mobile.
+
+### Study Modes
+
+- Home
+- Quick Revise
+- Quiz
+- Mock Test
+- Rapid Fire
+- Revise Mistakes
+
+### Core Topics
+
+- Timeline
+- 4 Nations
+- Confusing Topics
+- Quick Facts
+- Landmarks
+- Government and law related facts
+
+### People and Culture
+
+- Key People
+- Inventors
+- Sports
+- Religion and Festivals
+- Arts
+- Symbols
+- International Organisations
+
+## Run locally
+
+This project has no build step.
+
+```bash
+python3 -m http.server 4173
 ```
 
-To add a quiz question:
-```javascript
-// In ALL_QUIZ array, add:
-{ q:"Your question?", opts:["Option A","Option B","Option C","Option D"], a:1,
-  tip:"Memory tip shown after answering." },
-// a: is the INDEX (0-3) of the correct answer
+Then open `http://localhost:4173`.
+
+## Project structure
+
+- [index.html](index.html) sets up the page shell and shared CSS
+- [src/app.jsx](src/app.jsx) contains the React UI, state, mobile navigation, and study modes
+- [src/data.js](src/data.js) contains all tabs, facts, mnemonics, and quiz questions
+- [tests/smoke-check.js](tests/smoke-check.js) runs structural validation on content and UI hooks
+- [tests/coverage-audit.js](tests/coverage-audit.js) checks where facts and questions may still be thin
+- [AGENTS.md](AGENTS.md) records product intent and recent changes for future contributors and coding agents
+
+## How to update content
+
+Add or edit facts in [src/data.js](src/data.js). Keep new entries inside the existing topic groups where possible.
+
+Quiz items use this structure:
+
+```js
+{ q: "Question?", opts: ["A", "B", "C", "D"], a: 1, tip: "Memory clue or context." }
 ```
 
-### To change the UI → `src/app.jsx`
+Guidelines:
 
-Each tab has its own function (e.g., `TimelineTab`, `QuizTab`, `RapidFireTab`). Edit independently.
+- keep questions short and exam-like
+- use `tip` for memory hooks, comparisons, and traps
+- prefer facts that are official-scope, high-frequency, or easy to confuse
+- avoid near-duplicate questions unless the wording teaches a different distinction
 
-### All categories in `src/data.js`:
-| Variable | Tab |
-|---|---|
-| `TIMELINE` | Timeline tab |
-| `NATIONS` | 4 Nations tab |
-| `CONFUSABLES` | Traps tab |
-| `INVENTORS` | Inventors tab |
-| `SPORTS_STARS` | Sports tab |
-| `KEY_FIGURES` | Key People tab |
-| `RELIGIONS` / `FESTIVALS` | Religion tab |
-| `LANDMARKS` | Landmarks tab |
-| `INT_ORGS` | World Orgs tab |
-| `ARTS` | Arts tab |
-| `QUICK_FACTS` | Quick Facts tab |
-| `ALL_QUIZ` | Quiz + Rapid Fire tabs |
-| `POPULATION_HISTORY` | Symbols tab |
-| `ANTHEM` | Symbols tab |
+## Testing
 
----
+Run:
 
-## 📚 Source
+```bash
+node tests/smoke-check.js
+node tests/coverage-audit.js
+```
 
-All facts are based on **Life in the United Kingdom: A Guide for New Residents (3rd Edition)**, published by TSO. That is the only official source for the test.
+The smoke check validates the current app shape. The coverage audit is a guide for finding thin areas, not a strict truth source.
 
----
+## Source basis
 
-## 🔓 License
-
-Open source — share freely. Help others pass their test!
-
----
-
-## 🤝 Contributing
-
-Pull requests welcome! If you find an error or want to add more quiz questions:
-1. Fork the repo
-2. Edit `src/data.js`
-3. Submit a pull request
+The app is based on the official handbook for the Life in the UK Test. Supplementary notes and mnemonics are used only to improve recall, not to replace the official source.

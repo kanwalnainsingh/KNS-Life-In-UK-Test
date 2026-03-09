@@ -3,175 +3,758 @@
    Edit data.js to change content. Edit this file for UI changes.
    ============================================================= */
 
-const { useState, useRef } = React;
+const { useEffect, useMemo, useRef, useState } = React;
+
+const STORAGE_KEYS = {
+  theme: "lifeuk-theme",
+  activeTab: "lifeuk-active-tab",
+  wrongQuestions: "lifeuk-wrong-questions",
+  mockHistory: "lifeuk-mock-history",
+  recentQuiz: "lifeuk-recent-quiz",
+  recentMock: "lifeuk-recent-mock",
+  recentRapid: "lifeuk-recent-rapid",
+};
+
+const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "mock", "revise", "quiz", "rapidfire", "timeline", "confuse"];
+const NAV_GROUPS = [
+  { title: "Study Modes", ids: ["home", "quickrev", "mock", "revise", "quiz", "rapidfire"] },
+  { title: "Core Topics", ids: ["timeline", "nations", "confuse", "quickfacts", "landmarks", "international"] },
+  { title: "People & Culture", ids: ["inventors", "sports", "figures", "religion", "arts", "anthem"] },
+];
+const COVERAGE_AREAS = [
+  { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
+  { title: "Government and Parliament", detail: "Constitution, Commons, Lords, elections", tab: "quickfacts", icon: "🏛️" },
+  { title: "Laws, rights and values", detail: "Rule of law, courts, equality, British values", tab: "quickfacts", icon: "⚖️" },
+  { title: "Countries, geography and landmarks", detail: "Capitals, rivers, mountains, places", tab: "nations", icon: "🗺️" },
+  { title: "Religion and festivals", detail: "Major faiths, census facts, festivals", tab: "religion", icon: "⛪" },
+  { title: "People, culture and sport", detail: "Writers, scientists, arts, sport", tab: "figures", icon: "🎭" },
+  { title: "Symbols and everyday life", detail: "Anthem, currency, identity, practical facts", tab: "anthem", icon: "🎵" },
+  { title: "International organisations", detail: "UN, NATO, Commonwealth, Council of Europe", tab: "international", icon: "🌍" },
+  { title: "Community and participation", detail: "Volunteering, jury service, magistrates, respect", tab: "quickfacts", icon: "🤝" },
+];
+
+const useViewportMobile = () => {
+  const getValue = () => window.matchMedia("(max-width: 820px)").matches;
+  const [isMobile, setIsMobile] = useState(getValue);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 820px)");
+    const handler = (event) => setIsMobile(event.matches);
+    setIsMobile(media.matches);
+    if (media.addEventListener) media.addEventListener("change", handler);
+    else media.addListener(handler);
+    return () => {
+      if (media.removeEventListener) media.removeEventListener("change", handler);
+      else media.removeListener(handler);
+    };
+  }, []);
+
+  return isMobile;
+};
+
+const readStore = (key, fallback) => {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (err) {
+    return fallback;
+  }
+};
+
+const writeStore = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (err) {
+    /* ignore storage failures */
+  }
+};
+
+const inferTopic = (question) => {
+  const text = `${question.q} ${question.tip}`.toLowerCase();
+  if (/roman|tudor|stuart|victoria|battle|carta|parliament|hastings|empire|war|union|nhs|revolution/.test(text)) return "History";
+  if (/england|scotland|wales|ireland|union jack|capital|saint|flower|senedd|msp|mla/.test(text)) return "4 Nations";
+  if (/church|religion|festival|easter|christmas|diwali|eid|hanukkah|vaisakhi/.test(text)) return "Religion";
+  if (/invent|develop|scientist|theory|engine|radar|web|vaccine|ivf|dna/.test(text)) return "Inventors";
+  if (/olympic|wimbledon|cricket|football|golf|ashes|rugby|cyclist/.test(text)) return "Sports";
+  if (/museum|stonehenge|castle|palace|wall|river|lake|park|london|landmark|cenotaph/.test(text)) return "Landmarks";
+  if (/council|europe|commonwealth|nato|un|g7|human rights|echr/.test(text)) return "World Orgs";
+  return "General";
+};
+
+const buildRevisionBuckets = (items) => {
+  const grouped = items.reduce((acc, item) => {
+    const topic = inferTopic(item);
+    if (!acc[topic]) acc[topic] = [];
+    acc[topic].push(item);
+    return acc;
+  }, {});
+  return Object.entries(grouped)
+    .map(([topic, questions]) => ({ topic, questions }))
+    .sort((a, b) => b.questions.length - a.questions.length);
+};
+
+const buildQuickRevisionDeck = () => {
+  const deck = [];
+  VISUAL_MNEMONICS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.title}`,
+      back: `${item.code}: ${item.clue}`,
+      memory: item.visual,
+      topic: "Memory Clue",
+      color: item.color,
+    });
+  });
+  COVERAGE_AREAS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.title}`,
+      back: item.detail,
+      memory: `Covered in ${TABS.find((tab) => tab.id === item.tab)?.label || item.tab}`,
+      topic: "Coverage",
+      color: "#64748b",
+    });
+  });
+  [
+    { front: "🏛️ House of Commons", back: "Elected MPs. More powerful. Controls money bills.", memory: "Commons = chosen by the public.", topic: "Parliament", color: "#22c55e" },
+    { front: "🏛️ House of Lords", back: "Appointed members. Reviews and delays laws.", memory: "Lords = not elected.", topic: "Parliament", color: "#ef4444" },
+    { front: "🗳️ Voting basics", back: "Voting age 18. Secret ballot. FPTP in general elections.", memory: "18 + secret ballot + FPTP.", topic: "Elections", color: "#3b82f6" },
+    { front: "⚖️ Justice basics", back: "Rule of law. Innocent until proven guilty. Equality before the law.", memory: "Law applies to everyone.", topic: "Law", color: "#10b981" },
+    { front: "🤝 Community role", back: "Volunteering, fundraising, jury service and local participation all matter.", memory: "Community = take part, do not just observe.", topic: "Community", color: "#8b5cf6" },
+    { front: "🗺️ UK capitals", back: "London, Edinburgh, Cardiff, Belfast.", memory: "LECB mnemonic.", topic: "Geography", color: "#06b6d4" },
+    { front: "📜 Anchor dates", back: "43, 1066, 1215, 1534, 1948.", memory: "Roman invasion, Hastings, Magna Carta, Church of England, NHS.", topic: "History", color: "#f97316" },
+    { front: "🌍 World organisations", back: "UN, NATO, Commonwealth, Council of Europe.", memory: "Council of Europe ≠ EU.", topic: "International", color: "#0ea5e9" },
+  ].forEach((item) => deck.push(item));
+  return deck;
+};
+
+const buildConfusionDeck = () =>
+  CONFUSABLES.flatMap((pair) => {
+    const left = pair.left.label.split("—").pop().trim();
+    const right = pair.right.label.split("—").pop().trim();
+    return [{
+      q: `${pair.title}: which side matches "${pair.left.points[0]}"?`,
+      opts: [left, right, "Both", "Neither"],
+      a: 0,
+      tip: `⭐ Compare mode — ${pair.memory}`,
+    }];
+  });
+
+const pickRandom = (items, count) => [...items].sort(() => Math.random() - 0.5).slice(0, count);
+
+const saveWrongQuestions = (items) => {
+  if (!items.length) return;
+  const existing = readStore(STORAGE_KEYS.wrongQuestions, []);
+  const merged = [...items, ...existing]
+    .filter((item, index, arr) => arr.findIndex((x) => x.q === item.q) === index)
+    .slice(0, 60);
+  writeStore(STORAGE_KEYS.wrongQuestions, merged);
+};
+
+const saveMockResult = (entry) => {
+  const existing = readStore(STORAGE_KEYS.mockHistory, []);
+  writeStore(STORAGE_KEYS.mockHistory, [entry, ...existing].slice(0, 8));
+};
+
+const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
+  const unique = items.filter((item, index, arr) => arr.findIndex((x) => x.q === item.q) === index);
+  const recent = readStore(storageKey, []);
+  const freshPool = unique.filter((item) => !recent.includes(item.q));
+  const source = freshPool.length >= count ? freshPool : unique;
+  const picked = [...source].sort(() => Math.random() - 0.5).slice(0, Math.min(count, source.length));
+  const updatedRecent = [...picked.map((item) => item.q), ...recent].filter((value, index, arr) => arr.indexOf(value) === index).slice(0, recentLimit);
+  writeStore(storageKey, updatedRecent);
+  return picked;
+};
 
 // ── HELPERS ──────────────────────────────────────────────────
 const Badge = ({ text, color = "#3b82f6" }) => (
-  <span style={{ background: color + "22", color, border: `1px solid ${color}44`, borderRadius: 6, padding: "2px 8px", fontSize: 11, fontWeight: 700, letterSpacing: 0.5, fontFamily: "monospace" }}>{text}</span>
+  <span className="app-badge" style={{ background: color + "22", color, border: `1px solid ${color}44`, borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, letterSpacing: 0.3, fontFamily: "monospace" }}>{text}</span>
 );
-const Card = ({ children, style = {} }) => (
-  <div style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", borderRadius: 12, padding: 16, marginBottom: 12, ...style }}>{children}</div>
+
+const Card = ({ children, style = {}, className = "", ...props }) => (
+  <div {...props} className={`app-card ${className}`.trim()} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", borderRadius: 18, padding: 16, marginBottom: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.12)", ...style }}>{children}</div>
 );
-const SectionTitle = ({ children, icon }) => (
-  <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-strong)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-    {icon && <span>{icon}</span>}{children}
-  </h2>
-);
-const MemoryHook = ({ text }) => (
-  <div style={{ background: "#1a2a1a", border: "1px solid #166534", borderRadius: 8, padding: "8px 12px", marginTop: 8, fontSize: 13, color: "#86efac" }}>
-    <span style={{ color: "#4ade80", fontWeight: 700 }}>💡 Memory: </span>{text}
-  </div>
-);
-const TrapAlert = ({ text }) => (
-  <div style={{ background: "#2a1a1a", border: "1px solid #991b1b", borderRadius: 8, padding: "8px 12px", marginTop: 6, fontSize: 13, color: "#fca5a5" }}>
-    <span style={{ color: "#f87171", fontWeight: 700 }}>🚨 Exam trap: </span>{text}
+
+const SectionTitle = ({ children, icon, meta }) => (
+  <div className="section-title-wrap" style={{ marginBottom: 16 }}>
+    <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-strong)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+      {icon && <span>{icon}</span>}{children}
+    </h2>
+    {meta && <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{meta}</p>}
   </div>
 );
 
-// ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark }) => (
-  <>
-    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100 }}>
-      <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 8, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>☰</button>
-      <span style={{ color: "#60a5fa", fontWeight: 700, fontSize: 16 }}>🇬🇧 Life in the UK</span>
-      <div style={{ marginLeft: "auto", display: "flex", gap: 6, alignItems: "center" }}>
-        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
-          style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none", padding: "5px 8px", borderRadius: 6, border: "1px solid var(--card-border)", background: "var(--card-bg)", whiteSpace: "nowrap" }}>
-          ⭐ GitHub
-        </a>
-        <button onClick={toggleDark} title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-          style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
-          {isDark ? "☀️" : "🌙"}
+const MemoryHook = ({ text }) => (
+  <div className="memory-hook" style={{ background: "linear-gradient(135deg, #10261a, #152f21)", border: "1px solid #166534", borderRadius: 12, padding: "10px 12px", marginTop: 8, fontSize: 13, color: "#bbf7d0" }}>
+    <span style={{ color: "#4ade80", fontWeight: 800 }}>💡 Memory: </span>{text}
+  </div>
+);
+
+const TrapAlert = ({ text }) => (
+  <div className="trap-alert" style={{ background: "linear-gradient(135deg, #331515, #281010)", border: "1px solid #991b1b", borderRadius: 12, padding: "10px 12px", marginTop: 8, fontSize: 13, color: "#fecaca" }}>
+    <span style={{ color: "#f87171", fontWeight: 800 }}>🚨 Exam trap: </span>{text}
+  </div>
+);
+
+const HeroIllustration = ({ variant = "study" }) => {
+  const palette = {
+    study: { a: "#2563eb", b: "#0f172a", c: "#f59e0b", d: "#0ea5e9" },
+    mock: { a: "#dc2626", b: "#1f2937", c: "#f59e0b", d: "#4ade80" },
+    compare: { a: "#7c3aed", b: "#0f172a", c: "#f97316", d: "#60a5fa" },
+  }[variant];
+
+  return (
+    <svg viewBox="0 0 360 220" role="img" aria-label={`${variant} illustration`} style={{ width: "100%", height: "auto", display: "block" }}>
+      <defs>
+        <linearGradient id={`bg-${variant}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={palette.b} />
+          <stop offset="100%" stopColor="#020617" />
+        </linearGradient>
+      </defs>
+      <rect width="360" height="220" rx="28" fill={`url(#bg-${variant})`} />
+      <circle cx="280" cy="48" r="24" fill={palette.a} opacity="0.25" />
+      <circle cx="68" cy="54" r="14" fill={palette.c} opacity="0.5" />
+      <rect x="40" y="52" width="124" height="132" rx="18" fill="#ffffff" opacity="0.08" />
+      <rect x="64" y="74" width="78" height="10" rx="5" fill={palette.a} />
+      <rect x="64" y="95" width="54" height="10" rx="5" fill="#94a3b8" opacity="0.7" />
+      <rect x="64" y="116" width="70" height="10" rx="5" fill="#94a3b8" opacity="0.5" />
+      <rect x="64" y="140" width="56" height="28" rx="12" fill={palette.c} />
+      <rect x="196" y="66" width="118" height="36" rx="16" fill={palette.a} opacity="0.25" stroke={palette.a} />
+      <rect x="196" y="114" width="118" height="36" rx="16" fill={palette.d} opacity="0.18" stroke={palette.d} />
+      <rect x="196" y="162" width="74" height="18" rx="9" fill={palette.c} opacity="0.8" />
+      <text x="220" y="89" fill="#e2e8f0" fontSize="14" fontWeight="700">Compare</text>
+      <text x="225" y="138" fill="#e2e8f0" fontSize="14" fontWeight="700">Revise</text>
+      <text x="74" y="159" fill="#0f172a" fontSize="16" fontWeight="800">GO</text>
+    </svg>
+  );
+};
+
+const StatTile = ({ label, value, color }) => (
+  <div style={{ borderRadius: 16, padding: 14, background: color + "14", border: `1px solid ${color}33` }}>
+    <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
+    <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{label}</div>
+  </div>
+);
+
+const TabButton = ({ active, onClick, children }) => (
+  <button onClick={onClick} className="focus-ring" style={{ padding: "9px 14px", borderRadius: 999, border: "1px solid", cursor: "pointer", fontSize: 13, fontWeight: 700, background: active ? "#2563eb" : "var(--chip-bg)", borderColor: active ? "#3b82f6" : "var(--card-border)", color: active ? "#fff" : "var(--text)" }}>
+    {children}
+  </button>
+);
+
+const SettingGroup = ({ label, options, value, onChange }) => (
+  <div style={{ marginBottom: 14 }}>
+    <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 8 }}>{label}</div>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+      {options.map((option) => (
+        <TabButton key={option.value} active={value === option.value} onClick={() => onChange(option.value)}>
+          {option.label}
+        </TabButton>
+      ))}
+    </div>
+  </div>
+);
+
+const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => {
+  const items = [
+    { id: "home", icon: "🏠", label: "Home" },
+    { id: "quickrev", icon: "↔️", label: "Quick" },
+    { id: "mock", icon: "📝", label: "Mock" },
+    { id: "quiz", icon: "🧠", label: "Quiz" },
+  ];
+
+  return (
+    <div className="mobile-bottom-nav">
+      <button
+        className="focus-ring"
+        onClick={onBack}
+        style={{ border: "none", background: "none", color: canGoBack ? "#f8fafc" : "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: canGoBack ? "pointer" : "default", minWidth: 54 }}
+      >
+        <span style={{ fontSize: 18 }}>←</span>
+        <span>Back</span>
+      </button>
+      {items.map((item) => (
+        <button
+          key={item.id}
+          className="focus-ring"
+          onClick={() => setActive(item.id)}
+          style={{
+            border: "none",
+            background: "none",
+            color: active === item.id ? "#60a5fa" : "var(--text-muted)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 4,
+            fontSize: 11,
+            fontWeight: active === item.id ? 800 : 600,
+            cursor: "pointer",
+            minWidth: 54,
+          }}
+        >
+          <span style={{ fontSize: 18 }}>{item.icon}</span>
+          <span>{item.label}</span>
         </button>
-      </div>
+      ))}
+      <button
+        className="focus-ring"
+        onClick={openQuickPanel}
+        style={{ border: "none", background: "none", color: "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: "pointer", minWidth: 54 }}
+      >
+        <span style={{ fontSize: 18 }}>⋯</span>
+        <span>Panel</span>
+      </button>
     </div>
-    <div className="tab-strip-wrap">
-      <div className="noscroll" style={{ display: "flex", overflowX: "auto", background: "var(--header-bg)", borderBottom: "2px solid var(--card-border)", padding: "0 8px" }}>
-        {TABS.map(t => (
-          <button key={t.id} onClick={() => { setActive(t.id); setMenuOpen(false); }}
-            style={{ flexShrink: 0, padding: "10px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active === t.id ? 700 : 400,
-              color: active === t.id ? "#60a5fa" : "var(--text-muted)", borderBottom: active === t.id ? "2px solid #60a5fa" : "2px solid transparent",
-              transition: "all 0.15s", whiteSpace: "nowrap" }}>
-            {t.icon} {t.label}
+  );
+};
+
+const ScrollTopButton = ({ visible }) => (
+  <button
+    className="focus-ring mobile-scroll-top"
+    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+    style={{
+      opacity: visible ? 1 : 0,
+      pointerEvents: visible ? "auto" : "none",
+      transform: visible ? "translateY(0)" : "translateY(12px)",
+    }}
+  >
+    ↑ Top
+  </button>
+);
+
+const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div className="mobile-sheet-backdrop" onClick={onClose}>
+      <div className="mobile-sheet" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="Quick actions">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Quick access</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Move around without scrolling</div>
+          </div>
+          <button className="focus-ring" onClick={onClose} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>
+            Close
           </button>
-        ))}
-      </div>
-    </div>
-    {menuOpen && (
-      <div style={{ position: "fixed", inset: 0, background: "#000000cc", zIndex: 200 }} onClick={() => setMenuOpen(false)}>
-        <div style={{ background: "var(--card-bg)", width: 280, height: "100%", overflowY: "auto", padding: 16 }} onClick={e => e.stopPropagation()}>
-          <div style={{ color: "#60a5fa", fontWeight: 700, marginBottom: 16, fontSize: 18 }}>🇬🇧 Topics</div>
-          {TABS.map(t => (
-            <button key={t.id} onClick={() => { setActive(t.id); setMenuOpen(false); }}
-              style={{ display: "block", width: "100%", padding: "12px 16px", background: active === t.id ? "#1e3a5f" : "none",
-                border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#60a5fa" : "var(--text)",
-                borderRadius: 8, marginBottom: 4, fontSize: 15 }}>
-              {t.icon} {t.label}
-            </button>
+        </div>
+        <div style={{ display: "grid", gap: 10 }}>
+          <button
+            className="focus-ring"
+            onClick={() => { if (canGoBack) onBack(); onClose(); }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid var(--card-border)", background: canGoBack ? "var(--chip-bg)" : "var(--panel-bg)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 14, padding: "12px 14px", cursor: canGoBack ? "pointer" : "default" }}
+          >
+            <span>← Back</span>
+            <span style={{ fontSize: 12 }}>{canGoBack ? "Previous screen" : "No history yet"}</span>
+          </button>
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title}>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>{group.title}</div>
+              <div className="mobile-sheet-grid">
+                {group.ids.map((id) => {
+                  const item = TABS.find((tab) => tab.id === id);
+                  if (!item) return null;
+                  return (
+                    <button
+                      key={item.id}
+                      className="focus-ring"
+                      onClick={() => { setActive(item.id); onClose(); }}
+                      style={{ border: active === item.id ? "1px solid #3b82f6" : "1px solid var(--card-border)", background: active === item.id ? "#1d4ed822" : "var(--chip-bg)", color: active === item.id ? "#60a5fa" : "var(--text)", borderRadius: 14, padding: "12px 10px", cursor: "pointer", textAlign: "left" }}
+                    >
+                      <div style={{ fontSize: 20, marginBottom: 6 }}>{item.icon}</div>
+                      <div style={{ fontWeight: 700, fontSize: 13 }}>{item.label}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           ))}
-          <div style={{ marginTop: 16, padding: "12px 16px", borderTop: "1px solid var(--card-border)" }}>
-            <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
-              style={{ color: "#60a5fa", fontSize: 13, textDecoration: "none" }}>
-              ⭐ View on GitHub →
-            </a>
+          <div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Browse all topics</div>
+            <div className="mobile-sheet-scroll-row">
+              {TABS.filter((tab) => !NAV_GROUPS.flatMap((group) => group.ids).includes(tab.id)).map((tab) => (
+                <button
+                  key={tab.id}
+                  className="focus-ring"
+                  onClick={() => { setActive(tab.id); onClose(); }}
+                  style={{ border: active === tab.id ? "1px solid #3b82f6" : "1px solid var(--card-border)", background: active === tab.id ? "#1d4ed822" : "var(--chip-bg)", color: active === tab.id ? "#60a5fa" : "var(--text)", borderRadius: 999, padding: "9px 12px", cursor: "pointer", whiteSpace: "nowrap", fontWeight: 700, fontSize: 12 }}
+                >
+                  {tab.icon} {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    )}
+    </div>
+  );
+};
+
+const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
+  <>
+    <Card style={{ background: "linear-gradient(180deg, rgba(15,23,42,0.9), rgba(8,12,20,0.92))", border: "1px solid #1e3a5f" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{question.q}</div>
+      <div style={{ marginTop: 10 }}><Badge text={inferTopic(question)} color="#60a5fa" /></div>
+    </Card>
+    <div style={{ display: "grid", gap: 8 }}>
+      {question.opts.map((opt, oi) => {
+        let bg = "var(--card-bg)";
+        let border = "var(--card-border)";
+        let color = "var(--text)";
+        if (confirmed) {
+          if (oi === question.a) { bg = "#0f1f0f"; border = "#22c55e"; color = "#4ade80"; }
+          else if (oi === selected && oi !== question.a) { bg = "#220d0d"; border = "#ef4444"; color = "#fca5a5"; }
+          else { color = "var(--text-muted)"; }
+        } else if (selected === oi) {
+          bg = "#1d4ed822"; border = "#3b82f6"; color = "#bfdbfe";
+        }
+        return (
+          <button key={oi} className="focus-ring" onClick={() => onSelect(oi)}
+            style={{ padding: "14px 16px", borderRadius: 14, border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer", background: bg, color, textAlign: "left", fontSize: 14, transition: "all 0.15s" }}>
+            <span style={{ marginRight: 8, opacity: 0.7, fontWeight: 700 }}>{["A", "B", "C", "D"][oi]}.</span>{opt}
+            {confirmed && oi === question.a && " ✓"}
+            {confirmed && oi === selected && oi !== question.a && " ✗"}
+          </button>
+        );
+      })}
+    </div>
   </>
 );
 
-// ── HOME ─────────────────────────────────────────────────────
-const HomeTab = ({ setActive }) => (
-  <div style={{ padding: 20 }}>
-    <div style={{ textAlign: "center", padding: "32px 0 24px" }}>
-      <div style={{ fontSize: 64, marginBottom: 12 }}>🇬🇧</div>
-      <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Life in the UK</h1>
-      <p style={{ color: "#60a5fa", fontSize: 18, marginBottom: 4 }}>Complete Study Guide</p>
-      <p style={{ color: "#6b7280", fontSize: 14 }}>Based on the 3rd Edition Official Handbook</p>
-      <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginTop: 16 }}>
-        <Badge text="24 questions" color="#3b82f6" />
-        <Badge text="45 minutes" color="#10b981" />
-        <Badge text="75% to pass (18/24)" color="#f59e0b" />
-        <Badge text="£50 per attempt" color="#ef4444" />
-      </div>
-    </div>
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 24 }}>
-      {TABS.filter(t => t.id !== "home").map(t => (
-        <button key={t.id} onClick={() => setActive(t.id)}
-          style={{ background: "#111827", border: "1px solid #1f2937", borderRadius: 12, padding: "16px 8px", cursor: "pointer",
-            color: "var(--text)", fontSize: 13, textAlign: "center" }}>
-          <div style={{ fontSize: 28, marginBottom: 6 }}>{t.icon}</div>
-          <div style={{ fontWeight: 600 }}>{t.label}</div>
-        </button>
-      ))}
-    </div>
-    <Card style={{ background: "#0f1f0f", border: "1px solid #166534" }}>
-      <div style={{ fontSize: 16, fontWeight: 700, color: "#4ade80", marginBottom: 12 }}>🎯 Top 10 Most-Tested Facts</div>
-      {["1066 = Battle of Hastings. LAST invasion. William the Conqueror.",
-        "1603 = Crowns join only. 1707 = Parliaments merge (Great Britain).",
-        "1807 = slave TRADE banned. 1833 = slavery fully ABOLISHED.",
-        "1918 = women over 30 vote. 1928 = equal age 21. 1969 = age 18.",
-        "Great Britain = 3 nations. United Kingdom = 4 (add N. Ireland).",
-        "Church of England = Monarch IS head. Church of Scotland = NO role.",
-        "Council of Europe (47) ≠ EU (27). Council CANNOT make laws.",
-        "House of Commons = ELECTED. House of Lords = APPOINTED.",
-        "NHS = 1948. Aneurin Bevan = Minister. Attlee = PM.",
-        "Big Ben = THE BELL (not tower). Tower = Elizabeth Tower.",
-      ].map((f, i) => (
-        <div key={i} style={{ padding: "6px 0", borderBottom: i < 9 ? "1px solid #1a3a1a" : "none", color: "#d1fae5", fontSize: 14 }}>
-          {f}
-        </div>
-      ))}
-    </Card>
-    <div style={{ textAlign: "center", marginTop: 16, padding: 12, background: "#1a1a2e", borderRadius: 10, border: "1px solid #312e81" }}>
-      <div style={{ fontSize: 12, color: "#818cf8" }}>🔓 Open Source — Fork it, share it, improve it</div>
-      <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
-        style={{ display: "inline-block", marginTop: 6, fontSize: 12, color: "#60a5fa", textDecoration: "none", fontWeight: 600 }}>
-        ⭐ github.com/kanwalnainsingh/KNS-Life-In-UK-Test →
-      </a>
-    </div>
-  </div>
-);
+// ── TAB BAR ──────────────────────────────────────────────────
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, onBack, canGoBack, openQuickPanel }) => {
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [setMenuOpen]);
 
-// ── TIMELINE ─────────────────────────────────────────────────
-const TimelineTab = () => {
-  const eras = ["All","Ancient","Roman","Medieval","Tudor","Stuart","Georgian","Victorian","Modern"];
-  const [era, setEra] = useState("All");
-  const [search, setSearch] = useState("");
-  const filtered = TIMELINE.filter(e =>
-    (era === "All" || e.era === era) &&
-    (!search || e.event.toLowerCase().includes(search.toLowerCase()) || e.year.toString().includes(search))
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  return (
+    <>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px", borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
+        <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring mobile-only" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
+          ☰
+        </button>
+        <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "#f8fafc" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
+          ←
+        </button>
+        <button aria-label="Go to home" className="focus-ring" onClick={() => setActive("home")} style={{ background: "none", border: "none", color: "#60a5fa", fontWeight: 800, fontSize: 18, cursor: "pointer", padding: 0 }}>
+          🇬🇧 Life in the UK
+        </button>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
+          <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
+            style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none", padding: "6px 10px", borderRadius: 999, border: "1px solid var(--card-border)", background: "var(--card-bg)", whiteSpace: "nowrap" }}>
+            ⭐ GitHub
+          </a>
+          <button aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} className="focus-ring" onClick={toggleDark} title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
+            {isDark ? "☀️" : "🌙"}
+          </button>
+          <button aria-label="Open quick panel" className="focus-ring mobile-only" onClick={openQuickPanel} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
+            ⋯
+          </button>
+        </div>
+      </div>
+      <div className="mobile-utility-strip">
+        <button className="focus-ring" onClick={onBack} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 999, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontWeight: 700 }}>← Back</button>
+        <button className="focus-ring" onClick={() => setActive("home")} style={{ border: "1px solid var(--card-border)", background: active === "home" ? "#1d4ed822" : "var(--chip-bg)", color: active === "home" ? "#60a5fa" : "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>🏠 Home</button>
+        <button className="focus-ring" onClick={openQuickPanel} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>Quick Panel</button>
+      </div>
+      <div className="tab-strip-wrap desktop-only">
+        <div className="noscroll" style={{ display: "flex", overflowX: "auto", background: "var(--header-bg)", borderBottom: "1px solid var(--card-border)", padding: "0 10px" }}>
+          {TABS.filter((tab) => PRIMARY_DESKTOP_TABS.includes(tab.id)).map((t) => (
+            <button key={t.id} className="focus-ring" onClick={() => setActive(t.id)}
+              style={{ flexShrink: 0, padding: "12px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active === t.id ? 800 : 500, color: active === t.id ? "#60a5fa" : "var(--text-muted)", borderBottom: active === t.id ? "2px solid #60a5fa" : "2px solid transparent", whiteSpace: "nowrap" }}>
+              {t.icon} {t.label}
+            </button>
+          ))}
+          <button className="focus-ring" onClick={() => setMenuOpen(true)} style={{ flexShrink: 0, padding: "12px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--text)", whiteSpace: "nowrap" }}>
+            ☰ All Topics
+          </button>
+        </div>
+      </div>
+      {menuOpen && (
+        <div role="dialog" aria-modal="true" aria-label="Topics menu" style={{ position: "fixed", inset: 0, background: "#020617cc", zIndex: 200 }} onClick={() => setMenuOpen(false)}>
+          <div style={{ background: "var(--card-bg)", width: 340, maxWidth: "86vw", height: "100%", overflowY: "auto", padding: 18, borderRight: "1px solid var(--card-border)" }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ color: "#60a5fa", fontWeight: 800, marginBottom: 16, fontSize: 18 }}>🇬🇧 Study Modes</div>
+            {NAV_GROUPS.map((group) => (
+              <div key={group.title} style={{ marginBottom: 14 }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>{group.title}</div>
+                {group.ids.map((id) => {
+                  const t = TABS.find((tab) => tab.id === id);
+                  if (!t) return null;
+                  return (
+                    <button key={t.id} className="focus-ring" onClick={() => { setActive(t.id); setMenuOpen(false); }}
+                      style={{ display: "block", width: "100%", padding: "12px 16px", background: active === t.id ? "#1e3a5f" : "none", border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#bfdbfe" : "var(--text)", borderRadius: 12, marginBottom: 4, fontSize: 15 }}>
+                      {t.icon} {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+            <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>More topics</div>
+            {TABS.filter((tab) => !NAV_GROUPS.flatMap((group) => group.ids).includes(tab.id)).map((t) => (
+              <button key={t.id} className="focus-ring" onClick={() => { setActive(t.id); setMenuOpen(false); }}
+                style={{ display: "block", width: "100%", padding: "12px 16px", background: active === t.id ? "#1e3a5f" : "none", border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#bfdbfe" : "var(--text)", borderRadius: 12, marginBottom: 4, fontSize: 15 }}>
+                {t.icon} {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
   );
+};
+
+// ── HOME ─────────────────────────────────────────────────────
+const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
+  const latestMock = mockHistory[0];
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="📅">British History Timeline</SectionTitle>
-      <input placeholder="Search events..." value={search} onChange={e => setSearch(e.target.value)}
-        style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--input-border)", borderRadius: 8, padding: "8px 12px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14 }} />
-      <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
-        {eras.map(e => (
-          <button key={e} onClick={() => setEra(e)}
-            style={{ flexShrink: 0, padding: "6px 12px", borderRadius: 20, border: "1px solid", cursor: "pointer", fontSize: 12,
-              background: era === e ? "#3b82f6" : "#111827", borderColor: era === e ? "#3b82f6" : "#374151", color: era === e ? "#fff" : "#9ca3af" }}>
-            {e}
+      <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.7))", border: "1px solid #1d4ed8" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+          <div>
+            <div style={{ color: "#eff6ff", fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Life in the UK revision hub</div>
+            <div style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.6 }}>Study by topic, compare traps, run mocks, and revise mistakes quickly.</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", fontWeight: 800, cursor: "pointer" }}>Mock Test</button>
+            <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", borderRadius: 12, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>Quick Revise</button>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+          <Badge text="24 questions" color="#3b82f6" />
+          <Badge text="45 minutes" color="#10b981" />
+          <Badge text="75% to pass" color="#f59e0b" />
+          <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
+        </div>
+      </Card>
+
+      <div className="stats-grid" style={{ display: "grid", gap: 12, marginBottom: 16 }}>
+        <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
+        <StatTile label="Mock attempts saved" value={mockHistory.length} color="#3b82f6" />
+        <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
+        <StatTile label="Best recent result" value={mockHistory.length ? `${Math.max(...mockHistory.map((x) => x.percent))}%` : "0%"} color="#f59e0b" />
+      </div>
+
+      <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.92), rgba(8,145,178,0.16))", border: "1px solid #0ea5e9" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <div>
+            <div style={{ color: "#e0f2fe", fontWeight: 800, fontSize: 18 }}>Visual memory clues</div>
+            <div style={{ color: "#bae6fd", fontSize: 13 }}>Short codes from the revision pack, now built into the app</div>
+          </div>
+          <Badge text={`${VISUAL_MNEMONICS.length} memory packs`} color="#06b6d4" />
+        </div>
+        <div className="study-mode-grid" style={{ display: "grid", gap: 10 }}>
+          {VISUAL_MNEMONICS.map((item) => (
+            <div key={item.code} style={{ background: item.color + "18", border: `1px solid ${item.color}44`, borderRadius: 16, padding: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.icon} {item.title}</div>
+                <Badge text={item.code} color={item.color} />
+              </div>
+              <div style={{ color: "#e2e8f0", fontSize: 13, lineHeight: 1.6, marginBottom: 6 }}>{item.clue}</div>
+              <div style={{ color: "#bae6fd", fontSize: 12, lineHeight: 1.6 }}>{item.visual}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card style={{ border: "1px solid #334155" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Coverage checklist</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Handbook-style areas organised for quick navigation</div>
+          </div>
+          <Badge text={`${COVERAGE_AREAS.length} areas covered`} color="#22c55e" />
+        </div>
+        <div className="study-mode-grid" style={{ display: "grid", gap: 10 }}>
+          {COVERAGE_AREAS.map((item) => (
+            <button key={item.title} className="focus-ring" onClick={() => setActive(item.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 16, padding: 12, textAlign: "left", cursor: "pointer" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 14 }}>{item.icon} {item.title}</div>
+                <span style={{ color: "#22c55e", fontWeight: 800, fontSize: 13 }}>✓</span>
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{item.detail}</div>
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      <div className="study-mode-grid" style={{ display: "grid", gap: 12, marginBottom: 20 }}>
+        {[
+          { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
+          { id: "confuse", icon: "⚖️", title: "Compare Confusions", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
+          { id: "revise", icon: "🧩", title: "Revise Mistakes", desc: "Retry only the questions you previously got wrong.", color: "#ef4444" },
+          { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
+        ].map((item) => (
+          <button key={item.id} className="focus-ring" onClick={() => setActive(item.id)} style={{ background: "var(--card-bg)", border: `1px solid ${item.color}44`, borderRadius: 18, padding: 18, textAlign: "left", cursor: "pointer" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+              <div style={{ fontSize: 26 }}>{item.icon}</div>
+              <Badge text="Study mode" color={item.color} />
+            </div>
+            <div style={{ color: "var(--text-strong)", fontSize: 17, fontWeight: 800, marginBottom: 6 }}>{item.title}</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6 }}>{item.desc}</div>
           </button>
         ))}
       </div>
-      <div style={{ fontSize: 13, color: "#6b7280", marginBottom: 12 }}>{filtered.length} events</div>
+
+      <Card style={{ background: "linear-gradient(135deg, #10261a, #111827)", border: "1px solid #166534" }}>
+        <div style={{ fontSize: 16, fontWeight: 800, color: "#4ade80", marginBottom: 12 }}>🎯 Top 10 Most-Tested Facts</div>
+        {[
+          "1066 = Battle of Hastings. LAST invasion. William the Conqueror.",
+          "1603 = Crowns join only. 1707 = Parliaments merge (Great Britain).",
+          "1807 = slave TRADE banned. 1833 = slavery fully ABOLISHED.",
+          "1918 = women over 30 vote. 1928 = equal age 21. 1969 = age 18.",
+          "Great Britain = 3 nations. United Kingdom = 4 (add N. Ireland).",
+          "Church of England = Monarch IS head. Church of Scotland = NO role.",
+          "Council of Europe (47) ≠ EU (27). Council CANNOT make laws.",
+          "House of Commons = ELECTED. House of Lords = APPOINTED.",
+          "NHS = 1948. Aneurin Bevan = Minister. Attlee = PM.",
+          "Big Ben = THE BELL. Tower = Elizabeth Tower.",
+        ].map((fact, index) => (
+          <div key={fact} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: index < 9 ? "1px solid rgba(74,222,128,0.15)" : "none" }}>
+            <div style={{ color: "#4ade80", fontWeight: 800, minWidth: 22 }}>{index + 1}.</div>
+            <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.5 }}>{fact}</div>
+          </div>
+        ))}
+      </Card>
+    </div>
+  );
+};
+
+const QuickRevisionTab = ({ setActive }) => {
+  const deck = useMemo(() => buildQuickRevisionDeck(), []);
+  const [index, setIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
+  const touchStartRef = useRef(null);
+  const current = deck[index];
+
+  const move = (direction) => {
+    setIndex((value) => {
+      if (direction === "next") return (value + 1) % deck.length;
+      return (value - 1 + deck.length) % deck.length;
+    });
+    setFlipped(false);
+  };
+
+  const onTouchStart = (event) => {
+    touchStartRef.current = event.changedTouches[0].clientX;
+  };
+
+  const onTouchEnd = (event) => {
+    if (touchStartRef.current === null) return;
+    const delta = event.changedTouches[0].clientX - touchStartRef.current;
+    if (Math.abs(delta) > 45) move(delta < 0 ? "next" : "prev");
+    touchStartRef.current = null;
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="↔️" meta="Swipe left or right for fast all-topic revision. Tap the card to flip it.">Quick Revision</SectionTitle>
+      <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(14,165,233,0.18))", border: "1px solid #0ea5e9" }}>
+        <div style={{ color: "#e0f2fe", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>All-topic rapid recap</div>
+        <div style={{ color: "#bae6fd", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
+          Flip each card for the answer. Swipe left or right to move through the deck quickly.
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Badge text={`${deck.length} cards`} color="#06b6d4" />
+          <Badge text="Flip card" color="#3b82f6" />
+          <Badge text="All core topics covered" color="#22c55e" />
+        </div>
+      </Card>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+        <button className="focus-ring" onClick={() => move("prev")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>← Previous</button>
+        <button className="focus-ring" onClick={() => setFlipped((v) => !v)} style={{ border: "1px solid #3b82f6", background: "#1d4ed822", color: "#bfdbfe", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{flipped ? "Show front" : "Flip card"}</button>
+        <button className="focus-ring" onClick={() => move("next")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Next →</button>
+        <div style={{ marginLeft: "auto" }}><Badge text={`${index + 1} / ${deck.length}`} color={current.color} /></div>
+      </div>
+      <Card
+        className="quick-revision-card"
+        onClick={() => setFlipped((v) => !v)}
+        style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}1f, rgba(15,23,42,0.96))`, cursor: "pointer", userSelect: "none" }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <Badge text={current.topic} color={current.color} />
+          <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{flipped ? "Back of card" : "Front of card"}</div>
+        </div>
+        <div style={{ minHeight: 180, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: flipped ? 24 : 28, lineHeight: 1.35, marginBottom: 10 }}>
+            {flipped ? current.back : current.front}
+          </div>
+          <div style={{ color: flipped ? "#cbd5e1" : "#94a3b8", fontSize: 14, lineHeight: 1.7 }}>
+            {flipped ? current.memory : "Tap to reveal the answer or swipe to move on."}
+          </div>
+        </div>
+      </Card>
+      <Card>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Coverage checklist</div>
+        <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
+          {COVERAGE_AREAS.map((item) => (
+            <button key={item.title} className="focus-ring" onClick={() => setActive(item.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left" }}>
+              <div style={{ fontWeight: 700, color: "var(--text-strong)", marginBottom: 4 }}>{item.icon} {item.title}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{item.detail}</div>
+            </button>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+// ── TIMELINE ─────────────────────────────────────────────────
+const TimelineTab = () => {
+  const eras = ["All", "Ancient", "Roman", "Medieval", "Tudor", "Stuart", "Georgian", "Victorian", "Modern"];
+  const [era, setEra] = useState("All");
+  const [search, setSearch] = useState("");
+  const filtered = TIMELINE.filter((e) =>
+    (era === "All" || e.era === era) &&
+    (!search || e.event.toLowerCase().includes(search.toLowerCase()) || e.year.toString().includes(search))
+  );
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="📅" meta="Use short date anchors first, then the memory clue.">British History Timeline</SectionTitle>
+      <input className="focus-ring" placeholder="Search events, years, or people..." value={search} onChange={(e) => setSearch(e.target.value)}
+        style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--input-border)", borderRadius: 14, padding: "11px 14px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14 }} />
+      <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
+        {eras.map((value) => <TabButton key={value} active={era === value} onClick={() => setEra(value)}>{value}</TabButton>)}
+      </div>
+      <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 12 }}>{filtered.length} events</div>
       {filtered.map((ev, i) => (
-        <div key={i} style={{ display: "flex", gap: 12, marginBottom: 12, alignItems: "flex-start" }}>
-          <div style={{ flexShrink: 0, width: 80, textAlign: "right" }}>
-            <div style={{ fontSize: 13, fontWeight: 700, color: ev.color }}>{ev.year}</div>
-            <div style={{ fontSize: 10, color: "#6b7280", marginTop: 2 }}>{ev.era}</div>
+        <div key={`${ev.year}-${i}`} className="timeline-item" style={{ display: "grid", gridTemplateColumns: "90px 26px 1fr", gap: 12, marginBottom: 14, alignItems: "flex-start" }}>
+          <div className="timeline-year" style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 13, fontWeight: 800, color: ev.color }}>{ev.year}</div>
+            <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 3 }}>{ev.era}</div>
           </div>
           <div style={{ width: 24, display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ width: 20, height: 20, borderRadius: "50%", background: ev.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>{ev.icon}</div>
-            <div style={{ width: 2, flexGrow: 1, background: "#1f2937", marginTop: 2 }} />
+            <div style={{ width: 22, height: 22, borderRadius: "50%", background: ev.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>{ev.icon}</div>
+            <div style={{ width: 2, flexGrow: 1, background: "#1f2937", marginTop: 2, minHeight: 38 }} />
           </div>
-          <div style={{ flex: 1, background: "#111827", border: `1px solid ${ev.color}33`, borderRadius: 10, padding: 12, marginBottom: 4 }}>
-            <div style={{ fontWeight: 600, color: "var(--text-strong)", fontSize: 14 }}>{ev.event}</div>
+          <Card style={{ marginBottom: 0, background: "rgba(15,23,42,0.72)", border: `1px solid ${ev.color}33` }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+              <Badge text={ev.era} color={ev.color} />
+              <Badge text={ev.year} color="#64748b" />
+            </div>
+            <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 14, lineHeight: 1.6 }}>{ev.event}</div>
             <MemoryHook text={ev.memory} />
-          </div>
+          </Card>
         </div>
       ))}
     </div>
@@ -181,87 +764,65 @@ const TimelineTab = () => {
 // ── 4 NATIONS ────────────────────────────────────────────────
 const NationsTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="🏴">The 4 Nations</SectionTitle>
-    <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", marginBottom: 16 }}>
-      <div style={{ fontWeight: 700, color: "#60a5fa", marginBottom: 8 }}>🗺️ Great Britain vs United Kingdom</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <div style={{ background: "#1e3a5f33", borderRadius: 8, padding: 10 }}>
-          <div style={{ fontWeight: 700, color: "#93c5fd", marginBottom: 4 }}>Great Britain</div>
-          <div style={{ color: "var(--text)", fontSize: 13 }}>🏴󠁧󠁢󠁥󠁮󠁧󠁿 England + 🏴󠁧󠁢󠁳󠁣󠁴󠁿 Scotland + 🏴󠁧󠁢󠁷󠁬󠁳󠁿 Wales = 3 nations</div>
+    <SectionTitle icon="🏴" meta="Use comparison blocks to separate nation facts quickly.">The 4 Nations</SectionTitle>
+    <Card style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(220,38,38,0.1))", border: "1px solid #334155" }}>
+      <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
+        <div style={{ background: "#1e3a5f33", borderRadius: 14, padding: 12 }}>
+          <div style={{ fontWeight: 800, color: "#93c5fd", marginBottom: 6 }}>Great Britain</div>
+          <div style={{ color: "var(--text)", fontSize: 14 }}>England + Scotland + Wales = 3 nations</div>
         </div>
-        <div style={{ background: "#dc262633", borderRadius: 8, padding: 10 }}>
-          <div style={{ fontWeight: 700, color: "#fca5a5", marginBottom: 4 }}>United Kingdom</div>
-          <div style={{ color: "var(--text)", fontSize: 13 }}>GB + 🇬🇧 Northern Ireland = 4 nations</div>
+        <div style={{ background: "#dc262633", borderRadius: 14, padding: 12 }}>
+          <div style={{ fontWeight: 800, color: "#fecaca", marginBottom: 6 }}>United Kingdom</div>
+          <div style={{ color: "var(--text)", fontSize: 14 }}>Great Britain + Northern Ireland = 4 nations</div>
         </div>
       </div>
-      <MemoryHook text="UK = GB + NI. One extra nation." />
+      <MemoryHook text="UK = GB + Northern Ireland. One extra nation." />
     </Card>
-    {NATIONS.map(n => (
+    {NATIONS.map((n) => (
       <Card key={n.name} style={{ border: `1px solid ${n.color}44` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 36 }}>{n.flag}</span>
           <div>
-            <h3 style={{ color: n.color, fontWeight: 800, fontSize: 20 }}>{n.name}</h3>
-            <div style={{ color: "#9ca3af", fontSize: 13 }}>{n.pop} of UK population</div>
+            <h3 style={{ color: n.color, fontWeight: 800, fontSize: 22 }}>{n.name}</h3>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>{n.pop} of UK population</div>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-          {[["🙏 Saint",n.saint],["📅 Day",n.day],["🌸 Flower",n.flower],["🏙️ Capital",n.capital],["🗣️ Language",n.lang],["🍽️ Food",n.food]].map(([label,val]) => (
-            <div key={label} style={{ background: "#1a2030", borderRadius: 8, padding: "8px 10px" }}>
-              <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 2 }}>{label}</div>
-              <div style={{ fontSize: 13, color: "#e2e8f0", fontWeight: 500 }}>{val}</div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 8, marginBottom: 10 }}>
+          {[["🙏 Saint", n.saint], ["📅 Day", n.day], ["🌸 Flower", n.flower], ["🏙️ Capital", n.capital], ["🗣️ Language", n.lang], ["🍽️ Food", n.food]].map(([label, val]) => (
+            <div key={label} style={{ background: "var(--panel-bg)", borderRadius: 12, padding: "10px 12px" }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>{label}</div>
+              <div style={{ fontSize: 13, color: "var(--text-strong)", fontWeight: 600 }}>{val}</div>
             </div>
           ))}
         </div>
-        <div style={{ background: "#1a1a2e", borderRadius: 8, padding: 10, marginBottom: 8 }}>
-          <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 700, marginBottom: 4 }}>🏛️ Parliament</div>
-          <div style={{ fontSize: 13, color: "#c7d2fe" }}>{n.parliament}</div>
+        <div style={{ background: "#1a1a2e", borderRadius: 12, padding: 10, marginBottom: 8 }}>
+          <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 800, marginBottom: 4 }}>🏛️ Parliament</div>
+          <div style={{ fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>{n.parliament}</div>
         </div>
         {n.tricks.map((t, i) => (
-          <div key={i} style={{ fontSize: 13, color: "#fde68a", padding: "3px 0", borderBottom: i < n.tricks.length-1 ? "1px solid #27272a" : "none" }}>⚡ {t}</div>
+          <div key={i} style={{ fontSize: 13, color: "#fde68a", padding: "5px 0", borderBottom: i < n.tricks.length - 1 ? "1px solid #27272a" : "none" }}>⚡ {t}</div>
         ))}
       </Card>
     ))}
-    <Card style={{ background: "#1a1a0a", border: "1px solid #713f12" }}>
-      <div style={{ fontWeight: 700, color: "#fbbf24", marginBottom: 10 }}>📅 Patron Saints — Calendar Order (D-P-G-A)</div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
-        {[{flag:"🏴󠁧󠁢󠁷󠁬󠁳󠁿",name:"St David",date:"1 Mar",letter:"D"},{flag:"☘️",name:"St Patrick",date:"17 Mar",letter:"P"},{flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",name:"St George",date:"23 Apr",letter:"G"},{flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",name:"St Andrew",date:"30 Nov",letter:"A"}].map(s => (
-          <div key={s.letter} style={{ background: "#27200a", borderRadius: 8, padding: 10, textAlign: "center" }}>
-            <div style={{ fontSize: 24 }}>{s.flag}</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: "#fbbf24" }}>{s.letter}</div>
-            <div style={{ fontSize: 11, color: "#fde68a" }}>{s.name}</div>
-            <div style={{ fontSize: 12, color: "#a16207", fontWeight: 700 }}>{s.date}</div>
-          </div>
-        ))}
-      </div>
-    </Card>
-    <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", marginTop: 12 }}>
-      <div style={{ fontWeight: 700, color: "#60a5fa", marginBottom: 10 }}>📈 UK Population Through History</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4 }}>
-        {POPULATION_HISTORY.map(p => (
-          <div key={p.year} style={{ display: "flex", justifyContent: "space-between", padding: "5px 8px", background: "#1f2937", borderRadius: 6 }}>
-            <span style={{ color: "#94a3b8", fontSize: 13 }}>{p.year}</span>
-            <span style={{ color: "#60a5fa", fontWeight: 600, fontSize: 13 }}>{p.pop}</span>
-          </div>
-        ))}
-      </div>
-    </Card>
   </div>
 );
 
 // ── CONFUSABLES ──────────────────────────────────────────────
 const ConfuseTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="⚠️">Don't Confuse These!</SectionTitle>
+    <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam traps.">Don't Confuse These</SectionTitle>
     {CONFUSABLES.map((c, i) => (
       <Card key={i} style={{ border: "1px solid #374151" }}>
-        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 16, marginBottom: 12 }}>{c.icon} {c.title}</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{c.icon} {c.title}</div>
+          <Badge text="High-confusion pair" color="#f97316" />
+        </div>
+        <div className="compare-grid" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
           {[c.left, c.right].map((side, si) => (
-            <div key={si} style={{ background: side.color+"11", border: `1px solid ${side.color}44`, borderRadius: 10, padding: 12 }}>
-              <div style={{ fontWeight: 700, color: side.color, marginBottom: 8, fontSize: 13 }}>{side.label}</div>
+            <div key={si} style={{ background: side.color + "11", border: `1px solid ${side.color}44`, borderRadius: 14, padding: 12 }}>
+              <div style={{ fontWeight: 800, color: side.color, marginBottom: 8, fontSize: 13 }}>{side.label}</div>
               {side.points.map((p, pi) => (
-                <div key={pi} style={{ fontSize: 13, color: "var(--text)", padding: "3px 0", borderBottom: pi < side.points.length-1 ? `1px solid ${side.color}22` : "none" }}>{p}</div>
+                <div key={pi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: pi < side.points.length - 1 ? `1px solid ${side.color}22` : "none", lineHeight: 1.55 }}>{p}</div>
               ))}
             </div>
           ))}
@@ -275,20 +836,14 @@ const ConfuseTab = () => (
 
 // ── INVENTORS ────────────────────────────────────────────────
 const InventorsTab = () => {
-  const cats = ["All","Medicine","Computing","Engineering","Electronics","Physics","Biology"];
+  const cats = ["All", "Medicine", "Computing", "Engineering", "Electronics", "Physics", "Biology"];
   const [cat, setCat] = useState("All");
-  const filtered = INVENTORS.filter(i => cat === "All" || i.link === cat);
+  const filtered = INVENTORS.filter((i) => cat === "All" || i.link === cat);
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="💡">British Inventors & Scientists</SectionTitle>
+      <SectionTitle icon="💡" meta="Inventors are easier to remember by category and visual icon.">British Inventors & Scientists</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
-        {cats.map(c => (
-          <button key={c} onClick={() => setCat(c)}
-            style={{ flexShrink: 0, padding: "6px 12px", borderRadius: 20, border: "1px solid", cursor: "pointer", fontSize: 12,
-              background: cat === c ? "#3b82f6" : "#111827", borderColor: cat === c ? "#3b82f6" : "#374151", color: cat === c ? "#fff" : "#9ca3af" }}>
-            {c}
-          </button>
-        ))}
+        {cats.map((c) => <TabButton key={c} active={cat === c} onClick={() => setCat(c)}>{c}</TabButton>)}
       </div>
       {filtered.map((inv, i) => (
         <Card key={i}>
@@ -296,12 +851,12 @@ const InventorsTab = () => {
             <div style={{ fontSize: 36, flexShrink: 0 }}>{inv.icon}</div>
             <div style={{ flex: 1 }}>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-                <span style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{inv.who}</span>
-                <Badge text={inv.nation} color="#6b7280" />
+                <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{inv.who}</span>
+                <Badge text={inv.nation} color="#64748b" />
                 <Badge text={inv.link} color="#3b82f6" />
                 {inv.when && <Badge text={inv.when} color="#d97706" />}
               </div>
-              <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6 }}>{inv.what}</div>
+              <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{inv.what}</div>
               <MemoryHook text={inv.memory} />
             </div>
           </div>
@@ -316,13 +871,13 @@ const SportsTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🏅">British Sports Stars</SectionTitle>
     <Card style={{ background: "#0f1f0f", border: "1px solid #166534", marginBottom: 16 }}>
-      <div style={{ fontWeight: 700, color: "#4ade80", marginBottom: 8 }}>🏟️ Olympics Key Facts</div>
+      <div style={{ fontWeight: 800, color: "#4ade80", marginBottom: 8 }}>🏟️ Olympics Key Facts</div>
       <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.8 }}>
-        • UK hosted Olympics <strong>3 times</strong>: 1908, 1948, 2012 (Stratford, East London)<br/>
-        • 2012: UK finished <strong>3rd in the medal table</strong><br/>
-        • Scotland has <strong>5 ski resorts</strong>
+        • UK hosted Olympics 3 times: 1908, 1948, 2012<br />
+        • 2012: UK finished 3rd in the medal table<br />
+        • Scotland has 5 ski resorts
       </div>
-      <MemoryHook text="Three times: 1908, 1948, 2012. All in London (or near it)." />
+      <MemoryHook text="Three times: 1908, 1948, 2012." />
     </Card>
     {SPORTS_STARS.map((s, i) => (
       <Card key={i}>
@@ -330,11 +885,11 @@ const SportsTab = () => (
           <div style={{ fontSize: 32, flexShrink: 0 }}>{s.icon}</div>
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-              <span style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{s.name}</span>
+              <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{s.name}</span>
               <Badge text={s.sport} color="#f59e0b" />
-              {s.year && <Badge text={s.year} color="#6b7280" />}
+              {s.year && <Badge text={s.year} color="#64748b" />}
             </div>
-            <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6 }}>{s.achievement}</div>
+            <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{s.achievement}</div>
             <MemoryHook text={s.memory} />
           </div>
         </div>
@@ -352,12 +907,12 @@ const FiguresTab = () => (
         <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 8 }}>
           <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
           <div>
-            <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
-            <div style={{ color: f.color, fontSize: 12, fontWeight: 600 }}>{f.role}</div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
+            <div style={{ color: f.color, fontSize: 12, fontWeight: 700 }}>{f.role}</div>
           </div>
         </div>
         {f.facts.map((fact, fi) => (
-          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "4px 0", borderBottom: fi < f.facts.length-1 ? "1px solid #1f2937" : "none" }}>• {fact}</div>
+          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>• {fact}</div>
         ))}
       </Card>
     ))}
@@ -369,37 +924,28 @@ const ReligionTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="⛪">Religion & Festivals</SectionTitle>
     <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f" }}>
-      <div style={{ fontWeight: 700, color: "#60a5fa", marginBottom: 12 }}>📊 2011 Census — Religious Identity</div>
-      {RELIGIONS.map(r => (
+      <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>📊 2011 Census — Religious Identity</div>
+      {RELIGIONS.map((r) => (
         <div key={r.faith} style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-            <span style={{ fontSize: 15 }}>{r.icon} <span style={{ color: "var(--text-strong)", fontWeight: 600 }}>{r.faith}</span></span>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 15 }}>{r.icon} <span style={{ color: "var(--text-strong)", fontWeight: 700 }}>{r.faith}</span></span>
             <Badge text={r.pct} color={r.color} />
           </div>
-          <div style={{ background: "#1f2937", borderRadius: 6, height: 8, overflow: "hidden" }}>
-            <div className="bar-fill" style={{ height: "100%", borderRadius: 6, background: r.color, width: `${Math.min(r.bar, 100)}%` }} />
+          <div style={{ background: "#1f2937", borderRadius: 999, height: 10, overflow: "hidden" }}>
+            <div className="bar-fill" style={{ height: "100%", borderRadius: 999, background: r.color, width: `${Math.min(r.bar, 100)}%` }} />
           </div>
-          <div style={{ fontSize: 12, color: "#6b7280", marginTop: 3 }}>{r.note}</div>
+          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, lineHeight: 1.5 }}>{r.note}</div>
         </div>
       ))}
     </Card>
-    <Card style={{ background: "#0f0f1a", border: "1px solid #312e81", marginTop: 8 }}>
-      <div style={{ fontWeight: 700, color: "#818cf8", marginBottom: 8 }}>⛪ Church Facts</div>
-      <div style={{ fontSize: 13, color: "#c7d2fe", lineHeight: 1.8 }}>
-        • Protestant groups: Baptists, Methodists, Presbyterians (Scotland), Quakers<br/>
-        • Church of England = also called <strong>Episcopal Church</strong> in USA and Scotland<br/>
-        • Church of Scotland Moderator = chairperson, appointed for <strong>ONE year only</strong>
-      </div>
-    </Card>
-    <SectionTitle icon="🎉">Key Festivals & Traditions</SectionTitle>
     {FESTIVALS.map((f, i) => (
       <Card key={i}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 6 }}>
-          <span style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+          <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</span>
           <Badge text={f.date} color="#d97706" />
         </div>
         <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 4 }}>{f.faith}</div>
-        <div style={{ fontSize: 13, color: "var(--text)" }}>{f.detail}</div>
+        <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{f.detail}</div>
       </Card>
     ))}
   </div>
@@ -408,12 +954,14 @@ const ReligionTab = () => (
 // ── LANDMARKS ────────────────────────────────────────────────
 const LandmarksTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="🏛️">Landmarks & Places</SectionTitle>
+    <SectionTitle icon="🏛️" meta="Use location + one distinctive clue for each landmark.">Landmarks & Places</SectionTitle>
     {LANDMARKS.map((l, i) => (
       <Card key={i}>
-        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 15, marginBottom: 4 }}>{l.name}</div>
-        <Badge text={l.where} color="#6b7280" />
-        <div style={{ color: "var(--text)", fontSize: 14, marginTop: 8 }}>{l.fact}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{l.name}</div>
+          <Badge text={l.where} color="#64748b" />
+        </div>
+        <div style={{ color: "var(--text)", fontSize: 14, marginTop: 8, lineHeight: 1.7 }}>{l.fact}</div>
         <TrapAlert text={l.trap} />
       </Card>
     ))}
@@ -424,17 +972,17 @@ const LandmarksTab = () => (
 const InternationalTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🌍">International Organisations</SectionTitle>
-    <TrapAlert text="Council of Europe ≠ EU. Completely different! Council has 47 members and CANNOT make laws. EU has 27 members and CAN." />
+    <TrapAlert text="Council of Europe ≠ EU. Council has 47 members and cannot make laws. EU has 27 and can." />
     <div style={{ marginTop: 16 }}>
       {INT_ORGS.map((o, i) => (
         <Card key={i}>
-          <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 16, marginBottom: 6 }}>{o.name}</div>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 16, marginBottom: 6 }}>{o.name}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
             <Badge text={o.members} color="#3b82f6" />
             <Badge text={o.power} color={o.power.includes("CANNOT") ? "#ef4444" : "#10b981"} />
           </div>
-          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 4 }}><strong style={{ color: "#9ca3af" }}>Purpose:</strong> {o.purpose}</div>
-          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8 }}><strong style={{ color: "#9ca3af" }}>UK's role:</strong> {o.ukRole}</div>
+          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 4, lineHeight: 1.6 }}><strong style={{ color: "#9ca3af" }}>Purpose:</strong> {o.purpose}</div>
+          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8, lineHeight: 1.6 }}><strong style={{ color: "#9ca3af" }}>UK's role:</strong> {o.ukRole}</div>
           <MemoryHook text={o.memory} />
         </Card>
       ))}
@@ -445,31 +993,25 @@ const InternationalTab = () => (
 // ── ARTS ─────────────────────────────────────────────────────
 const ArtsTab = () => {
   const sections = [
-    { key:"literature", label:"📚 Literature", color:"#3b82f6" },
-    { key:"music",      label:"🎵 Music",       color:"#8b5cf6" },
-    { key:"art",        label:"🎨 Art",          color:"#ec4899" },
-    { key:"architecture", label:"🏛️ Architecture", color:"#f59e0b" },
-    { key:"fashion",    label:"👗 Fashion",      color:"#10b981" },
-    { key:"film",       label:"🎬 Film",         color:"#ef4444" },
+    { key: "literature", label: "📚 Literature", color: "#3b82f6" },
+    { key: "music", label: "🎵 Music", color: "#8b5cf6" },
+    { key: "art", label: "🎨 Art", color: "#ec4899" },
+    { key: "architecture", label: "🏛️ Architecture", color: "#f59e0b" },
+    { key: "fashion", label: "👗 Fashion", color: "#10b981" },
+    { key: "film", label: "🎬 Film", color: "#ef4444" },
   ];
   const [active, setActive] = useState("literature");
-  const sec = sections.find(s => s.key === active);
+  const sec = sections.find((s) => s.key === active);
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="🎭">Arts & Culture</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
-        {sections.map(s => (
-          <button key={s.key} onClick={() => setActive(s.key)}
-            style={{ flexShrink: 0, padding: "7px 12px", borderRadius: 20, border: `1px solid ${active === s.key ? s.color : "#374151"}`, cursor: "pointer", fontSize: 12,
-              background: active === s.key ? s.color+"22" : "#111827", color: active === s.key ? s.color : "#9ca3af" }}>
-            {s.label}
-          </button>
-        ))}
+        {sections.map((s) => <TabButton key={s.key} active={active === s.key} onClick={() => setActive(s.key)}>{s.label}</TabButton>)}
       </div>
       {(ARTS[active] || []).map((item, i) => (
         <Card key={i}>
-          <div style={{ fontWeight: 700, color: sec ? sec.color : "#f9fafb", fontSize: 14, marginBottom: 4 }}>{item.who}</div>
-          <div style={{ color: "var(--text)", fontSize: 13, marginBottom: 6 }}>{item.what}</div>
+          <div style={{ fontWeight: 800, color: sec ? sec.color : "#f9fafb", fontSize: 14, marginBottom: 4 }}>{item.who}</div>
+          <div style={{ color: "var(--text)", fontSize: 13, marginBottom: 6, lineHeight: 1.6 }}>{item.what}</div>
           <MemoryHook text={item.mem} />
         </Card>
       ))}
@@ -482,9 +1024,9 @@ const AnthemTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🎵">National Anthem & Symbols</SectionTitle>
     <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f" }}>
-      <div style={{ fontWeight: 700, color: "#60a5fa", marginBottom: 4 }}>{ANTHEM.title}</div>
-      <div style={{ fontSize: 12, color: "#6b7280", marginBottom: 12 }}>{ANTHEM.note}</div>
-      <div style={{ background: "#111827", borderRadius: 10, padding: 16, borderLeft: "4px solid #1e3a5f" }}>
+      <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 4 }}>{ANTHEM.title}</div>
+      <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>{ANTHEM.note}</div>
+      <div style={{ background: "#111827", borderRadius: 14, padding: 16, borderLeft: "4px solid #1e3a5f" }}>
         {ANTHEM.words.map((line, i) => (
           <div key={i} style={{ color: "#e2e8f0", fontSize: 15, lineHeight: 2, fontStyle: "italic" }}>{line}</div>
         ))}
@@ -492,28 +1034,14 @@ const AnthemTab = () => (
       <MemoryHook text={ANTHEM.memory} />
     </Card>
     <Card style={{ background: "#0f0a0a", border: "1px solid #7f1d1d" }}>
-      <div style={{ fontWeight: 700, color: "#fca5a5", marginBottom: 10 }}>🇬🇧 The Union Jack</div>
+      <div style={{ fontWeight: 800, color: "#fca5a5", marginBottom: 10 }}>🇬🇧 The Union Jack</div>
       <div style={{ fontSize: 13, color: "#fecaca", lineHeight: 1.8 }}>
-        • <strong>St George's Cross</strong> (England) — Red cross on white<br/>
-        • <strong>St Andrew's Cross / Saltire</strong> (Scotland) — White diagonal cross on blue<br/>
-        • <strong>St Patrick's Cross</strong> (N. Ireland) — Red diagonal cross on white<br/>
-        • <strong>Wales NOT included</strong> — was already united with England when flag designed
+        • St George's Cross (England) — red cross on white<br />
+        • St Andrew's Cross (Scotland) — white diagonal cross on blue<br />
+        • St Patrick's Cross (N. Ireland) — red diagonal cross on white<br />
+        • Wales is not included because it was already united with England
       </div>
-      <TrapAlert text="Wales has NO representation in the Union Jack. The Red Dragon is absent." />
-    </Card>
-    <Card style={{ background: "#0f170a", border: "1px solid #166534", marginTop: 12 }}>
-      <div style={{ fontWeight: 700, color: "#4ade80", marginBottom: 10 }}>💷 British Currency</div>
-      <div style={{ fontSize: 13, color: "#bbf7d0", lineHeight: 1.8 }}>
-        <strong>Pound sterling (£)</strong> — 100 pence in a pound<br/>
-        <strong>Coins:</strong> 1p, 2p, 5p, 10p, 20p, 50p, £1, £2<br/>
-        <strong>Notes:</strong> £5, £10, £20, £50
-      </div>
-    </Card>
-    <Card style={{ background: "#0f0f1a", border: "1px solid #312e81", marginTop: 12 }}>
-      <div style={{ fontWeight: 700, color: "#818cf8", marginBottom: 10 }}>⚖️ European Convention on Human Rights</div>
-      {["Right to life","Prohibition of torture","Prohibition of slavery","Right to liberty and security","Right to a fair trial","Freedom of thought, conscience and religion","Freedom of expression (speech)"].map((r, i) => (
-        <div key={i} style={{ fontSize: 13, color: "#c7d2fe", padding: "4px 0", borderBottom: i < 6 ? "1px solid #1e1b4b" : "none" }}>• {r}</div>
-      ))}
+      <TrapAlert text="Wales has no representation in the Union Jack." />
     </Card>
   </div>
 );
@@ -524,9 +1052,9 @@ const QuickFactsTab = () => (
     <SectionTitle icon="⚡">Quick Facts</SectionTitle>
     {QUICK_FACTS.map((section, si) => (
       <Card key={si} style={{ border: `1px solid ${section.color}33` }}>
-        <div style={{ fontWeight: 700, color: section.color, marginBottom: 10, fontSize: 15 }}>{section.icon} {section.cat}</div>
+        <div style={{ fontWeight: 800, color: section.color, marginBottom: 10, fontSize: 15 }}>{section.icon} {section.cat}</div>
         {section.facts.map((f, fi) => (
-          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < section.facts.length-1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>
+          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < section.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>
             <span style={{ color: section.color, marginRight: 6 }}>▸</span>{f}
           </div>
         ))}
@@ -548,82 +1076,124 @@ const QuizTab = () => {
   const [questions, setQuestions] = useState([]);
   const [reviewMode, setReviewMode] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [answerMode, setAnswerMode] = useState("instant");
+  const [showContext, setShowContext] = useState(true);
   const advanceRef = useRef(null);
-  const { useEffect } = React;
-  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
-  const FILTERS = [
-    { id:"all", label:"All Topics", icon:"🎯" },
-    { id:"star", label:"Exam Favourites", icon:"⭐" },
-    { id:"pin", label:"Often Tested", icon:"📌" },
-    { id:"bulb", label:"Good to Know", icon:"💡" },
+
+  const filters = [
+    { id: "all", label: "All Topics", icon: "🎯" },
+    { id: "star", label: "Exam Favourites", icon: "⭐" },
+    { id: "pin", label: "Often Tested", icon: "📌" },
+    { id: "bulb", label: "Good to Know", icon: "💡" },
   ];
+
   const filterQuestions = () => {
     if (filter === "all") return ALL_QUIZ;
-    const prefix = { star:"⭐", pin:"📌", bulb:"💡" }[filter];
-    return ALL_QUIZ.filter(q => q.tip.startsWith(prefix));
+    const prefix = { star: "⭐", pin: "📌", bulb: "💡" }[filter];
+    return ALL_QUIZ.filter((q) => q.tip.startsWith(prefix));
   };
-  const startQuiz = () => {
-    const pool = filterQuestions();
+
+  const resetFlow = (pool) => {
     const n = Math.min(count, pool.length);
-    setQuestions(shuffle(pool).slice(0, n));
-    setCurrent(0); setSelected(null); setConfirmed(false);
-    setScore(0); setWrong([]); setFinished(false); setReviewMode(false);
+    setQuestions(pickRandomNoRepeat(pool, n, STORAGE_KEYS.recentQuiz, 120));
+    setCurrent(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setWrong([]);
+    setFinished(false);
+    setReviewMode(false);
     setStarted(true);
   };
+
+  const startQuiz = () => resetFlow(filterQuestions());
+
   const handleSelect = (oi) => {
-    if (confirmed) return;
-    setSelected(oi); setConfirmed(true);
-    if (oi === questions[current].a) setScore(s => s + 1);
-    else setWrong(w => [...w, { ...questions[current], chosen: oi }]);
-    if (advanceRef.current) clearTimeout(advanceRef.current);
-    advanceRef.current = setTimeout(() => {
-      if (current + 1 >= questions.length) { setFinished(true); return; }
-      setCurrent(c => c + 1); setSelected(null); setConfirmed(false);
-    }, 2500);
+    if (confirmed || selected !== null) return;
+    setSelected(oi);
+    if (answerMode === "instant") {
+      setConfirmed(true);
+      if (oi === questions[current].a) setScore((s) => s + 1);
+      else setWrong((w) => [...w, { ...questions[current], chosen: oi }]);
+      if (advanceRef.current) clearTimeout(advanceRef.current);
+      advanceRef.current = setTimeout(() => {
+        if (current + 1 >= questions.length) {
+          setFinished(true);
+          return;
+        }
+        setCurrent((c) => c + 1);
+        setSelected(null);
+        setConfirmed(false);
+      }, 2200);
+    }
   };
-  useEffect(() => { return () => { if (advanceRef.current) clearTimeout(advanceRef.current); }; }, []);
+
+  useEffect(() => () => {
+    if (advanceRef.current) clearTimeout(advanceRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (finished) saveWrongQuestions(wrong);
+  }, [finished, wrong]);
+
   const skipToNext = () => {
     if (advanceRef.current) clearTimeout(advanceRef.current);
-    if (current + 1 >= questions.length) { setFinished(true); return; }
-    setCurrent(c => c + 1); setSelected(null); setConfirmed(false);
+    if (!confirmed && answerMode === "deferred" && selected !== null) {
+      const q = questions[current];
+      if (selected === q.a) setScore((s) => s + 1);
+      else setWrong((w) => [...w, { ...q, chosen: selected }]);
+    }
+    if (current + 1 >= questions.length) {
+      setFinished(true);
+      return;
+    }
+    setCurrent((c) => c + 1);
+    setSelected(null);
+    setConfirmed(false);
   };
 
   if (!started) {
     const pool = filterQuestions();
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="🧠">Quiz Me!</SectionTitle>
-        <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>🎯</div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 18, marginBottom: 8 }}>Test your knowledge!</div>
-          <div style={{ color: "#9ca3af", fontSize: 14, marginBottom: 20 }}>{pool.length} questions available</div>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ color: "#9ca3af", fontSize: 13, marginBottom: 10 }}>Filter by frequency</div>
-            <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
-              {FILTERS.map(f => (
-                <button key={f.id} onClick={() => setFilter(f.id)}
-                  style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid", cursor: "pointer", fontSize: 13,
-                    background: filter === f.id ? "#3b82f6" : "#1f2937", borderColor: filter === f.id ? "#3b82f6" : "#374151", color: "var(--text-strong)" }}>
-                  {f.icon} {f.label}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ color: "#9ca3af", fontSize: 13, marginBottom: 10 }}>How many questions?</div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-              {[10, 24, 50, pool.length].map(n => (
-                <button key={n} onClick={() => setCount(n)}
-                  style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid", cursor: "pointer",
-                    background: count === n ? "#3b82f6" : "#1f2937", borderColor: count === n ? "#3b82f6" : "#374151", color: "var(--text-strong)", fontSize: 14 }}>
-                  {n === pool.length ? `All (${n})` : n}
-                </button>
-              ))}
-            </div>
-          </div>
-          <button onClick={startQuiz} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 10, padding: "14px 32px", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
-            Start Quiz →
-          </button>
+        <SectionTitle icon="🧠" meta="Use this for broad recall with instant feedback.">Quiz Me</SectionTitle>
+        <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.92), rgba(29,78,216,0.18))", border: "1px solid #1e3a5f", textAlign: "center" }}>
+              <div style={{ fontSize: 40, marginBottom: 8 }}>🎯</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>Test your knowledge</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 20 }}>{pool.length} questions available</div>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 10 }}>Filter by frequency</div>
+                <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
+                  {filters.map((f) => <TabButton key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>{f.icon} {f.label}</TabButton>)}
+                </div>
+              </div>
+              <SettingGroup
+                label="When should answers be shown?"
+                value={answerMode}
+                onChange={setAnswerMode}
+                options={[
+                  { value: "instant", label: "Show now" },
+                  { value: "deferred", label: "Show at end" },
+                ]}
+              />
+              <SettingGroup
+                label="Show memory tips and context?"
+                value={showContext ? "yes" : "no"}
+                onChange={(value) => setShowContext(value === "yes")}
+                options={[
+                  { value: "yes", label: "With context" },
+                  { value: "no", label: "Answers only" },
+                ]}
+              />
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 10 }}>How many questions?</div>
+                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+                  {[10, 24, 50, pool.length].map((n) => <TabButton key={n} active={count === n} onClick={() => setCount(n)}>{n === pool.length ? `All (${n})` : n}</TabButton>)}
+                </div>
+              </div>
+              <button className="focus-ring" onClick={startQuiz} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 14, padding: "14px 32px", fontSize: 16, fontWeight: 800, cursor: "pointer" }}>
+                Start Quiz
+              </button>
         </Card>
       </div>
     );
@@ -636,21 +1206,26 @@ const QuizTab = () => {
       <div style={{ padding: 20 }}>
         <Card style={{ textAlign: "center", border: `2px solid ${pass ? "#22c55e" : "#ef4444"}` }}>
           <div style={{ fontSize: 56, marginBottom: 8 }}>{pass ? "🎉" : "📚"}</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "PASSED!" : "Keep Studying"}</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--text-strong)" }}>{score}/{questions.length}</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Strong recall" : "Revision needed"}</div>
+          <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)" }}>{score}/{questions.length}</div>
           <div style={{ fontSize: 20, color: pass ? "#4ade80" : "#f87171", marginBottom: 16 }}>{pct}%</div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button onClick={startQuiz} style={{ background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}>Try Again</button>
-            {wrong.length > 0 && <button onClick={() => setReviewMode(true)} style={{ background: "#ef444422", color: "#f87171", border: "1px solid #ef4444", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontWeight: 700 }}>Review {wrong.length} wrong</button>}
-            <button onClick={() => setStarted(false)} style={{ background: "#1f2937", color: "#9ca3af", border: "1px solid #374151", borderRadius: 8, padding: "10px 20px", cursor: "pointer" }}>Back</button>
+            <button className="focus-ring" onClick={startQuiz} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 12, padding: "10px 20px", cursor: "pointer", fontWeight: 800 }}>Try Again</button>
+            {wrong.length > 0 && <button className="focus-ring" onClick={() => setReviewMode((v) => !v)} style={{ background: "#ef444422", color: "#f87171", border: "1px solid #ef4444", borderRadius: 12, padding: "10px 20px", cursor: "pointer", fontWeight: 800 }}>{reviewMode ? "Hide review" : `Review ${wrong.length} wrong`}</button>}
+            <button className="focus-ring" onClick={() => setStarted(false)} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 20px", cursor: "pointer" }}>Back</button>
           </div>
         </Card>
+        {answerMode === "deferred" && wrong.length === 0 && (
+          <Card style={{ border: "1px solid #166534", background: "#0f1f0f" }}>
+            <div style={{ color: "#bbf7d0", fontWeight: 700 }}>All answers were correct. Deferred review is ready when you miss questions.</div>
+          </Card>
+        )}
         {reviewMode && wrong.map((w, i) => (
           <Card key={i} style={{ border: "1px solid #7f1d1d", background: "#1a0a0a" }}>
-            <div style={{ fontWeight: 600, color: "var(--text-strong)", marginBottom: 8 }}>Q: {w.q}</div>
-            <div style={{ color: "#f87171", marginBottom: 4 }}>✗ You chose: {w.opts[w.chosen]}</div>
+            <div style={{ fontWeight: 700, color: "var(--text-strong)", marginBottom: 8 }}>Q: {w.q}</div>
+            <div style={{ color: "#fca5a5", marginBottom: 4 }}>✗ You chose: {w.opts[w.chosen]}</div>
             <div style={{ color: "#4ade80", marginBottom: 8 }}>✓ Correct: {w.opts[w.a]}</div>
-            <MemoryHook text={w.tip} />
+            {showContext && <MemoryHook text={w.tip} />}
           </Card>
         ))}
       </div>
@@ -660,41 +1235,333 @@ const QuizTab = () => {
   const q = questions[current];
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-        <Badge text={`${current+1} / ${questions.length}`} color="#6b7280" />
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        <Badge text={`${current + 1} / ${questions.length}`} color="#64748b" />
         <Badge text={`Score: ${score}`} color="#22c55e" />
       </div>
-      <div style={{ background: "#1f2937", borderRadius: 6, height: 6, marginBottom: 16 }}>
-        <div style={{ background: "#3b82f6", height: "100%", borderRadius: 6, width: `${((current+1)/questions.length)*100}%`, transition: "width 0.3s" }} />
+      <button className="focus-ring" onClick={() => setStarted(false)} style={{ marginBottom: 12, background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>
+        ← Back to quiz setup
+      </button>
+      <div style={{ background: "#1f2937", borderRadius: 999, height: 8, marginBottom: 16 }}>
+        <div style={{ background: "#3b82f6", height: "100%", borderRadius: 999, width: `${((current + 1) / questions.length) * 100}%`, transition: "width 0.3s" }} />
       </div>
-      <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f" }}>
-        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{q.q}</div>
-      </Card>
-      <div style={{ display: "grid", gap: 8, marginBottom: 16 }}>
-        {q.opts.map((opt, oi) => {
-          let bg = "#111827", border = "#374151", color = "var(--text)";
-          if (confirmed) {
-            if (oi === q.a) { bg = "#0f1f0f"; border = "#22c55e"; color = "#4ade80"; }
-            else if (oi === selected && oi !== q.a) { bg = "#1a0a0a"; border = "#ef4444"; color = "#f87171"; }
-            else { bg = "#111827"; border = "#374151"; color = "var(--text-muted)"; }
-          }
+      <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
+      {confirmed && answerMode === "instant" && (
+        <>
+          {showContext && <MemoryHook text={q.tip} />}
+          <button className="focus-ring" onClick={skipToNext}
+            style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "#22c55e22", color: "#4ade80", border: "1px solid #22c55e44", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+            {current + 1 < questions.length ? "Next" : "See Results"}
+          </button>
+        </>
+      )}
+      {answerMode === "deferred" && (
+        <button className="focus-ring" onClick={skipToNext}
+          style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+          {current + 1 < questions.length ? "Lock answer and continue" : "Finish and review"}
+        </button>
+      )}
+    </div>
+  );
+};
+
+// ── MOCK EXAM ────────────────────────────────────────────────
+const MockExamTab = () => {
+  const TOTAL = 24;
+  const LIMIT_SECONDS = 45 * 60;
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [questions, setQuestions] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(LIMIT_SECONDS);
+  const [answerMode, setAnswerMode] = useState("deferred");
+  const [showContext, setShowContext] = useState(true);
+  const timerRef = useRef(null);
+
+  const score = questions.reduce((sum, q, index) => sum + (answers[index] === q.a ? 1 : 0), 0);
+
+  const startMock = () => {
+    setQuestions(pickRandomNoRepeat([...ALL_QUIZ, ...buildConfusionDeck()], TOTAL, STORAGE_KEYS.recentMock, 140));
+    setAnswers({});
+    setCurrent(0);
+    setTimeLeft(LIMIT_SECONDS);
+    setStarted(true);
+    setFinished(false);
+  };
+
+  useEffect(() => {
+    if (!started || finished) return undefined;
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft((value) => {
+        if (value <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return value - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timerRef.current);
+  }, [started, finished]);
+
+  useEffect(() => {
+    if (timeLeft === 0 && started && !finished) setFinished(true);
+  }, [timeLeft, started, finished]);
+
+  useEffect(() => {
+    if (!finished || !questions.length) return;
+    const wrong = questions
+      .map((q, index) => ({ ...q, chosen: answers[index] }))
+      .filter((q, index) => answers[index] !== q.a);
+    saveWrongQuestions(wrong);
+    saveMockResult({
+      date: new Date().toISOString(),
+      score,
+      percent: Math.round((score / TOTAL) * 100),
+      passed: score >= 18,
+    });
+  }, [finished, questions, answers, score]);
+
+  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+  const seconds = String(timeLeft % 60).padStart(2, "0");
+  const currentQuestion = questions[current];
+
+  if (!started) {
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="📝" meta="This matches the official test format: 24 questions, 45 minutes, no instant feedback.">Mock Test</SectionTitle>
+        <Card style={{ background: "linear-gradient(135deg, rgba(127,29,29,0.18), rgba(15,23,42,0.94))", border: "1px solid #dc2626" }}>
+              <div style={{ color: "#fca5a5", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Proper exam practice</div>
+              <div style={{ color: "#e2e8f0", fontSize: 15, lineHeight: 1.7, marginBottom: 16 }}>
+                24 questions. 45 minutes. Pass mark 18. Results only at the end. This is the closest mode to the real experience.
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 18 }}>
+                <Badge text="24 questions" color="#f97316" />
+                <Badge text="45:00 timer" color="#ef4444" />
+                <Badge text="18 needed to pass" color="#22c55e" />
+              </div>
+              <SettingGroup
+                label="When should answers be shown?"
+                value={answerMode}
+                onChange={setAnswerMode}
+                options={[
+                  { value: "deferred", label: "At end" },
+                  { value: "instant", label: "After each" },
+                ]}
+              />
+              <SettingGroup
+                label="Show memory tips and context?"
+                value={showContext ? "yes" : "no"}
+                onChange={(value) => setShowContext(value === "yes")}
+                options={[
+                  { value: "yes", label: "With context" },
+                  { value: "no", label: "Answers only" },
+                ]}
+              />
+              <button className="focus-ring" onClick={startMock} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 14, padding: "14px 28px", fontWeight: 800, cursor: "pointer" }}>
+                Start Mock Exam
+              </button>
+        </Card>
+      </div>
+    );
+  }
+
+  if (finished) {
+    const percent = Math.round((score / TOTAL) * 100);
+    const passed = score >= 18;
+    const wrong = questions
+      .map((q, index) => ({ ...q, chosen: answers[index] }))
+      .filter((q, index) => answers[index] !== q.a);
+
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="📝">Mock Test Results</SectionTitle>
+        <Card style={{ textAlign: "center", border: `2px solid ${passed ? "#22c55e" : "#ef4444"}` }}>
+          <div style={{ fontSize: 54, marginBottom: 8 }}>{passed ? "✅" : "📘"}</div>
+          <div style={{ fontSize: 26, fontWeight: 900, color: passed ? "#4ade80" : "#f87171" }}>{passed ? "Pass standard reached" : "Below pass mark"}</div>
+          <div style={{ fontSize: 36, fontWeight: 800, color: "var(--text-strong)", marginTop: 8 }}>{score}/24</div>
+          <div style={{ fontSize: 18, color: "var(--text-muted)", marginBottom: 10 }}>{percent}%</div>
+          <div style={{ color: passed ? "#4ade80" : "#fca5a5", fontSize: 14, marginBottom: 16 }}>
+            {passed ? "You cleared the real test threshold of 18 correct answers." : `You need ${18 - score} more correct answers to reach the pass mark.`}
+          </div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={startMock} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 20px", fontWeight: 800, cursor: "pointer" }}>Retake Mock</button>
+            <button className="focus-ring" onClick={() => { setStarted(false); setFinished(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 20px", cursor: "pointer" }}>Back</button>
+          </div>
+        </Card>
+        {wrong.length > 0 && (
+          <Card style={{ border: "1px solid #7f1d1d", background: "#1a0a0a" }}>
+            <div style={{ fontWeight: 800, color: "#fca5a5", marginBottom: 12 }}>Revision targets from this mock</div>
+            {wrong.map((item, index) => (
+              <div key={`${item.q}-${index}`} style={{ padding: "10px 0", borderBottom: index < wrong.length - 1 ? "1px solid rgba(248,113,113,0.15)" : "none" }}>
+                <div style={{ color: "#fff", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{item.q}</div>
+                <div style={{ color: "#fca5a5", fontSize: 13 }}>Your answer: {item.chosen === undefined ? "No answer" : item.opts[item.chosen]}</div>
+                <div style={{ color: "#4ade80", fontSize: 13 }}>Correct answer: {item.opts[item.a]}</div>
+                {showContext && <MemoryHook text={item.tip} />}
+              </div>
+            ))}
+          </Card>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ padding: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+        <Badge text={`Question ${current + 1} of ${TOTAL}`} color="#64748b" />
+        <Badge text={`${minutes}:${seconds}`} color={timeLeft > 600 ? "#22c55e" : timeLeft > 300 ? "#f59e0b" : "#ef4444"} />
+      </div>
+      <div style={{ background: "#1f2937", borderRadius: 999, height: 8, marginBottom: 16 }}>
+        <div style={{ background: "#f97316", height: "100%", borderRadius: 999, width: `${(Object.keys(answers).length / TOTAL) * 100}%`, transition: "width 0.2s" }} />
+      </div>
+      <QuestionCard question={currentQuestion} selected={answers[current]} confirmed={answerMode === "instant" && answers[current] !== undefined} onSelect={(oi) => {
+        if (answerMode === "instant" && answers[current] !== undefined) return;
+        setAnswers((prev) => ({ ...prev, [current]: oi }));
+      }} />
+      {answerMode === "instant" && answers[current] !== undefined && (
+        <>
+          {showContext && <MemoryHook text={currentQuestion.tip} />}
+          <div style={{ marginTop: 8, color: answers[current] === currentQuestion.a ? "#4ade80" : "#fca5a5", fontSize: 13, fontWeight: 700 }}>
+            {answers[current] === currentQuestion.a ? "Correct" : `Correct answer: ${currentQuestion.opts[currentQuestion.a]}`}
+          </div>
+        </>
+      )}
+      <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+        <button className="focus-ring" onClick={() => setCurrent((c) => Math.max(0, c - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
+        <button className="focus-ring" onClick={() => setCurrent((c) => Math.min(TOTAL - 1, c + 1))} style={{ background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
+        <button className="focus-ring" onClick={() => setFinished(true)} style={{ marginLeft: "auto", background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}>Finish Exam</button>
+      </div>
+      <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginTop: 14 }}>
+        {questions.map((_, index) => {
+          const answered = answers[index] !== undefined;
           return (
-            <button key={oi} onClick={() => handleSelect(oi)}
-              style={{ padding: "14px 16px", borderRadius: 10, border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer",
-                background: bg, color, textAlign: "left", fontSize: 14, transition: "all 0.15s" }}>
-              <span style={{ marginRight: 8, opacity: 0.6 }}>{["A","B","C","D"][oi]}.</span>{opt}
-              {confirmed && oi === q.a && " ✓"}
-              {confirmed && oi === selected && oi !== q.a && " ✗"}
+            <button key={index} className="focus-ring" onClick={() => setCurrent(index)} style={{ minWidth: 40, height: 40, borderRadius: 999, border: `1px solid ${current === index ? "#f97316" : answered ? "#22c55e" : "#475569"}`, background: current === index ? "#f97316" : answered ? "#0f1f0f" : "var(--chip-bg)", color: current === index ? "#fff" : answered ? "#4ade80" : "var(--text-muted)", cursor: "pointer", fontWeight: 800 }}>
+              {index + 1}
             </button>
           );
         })}
       </div>
+    </div>
+  );
+};
+
+// ── REVISE ───────────────────────────────────────────────────
+const ReviseTab = () => {
+  const [bank, setBank] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
+  const [session, setSession] = useState([]);
+  const [started, setStarted] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [sessionAnswers, setSessionAnswers] = useState({});
+
+  const buckets = useMemo(() => buildRevisionBuckets(bank), [bank]);
+
+  const startRevision = (questions = bank) => {
+    if (!questions.length) return;
+    setSession(pickRandom(questions, Math.min(questions.length, 12)));
+    setCurrent(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setSessionAnswers({});
+    setStarted(true);
+  };
+
+  const clearBank = () => {
+    writeStore(STORAGE_KEYS.wrongQuestions, []);
+    setBank([]);
+    setStarted(false);
+  };
+
+  const handleSelect = (oi) => {
+    if (confirmed) return;
+    setSelected(oi);
+    setConfirmed(true);
+    setSessionAnswers((prev) => ({ ...prev, [current]: oi }));
+    if (oi === session[current].a) {
+      setScore((s) => s + 1);
+    }
+  };
+
+  const next = () => {
+    if (current + 1 >= session.length) {
+      const finalAnswers = { ...sessionAnswers, [current]: selected };
+      const corrected = session.filter((q, index) => finalAnswers[index] === q.a).map((q) => q.q);
+      const updatedBank = bank.filter((item) => !corrected.includes(item.q));
+      writeStore(STORAGE_KEYS.wrongQuestions, updatedBank);
+      setStarted(false);
+      setBank(updatedBank);
+      return;
+    }
+    setCurrent((c) => c + 1);
+    setSelected(null);
+    setConfirmed(false);
+  };
+
+  if (!bank.length) {
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="🧩" meta="This space fills automatically from quiz and mock mistakes.">Revise Mistakes</SectionTitle>
+        <Card style={{ textAlign: "center", background: "linear-gradient(135deg, rgba(34,197,94,0.1), rgba(15,23,42,0.9))", border: "1px solid #166534" }}>
+          <div style={{ fontSize: 48, marginBottom: 10 }}>✅</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 20, marginBottom: 8 }}>No saved mistakes yet</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7 }}>Finish a quiz or mock test and the wrong answers will appear here for targeted revision.</div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!started) {
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="🧩" meta="Target the exact questions you previously missed.">Revise Mistakes</SectionTitle>
+        <div className="stats-grid" style={{ display: "grid", gap: 12, marginBottom: 16 }}>
+          <StatTile label="Saved wrong answers" value={bank.length} color="#ef4444" />
+          <StatTile label="Topic groups" value={buckets.length} color="#3b82f6" />
+          <StatTile label="Suggested session size" value={Math.min(bank.length, 12)} color="#22c55e" />
+          <StatTile label="Hardest area" value={buckets[0] ? buckets[0].topic : "General"} color="#f59e0b" />
+        </div>
+        <Card style={{ background: "linear-gradient(135deg, rgba(127,29,29,0.18), rgba(15,23,42,0.9))", border: "1px solid #991b1b" }}>
+              <div style={{ color: "#fecaca", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Use mistakes as your revision syllabus</div>
+              <div style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
+                Retake only the facts you missed, or start with the topic cluster that currently causes the most errors.
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <button className="focus-ring" onClick={() => startRevision(bank)} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 12, padding: "12px 18px", fontWeight: 800, cursor: "pointer" }}>Revise All Mistakes</button>
+                <button className="focus-ring" onClick={clearBank} style={{ background: "transparent", color: "#fecaca", border: "1px solid #7f1d1d", borderRadius: 12, padding: "12px 18px", cursor: "pointer" }}>Clear Saved Mistakes</button>
+              </div>
+        </Card>
+        {buckets.map((bucket) => (
+          <Card key={bucket.topic}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 8 }}>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 16 }}>{bucket.topic}</div>
+              <button className="focus-ring" onClick={() => startRevision(bucket.questions)} style={{ background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>Revise {bucket.questions.length}</button>
+            </div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>{bucket.questions.slice(0, 3).map((item) => item.q).join(" • ")}</div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
+  const q = session[current];
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="🧩">Mistake Revision Session</SectionTitle>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+        <Badge text={`${current + 1} / ${session.length}`} color="#64748b" />
+        <Badge text={`Correct this round: ${score}`} color="#22c55e" />
+      </div>
+      <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {confirmed && (
         <>
           <MemoryHook text={q.tip} />
-          <button onClick={skipToNext}
-            style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 10, background: "#22c55e22", color: "#4ade80", border: "1px solid #22c55e44", fontSize: 14, cursor: "pointer" }}>
-            {current+1 < questions.length ? "Next →" : "See Results 🎯"}
+          <button className="focus-ring" onClick={next} style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "#2563eb", color: "#fff", border: "none", fontSize: 14, cursor: "pointer", fontWeight: 800 }}>
+            {current + 1 < session.length ? "Next mistake" : "Finish session"}
           </button>
         </>
       )}
@@ -704,32 +1571,47 @@ const QuizTab = () => {
 
 // ── RAPID FIRE ───────────────────────────────────────────────
 const RapidFireTab = () => {
-  const TOTAL = 10, TIME_PER_Q = 20;
+  const [total, setTotal] = useState(10);
+  const [timePerQuestion, setTimePerQuestion] = useState(20);
+  const [answerMode, setAnswerMode] = useState("summary");
+  const [includeCompare, setIncludeCompare] = useState("yes");
+  const [showContext, setShowContext] = useState(true);
   const [started, setStarted] = useState(false);
   const [questions, setQuestions] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(TIME_PER_Q);
+  const [timeLeft, setTimeLeft] = useState(timePerQuestion);
   const [score, setScore] = useState(0);
   const [results, setResults] = useState([]);
   const [finished, setFinished] = useState(false);
-  const { useEffect } = React;
   const timerRef = useRef(null);
-  const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
 
   const startGame = () => {
-    setQuestions(shuffle(ALL_QUIZ).slice(0, TOTAL));
-    setCurrent(0); setSelected(null); setConfirmed(false);
-    setScore(0); setResults([]); setFinished(false); setTimeLeft(TIME_PER_Q);
+    const pool = includeCompare === "yes" ? [...ALL_QUIZ, ...buildConfusionDeck()] : ALL_QUIZ;
+    setQuestions(pickRandomNoRepeat(pool, total, STORAGE_KEYS.recentRapid, 180));
+    setCurrent(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setResults([]);
+    setFinished(false);
+    setTimeLeft(timePerQuestion);
     setStarted(true);
   };
 
   const advance = (isCorrect, chosen, q) => {
-    setResults(r => [...r, { ...q, chosen, correct: isCorrect }]);
+    setResults((r) => [...r, { ...q, chosen, correct: isCorrect }]);
     const next = current + 1;
-    if (next >= TOTAL) { setFinished(true); setStarted(false); return; }
-    setCurrent(next); setSelected(null); setConfirmed(false); setTimeLeft(TIME_PER_Q);
+    if (next >= questions.length) {
+      setFinished(true);
+      setStarted(false);
+      return;
+    }
+    setCurrent(next);
+    setSelected(null);
+    setConfirmed(false);
+    setTimeLeft(timePerQuestion);
   };
 
   const handleSelect = (oi) => {
@@ -737,19 +1619,26 @@ const RapidFireTab = () => {
     clearInterval(timerRef.current);
     const q = questions[current];
     const isCorrect = oi === q.a;
-    if (isCorrect) setScore(s => s + 1);
-    setSelected(oi); setConfirmed(true);
-    setTimeout(() => advance(isCorrect, oi, q), 1000);
+    if (isCorrect) setScore((s) => s + 1);
+    setSelected(oi);
+    setConfirmed(true);
+    setTimeout(() => advance(isCorrect, oi, q), answerMode === "instant" ? 1000 : 350);
   };
 
   useEffect(() => {
-    if (!started || confirmed || finished) return;
+    if (!started || confirmed || finished) return undefined;
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
-      setTimeLeft(t => { if (t <= 1) { clearInterval(timerRef.current); return 0; } return t - 1; });
+      setTimeLeft((t) => {
+        if (t <= 1) {
+          clearInterval(timerRef.current);
+          return 0;
+        }
+        return t - 1;
+      });
     }, 1000);
     return () => clearInterval(timerRef.current);
-  }, [started, current, confirmed, finished]);
+  }, [started, current, confirmed, finished, timePerQuestion]);
 
   useEffect(() => {
     if (timeLeft === 0 && !confirmed && started && !finished) {
@@ -758,46 +1647,100 @@ const RapidFireTab = () => {
       setConfirmed(true);
       setTimeout(() => advance(false, -1, q), 800);
     }
-  }, [timeLeft]);
+  }, [timeLeft, confirmed, started, finished, current, questions]);
 
-  if (!started && !finished) return (
-    <div style={{ padding: 20 }}>
-      <SectionTitle icon="🔥">Rapid Fire</SectionTitle>
-      <Card style={{ background: "#0f172a", border: "1px solid #7f1d1d", textAlign: "center" }}>
-        <div style={{ fontSize: 56, marginBottom: 12 }}>⏱️</div>
-        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>10 Questions · 20 Seconds Each</div>
-        <div style={{ color: "#9ca3af", fontSize: 14, marginBottom: 6 }}>Pick an answer before time runs out!</div>
-        <div style={{ color: "#f59e0b", fontSize: 13, marginBottom: 24 }}>⚡ No time to think — go with your gut</div>
-        <button onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 10, padding: "14px 36px", fontSize: 17, fontWeight: 700, cursor: "pointer" }}>
-          Start Rapid Fire 🔥
-        </button>
-      </Card>
-    </div>
-  );
+  useEffect(() => {
+    if (finished) saveWrongQuestions(results.filter((x) => !x.correct));
+  }, [finished, results]);
+
+  if (!started && !finished) {
+    return (
+      <div style={{ padding: 20 }}>
+        <SectionTitle icon="🔥" meta="Pressure practice for fast recall.">Rapid Fire</SectionTitle>
+        <Card style={{ background: "linear-gradient(135deg, rgba(127,29,29,0.18), rgba(15,23,42,0.94))", border: "1px solid #7f1d1d", textAlign: "center" }}>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>⏱️</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 22, marginBottom: 8 }}>Fast recall with a bigger rotating pool</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 6 }}>Pick an answer before time runs out.</div>
+          <div style={{ color: "#f59e0b", fontSize: 13, marginBottom: 18 }}>Uses recent-history avoidance so the same questions do not repeat too often.</div>
+          <SettingGroup
+            label="How many questions?"
+            value={String(total)}
+            onChange={(value) => setTotal(Number(value))}
+            options={[
+              { value: "10", label: "10" },
+              { value: "24", label: "24" },
+              { value: "50", label: "50" },
+            ]}
+          />
+          <SettingGroup
+            label="Time per question"
+            value={String(timePerQuestion)}
+            onChange={(value) => setTimePerQuestion(Number(value))}
+            options={[
+              { value: "10", label: "10s" },
+              { value: "20", label: "20s" },
+              { value: "30", label: "30s" },
+            ]}
+          />
+          <SettingGroup
+            label="Show answer after each question?"
+            value={answerMode}
+            onChange={setAnswerMode}
+            options={[
+              { value: "summary", label: "End only" },
+              { value: "instant", label: "Show now" },
+            ]}
+          />
+          <SettingGroup
+            label="Show memory tips and context?"
+            value={showContext ? "yes" : "no"}
+            onChange={(value) => setShowContext(value === "yes")}
+            options={[
+              { value: "yes", label: "With context" },
+              { value: "no", label: "Answers only" },
+            ]}
+          />
+          <SettingGroup
+            label="Include confusion/trap cards?"
+            value={includeCompare}
+            onChange={setIncludeCompare}
+            options={[
+              { value: "yes", label: "Include" },
+              { value: "no", label: "Quiz only" },
+            ]}
+          />
+          <button className="focus-ring" onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 14, padding: "14px 36px", fontSize: 17, fontWeight: 800, cursor: "pointer" }}>
+            Start Rapid Fire
+          </button>
+        </Card>
+      </div>
+    );
+  }
 
   if (finished) {
-    const pct = Math.round((score / TOTAL) * 100);
+    const pct = Math.round((score / questions.length) * 100);
     const pass = pct >= 75;
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="🔥">Rapid Fire — Results</SectionTitle>
+        <SectionTitle icon="🔥">Rapid Fire Results</SectionTitle>
         <Card style={{ textAlign: "center", border: `2px solid ${pass ? "#22c55e" : "#ef4444"}` }}>
           <div style={{ fontSize: 56, marginBottom: 8 }}>{pass ? "🏆" : "💪"}</div>
-          <div style={{ fontSize: 24, fontWeight: 800, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "On Fire!" : "Keep Practising"}</div>
-          <div style={{ fontSize: 36, fontWeight: 700, color: "var(--text-strong)", margin: "8px 0" }}>{score}/{TOTAL}</div>
+          <div style={{ fontSize: 24, fontWeight: 900, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "On fire" : "Keep sharpening"}</div>
+          <div style={{ fontSize: 36, fontWeight: 800, color: "var(--text-strong)", margin: "8px 0" }}>{score}/{questions.length}</div>
           <div style={{ fontSize: 20, color: pass ? "#4ade80" : "#f87171", marginBottom: 20 }}>{pct}%</div>
-          <button onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 8, padding: "12px 28px", cursor: "pointer", fontWeight: 700, fontSize: 15 }}>Try Again 🔥</button>
+          <button className="focus-ring" onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 12, padding: "12px 28px", cursor: "pointer", fontWeight: 800, fontSize: 15 }}>Try Again</button>
           {" "}
-          <button onClick={() => { setFinished(false); setStarted(false); }} style={{ background: "var(--card-bg)", color: "var(--text-muted)", border: "1px solid var(--card-border)", borderRadius: 8, padding: "12px 20px", cursor: "pointer", marginLeft: 6 }}>Back</button>
+          <button className="focus-ring" onClick={() => { setFinished(false); setStarted(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 20px", cursor: "pointer", marginLeft: 6 }}>Back</button>
         </Card>
         {results.map((r, i) => (
           <Card key={i} style={{ border: `1px solid ${r.correct ? "#166534" : "#7f1d1d"}`, background: r.correct ? "#0f1f0f" : "#1a0808" }}>
-            <div style={{ fontSize: 11, color: "#6b7280", marginBottom: 4 }}>Q{i + 1}</div>
-            <div style={{ fontWeight: 600, color: "var(--text-strong)", fontSize: 13, marginBottom: 6 }}>{r.q}</div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Q{i + 1}</div>
+            <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 13, marginBottom: 6 }}>{r.q}</div>
             <div style={{ fontSize: 13, color: r.correct ? "#4ade80" : "#f87171" }}>
-              {r.correct ? "✓" : "✗"} {r.chosen === -1 ? "⏱️ Time ran out" : r.opts[r.chosen]}
+              {r.correct ? "✓" : "✗"} {r.chosen === -1 ? "Time ran out" : r.opts[r.chosen]}
             </div>
             {!r.correct && <div style={{ fontSize: 13, color: "#4ade80", marginTop: 2 }}>✓ {r.opts[r.a]}</div>}
+            {showContext && <MemoryHook text={r.tip} />}
           </Card>
         ))}
       </div>
@@ -805,90 +1748,127 @@ const RapidFireTab = () => {
   }
 
   const q = questions[current];
-  const timerPct = (timeLeft / TIME_PER_Q) * 100;
+  const timerPct = (timeLeft / timePerQuestion) * 100;
   const timerColor = timeLeft > 10 ? "#22c55e" : timeLeft > 5 ? "#f59e0b" : "#ef4444";
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-        <Badge text={`${current + 1} / ${TOTAL}`} color="#6b7280" />
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <span style={{ fontSize: 16 }}>⏱️</span>
-          <span style={{ fontSize: 26, fontWeight: 800, color: timerColor, minWidth: 32, textAlign: "center" }}>{timeLeft}</span>
-        </div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        <Badge text={`${current + 1} / ${questions.length}`} color="#64748b" />
         <Badge text={`Score: ${score}`} color="#22c55e" />
+        <Badge text={`${timeLeft}s`} color={timerColor} />
       </div>
-      <div style={{ background: "#1f2937", borderRadius: 6, height: 10, marginBottom: 16, overflow: "hidden" }}>
-        <div style={{ background: timerColor, height: "100%", borderRadius: 6, width: `${timerPct}%`, transition: "width 1s linear, background 0.3s" }} />
+      <div style={{ background: "#1f2937", borderRadius: 999, height: 10, marginBottom: 16, overflow: "hidden" }}>
+        <div style={{ background: timerColor, height: "100%", borderRadius: 999, width: `${timerPct}%`, transition: "width 1s linear, background 0.3s" }} />
       </div>
-      <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f", marginBottom: 12 }}>
-        <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{q.q}</div>
-      </Card>
-      <div style={{ display: "grid", gap: 8 }}>
-        {q.opts.map((opt, oi) => {
-          let bg = "var(--card-bg)", border = "var(--card-border)", color = "var(--text)";
-          if (confirmed) {
-            if (oi === q.a) { bg = "#0f1f0f"; border = "#22c55e"; color = "#4ade80"; }
-            else if (oi === selected && oi !== q.a) { bg = "#1a0808"; border = "#ef4444"; color = "#f87171"; }
-          } else if (selected === oi) { bg = "#1e3a5f"; border = "#3b82f6"; color = "#60a5fa"; }
-          return (
-            <button key={oi} onClick={() => handleSelect(oi)}
-              style={{ padding: "14px 16px", borderRadius: 10, border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer",
-                background: bg, color, textAlign: "left", fontSize: 14, transition: "all 0.15s" }}>
-              <span style={{ marginRight: 8, opacity: 0.6 }}>{["A","B","C","D"][oi]}.</span>{opt}
-              {confirmed && oi === q.a && " ✓"}
-              {confirmed && oi === selected && oi !== q.a && " ✗"}
-            </button>
-          );
-        })}
-      </div>
-      {confirmed && timeLeft === 0 && (
-        <div style={{ marginTop: 10, textAlign: "center", color: "#f59e0b", fontWeight: 700 }}>⏱️ Time's up!</div>
+      <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
+      {answerMode === "instant" && confirmed && (
+        <>
+          {showContext && <MemoryHook text={q.tip} />}
+          {timeLeft === 0 && <div style={{ marginTop: 10, textAlign: "center", color: "#f59e0b", fontWeight: 800 }}>Time's up</div>}
+        </>
+      )}
+      {answerMode !== "instant" && confirmed && timeLeft === 0 && (
+        <div style={{ marginTop: 10, textAlign: "center", color: "#f59e0b", fontWeight: 800 }}>Time's up</div>
       )}
     </div>
   );
 };
 
 // ── ROOT ──────────────────────────────────────────────────────
-const { useEffect } = React;
 const App = () => {
-  const [active, setActive] = useState("home");
+  const isMobile = useViewportMobile();
+  const [active, setActive] = useState(() => readStore(STORAGE_KEYS.activeTab, "home"));
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(() => readStore(STORAGE_KEYS.theme, true));
+  const [wrongQuestions, setWrongQuestions] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
+  const [mockHistory, setMockHistory] = useState(() => readStore(STORAGE_KEYS.mockHistory, []));
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const [quickPanelOpen, setQuickPanelOpen] = useState(false);
+  const [tabHistory, setTabHistory] = useState([]);
+
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+    writeStore(STORAGE_KEYS.theme, isDark);
   }, [isDark]);
-  const toggleDark = () => setIsDark(d => !d);
-  const renderTab = () => {
-    switch (active) {
-      case "home":          return <HomeTab setActive={setActive} />;
-      case "timeline":      return <TimelineTab />;
-      case "nations":       return <NationsTab />;
-      case "confuse":       return <ConfuseTab />;
-      case "inventors":     return <InventorsTab />;
-      case "sports":        return <SportsTab />;
-      case "figures":       return <FiguresTab />;
-      case "religion":      return <ReligionTab />;
-      case "landmarks":     return <LandmarksTab />;
-      case "international": return <InternationalTab />;
-      case "arts":          return <ArtsTab />;
-      case "anthem":        return <AnthemTab />;
-      case "quickfacts":    return <QuickFactsTab />;
-      case "quiz":          return <QuizTab />;
-      case "rapidfire":     return <RapidFireTab />;
-      default:              return <HomeTab setActive={setActive} />;
+
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.activeTab, active);
+    setWrongQuestions(readStore(STORAGE_KEYS.wrongQuestions, []));
+    setMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
+  }, [active]);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollTop(window.scrollY > 260);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const toggleDark = () => setIsDark((d) => !d);
+  const navigateTo = (nextTab) => {
+    setActive((current) => {
+      if (current !== nextTab) {
+        setTabHistory((history) => [...history, current].slice(-24));
+      }
+      return nextTab;
+    });
+    setMenuOpen(false);
+    setQuickPanelOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleBack = () => {
+    let previous = null;
+    setTabHistory((history) => {
+      if (!history.length) return history;
+      previous = history[history.length - 1];
+      return history.slice(0, -1);
+    });
+    if (previous) {
+      setActive(previous);
+      setMenuOpen(false);
+      setQuickPanelOpen(false);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+
+  const renderTab = () => {
+    switch (active) {
+      case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} />;
+      case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
+      case "timeline": return <TimelineTab />;
+      case "nations": return <NationsTab />;
+      case "confuse": return <ConfuseTab />;
+      case "inventors": return <InventorsTab />;
+      case "sports": return <SportsTab />;
+      case "figures": return <FiguresTab />;
+      case "religion": return <ReligionTab />;
+      case "landmarks": return <LandmarksTab />;
+      case "international": return <InternationalTab />;
+      case "arts": return <ArtsTab />;
+      case "anthem": return <AnthemTab />;
+      case "quickfacts": return <QuickFactsTab />;
+      case "quiz": return <QuizTab />;
+      case "mock": return <MockExamTab />;
+      case "revise": return <ReviseTab />;
+      case "rapidfire": return <RapidFireTab />;
+      default: return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} />;
+    }
+  };
+
   return (
-    <div style={{ minHeight: "100vh", maxWidth: 900, margin: "0 auto" }}>
-      <TabBar active={active} setActive={setActive} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} />
+    <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 88 : 0 }}>
+      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} onBack={handleBack} canGoBack={tabHistory.length > 0} openQuickPanel={() => setQuickPanelOpen(true)} />
       <div className="tabcontent">{renderTab()}</div>
       <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>
-        🔓 Open Source — Share Freely ·{" "}
-        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
-          style={{ color: "#60a5fa", textDecoration: "none" }}>
+        Open Source — Share Freely ·{" "}
+        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" style={{ color: "#60a5fa", textDecoration: "none" }}>
           github.com/kanwalnainsingh/KNS-Life-In-UK-Test
         </a>
       </div>
+      {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
+      {isMobile && <ScrollTopButton visible={showScrollTop} />}
+      {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
     </div>
   );
 };
