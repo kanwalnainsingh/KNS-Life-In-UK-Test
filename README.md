@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 263 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
+> 📖 274 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
-Current release: `v1.10.2`
+Current release: `v1.10.4`
 
 ---
 
@@ -101,6 +101,12 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Elizabeth II coronation
 - Dedicated `Wars & Battles` section with battle cards, compare traps, and WWII anchors
 - Added direct quiz coverage for `Boxing Day`, closing the last festival audit gap
+- Added boundary-topic coverage for:
+  - `British Isles`
+  - `Republic of Ireland`
+  - `Crown Dependencies`
+  - `Channel Islands`
+  - `British Overseas Territories`
 - Offline cache support after first online load
 - Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 
@@ -117,6 +123,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 - `scripts/build.mjs` — static build for GitHub Pages
 - `tests/smoke-check.cjs` — structure/content checks
 - `tests/coverage-audit.cjs` — fact/question coverage audit
+- `tests/regression-check.cjs` — duplicate-question and key-content regression checks
 - `AGENTS.md` — notes for future contributors and coding agents
 
 ---
