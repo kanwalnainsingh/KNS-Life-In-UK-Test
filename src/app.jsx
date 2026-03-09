@@ -1594,6 +1594,32 @@ const TimelineTab = () => {
 const WarsTab = () => {
   const battleCards = BATTLES_AND_WARS.filter((item) => /battle|revolt|armada|dunkirk|blitz|d-day/i.test(item.name));
   const widerWarCards = BATTLES_AND_WARS.filter((item) => !battleCards.includes(item));
+  const warComparisons = [
+    {
+      title: "Trafalgar vs Waterloo",
+      left: "Trafalgar = sea battle = Nelson = 1805",
+      right: "Waterloo = land battle = Wellington = 1815",
+      memory: "Sea = Nelson. Land = Wellington.",
+    },
+    {
+      title: "WWI vs WWII",
+      left: "WWI = 1914–1918 = Armistice 11 November 1918",
+      right: "WWII = 1939–1945 = Churchill in war, Attlee after war",
+      memory: "First war ends 1918. Second war ends 1945.",
+    },
+    {
+      title: "Battle of Britain vs Blitz",
+      left: "Battle of Britain = air battle defending Britain",
+      right: "Blitz = bombing of British cities",
+      memory: "Air battle vs bombing campaign.",
+    },
+    {
+      title: "Dunkirk vs D-Day",
+      left: "Dunkirk = 1940 evacuation from France",
+      right: "D-Day = 1944 landing in Normandy",
+      memory: "Evacuation first, landing later.",
+    },
+  ];
 
   return (
     <div style={{ padding: 20 }}>
@@ -1630,6 +1656,20 @@ const WarsTab = () => {
         </div>
         <MemoryHook text="Sea = Nelson. Land = Wellington. Air = Battle of Britain. Evacuation = Dunkirk." />
       </Card>
+      <div style={{ marginTop: 20, marginBottom: 10 }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Battle comparisons</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use these compare cards for the battle traps that are easiest to mix up.</div>
+      </div>
+      <div className="compare-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+        {warComparisons.map((item) => (
+          <Card key={item.title} style={{ border: "1px solid var(--card-border)" }}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>{item.title}</div>
+            <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7, marginBottom: 8 }}>{item.left}</div>
+            <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7, marginBottom: 10 }}>{item.right}</div>
+            <MemoryHook text={item.memory} />
+          </Card>
+        ))}
+      </div>
 
       <div style={{ marginTop: 20, marginBottom: 10 }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Key Battles</div>
@@ -1645,7 +1685,10 @@ const WarsTab = () => {
                 <div style={{ color: item.color, fontSize: 12, fontWeight: 700 }}>{item.years}</div>
               </div>
             </div>
-            <Badge text={item.years} color={item.color} />
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <Badge text={item.type} color="#64748b" />
+              <Badge text={item.years} color={item.color} />
+            </div>
           </div>
           <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
           <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
@@ -1667,7 +1710,10 @@ const WarsTab = () => {
                 <div style={{ color: item.color, fontSize: 12, fontWeight: 700 }}>{item.years}</div>
               </div>
             </div>
-            <Badge text={item.years} color={item.color} />
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              <Badge text={item.type} color="#64748b" />
+              <Badge text={item.years} color={item.color} />
+            </div>
           </div>
           <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7, marginBottom: 8 }}>{item.fact}</div>
           <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>{item.context}</div>
