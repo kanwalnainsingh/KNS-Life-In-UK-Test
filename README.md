@@ -17,19 +17,22 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/mobile-guide.png" width="30%" alt="Mobile home and revision hub" />
+  <img src="screenshots/mobile-nav.png" width="30%" alt="Mobile navigation and revision hub" />
 </p>
+<p align="center"><strong>Mobile navigation</strong> — header controls, quick actions, and bottom navigation in one compact view.</p>
 
 <p align="center">
-  <img src="screenshots/home-light.png" width="48%" alt="Home — light mode" />
+  <img src="screenshots/home-light.png" width="48%" alt="Home — feature overview" />
   &nbsp;
-  <img src="screenshots/home-dark.png" width="48%" alt="Home — dark mode" />
+  <img src="screenshots/timeline.png" width="48%" alt="Timeline — history revision" />
 </p>
+<p align="center"><strong>Core features</strong> — revision hub and timeline view.</p>
 <p align="center">
   <img src="screenshots/quiz.png" width="48%" alt="Quiz mode" />
   &nbsp;
-  <img src="screenshots/timeline.png" width="48%" alt="History Timeline" />
+  <img src="screenshots/home-dark.png" width="48%" alt="Dark mode home view" />
 </p>
+<p align="center"><strong>Practice modes</strong> — quiz flow and dark-mode home.</p>
 
 ---
 
