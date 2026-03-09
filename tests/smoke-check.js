@@ -42,6 +42,9 @@ assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missi
 assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
 assert(/ReviseTab/.test(appSource), "Revision UI missing");
 assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
+assert(/MOCK_PAPER_COUNT = 20/.test(appSource), "Expected 20 fixed mock papers");
+assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
+assert(/Show details/.test(appSource), "Quick revision inline details control missing");
 assert(/Back to quiz setup/.test(appSource), "Quiz back button missing");
 assert(/Go to home/.test(appSource), "Header home button missing");
 assert(/mobile-bottom-nav/.test(indexSource), "Mobile bottom nav styling missing");

@@ -737,6 +737,132 @@ const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
   </>
 );
 
+const MOCK_TOTAL = 24;
+const MOCK_LIMIT_SECONDS = 45 * 60;
+const MOCK_PAPER_COUNT = 20;
+
+const MOCK_CATEGORY_META = {
+  history: { label: "History", icon: "📜", color: "#f97316", hint: "Kings, wars, reform, dates, and welfare-state anchors." },
+  civics: { label: "Government & Law", icon: "⚖️", color: "#22c55e", hint: "Parliament, voting, values, rights, duties, courts, and citizenship." },
+  nations: { label: "4 Nations & Places", icon: "🗺️", color: "#0ea5e9", hint: "Capitals, saints, parliaments, symbols, and geography." },
+  culture: { label: "People & Culture", icon: "🎭", color: "#8b5cf6", hint: "Religion, festivals, inventors, arts, sport, landmarks, and famous people." },
+  traps: { label: "Compare Traps", icon: "⚠️", color: "#ef4444", hint: "Common mix-ups that often cost easy marks under pressure." },
+};
+
+const MOCK_DISTRIBUTION = [
+  { id: "history", count: 8 },
+  { id: "civics", count: 6 },
+  { id: "nations", count: 4 },
+  { id: "culture", count: 4 },
+  { id: "traps", count: 2 },
+];
+
+const createSeededRandom = (seed) => {
+  let value = seed >>> 0;
+  return () => {
+    value = (value * 1664525 + 1013904223) >>> 0;
+    return value / 4294967296;
+  };
+};
+
+const seededShuffle = (items, seed) => {
+  const random = createSeededRandom(seed);
+  const copy = [...items];
+  for (let index = copy.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1));
+    [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+  }
+  return copy;
+};
+
+const classifyMockCategory = (question) => {
+  const text = `${question.q} ${question.tip}`.toLowerCase();
+  if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote/.test(text)) return "traps";
+  if (/war|battle|roman|norman|tudor|stuart|victoria|magna carta|boudicca|athelstan|alfred|domesday|hastings|reformation|beveridge|nhs|wilberforce|chartist|peterloo|suffragette|general strike|union of crowns|james i|charles i|waterloo|world war/.test(text)) return "history";
+  if (/prime minister|monarch|commons|lords|parliament|speaker|democracy|vote|ballot|constituenc|jury|magistrate|law|equality act|rule of law|innocent|community|volunteer|bank of england|10 downing street|government|human rights/.test(text)) return "civics";
+  if (/england|scotland|wales|northern ireland|belfast|cardiff|edinburgh|london|saint|shamrock|daffodil|thistle|rose|senedd|holyrood|stormont|union jack|capital city|loch|snowdonia|river|wall|castle|palace|museum|stonehenge|tower of london|windsor|buckingham|cenotaph/.test(text)) return "nations";
+  return "culture";
+};
+
+const buildMockBuckets = () => {
+  const bucketed = { history: [], civics: [], nations: [], culture: [], traps: [] };
+  [...ALL_QUIZ, ...buildConfusionDeck()].forEach((question, index) => {
+    const key = classifyMockCategory(question);
+    bucketed[key].push({ ...question, mockKey: `${key}:${index}:${question.q}` });
+  });
+  return bucketed;
+};
+
+const takeFixedQuestions = (items, count, startIndex, used) => {
+  if (!items.length) return [];
+  const picked = [];
+  let offset = 0;
+  while (picked.length < count && offset < items.length * 2) {
+    const item = items[(startIndex + offset) % items.length];
+    if (!used.has(item.q)) {
+      picked.push(item);
+      used.add(item.q);
+    }
+    offset += 1;
+  }
+  return picked;
+};
+
+const buildFixedMockPaper = (paperNumber) => {
+  const buckets = buildMockBuckets();
+  const used = new Set();
+  const questions = [];
+
+  MOCK_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
+    const items = buckets[id];
+    const startIndex = ((paperNumber - 1) * (count + bucketIndex + 2)) % items.length;
+    questions.push(...takeFixedQuestions(items, count, startIndex, used));
+  });
+
+  if (questions.length < MOCK_TOTAL) {
+    const fallback = seededShuffle([...ALL_QUIZ, ...buildConfusionDeck()], 1000 + paperNumber);
+    fallback.forEach((question) => {
+      if (questions.length >= MOCK_TOTAL || used.has(question.q)) return;
+      questions.push(question);
+      used.add(question.q);
+    });
+  }
+
+  return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber);
+};
+
+const MOCK_PAPERS = Array.from({ length: MOCK_PAPER_COUNT }, (_, index) => ({
+  id: index + 1,
+  title: `Mock Test ${index + 1}`,
+  note: index < 5 ? "Start with these for broad balanced recall." : index < 10 ? "Good second round once the basics feel steady." : index < 15 ? "More pressure from traps and mixed recall." : "Final stretch papers before the real test.",
+  accent: ["#f97316", "#3b82f6", "#22c55e", "#8b5cf6", "#ef4444"][index % 5],
+  questions: buildFixedMockPaper(index + 1),
+}));
+
+const formatCountdown = (seconds) => {
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");
+  const secs = String(seconds % 60).padStart(2, "0");
+  return `${minutes}:${secs}`;
+};
+
+const buildMockAnswerContext = (question) => {
+  const category = classifyMockCategory(question);
+  if (category === "history") return "Pin this to a date or reign. In the test, history errors usually come from mixing two similar years or rulers.";
+  if (category === "civics") return "These questions test how the UK works today: laws, rights, voting, government, and your role in public life.";
+  if (category === "nations") return "Anchor these with a place link: nation, capital, symbol, parliament, or landmark. Geography marks should feel quick and confident.";
+  if (category === "traps") return "Treat this as a comparison question. The easiest way to remember it is to hold both sides in your head at the same time.";
+  return "This area is usually tested as short factual recall. Link the answer to one person, place, event, or visible clue so it sticks.";
+};
+
+const buildMockCategoryBreakdown = (questions, answers) =>
+  Object.entries(MOCK_CATEGORY_META)
+    .map(([key, meta]) => {
+      const total = questions.filter((question) => classifyMockCategory(question) === key).length;
+      const correct = questions.reduce((sum, question, index) => sum + ((classifyMockCategory(question) === key && answers[index] === question.a) ? 1 : 0), 0);
+      return { ...meta, total, correct };
+    })
+    .filter((row) => row.total > 0);
+
 // ── TAB BAR ──────────────────────────────────────────────────
 const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, onBack, canGoBack, openQuickPanel }) => {
   useEffect(() => {
@@ -1042,6 +1168,19 @@ const QuickRevisionTab = ({ setActive }) => {
   };
 
   const markGotIt = () => moveToNext();
+  const moveCard = (direction) => {
+    if (!session.length) return;
+    setIndex((value) => {
+      if (direction === "next") return (value + 1) % session.length;
+      return (value - 1 + session.length) % session.length;
+    });
+    setRevealed(false);
+  };
+  const jumpRandomCard = () => {
+    if (!session.length) return;
+    setIndex(Math.floor(Math.random() * session.length));
+    setRevealed(false);
+  };
 
   const remaining = Math.max(session.length - index, 0);
   const isFinished = session.length > 0 && index >= session.length;
@@ -1100,9 +1239,8 @@ const QuickRevisionTab = ({ setActive }) => {
         <Badge text={`${remaining} left`} color="#64748b" />
         <Badge text={`${completed} done`} color="#22c55e" />
         {againCount > 0 && <Badge text={`${againCount} repeat later`} color="#f59e0b" />}
-        <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ marginLeft: "auto" }}>
           <button className="focus-ring" onClick={startSession} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>New mix</button>
-          <button className="focus-ring" onClick={() => setRevealed((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{revealed ? "Hide answer" : "Show answer"}</button>
         </div>
       </div>
       <Card className="quick-revision-card" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
@@ -1134,18 +1272,33 @@ const QuickRevisionTab = ({ setActive }) => {
             </>
           )}
         </div>
+        <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={() => setRevealed((value) => !value)} style={{ flex: 1, minWidth: 160, border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 800 }}>
+              {revealed ? "Hide details" : "Show details"}
+            </button>
+            <button className="focus-ring" onClick={() => moveCard("prev")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 700 }}>
+              ← Previous
+            </button>
+            <button className="focus-ring" onClick={jumpRandomCard} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 700 }}>
+              Random
+            </button>
+            <button className="focus-ring" onClick={() => moveCard("next")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 700 }}>
+              Next →
+            </button>
+          </div>
+          {revealed ? (
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="focus-ring" onClick={markAgain} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Again later</button>
+              <button className="focus-ring" onClick={markGotIt} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#15803d", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Got it</button>
+            </div>
+          ) : (
+            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
+              Think first, then use <strong style={{ color: "var(--text-strong)" }}>Show details</strong> to reveal the answer, why it matters, and the memory clue.
+            </div>
+          )}
+        </div>
       </Card>
-      {revealed && (
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-          <button className="focus-ring" onClick={markAgain} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Again later</button>
-          <button className="focus-ring" onClick={markGotIt} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#15803d", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Got it</button>
-        </div>
-      )}
-      {!revealed && (
-        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7, marginBottom: 12 }}>
-          Use this like a quick self-test: think first, reveal the answer, then choose whether it should come back again later.
-        </div>
-      )}
       </>
       )}
       <Card>
@@ -1911,31 +2064,50 @@ const QuizTab = () => {
 
 // ── MOCK EXAM ────────────────────────────────────────────────
 const MockExamTab = () => {
-  const TOTAL = 24;
-  const LIMIT_SECONDS = 45 * 60;
+  const [selectedPaperId, setSelectedPaperId] = useState(1);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [questions, setQuestions] = useState([]);
-  const [timeLeft, setTimeLeft] = useState(LIMIT_SECONDS);
+  const [flagged, setFlagged] = useState({});
+  const [timeLeft, setTimeLeft] = useState(MOCK_LIMIT_SECONDS);
   const [answerMode, setAnswerMode] = useState("deferred");
   const [showContext, setShowContext] = useState(true);
+  const [timerMode, setTimerMode] = useState("strict");
+  const [reviewFilter, setReviewFilter] = useState("wrong");
+  const [mockHistory, setMockHistory] = useState(() => readStore(STORAGE_KEYS.mockHistory, []));
   const timerRef = useRef(null);
 
-  const score = questions.reduce((sum, q, index) => sum + (answers[index] === q.a ? 1 : 0), 0);
+  const selectedPaper = MOCK_PAPERS.find((paper) => paper.id === selectedPaperId) || MOCK_PAPERS[0];
+  const currentQuestion = questions[current];
+  const answeredCount = Object.keys(answers).length;
+  const flaggedCount = Object.values(flagged).filter(Boolean).length;
+  const score = questions.reduce((sum, question, index) => sum + (answers[index] === question.a ? 1 : 0), 0);
+  const breakdown = buildMockCategoryBreakdown(questions, answers);
+  const reviewItems = questions
+    .map((question, index) => ({ ...question, chosen: answers[index], index }))
+    .filter((item) => {
+      if (reviewFilter === "all") return true;
+      if (reviewFilter === "flagged") return flagged[item.index];
+      return item.chosen !== item.a;
+    });
 
-  const startMock = () => {
-    setQuestions(pickRandomNoRepeat([...ALL_QUIZ, ...buildConfusionDeck()], TOTAL, STORAGE_KEYS.recentMock, 140));
+  const startPaper = (paperId = selectedPaperId) => {
+    const paper = MOCK_PAPERS.find((entry) => entry.id === paperId) || MOCK_PAPERS[0];
+    setSelectedPaperId(paper.id);
+    setQuestions(paper.questions);
     setAnswers({});
+    setFlagged({});
     setCurrent(0);
-    setTimeLeft(LIMIT_SECONDS);
+    setTimeLeft(MOCK_LIMIT_SECONDS);
+    setReviewFilter("wrong");
     setStarted(true);
     setFinished(false);
   };
 
   useEffect(() => {
-    if (!started || finished) return undefined;
+    if (!started || finished || timerMode !== "strict") return undefined;
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((value) => {
@@ -1947,145 +2119,303 @@ const MockExamTab = () => {
       });
     }, 1000);
     return () => clearInterval(timerRef.current);
-  }, [started, finished]);
+  }, [started, finished, timerMode]);
 
   useEffect(() => {
-    if (timeLeft === 0 && started && !finished) setFinished(true);
-  }, [timeLeft, started, finished]);
+    if (started && !finished && timerMode === "strict" && timeLeft === 0) setFinished(true);
+  }, [started, finished, timerMode, timeLeft]);
 
   useEffect(() => {
     if (!finished || !questions.length) return;
     const wrong = questions
-      .map((q, index) => ({ ...q, chosen: answers[index] }))
-      .filter((q, index) => answers[index] !== q.a);
+      .map((question, index) => ({ ...question, chosen: answers[index] }))
+      .filter((question, index) => answers[index] !== question.a);
     saveWrongQuestions(wrong);
     saveMockResult({
       date: new Date().toISOString(),
+      paperId: selectedPaper.id,
+      paperTitle: selectedPaper.title,
       score,
-      percent: Math.round((score / TOTAL) * 100),
+      percent: Math.round((score / MOCK_TOTAL) * 100),
       passed: score >= 18,
     });
-  }, [finished, questions, answers, score]);
-
-  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-  const seconds = String(timeLeft % 60).padStart(2, "0");
-  const currentQuestion = questions[current];
+    setMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
+  }, [finished, questions, answers, score, selectedPaper]);
 
   if (!started) {
+    const latestMock = mockHistory[0];
+    const groupedPapers = [
+      { title: "Papers 1-5", items: MOCK_PAPERS.slice(0, 5) },
+      { title: "Papers 6-10", items: MOCK_PAPERS.slice(5, 10) },
+      { title: "Papers 11-15", items: MOCK_PAPERS.slice(10, 15) },
+      { title: "Papers 16-20", items: MOCK_PAPERS.slice(15, 20) },
+    ];
+
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="📝" meta="This matches the official test format: 24 questions, 45 minutes, no instant feedback.">Mock Test</SectionTitle>
-        <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #ef4444 10%, var(--card-bg)), var(--surface-soft))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
-              <div style={{ color: "#fca5a5", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Proper exam practice</div>
-              <div style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.7, marginBottom: 16 }}>
-                24 questions. 45 minutes. Pass mark 18. Results only at the end. This is the closest mode to the real experience.
+        <SectionTitle icon="📝" meta="20 fixed mock papers, each with 24 questions and a balanced spread across history, government, 4 nations, and culture.">Mock Test</SectionTitle>
+        <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #f97316 12%, var(--card-bg)), color-mix(in srgb, #0f172a 14%, var(--surface-soft)))", border: "1px solid color-mix(in srgb, #f97316 35%, var(--card-border))" }}>
+          <div className="study-mode-grid" style={{ display: "grid", gap: 14, alignItems: "center" }}>
+            <div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 22, marginBottom: 8 }}>Balanced fixed mock papers</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
+                Use these like proper papers. Each set stays fixed, covers the core handbook areas, and gives detailed review with memory tips after you finish.
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 18 }}>
-                <Badge text="24 questions" color="#f97316" />
-                <Badge text="45:00 timer" color="#ef4444" />
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                <Badge text="20 fixed papers" color="#f97316" />
+                <Badge text="24 questions each" color="#3b82f6" />
+                <Badge text="45:00 official timer" color="#ef4444" />
                 <Badge text="18 needed to pass" color="#22c55e" />
               </div>
-              <SettingGroup
-                label="When should answers be shown?"
-                value={answerMode}
-                onChange={setAnswerMode}
-                options={[
-                  { value: "deferred", label: "At end" },
-                  { value: "instant", label: "After each" },
-                ]}
-              />
-              <SettingGroup
-                label="Show memory tips and context?"
-                value={showContext ? "yes" : "no"}
-                onChange={(value) => setShowContext(value === "yes")}
-                options={[
-                  { value: "yes", label: "With context" },
-                  { value: "no", label: "Answers only" },
-                ]}
-              />
-              <button className="focus-ring" onClick={startMock} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 14, padding: "14px 28px", fontWeight: 800, cursor: "pointer" }}>
-                Start Mock Exam
-              </button>
+              <div className="study-mode-grid" style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
+                <StatTile label="Mocks completed" value={mockHistory.length} color="#3b82f6" />
+                <StatTile label="Last result" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#22c55e" />
+                <StatTile label="Latest paper" value={latestMock?.paperTitle ? latestMock.paperTitle.replace("Mock Test ", "#") : "Paper #1"} color="#f97316" />
+              </div>
+            </div>
+            <HeroIllustration variant="mock" />
+          </div>
         </Card>
+        <Card>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Mock settings</div>
+          <SettingGroup
+            label="When should answers be shown?"
+            value={answerMode}
+            onChange={setAnswerMode}
+            options={[
+              { value: "deferred", label: "At end" },
+              { value: "instant", label: "After each" },
+            ]}
+          />
+          <SettingGroup
+            label="Show context and memory tips?"
+            value={showContext ? "yes" : "no"}
+            onChange={(value) => setShowContext(value === "yes")}
+            options={[
+              { value: "yes", label: "With context" },
+              { value: "no", label: "Answers only" },
+            ]}
+          />
+          <SettingGroup
+            label="Timer mode"
+            value={timerMode}
+            onChange={setTimerMode}
+            options={[
+              { value: "strict", label: "45 min timer" },
+              { value: "practice", label: "Practice mode" },
+            ]}
+          />
+        </Card>
+        {Object.entries(MOCK_CATEGORY_META).length > 0 && (
+          <Card>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 12 }}>Balanced paper structure</div>
+            <div className="study-mode-grid" style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
+              {MOCK_DISTRIBUTION.map(({ id, count }) => {
+                const meta = MOCK_CATEGORY_META[id];
+                return (
+                  <div key={id} style={{ borderRadius: 16, border: `1px solid ${meta.color}33`, background: `${meta.color}10`, padding: 14 }}>
+                    <div style={{ fontSize: 18, marginBottom: 6 }}>{meta.icon}</div>
+                    <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 4 }}>{meta.label}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 8 }}>{meta.hint}</div>
+                    <Badge text={`${count} questions`} color={meta.color} />
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+        {groupedPapers.map((group) => (
+          <Card key={group.title}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 12 }}>{group.title}</div>
+            <div className="study-mode-grid" style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
+              {group.items.map((paper) => (
+                <button
+                  key={paper.id}
+                  className="focus-ring"
+                  onClick={() => startPaper(paper.id)}
+                  style={{ textAlign: "left", border: selectedPaperId === paper.id ? `1px solid ${paper.accent}` : "1px solid var(--card-border)", background: selectedPaperId === paper.id ? `${paper.accent}14` : "var(--panel-bg)", borderRadius: 18, padding: 14, cursor: "pointer" }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", marginBottom: 8 }}>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{paper.title}</div>
+                    <Badge text="24" color={paper.accent} />
+                  </div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>{paper.note}</div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <Badge text="Balanced" color="#22c55e" />
+                    <Badge text="Fixed paper" color="#64748b" />
+                  </div>
+                </button>
+              ))}
+            </div>
+          </Card>
+        ))}
       </div>
     );
   }
 
   if (finished) {
-    const percent = Math.round((score / TOTAL) * 100);
+    const percent = Math.round((score / MOCK_TOTAL) * 100);
     const passed = score >= 18;
-    const wrong = questions
-      .map((q, index) => ({ ...q, chosen: answers[index] }))
-      .filter((q, index) => answers[index] !== q.a);
 
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="📝">Mock Test Results</SectionTitle>
+        <SectionTitle icon="📝" meta={`${selectedPaper.title} is fixed, so you can retake it later and measure whether recall improved.`}>Mock Results</SectionTitle>
         <Card style={{ textAlign: "center", border: `2px solid ${passed ? "#22c55e" : "#ef4444"}` }}>
           <div style={{ fontSize: 54, marginBottom: 8 }}>{passed ? "✅" : "📘"}</div>
-          <div style={{ fontSize: 26, fontWeight: 900, color: passed ? "#4ade80" : "#f87171" }}>{passed ? "Pass standard reached" : "Below pass mark"}</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 4 }}>{selectedPaper.title}</div>
+          <div style={{ fontSize: 26, fontWeight: 900, color: passed ? "#22c55e" : "#ef4444" }}>{passed ? "Pass standard reached" : "Below pass mark"}</div>
           <div style={{ fontSize: 36, fontWeight: 800, color: "var(--text-strong)", marginTop: 8 }}>{score}/24</div>
           <div style={{ fontSize: 18, color: "var(--text-muted)", marginBottom: 10 }}>{percent}%</div>
-          <div style={{ color: passed ? "#4ade80" : "#fca5a5", fontSize: 14, marginBottom: 16 }}>
+          <div style={{ color: passed ? "#16a34a" : "#dc2626", fontSize: 14, marginBottom: 16 }}>
             {passed ? "You cleared the real test threshold of 18 correct answers." : `You need ${18 - score} more correct answers to reach the pass mark.`}
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={startMock} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 20px", fontWeight: 800, cursor: "pointer" }}>Retake Mock</button>
-            <button className="focus-ring" onClick={() => { setStarted(false); setFinished(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 20px", cursor: "pointer" }}>Back</button>
+            <button className="focus-ring" onClick={() => startPaper(selectedPaper.id)} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 20px", fontWeight: 800, cursor: "pointer" }}>Retake same paper</button>
+            <button className="focus-ring" onClick={() => { setStarted(false); setFinished(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 20px", cursor: "pointer" }}>Back to paper list</button>
           </div>
         </Card>
-        {wrong.length > 0 && (
-          <Card style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 8%, var(--card-bg))" }}>
-            <div style={{ fontWeight: 800, color: "#fca5a5", marginBottom: 12 }}>Revision targets from this mock</div>
-            {wrong.map((item, index) => (
-              <div key={`${item.q}-${index}`} style={{ padding: "10px 0", borderBottom: index < wrong.length - 1 ? "1px solid rgba(248,113,113,0.15)" : "none" }}>
-                <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{item.q}</div>
-                <div style={{ color: "#fca5a5", fontSize: 13 }}>Your answer: {item.chosen === undefined ? "No answer" : item.opts[item.chosen]}</div>
-                <div style={{ color: "#4ade80", fontSize: 13 }}>Correct answer: {item.opts[item.a]}</div>
-                {showContext && <MemoryHook text={item.tip} />}
+        <Card>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 12 }}>Topic breakdown</div>
+          <div className="study-mode-grid" style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))" }}>
+            {breakdown.map((item) => (
+              <div key={item.label} style={{ borderRadius: 16, border: `1px solid ${item.color}33`, background: `${item.color}10`, padding: 14 }}>
+                <div style={{ fontSize: 18, marginBottom: 6 }}>{item.icon}</div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.label}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12, margin: "6px 0 8px" }}>{item.correct}/{item.total} correct</div>
+                <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8 }}>
+                  <div style={{ background: item.color, height: "100%", borderRadius: 999, width: `${(item.correct / item.total) * 100}%` }} />
+                </div>
               </div>
             ))}
-          </Card>
-        )}
+          </div>
+        </Card>
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>Review this paper</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Use the detailed review to turn wrong answers into memory anchors.</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <TabButton active={reviewFilter === "wrong"} onClick={() => setReviewFilter("wrong")}>Wrong only</TabButton>
+              <TabButton active={reviewFilter === "flagged"} onClick={() => setReviewFilter("flagged")}>Flagged</TabButton>
+              <TabButton active={reviewFilter === "all"} onClick={() => setReviewFilter("all")}>All 24</TabButton>
+            </div>
+          </div>
+          {!reviewItems.length && <div style={{ color: "var(--text-muted)", fontSize: 14 }}>No questions match this review filter.</div>}
+          {reviewItems.map((item) => {
+            const category = MOCK_CATEGORY_META[classifyMockCategory(item)];
+            const correct = item.chosen === item.a;
+            return (
+              <div key={`${item.q}-${item.index}`} style={{ padding: "12px 0", borderBottom: item.index < reviewItems.length - 1 ? "1px solid var(--card-border)" : "none" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+                  <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 14 }}>{item.q}</div>
+                  <Badge text={`${category.icon} ${category.label}`} color={category.color} />
+                </div>
+                <div style={{ color: correct ? "#16a34a" : "#dc2626", fontSize: 13, marginBottom: 4 }}>
+                  {correct ? `Correct: ${item.opts[item.a]}` : `Your answer: ${item.chosen === undefined ? "No answer" : item.opts[item.chosen]}`}
+                </div>
+                {!correct && <div style={{ color: "#16a34a", fontSize: 13, marginBottom: 8 }}>Correct answer: {item.opts[item.a]}</div>}
+                {showContext && (
+                  <div style={{ borderRadius: 14, border: `1px solid ${category.color}33`, background: `${category.color}10`, padding: 12 }}>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 13, marginBottom: 6 }}>Why this matters</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>{buildMockAnswerContext(item)}</div>
+                    <MemoryHook text={item.tip} />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </Card>
       </div>
     );
   }
 
   return (
     <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <Badge text={`Question ${current + 1} of ${TOTAL}`} color="#64748b" />
-        <Badge text={`${minutes}:${seconds}`} color={timeLeft > 600 ? "#22c55e" : timeLeft > 300 ? "#f59e0b" : "#ef4444"} />
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Badge text={selectedPaper.title} color={selectedPaper.accent} />
+          <Badge text={`Question ${current + 1} of ${MOCK_TOTAL}`} color="#64748b" />
+          <Badge text={`${answeredCount} answered`} color="#22c55e" />
+          {flaggedCount > 0 && <Badge text={`${flaggedCount} flagged`} color="#f59e0b" />}
+        </div>
+        <Badge text={timerMode === "strict" ? formatCountdown(timeLeft) : "Practice mode"} color={timerMode === "strict" ? (timeLeft > 600 ? "#22c55e" : timeLeft > 300 ? "#f59e0b" : "#ef4444") : "#3b82f6"} />
       </div>
-      <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, marginBottom: 16 }}>
-        <div style={{ background: "#f97316", height: "100%", borderRadius: 999, width: `${(Object.keys(answers).length / TOTAL) * 100}%`, transition: "width 0.2s" }} />
+      <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, marginBottom: 14 }}>
+        <div style={{ background: selectedPaper.accent, height: "100%", borderRadius: 999, width: `${(answeredCount / MOCK_TOTAL) * 100}%`, transition: "width 0.2s" }} />
       </div>
-      <QuestionCard question={currentQuestion} selected={answers[current]} confirmed={answerMode === "instant" && answers[current] !== undefined} onSelect={(oi) => {
-        if (answerMode === "instant" && answers[current] !== undefined) return;
-        setAnswers((prev) => ({ ...prev, [current]: oi }));
-      }} />
-      {answerMode === "instant" && answers[current] !== undefined && (
-        <>
-          {showContext && <MemoryHook text={currentQuestion.tip} />}
-          <div style={{ marginTop: 8, color: answers[current] === currentQuestion.a ? "#4ade80" : "#fca5a5", fontSize: 13, fontWeight: 700 }}>
-            {answers[current] === currentQuestion.a ? "Correct" : `Correct answer: ${currentQuestion.opts[currentQuestion.a]}`}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+        <button className="focus-ring" onClick={() => { setStarted(false); setFinished(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>← Back to papers</button>
+        <button className="focus-ring" onClick={() => setFlagged((prev) => ({ ...prev, [current]: !prev[current] }))} style={{ background: flagged[current] ? "color-mix(in srgb, #f59e0b 16%, var(--card-bg))" : "var(--chip-bg)", color: flagged[current] ? "#d97706" : "var(--text)", border: `1px solid ${flagged[current] ? "#f59e0b" : "var(--card-border)"}`, borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>
+          {flagged[current] ? "★ Flagged" : "☆ Flag for review"}
+        </button>
+      </div>
+      <div className="study-mode-grid" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", alignItems: "start" }}>
+        <div>
+          <QuestionCard
+            question={currentQuestion}
+            selected={answers[current]}
+            confirmed={answerMode === "instant" && answers[current] !== undefined}
+            onSelect={(choice) => {
+              if (answerMode === "instant" && answers[current] !== undefined) return;
+              setAnswers((prev) => ({ ...prev, [current]: choice }));
+            }}
+          />
+          {answerMode === "instant" && answers[current] !== undefined && (
+            <Card style={{ marginTop: 12, border: `1px solid ${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color}33`, background: `${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color}12` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+                <div style={{ color: answers[current] === currentQuestion.a ? "#16a34a" : "#dc2626", fontWeight: 800 }}>
+                  {answers[current] === currentQuestion.a ? "Correct" : `Correct answer: ${currentQuestion.opts[currentQuestion.a]}`}
+                </div>
+                <Badge text={`${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].icon} ${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].label}`} color={MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color} />
+              </div>
+              {showContext && (
+                <>
+                  <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>{buildMockAnswerContext(currentQuestion)}</div>
+                  <MemoryHook text={currentQuestion.tip} />
+                </>
+              )}
+            </Card>
+          )}
+          <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={() => setCurrent((value) => Math.max(0, value - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
+            <button className="focus-ring" onClick={() => setCurrent((value) => Math.min(MOCK_TOTAL - 1, value + 1))} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
+            <button className="focus-ring" onClick={() => setFinished(true)} style={{ marginLeft: "auto", background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}>Finish paper</button>
           </div>
-        </>
-      )}
-      <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
-        <button className="focus-ring" onClick={() => setCurrent((c) => Math.max(0, c - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
-        <button className="focus-ring" onClick={() => setCurrent((c) => Math.min(TOTAL - 1, c + 1))} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
-        <button className="focus-ring" onClick={() => setFinished(true)} style={{ marginLeft: "auto", background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}>Finish Exam</button>
-      </div>
-      <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginTop: 14 }}>
-        {questions.map((_, index) => {
-          const answered = answers[index] !== undefined;
-          return (
-            <button key={index} className="focus-ring" onClick={() => setCurrent(index)} style={{ minWidth: 40, height: 40, borderRadius: 999, border: `1px solid ${current === index ? "#f97316" : answered ? "#22c55e" : "#475569"}`, background: current === index ? "#f97316" : answered ? "color-mix(in srgb, #22c55e 12%, var(--card-bg))" : "var(--chip-bg)", color: current === index ? "#fff" : answered ? "#16a34a" : "var(--text-muted)", cursor: "pointer", fontWeight: 800 }}>
-              {index + 1}
-            </button>
-          );
-        })}
+        </div>
+        <Card>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Paper navigator</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.7, marginBottom: 12 }}>
+            Jump to any question. Green means answered. Amber means flagged for review.
+          </div>
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+            {questions.map((question, index) => {
+              const answered = answers[index] !== undefined;
+              const isCurrent = current === index;
+              const isFlagged = flagged[index];
+              return (
+                <button
+                  key={`${question.q}-${index}`}
+                  className="focus-ring"
+                  onClick={() => setCurrent(index)}
+                  style={{
+                    minHeight: 50,
+                    borderRadius: 14,
+                    border: `1px solid ${isCurrent ? selectedPaper.accent : isFlagged ? "#f59e0b" : answered ? "#22c55e" : "var(--card-border)"}`,
+                    background: isCurrent ? `${selectedPaper.accent}20` : isFlagged ? "color-mix(in srgb, #f59e0b 12%, var(--card-bg))" : answered ? "color-mix(in srgb, #22c55e 12%, var(--card-bg))" : "var(--panel-bg)",
+                    color: isCurrent ? "var(--text-strong)" : isFlagged ? "#d97706" : answered ? "#16a34a" : "var(--text-muted)",
+                    cursor: "pointer",
+                    fontWeight: 800,
+                    display: "grid",
+                    placeItems: "center",
+                  }}
+                >
+                  {index + 1}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
       </div>
     </div>
   );
