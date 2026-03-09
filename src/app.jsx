@@ -1131,11 +1131,12 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
   );
 };
 
-const AppFooterBar = ({ onForceRefresh }) => (
+const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
   <div style={{ padding: "6px 16px 18px", paddingBottom: "max(18px, env(safe-area-inset-bottom))" }}>
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", border: "1px solid var(--card-border)", background: "var(--panel-bg)", borderRadius: 14, padding: "10px 12px" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
         <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
+        <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
         <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Not seeing updates? Refresh the latest version.</div>
       </div>
       <button
@@ -3598,6 +3599,8 @@ const App = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [quickPanelOpen, setQuickPanelOpen] = useState(false);
   const [tabHistory, setTabHistory] = useState([]);
+  const [isOffline, setIsOffline] = useState(() => !navigator.onLine);
+  const [offlineReady, setOfflineReady] = useState(() => Boolean(window.__offlineReady));
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
@@ -3635,6 +3638,20 @@ const App = () => {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onOnline = () => setIsOffline(false);
+    const onOffline = () => setIsOffline(true);
+    const onOfflineReady = () => setOfflineReady(true);
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
+    window.addEventListener("lifeuk-offline-ready", onOfflineReady);
+    return () => {
+      window.removeEventListener("online", onOnline);
+      window.removeEventListener("offline", onOffline);
+      window.removeEventListener("lifeuk-offline-ready", onOfflineReady);
+    };
   }, []);
 
   const toggleDark = () => setIsDark((d) => !d);
@@ -3698,7 +3715,7 @@ const App = () => {
     <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 112 : 12 }}>
       <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} />
       <div className="tabcontent">{renderTab()}</div>
-      <AppFooterBar onForceRefresh={forceLatestAppReload} />
+      <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />
       <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>
         Open Source — Share Freely ·{" "}
         <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" style={{ color: "#60a5fa", textDecoration: "none" }}>

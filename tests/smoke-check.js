@@ -10,10 +10,12 @@ const root = path.resolve(__dirname, "..");
 const dataPath = path.join(root, "src", "data.js");
 const appPath = path.join(root, "src", "app.jsx");
 const indexPath = path.join(root, "index.html");
+const serviceWorkerPath = path.join(root, "service-worker.js");
 
 const dataSource = fs.readFileSync(dataPath, "utf8");
 const appSource = fs.readFileSync(appPath, "utf8");
 const indexSource = fs.readFileSync(indexPath, "utf8");
+const serviceWorkerSource = fs.readFileSync(serviceWorkerPath, "utf8");
 
 const exportedNames = [
   "ALL_QUIZ",
@@ -70,10 +72,14 @@ assert(/MobileQuickPanel/.test(appSource), "Quick panel component missing");
 assert(/mobile-primary-strip/.test(indexSource), "Mobile primary strip styling missing");
 assert(/desktop-nav-panel/.test(indexSource), "Desktop grouped navigation styling missing");
 assert(/AppFooterBar/.test(appSource), "Footer version bar missing");
+assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");
 assert(/Visual memory clues/.test(appSource), "Mnemonic home panel missing");
 assert(/Coverage checklist/.test(appSource), "Coverage checklist missing");
 assert(/focus-ring/.test(indexSource), "Focus-visible styling missing");
 assert(/@media \(max-width: 820px\)/.test(indexSource), "Responsive breakpoint missing");
+assert(/serviceWorker\.register/.test(indexSource), "Service worker registration missing");
+assert(/CACHE_VERSION/.test(serviceWorkerSource), "Service worker cache version missing");
+assert(/addEventListener\(\"fetch\"/.test(serviceWorkerSource) || /addEventListener\('fetch'/.test(serviceWorkerSource), "Service worker fetch handler missing");
 
 data.ALL_QUIZ.forEach((question, index) => {
   assert(typeof question.q === "string" && question.q.length > 10, `Question ${index + 1} text invalid`);

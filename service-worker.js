@@ -1,0 +1,74 @@
+const CACHE_VERSION = "lifeuk-static-v1.0.0";
+const APP_SHELL = [
+  "./",
+  "./index.html",
+  "./src/data.js",
+  "./src/app.jsx",
+  "./robots.txt",
+  "./sitemap.xml",
+];
+
+const CDN_ASSETS = [
+  "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
+  "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js",
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_VERSION).then(async (cache) => {
+      await cache.addAll(APP_SHELL);
+      await Promise.all(CDN_ASSETS.map(async (url) => {
+        try {
+          await cache.add(url);
+        } catch (err) {
+          // Ignore individual CDN cache failures during install.
+        }
+      }));
+    }).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
+
+  const url = new URL(event.request.url);
+  const isSameOrigin = url.origin === self.location.origin;
+  const isCdnAsset = CDN_ASSETS.includes(url.href);
+
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_VERSION).then((cache) => cache.put("./index.html", copy));
+        return response;
+      }).catch(async () => {
+        const cached = await caches.match("./index.html");
+        return cached || Response.error();
+      })
+    );
+    return;
+  }
+
+  if (!isSameOrigin && !isCdnAsset) return;
+
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      const networkFetch = fetch(event.request).then((response) => {
+        const copy = response.clone();
+        caches.open(CACHE_VERSION).then((cache) => cache.put(event.request, copy));
+        return response;
+      }).catch(() => cached);
+
+      return cached || networkFetch;
+    })
+  );
+});

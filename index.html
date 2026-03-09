@@ -23,6 +23,8 @@
   <meta name="twitter:description" content="Free Life in the UK test app with mock tests, quick revision, memory clues, and full topic coverage for ILR and citizenship prep." />
   <meta name="twitter:image" content="https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/screenshots/mobile-nav.png" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇧</text></svg>" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -283,5 +285,18 @@
        APP — edit for UI changes
        ═══════════════════════════════════ -->
   <script type="text/babel" src="src/app.jsx"></script>
+  <script>
+    window.__offlineReady = false;
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").then(() => {
+          window.__offlineReady = true;
+          window.dispatchEvent(new CustomEvent("lifeuk-offline-ready"));
+        }).catch(() => {
+          // Ignore registration failures and continue online only.
+        });
+      });
+    }
+  </script>
 </body>
 </html>
