@@ -78,16 +78,55 @@
       justify-content: space-between;
       align-items: center;
     }
-    .mobile-utility-strip {
+    .desktop-nav-panel {
+      display: grid;
+      gap: 10px;
+      padding: 10px 16px 14px;
+      border-top: 1px solid color-mix(in srgb, var(--card-border) 80%, transparent);
+      background: linear-gradient(to bottom, color-mix(in srgb, var(--header-bg) 96%, transparent), color-mix(in srgb, var(--header-bg) 88%, transparent));
+    }
+    .desktop-nav-group { display: grid; gap: 6px; }
+    .desktop-nav-label {
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .desktop-nav-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .desktop-nav-chip,
+    .mobile-primary-chip {
+      border: 1px solid var(--card-border);
+      background: var(--chip-bg);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .desktop-nav-chip[data-active="true"],
+    .mobile-primary-chip[data-active="true"] {
+      background: #1d4ed822;
+      border-color: #3b82f6;
+      color: #60a5fa;
+    }
+    .mobile-primary-strip {
       display: none;
       gap: 8px;
-      padding: 8px 14px 10px;
-      position: sticky;
-      top: 65px;
-      z-index: 95;
-      background: linear-gradient(to bottom, var(--header-bg), color-mix(in srgb, var(--header-bg) 78%, transparent));
-      backdrop-filter: blur(10px);
+      overflow-x: auto;
+      padding: 8px 14px 12px;
+      border-top: 1px solid color-mix(in srgb, var(--card-border) 80%, transparent);
+      background: linear-gradient(to bottom, color-mix(in srgb, var(--header-bg) 96%, transparent), color-mix(in srgb, var(--header-bg) 88%, transparent));
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
+    .mobile-primary-strip::-webkit-scrollbar { display: none; }
     .mobile-scroll-top {
       display: none;
       position: fixed;
@@ -151,7 +190,8 @@
       .section-title-wrap p { font-size: 12px !important; }
       .app-badge { font-size: 10px !important; padding: 3px 8px !important; }
       .mobile-bottom-nav { display: flex; }
-      .mobile-utility-strip { display: flex; overflow-x: auto; }
+      .desktop-nav-panel { display: none; }
+      .mobile-primary-strip { display: flex; }
       .mobile-scroll-top { display: inline-flex; align-items: center; justify-content: center; }
       .mobile-sheet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       body { background-size: cover; }

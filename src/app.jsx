@@ -16,6 +16,7 @@ const STORAGE_KEYS = {
 };
 
 const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "mock", "revise", "quiz", "rapidfire", "timeline", "confuse"];
+const PRIMARY_MOBILE_TABS = ["home", "quickrev", "quiz", "mock", "rapidfire", "timeline"];
 const NAV_GROUPS = [
   { title: "Study Modes", ids: ["home", "quickrev", "mock", "revise", "quiz", "rapidfire"] },
   { title: "Core Topics", ids: ["timeline", "nations", "confuse", "quickfacts", "landmarks", "international"] },
@@ -568,8 +569,9 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px", borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
-        <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring mobile-only" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
+      <div style={{ borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px" }}>
+        <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
           ☰
         </button>
         <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "#f8fafc" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
@@ -591,22 +593,43 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
             ⋯
           </button>
         </div>
-      </div>
-      <div className="mobile-utility-strip">
-        <button className="focus-ring" onClick={onBack} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 999, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontWeight: 700 }}>← Back</button>
-        <button className="focus-ring" onClick={() => setActive("home")} style={{ border: "1px solid var(--card-border)", background: active === "home" ? "#1d4ed822" : "var(--chip-bg)", color: active === "home" ? "#60a5fa" : "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>🏠 Home</button>
-        <button className="focus-ring" onClick={openQuickPanel} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>Quick Panel</button>
-      </div>
-      <div className="tab-strip-wrap desktop-only">
-        <div className="noscroll" style={{ display: "flex", overflowX: "auto", background: "var(--header-bg)", borderBottom: "1px solid var(--card-border)", padding: "0 10px" }}>
-          {TABS.filter((tab) => PRIMARY_DESKTOP_TABS.includes(tab.id)).map((t) => (
-            <button key={t.id} className="focus-ring" onClick={() => setActive(t.id)}
-              style={{ flexShrink: 0, padding: "12px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: active === t.id ? 800 : 500, color: active === t.id ? "#60a5fa" : "var(--text-muted)", borderBottom: active === t.id ? "2px solid #60a5fa" : "2px solid transparent", whiteSpace: "nowrap" }}>
-              {t.icon} {t.label}
+        </div>
+        <div className="desktop-nav-panel desktop-only">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title} className="desktop-nav-group">
+              <div className="desktop-nav-label">{group.title}</div>
+              <div className="desktop-nav-row">
+                {group.ids.map((id) => {
+                  const tab = TABS.find((item) => item.id === id);
+                  if (!tab) return null;
+                  return (
+                    <button
+                      key={tab.id}
+                      className="focus-ring desktop-nav-chip"
+                      onClick={() => setActive(tab.id)}
+                      data-active={active === tab.id ? "true" : "false"}
+                    >
+                      {tab.icon} {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="mobile-primary-strip mobile-only noscroll">
+          {TABS.filter((tab) => PRIMARY_MOBILE_TABS.includes(tab.id)).map((tab) => (
+            <button
+              key={tab.id}
+              className="focus-ring mobile-primary-chip"
+              onClick={() => setActive(tab.id)}
+              data-active={active === tab.id ? "true" : "false"}
+            >
+              {tab.icon} {tab.label}
             </button>
           ))}
-          <button className="focus-ring" onClick={() => setMenuOpen(true)} style={{ flexShrink: 0, padding: "12px 14px", background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 700, color: "var(--text)", whiteSpace: "nowrap" }}>
-            ☰ All Topics
+          <button className="focus-ring mobile-primary-chip" onClick={openQuickPanel}>
+            ☰ Topics
           </button>
         </div>
       </div>
