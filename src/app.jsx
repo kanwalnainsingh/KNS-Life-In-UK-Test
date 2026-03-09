@@ -114,34 +114,174 @@ const buildRevisionBuckets = (items) => {
 
 const buildQuickRevisionDeck = () => {
   const deck = [];
+
   VISUAL_MNEMONICS.forEach((item) => {
     deck.push({
       front: `${item.icon} ${item.title}`,
       back: `${item.code}: ${item.clue}`,
+      context: "Use this as a compression code for fast recall before a mock or rapid-fire run.",
       memory: item.visual,
       topic: "Memory Clue",
       color: item.color,
     });
   });
+
   COVERAGE_AREAS.forEach((item) => {
     deck.push({
       front: `${item.icon} ${item.title}`,
       back: item.detail,
-      memory: `Covered in ${TABS.find((tab) => tab.id === item.tab)?.label || item.tab}`,
+      context: `This area is covered in ${TABS.find((tab) => tab.id === item.tab)?.label || item.tab}.`,
+      memory: "Use the linked section after this card if you want the fuller fact list.",
       topic: "Coverage",
       color: "#64748b",
     });
   });
-  [
-    { front: "🏛️ House of Commons", back: "Elected MPs. More powerful. Controls money bills.", memory: "Commons = chosen by the public.", topic: "Parliament", color: "#22c55e" },
-    { front: "🏛️ House of Lords", back: "Appointed members. Reviews and delays laws.", memory: "Lords = not elected.", topic: "Parliament", color: "#ef4444" },
-    { front: "🗳️ Voting basics", back: "Voting age 18. Secret ballot. FPTP in general elections.", memory: "18 + secret ballot + FPTP.", topic: "Elections", color: "#3b82f6" },
-    { front: "⚖️ Justice basics", back: "Rule of law. Innocent until proven guilty. Equality before the law.", memory: "Law applies to everyone.", topic: "Law", color: "#10b981" },
-    { front: "🤝 Community role", back: "Volunteering, fundraising, jury service and local participation all matter.", memory: "Community = take part, do not just observe.", topic: "Community", color: "#8b5cf6" },
-    { front: "🗺️ UK capitals", back: "London, Edinburgh, Cardiff, Belfast.", memory: "LECB mnemonic.", topic: "Geography", color: "#06b6d4" },
-    { front: "📜 Anchor dates", back: "43, 1066, 1215, 1534, 1948.", memory: "Roman invasion, Hastings, Magna Carta, Church of England, NHS.", topic: "History", color: "#f97316" },
-    { front: "🌍 World organisations", back: "UN, NATO, Commonwealth, Council of Europe.", memory: "Council of Europe ≠ EU.", topic: "International", color: "#0ea5e9" },
-  ].forEach((item) => deck.push(item));
+
+  TIMELINE.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.year}`,
+      back: item.event,
+      context: buildTimelineDetails(item).slice(0, 2).join(" "),
+      memory: item.memory,
+      topic: "History",
+      color: item.color,
+    });
+  });
+
+  NATIONS.forEach((item) => {
+    deck.push({
+      front: `${item.flag} ${item.name}: capital + saint`,
+      back: `${item.capital} · ${item.saint} · ${item.day}`,
+      context: `${item.flower}. ${item.parliament}. Population share: ${item.pop}.`,
+      memory: item.tricks.slice(0, 2).join(" "),
+      topic: "4 Nations",
+      color: item.color,
+    });
+    deck.push({
+      front: `${item.flag} ${item.name}: language + parliament`,
+      back: `${item.lang} · ${item.parliament}`,
+      context: `Food clue: ${item.food}. Key cities: ${item.cities}.`,
+      memory: item.tricks.slice(2).join(" "),
+      topic: "4 Nations",
+      color: item.color,
+    });
+  });
+
+  QUICK_FACTS.forEach((section) => {
+    section.facts.forEach((fact) => {
+      deck.push({
+        front: `${section.icon} ${section.cat}`,
+        back: fact,
+        context: `Quick fact from ${section.cat}. These are common short-answer revision points.`,
+        memory: fact.includes("Memory clue:") ? fact.replace("Memory clue:", "").trim() : section.cat,
+        topic: section.cat,
+        color: section.color,
+      });
+    });
+  });
+
+  INVENTORS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.who}`,
+      back: `${item.what} · ${item.when}`,
+      context: `${item.nation}. Category: ${item.link}.`,
+      memory: item.memory,
+      topic: "Inventors",
+      color: "#06b6d4",
+    });
+  });
+
+  SPORTS_STARS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.name}`,
+      back: item.achievement,
+      context: `${item.sport}. Key year: ${item.year}.`,
+      memory: item.memory,
+      topic: "Sports",
+      color: "#8b5cf6",
+    });
+  });
+
+  RELIGIONS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.faith}`,
+      back: `${item.pct} of the UK population (2011 census)`,
+      context: item.note,
+      memory: `${item.faith} = ${item.pct}.`,
+      topic: "Religion",
+      color: item.color,
+    });
+  });
+
+  FESTIVALS.forEach((item) => {
+    deck.push({
+      front: `${item.faith.split(" ")[1] || "🎉"} ${item.name}`,
+      back: `${item.date} · ${item.faith}`,
+      context: item.detail,
+      memory: `${item.name} = ${item.date}.`,
+      topic: "Festivals",
+      color: "#f59e0b",
+    });
+  });
+
+  LANDMARKS.forEach((item) => {
+    deck.push({
+      front: item.name,
+      back: `${item.where} · ${item.fact}`,
+      context: "Landmark/location cards are easiest if you link one place to one standout clue.",
+      memory: item.trap,
+      topic: "Landmarks",
+      color: "#0ea5e9",
+    });
+  });
+
+  INT_ORGS.forEach((item) => {
+    deck.push({
+      front: item.name,
+      back: `${item.members} · ${item.power}`,
+      context: `${item.purpose} UK role: ${item.ukRole}`,
+      memory: item.memory,
+      topic: "World Orgs",
+      color: "#10b981",
+    });
+  });
+
+  [...KEY_FIGURES, ...EXTRA_KEY_FIGURES]
+    .filter((figure, index, arr) => arr.findIndex((item) => item.name === figure.name) === index)
+    .forEach((item) => {
+      deck.push({
+        front: `${item.icon} ${item.name}`,
+        back: item.role,
+        context: item.facts.join(" "),
+        memory: FIGURE_MEMORY[item.name] || item.facts[0],
+        topic: "Key People",
+        color: item.color,
+      });
+    });
+
+  CONFUSABLES.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.title}`,
+      back: `${item.left.label} vs ${item.right.label}`,
+      context: `${item.left.points[0]} / ${item.right.points[0]}`,
+      memory: item.memory,
+      topic: "Comparisons",
+      color: "#7c3aed",
+    });
+  });
+
+  deck.push(
+    { front: "🏛️ House of Commons", back: "Elected MPs. More powerful. Controls money bills.", context: "650 MPs. Commons is the chamber that usually decides who forms the government.", memory: "Commons = chosen by the public.", topic: "Parliament", color: "#22c55e" },
+    { front: "🏛️ House of Lords", back: "Appointed members. Reviews and delays laws.", context: "Usually revises bills and asks the Commons to think again, but is less powerful.", memory: "Lords = not elected.", topic: "Parliament", color: "#ef4444" },
+    { front: "🗳️ Voting basics", back: "Voting age 18. Secret ballot. FPTP in general elections.", context: "Good one-card summary for most democracy questions.", memory: "18 + secret ballot + FPTP.", topic: "Elections", color: "#3b82f6" },
+    { front: "⚖️ Justice basics", back: "Rule of law. Innocent until proven guilty. Equality before the law.", context: "These ideas appear across courts, values, and citizenship questions.", memory: "Law applies to everyone.", topic: "Law", color: "#10b981" },
+    { front: "🤝 Community role", back: "Volunteering, fundraising, jury service and local participation all matter.", context: "Useful for questions about what good citizenship looks like in practice.", memory: "Community = take part, do not just observe.", topic: "Community", color: "#8b5cf6" },
+    { front: "🗺️ UK capitals", back: "London, Edinburgh, Cardiff, Belfast.", context: "These are among the easiest marks in the test, but also easy to mix up under pressure.", memory: "LECB mnemonic.", topic: "Geography", color: "#06b6d4" },
+    { front: "📜 Anchor dates", back: "43, 1066, 1215, 1534, 1948.", context: "Roman invasion, Hastings, Magna Carta, Church of England, NHS.", memory: "Use these as a history spine for the whole course.", topic: "History", color: "#f97316" },
+    { front: "🌍 World organisations", back: "UN, NATO, Commonwealth, Council of Europe.", context: "The most common trap is Council of Europe versus EU.", memory: "Council of Europe ≠ EU.", topic: "International", color: "#0ea5e9" },
+    { front: "🎵 National anthem", back: ANTHEM.title, context: ANTHEM.note, memory: ANTHEM.memory, topic: "Symbols", color: "#3b82f6" },
+  );
+
   return deck;
 };
 
@@ -832,16 +972,26 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
 
 const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
+  const topics = useMemo(() => ["All", ...Array.from(new Set(deck.map((item) => item.topic)))], [deck]);
+  const [topic, setTopic] = useState("All");
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const touchStartRef = useRef(null);
-  const current = deck[index];
+  const filteredDeck = useMemo(() => topic === "All" ? deck : deck.filter((item) => item.topic === topic), [deck, topic]);
+  const current = filteredDeck[index] || filteredDeck[0];
 
   const move = (direction) => {
     setIndex((value) => {
-      if (direction === "next") return (value + 1) % deck.length;
-      return (value - 1 + deck.length) % deck.length;
+      if (!filteredDeck.length) return 0;
+      if (direction === "next") return (value + 1) % filteredDeck.length;
+      return (value - 1 + filteredDeck.length) % filteredDeck.length;
     });
+    setFlipped(false);
+  };
+
+  const jumpRandom = () => {
+    if (!filteredDeck.length) return;
+    setIndex(Math.floor(Math.random() * filteredDeck.length));
     setFlipped(false);
   };
 
@@ -856,25 +1006,39 @@ const QuickRevisionTab = ({ setActive }) => {
     touchStartRef.current = null;
   };
 
+  useEffect(() => {
+    setIndex(0);
+    setFlipped(false);
+  }, [topic]);
+
+  if (!current) return null;
+
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="↔️" meta="Swipe left or right for fast all-topic revision. Tap the card to flip it.">Quick Revision</SectionTitle>
-      <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(14,165,233,0.18))", border: "1px solid #0ea5e9" }}>
-        <div style={{ color: "#e0f2fe", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>All-topic rapid recap</div>
-        <div style={{ color: "#bae6fd", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
-          Flip each card for the answer. Swipe left or right to move through the deck quickly.
+      <SectionTitle icon="↔️" meta="Bigger revision deck with answer, context, and memory clue on every card.">Quick Revision</SectionTitle>
+      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Rapid revision with more detail</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
+          Flip each card for the answer, then use the context and memory clue to lock it in. Filter by topic if you want focused revision.
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <Badge text={`${deck.length} cards`} color="#06b6d4" />
-          <Badge text="Flip card" color="#3b82f6" />
-          <Badge text="All core topics covered" color="#22c55e" />
+          <Badge text={`${deck.length} cards total`} color="#06b6d4" />
+          <Badge text={`${filteredDeck.length} in view`} color="#3b82f6" />
+          <Badge text="Answer + context + memory" color="#22c55e" />
+        </div>
+      </Card>
+      <Card>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Topic filter</div>
+        <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto" }}>
+          {topics.map((item) => <TabButton key={item} active={topic === item} onClick={() => setTopic(item)}>{item}</TabButton>)}
         </div>
       </Card>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <button className="focus-ring" onClick={() => move("prev")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>← Previous</button>
         <button className="focus-ring" onClick={() => setFlipped((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{flipped ? "Show front" : "Flip card"}</button>
+        <button className="focus-ring" onClick={jumpRandom} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Random</button>
         <button className="focus-ring" onClick={() => move("next")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Next →</button>
-        <div style={{ marginLeft: "auto" }}><Badge text={`${index + 1} / ${deck.length}`} color={current.color} /></div>
+        <div style={{ marginLeft: "auto" }}><Badge text={`${index + 1} / ${filteredDeck.length}`} color={current.color} /></div>
       </div>
       <Card
         className="quick-revision-card"
@@ -887,13 +1051,20 @@ const QuickRevisionTab = ({ setActive }) => {
           <Badge text={current.topic} color={current.color} />
           <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{flipped ? "Back of card" : "Front of card"}</div>
         </div>
-        <div style={{ minHeight: 180, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ minHeight: 220, display: "flex", flexDirection: "column", justifyContent: "center" }}>
           <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: flipped ? 24 : 28, lineHeight: 1.35, marginBottom: 10 }}>
             {flipped ? current.back : current.front}
           </div>
-          <div style={{ color: flipped ? "#cbd5e1" : "#94a3b8", fontSize: 14, lineHeight: 1.7 }}>
-            {flipped ? current.memory : "Tap to reveal the answer or swipe to move on."}
-          </div>
+          {!flipped && <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7 }}>Tap to reveal the answer, then read the extra context and memory clue.</div>}
+          {flipped && (
+            <div style={{ display: "grid", gap: 10 }}>
+              <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "10px 12px" }}>
+                <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>WHY THIS MATTERS</div>
+                <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.65 }}>{current.context}</div>
+              </div>
+              <MemoryHook text={current.memory} />
+            </div>
+          )}
         </div>
       </Card>
       <Card>
