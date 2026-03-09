@@ -11,10 +11,12 @@ It is designed to help learners revise quickly on mobile and desktop with:
 
 ## Stack
 - Plain `index.html`
-- React via CDN
+- Local bundled React app with `esbuild`
 - `src/data.js` for all facts, mnemonics, tabs, and question bank
 - `src/app.jsx` for UI and state
-- No build step
+- `src/main.jsx` as bundle entry
+- `scripts/build.mjs` writes the GitHub Pages build to `docs/`
+- `service-worker.js` provides offline support after first online load
 
 ## Core product direction
 - Keep the app mobile-first and low-friction.
@@ -32,8 +34,9 @@ It is designed to help learners revise quickly on mobile and desktop with:
 
 ## Recent major changes
 - Added grouped navigation for mobile and desktop.
-- Simplified the header so main study actions are first, with topic subsections grouped underneath.
-- Added `Quick Revise` swipe-style flash-card mode.
+- Simplified mobile navigation by removing the extra mobile primary strip and relying on header menu + bottom nav + quick panel.
+- Added `Quick Revise` short-session card mode.
+- Added stable `Story Mode` chapters sourced from `src/data.js`.
 - Added visible app release versioning sourced from `package.json`.
 - Added `↻ Latest` refresh action to help mobile users pull the newest deployed version.
 - Added timeline checkpoint saving so learners can jump back to the point they last remembered.
@@ -51,6 +54,8 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added community/participation facts and questions.
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
+- Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
+- Added direct `Boxing Day` quiz coverage to close the last festival audit gap.
 
 ## Data model notes
 - `ALL_QUIZ` is the main bank. Each entry should keep:
@@ -60,6 +65,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
   - `tip`
 - `tip` is used for memory/context and sometimes category hints.
 - `VISUAL_MNEMONICS` powers the home memory panel and quick revision mode.
+- `STORY_CHAPTERS` is the stable source for story-mode content.
 - `KEY_FIGURES`, `EXTRA_KEY_FIGURES`, and `FIGURE_MEMORY` together power the people page.
 - `CONFUSABLES` powers compare/trap views and also seeds some mock/rapid content.
 
@@ -67,7 +73,6 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Mobile users should be able to move between modes with minimal scrolling.
 - Important actions should stay visible:
   - back
-  - home
   - quick panel
   - bottom navigation
 - Long pages should feel skimmable, not heavy.
@@ -75,13 +80,18 @@ It is designed to help learners revise quickly on mobile and desktop with:
 ## Testing
 - Run:
 ```bash
-node tests/smoke-check.js
+node tests/smoke-check.cjs
+node tests/coverage-audit.cjs
+npm run build
 ```
 - This validates:
   - quiz bank shape
+  - story chapter structure
   - mnemonic packs
   - tab presence
   - key UI hooks and mobile navigation markers
+  - fact/question coverage alignment
+  - production bundle output
 
 ## Editing guidance
 - Prefer adding to existing topic structures instead of inventing new scattered sections.

@@ -2,7 +2,7 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 262 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
+> 📖 263 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
 Current release: `v1.10.2`
 
@@ -57,7 +57,8 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | Section | What it does |
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
-| ↔️ Quick Revise | Swipe/tap-style revision cards for fast fact review |
+| ↔️ Quick Revise | Short-session revision cards with answer, context, and memory clue |
+| 📚 Story Mode | Small handbook-style chapters for quick sequential revision |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
 | 📄 Cram Sheet | One-page night-before summary |
@@ -83,6 +84,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## 🧠 What’s New
 
 - Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
+- Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
 - More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` flash cards for fast revision
 - `Mock Test` and `Revise Mistakes` modes
@@ -98,8 +100,9 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Beveridge Report
   - Elizabeth II coronation
 - Dedicated `Wars & Battles` section with battle cards, compare traps, and WWII anchors
+- Added direct quiz coverage for `Boxing Day`, closing the last festival audit gap
 - Offline cache support after first online load
-- Local bundled build setup for GitHub Pages with output in `docs/`
+- Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 
 ---
 
@@ -139,8 +142,8 @@ For GitHub Pages:
 
 - The visible app release version comes from `package.json`
 - Bump `package.json` for each user-facing release
-- The current version is shown in the header and on the home screen
-- Users can tap `↻ Latest` in the app header to force-refresh cached mobile pages
+- The current version is shown in the app footer and on the home screen
+- Users can tap `↻ Latest` in the footer to force-refresh cached mobile pages
 - Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point
 - Section pages now include more exam-anchor cards, memory clues, and compare points for faster revision
 - Once the app has loaded online, the service worker can cache it for offline train revision
