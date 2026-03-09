@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 280 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 290 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.0`
+Current release: `v1.11.1`
 
 ---
 
@@ -115,6 +115,16 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Holyrood and Stormont
   - EU citizens and local-election voting
   - census facts used across religion and society questions
+- Added more high-yield civics and everyday-life coverage across revision, mocks, and rapid modes:
+  - Model Parliament
+  - Cabinet ministers
+  - life peers and hereditary peers
+  - Police and Crime Commissioners
+  - jury-service eligibility
+  - National Lottery age
+  - blood donation timing
+  - National Trust as a charity
+  - post-war decolonisation / Empire winds down
 - Offline cache support after first online load
 - Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 
