@@ -112,6 +112,36 @@ const buildRevisionBuckets = (items) => {
     .sort((a, b) => b.questions.length - a.questions.length);
 };
 
+const COVERAGE_CONTEXT = {
+  timeline: "Key test anchors include 43 AD, 1066, 1215, 1534, 1603/1707, 1918/1928/1969, and 1948. Use the timeline for dates, people, and compare traps.",
+  quickfacts: "This area links Parliament, law, rights, voting, daily life, and community duties. Expect short factual questions and principle-based questions.",
+  nations: "Know capitals, saints, flowers, languages, and devolved parliaments. England has no separate parliament, and Wales is not in the Union Jack.",
+  religion: "Focus on the 2011 census, the largest groups, and major festivals like Christmas, Easter, Diwali, Vaisakhi, Hanukkah, and the Eids.",
+  figures: "These people unlock many history and society questions: rulers, reformers, wartime leaders, scientists, and welfare-state figures.",
+  anthem: "Includes the national anthem, Union Jack parts, and identity facts that often appear as short memory questions.",
+  international: "The biggest traps are Council of Europe vs EU and voluntary bodies vs military alliances.",
+};
+
+const buildQuickFactContext = (section, factIndex) => {
+  const previous = section.facts[factIndex - 1];
+  const next = section.facts[factIndex + 1];
+  const related = [previous, next].filter(Boolean).slice(0, 2).join(" ");
+  return related || `${section.cat} is usually tested as short factual recall, so connect this fact to the other points in the same section.`;
+};
+
+const buildLandmarkContext = (landmark) => {
+  if (/Big Ben|Elizabeth Tower/.test(landmark.name)) return "Classic exam trap: Big Ben is the bell, not the tower. Link it with Westminster and Elizabeth II.";
+  if (/Windsor Castle|Buckingham Palace/.test(landmark.name)) return "Royal-residence questions usually test official London home versus weekend or ceremonial residence.";
+  if (/River Severn|Loch Ness|Loch Lomond|Snowdonia|Hadrian's Wall/.test(landmark.name)) return "These place questions are often mixed with longest/highest/location compare traps.";
+  return "Landmark questions usually test one location plus one standout clue such as who built it, what it contains, or why it is famous.";
+};
+
+const buildComparisonContext = (item) => {
+  const left = item.left.points.slice(0, 2).join(" ");
+  const right = item.right.points.slice(0, 2).join(" ");
+  return `${left} ${right}`;
+};
+
 const buildQuickRevisionDeck = () => {
   const deck = [];
 
@@ -130,8 +160,8 @@ const buildQuickRevisionDeck = () => {
     deck.push({
       front: `${item.icon} ${item.title}`,
       back: item.detail,
-      context: `This area is covered in ${TABS.find((tab) => tab.id === item.tab)?.label || item.tab}.`,
-      memory: "Use the linked section after this card if you want the fuller fact list.",
+      context: COVERAGE_CONTEXT[item.tab] || `This area is covered in ${TABS.find((tab) => tab.id === item.tab)?.label || item.tab}.`,
+      memory: `Use ${TABS.find((tab) => tab.id === item.tab)?.label || item.tab} for the fuller fact list and compare points.`,
       topic: "Coverage",
       color: "#64748b",
     });
@@ -168,11 +198,11 @@ const buildQuickRevisionDeck = () => {
   });
 
   QUICK_FACTS.forEach((section) => {
-    section.facts.forEach((fact) => {
+    section.facts.forEach((fact, factIndex) => {
       deck.push({
         front: `${section.icon} ${section.cat}`,
         back: fact,
-        context: `Quick fact from ${section.cat}. These are common short-answer revision points.`,
+        context: buildQuickFactContext(section, factIndex),
         memory: fact.includes("Memory clue:") ? fact.replace("Memory clue:", "").trim() : section.cat,
         topic: section.cat,
         color: section.color,
@@ -228,7 +258,7 @@ const buildQuickRevisionDeck = () => {
     deck.push({
       front: item.name,
       back: `${item.where} · ${item.fact}`,
-      context: "Landmark/location cards are easiest if you link one place to one standout clue.",
+      context: buildLandmarkContext(item),
       memory: item.trap,
       topic: "Landmarks",
       color: "#0ea5e9",
@@ -263,7 +293,7 @@ const buildQuickRevisionDeck = () => {
     deck.push({
       front: `${item.icon} ${item.title}`,
       back: `${item.left.label} vs ${item.right.label}`,
-      context: `${item.left.points[0]} / ${item.right.points[0]}`,
+      context: buildComparisonContext(item),
       memory: item.memory,
       topic: "Comparisons",
       color: "#7c3aed",
