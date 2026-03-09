@@ -210,6 +210,33 @@ const buildTimelineDetails = (ev) => {
   return details.slice(0, 3);
 };
 
+const NATION_KEY_POINTS = {
+  ENGLAND: [
+    "Capital = London. England has no separate parliament of its own.",
+    "Saint = St George, day = 23 April, flower = rose.",
+    "Largest nation by population: about 84% of the UK.",
+    "Church of England is the established church and the monarch is its head.",
+  ],
+  SCOTLAND: [
+    "Capital = Edinburgh, but Glasgow is the largest city.",
+    "Scottish Parliament = Holyrood, 129 MSPs, elected by proportional representation.",
+    "Saint = St Andrew, day = 30 November, flower = thistle, animal = unicorn.",
+    "Church of Scotland is Presbyterian and the monarch is not its head.",
+  ],
+  WALES: [
+    "Capital = Cardiff. Welsh Parliament = Senedd, 60 SMs.",
+    "Saint = St David, day = 1 March, symbols = daffodil or leek.",
+    "Welsh is widely spoken alongside English, by around a quarter of the population.",
+    "Wales is not shown separately in the Union Jack because it was already joined with England.",
+  ],
+  "N. IRELAND": [
+    "Capital = Belfast. NI Assembly = Stormont, 90 MLAs.",
+    "Saint = St Patrick, day = 17 March, symbol = shamrock.",
+    "Good Friday Agreement 1998 is key background for the current Assembly.",
+    "Giant's Causeway and Belfast are common Northern Ireland exam anchors.",
+  ],
+};
+
 const TOP_TESTED_FACTS = [
   "1066 = Battle of Hastings. LAST invasion. William the Conqueror.",
   "1603 = Crowns join only. 1707 = Parliaments merge (Great Britain).",
@@ -982,6 +1009,27 @@ const NationsTab = () => (
       </div>
       <MemoryHook text="UK = GB + Northern Ireland. One extra nation." />
     </Card>
+    <Card style={{ background: "rgba(15,23,42,0.78)", border: "1px solid #334155" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+        <div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>4 Nations quick compare</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Best for capitals, saints, symbols, and parliament differences.</div>
+        </div>
+        <Badge text="High-yield nation facts" color="#22c55e" />
+      </div>
+      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+        {[
+          "LECB = London, Edinburgh, Cardiff, Belfast.",
+          "England has no separate parliament. The other 3 nations have devolved bodies.",
+          "St George, St Andrew, St David, St Patrick = key nation-day sequence.",
+          "Rose, thistle, daffodil, shamrock = nation flowers.",
+        ].map((item) => (
+          <div key={item} style={{ borderRadius: 14, padding: 12, background: "#0f172a", border: "1px solid #1e293b", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
+            {item}
+          </div>
+        ))}
+      </div>
+    </Card>
     {NATIONS.map((n) => (
       <Card key={n.name} style={{ border: `1px solid ${n.color}44` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
@@ -1002,6 +1050,14 @@ const NationsTab = () => (
         <div style={{ background: "#1a1a2e", borderRadius: 12, padding: 10, marginBottom: 8 }}>
           <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 800, marginBottom: 4 }}>🏛️ Parliament</div>
           <div style={{ fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>{n.parliament}</div>
+        </div>
+        <div style={{ display: "grid", gap: 6, marginBottom: 10 }}>
+          {NATION_KEY_POINTS[n.name].map((point) => (
+            <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55, background: "var(--panel-bg)", borderRadius: 12, padding: "10px 12px" }}>
+              <span style={{ color: n.color, fontWeight: 800 }}>•</span>
+              <span>{point}</span>
+            </div>
+          ))}
         </div>
         {n.tricks.map((t, i) => (
           <div key={i} style={{ fontSize: 13, color: "#fde68a", padding: "5px 0", borderBottom: i < n.tricks.length - 1 ? "1px solid #27272a" : "none" }}>⚡ {t}</div>
