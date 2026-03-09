@@ -138,6 +138,101 @@ const buildConfusionDeck = () =>
     }];
   });
 
+const shuffleList = (items) => [...items].sort(() => Math.random() - 0.5);
+
+const TIMELINE_KEY_POINTS = {
+  "55 BC": ["Julius Caesar only ATTEMPTED invasion.", "Romans did not settle Britain in 55 BC.", "Compare with 43 AD under Claudius."],
+  "43 AD": ["Claudius led the SUCCESSFUL Roman invasion.", "Roman rule lasts for nearly 400 years.", "High-value compare date against 55 BC."],
+  "60–61 AD": ["Boudicca was queen of the Iceni.", "Her revolt attacked Roman settlements such as Londinium.", "Romans still kept control afterwards."],
+  "122 AD": ["Built across northern England.", "Marked the Roman Empire's northern frontier.", "Often linked with Romans rather than Normans or Tudors."],
+  "597 AD": ["St Augustine came from Rome to Kent.", "Helps explain how Christianity spread in England.", "Important church-history anchor before the Reformation."],
+  "927 AD": ["Athelstan is treated as first king of a united England.", "Useful before 1066 when tracing English kingship.", "Anglo-Saxon, not Norman or Tudor."],
+  "1066": ["Battle of Hastings: William defeats Harold.", "Last successful invasion of England.", "Norman rule follows immediately."],
+  "1086": ["William I orders the Domesday Book survey.", "Land and property were recorded for tax and control.", "Directly linked to Norman administration."],
+  "1215": ["Signed by King John at Runnymede.", "No one, not even the king, is above the law.", "Law-and-rights anchor often tested with democracy history."],
+  "1295": ["Edward I's Model Parliament.", "Represents an early step toward modern Parliament.", "Useful compare with later Commons/Lords questions."],
+  "1485": ["Henry VII wins at Bosworth.", "Wars of the Roses end.", "Tudor period begins."],
+  "1534": ["Henry VIII breaks from Rome.", "Church of England is created.", "Monarch becomes head of the Church of England."],
+  "1536–1543": ["Acts of Union link Wales to England in law and administration.", "Explains why Wales is not separately represented in the Union Jack.", "Often confused with 1707 and 1801 unions."],
+  "1560": ["Scottish Reformation is separate from Henry VIII's break with Rome.", "Church of Scotland becomes Presbyterian.", "Monarch is not head of the Church of Scotland."],
+  "1588": ["Spanish Armada defeated under Elizabeth I.", "Francis Drake co-commanded the English fleet.", "Major Tudor military victory."],
+  "1603": ["James VI of Scotland becomes James I of England.", "Crowns unite but parliaments stay separate.", "Compare carefully with 1707."],
+  "1605": ["Guy Fawkes and Catholic conspirators fail to blow up Parliament.", "Remember Bonfire Night = 5 November.", "Exam trap for Stuart history."],
+  "1642": ["Roundheads supported Parliament.", "Cavaliers supported the king.", "Civil War is about power between Crown and Parliament."],
+  "1649": ["Charles I is executed.", "Britain becomes a republic for a short period.", "Only British monarch to be tried and executed."],
+  "1660": ["Charles II is restored to the throne.", "Ends the republic period.", "Restoration follows Cromwell era."],
+  "1688": ["Glorious Revolution removes James II.", "Parliament's power becomes more secure.", "Linked directly to Bill of Rights 1689."],
+  "1689": ["Bill of Rights limits royal power.", "Constitutional monarchy is reinforced.", "Important law-and-Parliament anchor."],
+  "1707": ["England and Scotland's parliaments merge.", "Great Britain is created.", "Do not confuse with 1603 crowns union."],
+  "1714": ["George I spoke poor English and relied on ministers.", "Robert Walpole becomes first Prime Minister in 1721.", "Important for early PM history."],
+  "1801": ["Act of Union with Ireland creates the United Kingdom.", "Current Union Flag form dates from this union.", "Compare with 1707 = Great Britain only."],
+  "1807": ["Slave TRADE banned.", "Owning enslaved people was still legal.", "Compare with 1833 abolition of slavery."],
+  "1815": ["Duke of Wellington defeats Napoleon at Waterloo.", "Ends the long French wars.", "Wellington later becomes Prime Minister."],
+  "1832": ["Reform Act removes rotten boroughs.", "Industrial towns gain more representation.", "Key step before wider voting reforms."],
+  "1833": ["Slavery abolished across the British Empire.", "Not the same as the 1807 slave-trade ban.", "Linked to William Wilberforce's campaign."],
+  "1830s–40s": ["Chartists wanted votes for working men.", "Also wanted secret ballots and pay for MPs.", "Important reform movement before later voting changes."],
+  "1851": ["Great Exhibition held at Crystal Palace in Hyde Park.", "Showcased British industry and invention.", "Strong Victorian-era anchor date."],
+  "1903": ["Emmeline Pankhurst founds the WSPU.", "Suffragettes push for women's votes.", "Useful before 1918 and 1928 voting dates."],
+  "1914–18": ["World War I begins in 1914 and ends in 1918.", "Armistice Day = 11 November 1918.", "Often paired with the first extension of women's voting rights."],
+  "1918": ["Women over 30 gain the vote, with conditions.", "Men and women are not yet on equal terms.", "Compare with 1928 and 1969."],
+  "1922": ["Ireland splits: 6 counties remain in UK as Northern Ireland.", "Rest becomes Irish Free State.", "Important background for later NI politics."],
+  "1928": ["Women get voting equality at age 21.", "Property qualification is removed.", "Compare with 1918 partial reform."],
+  "1939": ["Britain enters WW2 after Germany invades Poland.", "Use with 1940, 1944, and 1945 as wartime anchors.", "Start of modern wartime sequence."],
+  "1940": ["Battle of Britain is an air battle.", "The Blitz is bombing of British cities.", "Dunkirk evacuation is another key 1940 fact."],
+  "1942": ["Beveridge Report identifies major social problems.", "Blueprint for post-war welfare reforms.", "Leads into NHS and welfare-state questions."],
+  "1944": ["D-Day landings in Normandy.", "Turning point in liberation of Europe.", "Important WW2 anchor after Battle of Britain."],
+  "1945": ["WW2 ends.", "Labour wins election and Attlee becomes PM.", "Leads into welfare state and NHS reforms."],
+  "1948": ["NHS is founded by Aneurin Bevan.", "Windrush arrives in the same year.", "London also hosts the Olympic Games."],
+  "1953": ["Elizabeth II is crowned.", "First coronation shown on television.", "Useful modern monarchy anchor."],
+  "1969": ["Voting age falls from 21 to 18.", "The Troubles begin in Northern Ireland.", "Important double-date for politics and NI history."],
+  "1973": ["UK joins the EEC.", "EEC is forerunner of the EU.", "Compare with Brexit and 2020 exit."],
+  "1998": ["Good Friday Agreement is the NI peace deal.", "Creates the NI Assembly at Stormont.", "Often tested modern politics date."],
+  "1999": ["Scottish Parliament and Welsh devolved institutions open.", "Hereditary peers lose automatic right to sit in Lords.", "Key devolution date."],
+  "2009": ["Supreme Court replaces the Law Lords.", "Highest court in the UK.", "Modern law-and-courts anchor."],
+  "2010": ["Conservative-Lib Dem coalition government formed.", "Equality Act 2010 protects 9 characteristics.", "Useful modern politics and law date."],
+  "2012": ["London hosts Olympics for the third time.", "Held in Stratford, East London.", "UK finishes third in medal table."],
+  "2016": ["Brexit referendum votes to leave the EU.", "Referendum date is not the same as formal exit date.", "Compare with 2020."],
+  "2020": ["UK formally leaves the European Union.", "Brexit becomes legally complete.", "Keep separate from the 2016 referendum."],
+};
+
+const buildTimelineDetails = (ev) => {
+  if (TIMELINE_KEY_POINTS[ev.year]) return TIMELINE_KEY_POINTS[ev.year];
+  const lower = ev.event.toLowerCase();
+  const details = [];
+  if (/battle|war|defeat|invasion|revolt|armada|plot|blitz/.test(lower)) details.push("Military / conflict anchor in the timeline.");
+  if (/parliament|bill of rights|magna carta|habeas corpus|reform act|vote|union/.test(lower)) details.push("Important for Parliament, law, union, or voting questions.");
+  if (/church|christianity|pope|reformation|jews/.test(lower)) details.push("Religion / church change point often linked with later compare questions.");
+  if (/queen|king|monarch|prime minister|crowns/.test(lower)) details.push("Useful for monarchy and government revision.");
+  if (/nhs|welfare|eec|eu|court|rights|equality/.test(lower)) details.push("Modern citizenship / law anchor.");
+  if (/radio|tv|web|radar|locomotive|film/.test(lower)) details.push("Technology / modern Britain link.");
+  if (!details.length) details.push(`Key ${ev.era.toLowerCase()} date for ordering events correctly.`);
+  details.push(ev.memory.replace(/\s+/g, " ").trim());
+  return details.slice(0, 3);
+};
+
+const TOP_TESTED_FACTS = [
+  "1066 = Battle of Hastings. LAST invasion. William the Conqueror.",
+  "1603 = Crowns join only. 1707 = Parliaments merge (Great Britain).",
+  "1807 = slave TRADE banned. 1833 = slavery fully ABOLISHED.",
+  "1918 = women over 30 vote. 1928 = equal age 21. 1969 = age 18.",
+  "Great Britain = 3 nations. United Kingdom = 4 (add N. Ireland).",
+  "Church of England = Monarch IS head. Church of Scotland = NO role.",
+  "Council of Europe (47) ≠ EU (27). Council CANNOT make laws.",
+  "House of Commons = ELECTED. House of Lords = APPOINTED.",
+  "NHS = 1948. Aneurin Bevan = Minister. Attlee = PM.",
+  "Big Ben = THE BELL. Tower = Elizabeth Tower.",
+  "55 BC = Julius Caesar FAILS. 43 AD = Claudius SUCCEEDS.",
+  "River Severn = longest in UK. Thames = longest in England only.",
+  "St David = 1 Mar. St Patrick = 17 Mar. St George = 23 Apr. St Andrew = 30 Nov.",
+  "British values = DRIM: Democracy, Rule of law, Individual liberty, Mutual respect and tolerance.",
+  "Crown Court jury = 12. Scotland Sheriff Court can be up to 15.",
+  "Westminster = UK Parliament. Holyrood, Senedd, Stormont = devolved bodies.",
+  "1942 Beveridge Report = welfare-state blueprint. 1948 NHS = delivery.",
+  "Boudicca fought the Romans around AD 60. Hadrian's Wall = AD 122.",
+  "Commonwealth = voluntary association. NATO = military alliance.",
+  "PM = head of government. Monarch = head of state.",
+];
+
 const pickRandom = (items, count) => [...items].sort(() => Math.random() - 0.5).slice(0, count);
 
 const saveWrongQuestions = (items) => {
@@ -524,6 +619,22 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 // ── HOME ─────────────────────────────────────────────────────
 const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
   const latestMock = mockHistory[0];
+  const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
+  const [factPage, setFactPage] = useState(0);
+  const visibleFacts = useMemo(() => {
+    const start = factPage * 10;
+    const slice = factOrder.slice(start, start + 10);
+    return slice.length === 10 ? slice : [...slice, ...factOrder.slice(0, Math.max(0, 10 - slice.length))];
+  }, [factOrder, factPage]);
+  const refreshFacts = () => {
+    setFactOrder(shuffleList(TOP_TESTED_FACTS));
+    setFactPage(0);
+  };
+  const nextFacts = () => {
+    const pages = Math.max(1, Math.ceil(factOrder.length / 10));
+    setFactPage((value) => (value + 1) % pages);
+  };
+
   return (
     <div style={{ padding: 20 }}>
       <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.7))", border: "1px solid #1d4ed8" }}>
@@ -614,19 +725,17 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
       </div>
 
       <Card style={{ background: "linear-gradient(135deg, #10261a, #111827)", border: "1px solid #166534" }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: "#4ade80", marginBottom: 12 }}>🎯 Top 10 Most-Tested Facts</div>
-        {[
-          "1066 = Battle of Hastings. LAST invasion. William the Conqueror.",
-          "1603 = Crowns join only. 1707 = Parliaments merge (Great Britain).",
-          "1807 = slave TRADE banned. 1833 = slavery fully ABOLISHED.",
-          "1918 = women over 30 vote. 1928 = equal age 21. 1969 = age 18.",
-          "Great Britain = 3 nations. United Kingdom = 4 (add N. Ireland).",
-          "Church of England = Monarch IS head. Church of Scotland = NO role.",
-          "Council of Europe (47) ≠ EU (27). Council CANNOT make laws.",
-          "House of Commons = ELECTED. House of Lords = APPOINTED.",
-          "NHS = 1948. Aneurin Bevan = Minister. Attlee = PM.",
-          "Big Ben = THE BELL. Tower = Elizabeth Tower.",
-        ].map((fact, index) => (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "#4ade80" }}>🎯 Top 10 Most-Tested Facts</div>
+            <div style={{ fontSize: 13, color: "#a7f3d0", marginTop: 4 }}>Refresh for a new mix or move to the next batch.</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={refreshFacts} style={{ background: "#166534", color: "#ecfdf5", border: "1px solid #22c55e", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Refresh facts</button>
+            <button className="focus-ring" onClick={nextFacts} style={{ background: "#0f172a", color: "#bbf7d0", border: "1px solid #166534", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Next 10</button>
+          </div>
+        </div>
+        {visibleFacts.map((fact, index) => (
           <div key={fact} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: index < 9 ? "1px solid rgba(74,222,128,0.15)" : "none" }}>
             <div style={{ color: "#4ade80", fontWeight: 800, minWidth: 22 }}>{index + 1}.</div>
             <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.5 }}>{fact}</div>
@@ -840,6 +949,14 @@ const TimelineTab = () => {
               <Badge text={ev.year} color="#64748b" />
             </div>
             <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 14, lineHeight: 1.6 }}>{ev.event}</div>
+            <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
+              {buildTimelineDetails(ev).map((point) => (
+                <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "#cbd5e1", fontSize: 13, lineHeight: 1.55 }}>
+                  <span style={{ color: ev.color, fontWeight: 800 }}>•</span>
+                  <span>{point}</span>
+                </div>
+              ))}
+            </div>
             <MemoryHook text={ev.memory} />
           </Card>
         </div>
