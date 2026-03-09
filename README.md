@@ -130,7 +130,8 @@ Then open `http://localhost:4173`
 
 For GitHub Pages:
 - build output is written to `docs/`
-- set the Pages source to `main /docs`
+- the repo now includes `.github/workflows/pages.yml` for automatic Pages deployment on every push to `main`
+- in GitHub repo settings, set Pages source to `GitHub Actions`
 
 ---
 
