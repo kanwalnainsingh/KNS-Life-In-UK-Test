@@ -731,6 +731,52 @@ const TimelineTab = () => {
     { year: "1603 / 1707", clue: "Crowns vs Union", color: "#065f46" },
     { year: "1918 / 1928 / 1969", clue: "Votes timeline", color: "#be185d" },
   ];
+  const revisionByEra = {
+    All: [
+      "55 BC vs 43 AD: Caesar fails, Claudius succeeds",
+      "1603 vs 1707 vs 1801: crowns, Great Britain, then United Kingdom",
+      "1918 vs 1928 vs 1969: partial vote, equal vote, then age 18",
+    ],
+    Ancient: [
+      "Neolithic farmers arrive after Britain becomes an island",
+      "Stonehenge is prehistoric and often paired with Bronze/Iron Age questions",
+    ],
+    Roman: [
+      "Caesar failed in 55 BC, Claudius succeeded in 43 AD",
+      "Boudicca fought the Romans, but the Romans stayed in Britain",
+      "Hadrian's Wall is Roman, northern England, 122 AD",
+    ],
+    Medieval: [
+      "Augustine = Christianity in England, Athelstan = united England",
+      "1066 is the last successful invasion of England",
+      "Magna Carta and Model Parliament are law-and-democracy anchors",
+    ],
+    Tudor: [
+      "Henry VIII = Church of England and union laws for Wales",
+      "Scotland's Reformation is separate from England's break with Rome",
+      "Elizabeth I + Armada 1588 is a classic test date",
+    ],
+    Stuart: [
+      "1603 crowns joined, but parliaments stayed separate until 1707",
+      "Civil War: Roundheads = Parliament, Cavaliers = King",
+      "1688–89 Glorious Revolution and Bill of Rights limit royal power",
+    ],
+    Georgian: [
+      "1707 creates Great Britain; 1801 creates the United Kingdom",
+      "Walpole = first PM, Nelson = Trafalgar, Wellington = Waterloo",
+      "1807 ends the slave trade, but 1833 ends slavery itself",
+    ],
+    Victorian: [
+      "1832 Reform Act, Chartists, and later votes reforms are linked",
+      "Victoria's era is industrial, imperial, and reform-heavy",
+      "Great Exhibition and Crimean War are frequent revision anchors",
+    ],
+    Modern: [
+      "Votes timeline: 1918, 1928, 1969",
+      "WW2 anchors: 1939, 1940, 1944, 1945, then Beveridge/NHS/Windrush",
+      "Modern politics anchors: 1973 EEC, 1998 Good Friday, 1999 devolution, 2020 Brexit",
+    ],
+  };
   const filtered = TIMELINE.filter((e) =>
     (era === "All" || e.era === era) &&
     (!search || e.event.toLowerCase().includes(search.toLowerCase()) || e.year.toString().includes(search))
@@ -762,6 +808,21 @@ const TimelineTab = () => {
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {eras.map((value) => <TabButton key={value} active={era === value} onClick={() => setEra(value)}>{value}</TabButton>)}
       </div>
+      <Card style={{ background: "rgba(15,23,42,0.74)", border: "1px solid #334155" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>
+            {era === "All" ? "Cross-era revision points" : `${era} revision points`}
+          </div>
+          <Badge text={`${revisionByEra[era].length} quick reminders`} color="#22c55e" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {revisionByEra[era].map((item) => (
+            <div key={item} style={{ borderRadius: 14, padding: 12, background: "#0f172a", border: "1px solid #1e293b", color: "var(--text)", fontSize: 14, lineHeight: 1.5 }}>
+              {item}
+            </div>
+          ))}
+        </div>
+      </Card>
       <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 12 }}>{filtered.length} events</div>
       {filtered.map((ev, i) => (
         <div key={`${ev.year}-${i}`} className="timeline-item" style={{ display: "grid", gridTemplateColumns: "90px 26px 1fr", gap: 12, marginBottom: 14, alignItems: "flex-start" }}>
