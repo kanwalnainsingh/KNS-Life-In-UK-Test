@@ -312,7 +312,7 @@ const Badge = ({ text, color = "#3b82f6" }) => (
 );
 
 const Card = ({ children, style = {}, className = "", ...props }) => (
-  <div {...props} className={`app-card ${className}`.trim()} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", borderRadius: 18, padding: 16, marginBottom: 12, boxShadow: "0 16px 40px rgba(0,0,0,0.12)", ...style }}>{children}</div>
+  <div {...props} className={`app-card ${className}`.trim()} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", borderRadius: 18, padding: 16, marginBottom: 12, boxShadow: "var(--shadow-lg)", ...style }}>{children}</div>
 );
 
 const SectionTitle = ({ children, icon, meta }) => (
@@ -325,7 +325,7 @@ const SectionTitle = ({ children, icon, meta }) => (
 );
 
 const MemoryHook = ({ text }) => (
-  <div className="memory-hook" style={{ background: "linear-gradient(135deg, #10261a, #152f21)", border: "1px solid #166534", borderRadius: 12, padding: "10px 12px", marginTop: 8, fontSize: 13, color: "#bbf7d0" }}>
+  <div className="memory-hook" style={{ background: "var(--success-surface)", border: "1px solid var(--success-border)", borderRadius: 12, padding: "10px 12px", marginTop: 8, fontSize: 13, color: "var(--success-text)" }}>
     <span style={{ color: "#4ade80", fontWeight: 800 }}>💡 Memory: </span>{text}
   </div>
 );
@@ -408,7 +408,7 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
       <button
         className="focus-ring"
         onClick={onBack}
-        style={{ border: "none", background: "none", color: canGoBack ? "#f8fafc" : "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: canGoBack ? "pointer" : "default", minWidth: 54 }}
+        style={{ border: "none", background: "none", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: canGoBack ? "pointer" : "default", minWidth: 54 }}
       >
         <span style={{ fontSize: 18 }}>←</span>
         <span>Back</span>
@@ -421,7 +421,7 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
           style={{
             border: "none",
             background: "none",
-            color: active === item.id ? "#60a5fa" : "var(--text-muted)",
+            color: active === item.id ? "var(--accent-text)" : "var(--text-muted)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -546,7 +546,7 @@ const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
           else if (oi === selected && oi !== question.a) { bg = "#220d0d"; border = "#ef4444"; color = "#fca5a5"; }
           else { color = "var(--text-muted)"; }
         } else if (selected === oi) {
-          bg = "#1d4ed822"; border = "#3b82f6"; color = "#bfdbfe";
+          bg = "var(--accent-soft)"; border = "var(--accent)"; color = "var(--accent-text)";
         }
         return (
           <button key={oi} className="focus-ring" onClick={() => onSelect(oi)}
@@ -583,7 +583,7 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
         <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
           ☰
         </button>
-        <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "#f8fafc" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
+        <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
           ←
         </button>
         <button aria-label="Go to home" className="focus-ring" onClick={() => setActive("home")} style={{ background: "none", border: "none", color: "#60a5fa", fontWeight: 800, fontSize: 18, cursor: "pointer", padding: 0 }}>
@@ -714,15 +714,15 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
 
   return (
     <div style={{ padding: 20 }}>
-      <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,58,95,0.7))", border: "1px solid #1d4ed8" }}>
+      <Card style={{ background: "var(--hero-bg)", border: "1px solid var(--hero-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
           <div>
-            <h1 style={{ color: "#eff6ff", fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Life in the UK test practice for ILR and citizenship</h1>
-            <p style={{ color: "#cbd5e1", fontSize: 14, lineHeight: 1.6 }}>Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.</p>
+            <h1 style={{ color: "var(--hero-title)", fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Life in the UK test practice for ILR and citizenship</h1>
+            <p style={{ color: "var(--hero-copy)", fontSize: 14, lineHeight: 1.6 }}>Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.</p>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", fontWeight: 800, cursor: "pointer" }}>Mock Test</button>
-            <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", borderRadius: 12, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>Quick Revise</button>
+            <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>Quick Revise</button>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
@@ -747,11 +747,11 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
         </div>
       </Card>
 
-      <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.92), rgba(8,145,178,0.16))", border: "1px solid #0ea5e9" }}>
+      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
           <div>
-            <div style={{ color: "#e0f2fe", fontWeight: 800, fontSize: 18 }}>Visual memory clues</div>
-            <div style={{ color: "#bae6fd", fontSize: 13 }}>Short codes from the revision pack, now built into the app</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Visual memory clues</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Short codes from the revision pack, now built into the app</div>
           </div>
           <Badge text={`${VISUAL_MNEMONICS.length} memory packs`} color="#06b6d4" />
         </div>
@@ -762,14 +762,14 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
                 <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.icon} {item.title}</div>
                 <Badge text={item.code} color={item.color} />
               </div>
-              <div style={{ color: "#e2e8f0", fontSize: 13, lineHeight: 1.6, marginBottom: 6 }}>{item.clue}</div>
-              <div style={{ color: "#bae6fd", fontSize: 12, lineHeight: 1.6 }}>{item.visual}</div>
+              <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6, marginBottom: 6 }}>{item.clue}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>{item.visual}</div>
             </div>
           ))}
         </div>
       </Card>
 
-      <Card style={{ border: "1px solid #334155" }}>
+      <Card style={{ border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Coverage checklist</div>
@@ -808,21 +808,21 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
         ))}
       </div>
 
-      <Card style={{ background: "linear-gradient(135deg, #10261a, #111827)", border: "1px solid #166534" }}>
+      <Card style={{ background: "var(--success-surface)", border: "1px solid var(--success-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "#4ade80" }}>🎯 Top 10 Most-Tested Facts</div>
-            <div style={{ fontSize: 13, color: "#a7f3d0", marginTop: 4 }}>Refresh for a new mix or move to the next batch.</div>
+            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--success-text)" }}>🎯 Top 10 Most-Tested Facts</div>
+            <div style={{ fontSize: 13, color: "var(--success-muted)", marginTop: 4 }}>Refresh for a new mix or move to the next batch.</div>
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={refreshFacts} style={{ background: "#166534", color: "#ecfdf5", border: "1px solid #22c55e", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Refresh facts</button>
-            <button className="focus-ring" onClick={nextFacts} style={{ background: "#0f172a", color: "#bbf7d0", border: "1px solid #166534", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Next 10</button>
+            <button className="focus-ring" onClick={nextFacts} style={{ background: "var(--surface-strong)", color: "var(--success-text)", border: "1px solid var(--success-border)", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Next 10</button>
           </div>
         </div>
         {visibleFacts.map((fact, index) => (
           <div key={fact} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: index < 9 ? "1px solid rgba(74,222,128,0.15)" : "none" }}>
             <div style={{ color: "#4ade80", fontWeight: 800, minWidth: 22 }}>{index + 1}.</div>
-            <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.5 }}>{fact}</div>
+            <div style={{ color: "var(--success-text)", fontSize: 14, lineHeight: 1.5 }}>{fact}</div>
           </div>
         ))}
       </Card>
@@ -872,14 +872,14 @@ const QuickRevisionTab = ({ setActive }) => {
       </Card>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <button className="focus-ring" onClick={() => move("prev")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>← Previous</button>
-        <button className="focus-ring" onClick={() => setFlipped((v) => !v)} style={{ border: "1px solid #3b82f6", background: "#1d4ed822", color: "#bfdbfe", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{flipped ? "Show front" : "Flip card"}</button>
+        <button className="focus-ring" onClick={() => setFlipped((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{flipped ? "Show front" : "Flip card"}</button>
         <button className="focus-ring" onClick={() => move("next")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Next →</button>
         <div style={{ marginLeft: "auto" }}><Badge text={`${index + 1} / ${deck.length}`} color={current.color} /></div>
       </div>
       <Card
         className="quick-revision-card"
         onClick={() => setFlipped((v) => !v)}
-        style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}1f, rgba(15,23,42,0.96))`, cursor: "pointer", userSelect: "none" }}
+        style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}1f, var(--surface-soft))`, cursor: "pointer", userSelect: "none" }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -978,7 +978,7 @@ const TimelineTab = () => {
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="📅" meta="Use short date anchors first, then the memory clue.">British History Timeline</SectionTitle>
-      <Card style={{ background: "linear-gradient(135deg, rgba(30,41,59,0.95), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
+      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), var(--surface-strong))", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>History anchors to memorise first</div>
@@ -1001,7 +1001,7 @@ const TimelineTab = () => {
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {eras.map((value) => <TabButton key={value} active={era === value} onClick={() => setEra(value)}>{value}</TabButton>)}
       </div>
-      <Card style={{ background: "rgba(15,23,42,0.74)", border: "1px solid #334155" }}>
+      <Card style={{ background: "color-mix(in srgb, var(--surface-strong) 86%, var(--card-bg))", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>
             {era === "All" ? "Cross-era revision points" : `${era} revision points`}
@@ -1010,7 +1010,7 @@ const TimelineTab = () => {
         </div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
           {revisionByEra[era].map((item) => (
-            <div key={item} style={{ borderRadius: 14, padding: 12, background: "#0f172a", border: "1px solid #1e293b", color: "var(--text)", fontSize: 14, lineHeight: 1.5 }}>
+            <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 14, lineHeight: 1.5 }}>
               {item}
             </div>
           ))}
@@ -1025,9 +1025,9 @@ const TimelineTab = () => {
           </div>
           <div style={{ width: 24, display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{ width: 22, height: 22, borderRadius: "50%", background: ev.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>{ev.icon}</div>
-            <div style={{ width: 2, flexGrow: 1, background: "#1f2937", marginTop: 2, minHeight: 38 }} />
+            <div style={{ width: 2, flexGrow: 1, background: "var(--surface-muted)", marginTop: 2, minHeight: 38 }} />
           </div>
-          <Card style={{ marginBottom: 0, background: "rgba(15,23,42,0.72)", border: `1px solid ${ev.color}33` }}>
+          <Card style={{ marginBottom: 0, background: "color-mix(in srgb, var(--surface-soft) 88%, var(--card-bg))", border: `1px solid ${ev.color}33` }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
               <Badge text={ev.era} color={ev.color} />
               <Badge text={ev.year} color="#64748b" />
@@ -1035,7 +1035,7 @@ const TimelineTab = () => {
             <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 14, lineHeight: 1.6 }}>{ev.event}</div>
             <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
               {buildTimelineDetails(ev).map((point) => (
-                <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "#cbd5e1", fontSize: 13, lineHeight: 1.55 }}>
+                <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>
                   <span style={{ color: ev.color, fontWeight: 800 }}>•</span>
                   <span>{point}</span>
                 </div>
@@ -1053,20 +1053,20 @@ const TimelineTab = () => {
 const NationsTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🏴" meta="Use comparison blocks to separate nation facts quickly.">The 4 Nations</SectionTitle>
-    <Card style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(220,38,38,0.1))", border: "1px solid #334155" }}>
+    <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #3b82f6 12%, var(--card-bg)), color-mix(in srgb, #ef4444 10%, var(--card-bg)))", border: "1px solid var(--card-border)" }}>
       <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
-        <div style={{ background: "#1e3a5f33", borderRadius: 14, padding: 12 }}>
-          <div style={{ fontWeight: 800, color: "#93c5fd", marginBottom: 6 }}>Great Britain</div>
+        <div style={{ background: "color-mix(in srgb, #3b82f6 12%, var(--panel-bg))", borderRadius: 14, padding: 12 }}>
+          <div style={{ fontWeight: 800, color: "var(--accent-text)", marginBottom: 6 }}>Great Britain</div>
           <div style={{ color: "var(--text)", fontSize: 14 }}>England + Scotland + Wales = 3 nations</div>
         </div>
-        <div style={{ background: "#dc262633", borderRadius: 14, padding: 12 }}>
+        <div style={{ background: "color-mix(in srgb, #ef4444 12%, var(--panel-bg))", borderRadius: 14, padding: 12 }}>
           <div style={{ fontWeight: 800, color: "#fecaca", marginBottom: 6 }}>United Kingdom</div>
           <div style={{ color: "var(--text)", fontSize: 14 }}>Great Britain + Northern Ireland = 4 nations</div>
         </div>
       </div>
       <MemoryHook text="UK = GB + Northern Ireland. One extra nation." />
     </Card>
-    <Card style={{ background: "rgba(15,23,42,0.78)", border: "1px solid #334155" }}>
+    <Card style={{ background: "color-mix(in srgb, var(--surface-strong) 88%, var(--card-bg))", border: "1px solid var(--card-border)" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
         <div>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>4 Nations quick compare</div>
@@ -1081,7 +1081,7 @@ const NationsTab = () => (
           "St George, St Andrew, St David, St Patrick = key nation-day sequence.",
           "Rose, thistle, daffodil, shamrock = nation flowers.",
         ].map((item) => (
-          <div key={item} style={{ borderRadius: 14, padding: 12, background: "#0f172a", border: "1px solid #1e293b", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
+          <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
             {item}
           </div>
         ))}
@@ -1104,7 +1104,7 @@ const NationsTab = () => (
             </div>
           ))}
         </div>
-        <div style={{ background: "#1a1a2e", borderRadius: 12, padding: 10, marginBottom: 8 }}>
+        <div style={{ background: "var(--surface-strong)", borderRadius: 12, padding: 10, marginBottom: 8 }}>
           <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 800, marginBottom: 4 }}>🏛️ Parliament</div>
           <div style={{ fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>{n.parliament}</div>
         </div>
@@ -1315,7 +1315,7 @@ const FiguresTab = () => {
 const ReligionTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="⛪">Religion & Festivals</SectionTitle>
-    <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f" }}>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>📊 2011 Census — Religious Identity</div>
       {RELIGIONS.map((r) => (
         <div key={r.faith} style={{ marginBottom: 12 }}>
@@ -1323,7 +1323,7 @@ const ReligionTab = () => (
             <span style={{ fontSize: 15 }}>{r.icon} <span style={{ color: "var(--text-strong)", fontWeight: 700 }}>{r.faith}</span></span>
             <Badge text={r.pct} color={r.color} />
           </div>
-          <div style={{ background: "#1f2937", borderRadius: 999, height: 10, overflow: "hidden" }}>
+          <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 10, overflow: "hidden" }}>
             <div className="bar-fill" style={{ height: "100%", borderRadius: 999, background: r.color, width: `${Math.min(r.bar, 100)}%` }} />
           </div>
           <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, lineHeight: 1.5 }}>{r.note}</div>
@@ -1336,7 +1336,7 @@ const ReligionTab = () => (
           <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</span>
           <Badge text={f.date} color="#d97706" />
         </div>
-        <div style={{ fontSize: 13, color: "#9ca3af", marginBottom: 4 }}>{f.faith}</div>
+        <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>{f.faith}</div>
         <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{f.detail}</div>
       </Card>
     ))}
@@ -1373,8 +1373,8 @@ const InternationalTab = () => (
             <Badge text={o.members} color="#3b82f6" />
             <Badge text={o.power} color={o.power.includes("CANNOT") ? "#ef4444" : "#10b981"} />
           </div>
-          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 4, lineHeight: 1.6 }}><strong style={{ color: "#9ca3af" }}>Purpose:</strong> {o.purpose}</div>
-          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8, lineHeight: 1.6 }}><strong style={{ color: "#9ca3af" }}>UK's role:</strong> {o.ukRole}</div>
+          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 4, lineHeight: 1.6 }}><strong style={{ color: "var(--text-muted)" }}>Purpose:</strong> {o.purpose}</div>
+          <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8, lineHeight: 1.6 }}><strong style={{ color: "var(--text-muted)" }}>UK's role:</strong> {o.ukRole}</div>
           <MemoryHook text={o.memory} />
         </Card>
       ))}
@@ -1415,17 +1415,17 @@ const ArtsTab = () => {
 const AnthemTab = () => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🎵">National Anthem & Symbols</SectionTitle>
-    <Card style={{ background: "#0f172a", border: "1px solid #1e3a5f" }}>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 4 }}>{ANTHEM.title}</div>
       <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 12 }}>{ANTHEM.note}</div>
-      <div style={{ background: "#111827", borderRadius: 14, padding: 16, borderLeft: "4px solid #1e3a5f" }}>
+      <div style={{ background: "var(--surface-soft)", borderRadius: 14, padding: 16, borderLeft: "4px solid var(--accent)" }}>
         {ANTHEM.words.map((line, i) => (
-          <div key={i} style={{ color: "#e2e8f0", fontSize: 15, lineHeight: 2, fontStyle: "italic" }}>{line}</div>
+          <div key={i} style={{ color: "var(--text)", fontSize: 15, lineHeight: 2, fontStyle: "italic" }}>{line}</div>
         ))}
       </div>
       <MemoryHook text={ANTHEM.memory} />
     </Card>
-    <Card style={{ background: "#0f0a0a", border: "1px solid #7f1d1d" }}>
+    <Card style={{ background: "color-mix(in srgb, #ef4444 8%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
       <div style={{ fontWeight: 800, color: "#fca5a5", marginBottom: 10 }}>🇬🇧 The Union Jack</div>
       <div style={{ fontSize: 13, color: "#fecaca", lineHeight: 1.8 }}>
         • St George's Cross (England) — red cross on white<br />
@@ -1634,7 +1634,7 @@ const QuizTab = () => {
       <button className="focus-ring" onClick={() => setStarted(false)} style={{ marginBottom: 12, background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>
         ← Back to quiz setup
       </button>
-      <div style={{ background: "#1f2937", borderRadius: 999, height: 8, marginBottom: 16 }}>
+      <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, marginBottom: 16 }}>
         <div style={{ background: "#3b82f6", height: "100%", borderRadius: 999, width: `${((current + 1) / questions.length) * 100}%`, transition: "width 0.3s" }} />
       </div>
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
@@ -1642,14 +1642,14 @@ const QuizTab = () => {
         <>
           {showContext && <MemoryHook text={q.tip} />}
           <button className="focus-ring" onClick={skipToNext}
-            style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "#22c55e22", color: "#4ade80", border: "1px solid #22c55e44", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+            style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#16a34a", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
             {current + 1 < questions.length ? "Next" : "See Results"}
           </button>
         </>
       )}
       {answerMode === "deferred" && (
         <button className="focus-ring" onClick={skipToNext}
-          style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+          style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
           {current + 1 < questions.length ? "Lock answer and continue" : "Finish and review"}
         </button>
       )}
@@ -1723,9 +1723,9 @@ const MockExamTab = () => {
     return (
       <div style={{ padding: 20 }}>
         <SectionTitle icon="📝" meta="This matches the official test format: 24 questions, 45 minutes, no instant feedback.">Mock Test</SectionTitle>
-        <Card style={{ background: "linear-gradient(135deg, rgba(127,29,29,0.18), rgba(15,23,42,0.94))", border: "1px solid #dc2626" }}>
+        <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #ef4444 10%, var(--card-bg)), var(--surface-soft))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
               <div style={{ color: "#fca5a5", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Proper exam practice</div>
-              <div style={{ color: "#e2e8f0", fontSize: 15, lineHeight: 1.7, marginBottom: 16 }}>
+              <div style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.7, marginBottom: 16 }}>
                 24 questions. 45 minutes. Pass mark 18. Results only at the end. This is the closest mode to the real experience.
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 18 }}>
@@ -1783,11 +1783,11 @@ const MockExamTab = () => {
           </div>
         </Card>
         {wrong.length > 0 && (
-          <Card style={{ border: "1px solid #7f1d1d", background: "#1a0a0a" }}>
+          <Card style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 8%, var(--card-bg))" }}>
             <div style={{ fontWeight: 800, color: "#fca5a5", marginBottom: 12 }}>Revision targets from this mock</div>
             {wrong.map((item, index) => (
               <div key={`${item.q}-${index}`} style={{ padding: "10px 0", borderBottom: index < wrong.length - 1 ? "1px solid rgba(248,113,113,0.15)" : "none" }}>
-                <div style={{ color: "#fff", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{item.q}</div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 14, marginBottom: 4 }}>{item.q}</div>
                 <div style={{ color: "#fca5a5", fontSize: 13 }}>Your answer: {item.chosen === undefined ? "No answer" : item.opts[item.chosen]}</div>
                 <div style={{ color: "#4ade80", fontSize: 13 }}>Correct answer: {item.opts[item.a]}</div>
                 {showContext && <MemoryHook text={item.tip} />}
@@ -1805,7 +1805,7 @@ const MockExamTab = () => {
         <Badge text={`Question ${current + 1} of ${TOTAL}`} color="#64748b" />
         <Badge text={`${minutes}:${seconds}`} color={timeLeft > 600 ? "#22c55e" : timeLeft > 300 ? "#f59e0b" : "#ef4444"} />
       </div>
-      <div style={{ background: "#1f2937", borderRadius: 999, height: 8, marginBottom: 16 }}>
+      <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, marginBottom: 16 }}>
         <div style={{ background: "#f97316", height: "100%", borderRadius: 999, width: `${(Object.keys(answers).length / TOTAL) * 100}%`, transition: "width 0.2s" }} />
       </div>
       <QuestionCard question={currentQuestion} selected={answers[current]} confirmed={answerMode === "instant" && answers[current] !== undefined} onSelect={(oi) => {
@@ -1822,14 +1822,14 @@ const MockExamTab = () => {
       )}
       <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
         <button className="focus-ring" onClick={() => setCurrent((c) => Math.max(0, c - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
-        <button className="focus-ring" onClick={() => setCurrent((c) => Math.min(TOTAL - 1, c + 1))} style={{ background: "#1d4ed822", color: "#bfdbfe", border: "1px solid #3b82f6", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
+        <button className="focus-ring" onClick={() => setCurrent((c) => Math.min(TOTAL - 1, c + 1))} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
         <button className="focus-ring" onClick={() => setFinished(true)} style={{ marginLeft: "auto", background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}>Finish Exam</button>
       </div>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginTop: 14 }}>
         {questions.map((_, index) => {
           const answered = answers[index] !== undefined;
           return (
-            <button key={index} className="focus-ring" onClick={() => setCurrent(index)} style={{ minWidth: 40, height: 40, borderRadius: 999, border: `1px solid ${current === index ? "#f97316" : answered ? "#22c55e" : "#475569"}`, background: current === index ? "#f97316" : answered ? "#0f1f0f" : "var(--chip-bg)", color: current === index ? "#fff" : answered ? "#4ade80" : "var(--text-muted)", cursor: "pointer", fontWeight: 800 }}>
+            <button key={index} className="focus-ring" onClick={() => setCurrent(index)} style={{ minWidth: 40, height: 40, borderRadius: 999, border: `1px solid ${current === index ? "#f97316" : answered ? "#22c55e" : "#475569"}`, background: current === index ? "#f97316" : answered ? "color-mix(in srgb, #22c55e 12%, var(--card-bg))" : "var(--chip-bg)", color: current === index ? "#fff" : answered ? "#16a34a" : "var(--text-muted)", cursor: "pointer", fontWeight: 800 }}>
               {index + 1}
             </button>
           );
