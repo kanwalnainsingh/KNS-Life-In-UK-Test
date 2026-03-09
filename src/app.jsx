@@ -3,7 +3,30 @@
    Edit data.js to change content. Edit this file for UI changes.
    ============================================================= */
 
-const { useEffect, useMemo, useRef, useState } = React;
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  ALL_QUIZ,
+  ANTHEM,
+  ARTS,
+  BATTLES_AND_WARS,
+  CONFUSABLES,
+  EXTRA_KEY_FIGURES,
+  FESTIVALS,
+  FIGURE_MEMORY,
+  INT_ORGS,
+  INVENTORS,
+  KEY_FIGURES,
+  LANDMARKS,
+  NATIONS,
+  QUICK_FACTS,
+  RELIGIONS,
+  SPORTS_FACTS,
+  SPORTS_STARS,
+  TABS,
+  TIMELINE,
+  VISUAL_MNEMONICS,
+} from "./data.js";
 
 const STORAGE_KEYS = {
   theme: "lifeuk-theme",
@@ -3729,4 +3752,4 @@ const App = () => {
   );
 };
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(<App />);

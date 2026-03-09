@@ -2,7 +2,7 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 257 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
+> 📖 262 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
 Current release: `v1.10.1`
 
@@ -58,6 +58,10 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
 | ↔️ Quick Revise | Swipe/tap-style revision cards for fast fact review |
+| 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions |
+| ⚡ T/F Sprint | Very fast true/false mobile revision |
+| 📄 Cram Sheet | One-page night-before summary |
+| ✅ Tracker | Full-course completion tracker stored on device |
 | 📅 Timeline | Full history timeline with search, era filters, and anchor dates |
 | 🏴 4 Nations | Capitals, saints, symbols, languages, parliaments, and common traps |
 | ⚠️ Confusing Topics | Side-by-side comparisons for the facts people mix up most |
@@ -93,16 +97,23 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - first Union Flag
   - Beveridge Report
   - Elizabeth II coronation
+- Dedicated `Wars & Battles` section with battle cards, compare traps, and WWII anchors
+- Offline cache support after first online load
+- Local bundled build setup for GitHub Pages with output in `docs/`
 
 ---
 
 ## 🛠️ Project Files
 
 - `index.html` — page shell and shared CSS
+- `docs/` — GitHub Pages build output
+- `service-worker.js` — offline cache support
 - `src/app.jsx` — React UI and study modes
+- `src/main.jsx` — bundled app entry point
 - `src/data.js` — facts, mnemonics, categories, and question bank
-- `tests/smoke-check.js` — structure/content checks
-- `tests/coverage-audit.js` — fact/question coverage audit
+- `scripts/build.mjs` — static build for GitHub Pages
+- `tests/smoke-check.cjs` — structure/content checks
+- `tests/coverage-audit.cjs` — fact/question coverage audit
 - `AGENTS.md` — notes for future contributors and coding agents
 
 ---
@@ -110,10 +121,16 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## ▶️ Run Locally
 
 ```bash
-python3 -m http.server 4173
+npm install
+npm run build
+python3 -m http.server 4173 -d docs
 ```
 
 Then open `http://localhost:4173`
+
+For GitHub Pages:
+- build output is written to `docs/`
+- set the Pages source to `main /docs`
 
 ---
 
@@ -125,6 +142,7 @@ Then open `http://localhost:4173`
 - Users can tap `↻ Latest` in the app header to force-refresh cached mobile pages
 - Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point
 - Section pages now include more exam-anchor cards, memory clues, and compare points for faster revision
+- Once the app has loaded online, the service worker can cache it for offline train revision
 
 ---
 

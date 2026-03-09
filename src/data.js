@@ -932,3 +932,27 @@ const TABS = [
   { id:"quiz",          label:"QUIZ ME",      icon:"🧠" },
   { id:"rapidfire",     label:"Rapid Fire",   icon:"🔥" },
 ];
+
+export {
+  TIMELINE,
+  BATTLES_AND_WARS,
+  NATIONS,
+  INVENTORS,
+  SPORTS_STARS,
+  SPORTS_FACTS,
+  CONFUSABLES,
+  RELIGIONS,
+  FESTIVALS,
+  LANDMARKS,
+  INT_ORGS,
+  KEY_FIGURES,
+  EXTRA_KEY_FIGURES,
+  FIGURE_MEMORY,
+  ARTS,
+  QUICK_FACTS,
+  VISUAL_MNEMONICS,
+  ANTHEM,
+  POPULATION_HISTORY,
+  ALL_QUIZ,
+  TABS,
+};

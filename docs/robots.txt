@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/sitemap.xml

@@ -1,0 +1,18 @@
+{
+  "name": "life-in-the-uk-test-practice",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test:smoke": "node tests/smoke-check.cjs",
+    "test:coverage": "node tests/coverage-audit.cjs"
+  },
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.17.19"
+  }
+}
