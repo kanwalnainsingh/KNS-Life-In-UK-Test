@@ -2307,7 +2307,7 @@ const MockExamTab = () => {
   const [questions, setQuestions] = useState([]);
   const [flagged, setFlagged] = useState({});
   const [timeLeft, setTimeLeft] = useState(MOCK_LIMIT_SECONDS);
-  const [answerMode, setAnswerMode] = useState("deferred");
+  const [answerMode, setAnswerMode] = useState("instant");
   const [showContext, setShowContext] = useState(true);
   const [timerMode, setTimerMode] = useState("strict");
   const [reviewFilter, setReviewFilter] = useState("wrong");
