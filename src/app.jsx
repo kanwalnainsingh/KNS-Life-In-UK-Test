@@ -35,6 +35,7 @@ const STORAGE_KEYS = {
   activeTab: "lifeuk-active-tab",
   wrongQuestions: "lifeuk-wrong-questions",
   mockHistory: "lifeuk-mock-history",
+  mockProgress: "lifeuk-mock-progress",
   recentQuiz: "lifeuk-recent-quiz",
   recentMock: "lifeuk-recent-mock",
   recentRapid: "lifeuk-recent-rapid",
@@ -617,9 +618,68 @@ const saveWrongQuestions = (items) => {
   writeStore(STORAGE_KEYS.wrongQuestions, merged);
 };
 
+const normalizeMockHistory = (history = []) =>
+  history
+    .filter((entry) => entry && Number.isInteger(entry.paperId) && typeof entry.score === "number")
+    .map((entry) => ({
+      date: entry.date || new Date(0).toISOString(),
+      paperId: entry.paperId,
+      paperTitle: entry.paperTitle || `Mock Test ${entry.paperId}`,
+      score: entry.score,
+      percent: typeof entry.percent === "number" ? entry.percent : Math.round((entry.score / MOCK_TOTAL) * 100),
+      passed: typeof entry.passed === "boolean" ? entry.passed : entry.score >= 18,
+      wrong: typeof entry.wrong === "number" ? entry.wrong : Math.max(0, MOCK_TOTAL - entry.score),
+      flagged: typeof entry.flagged === "number" ? entry.flagged : 0,
+      answerMode: entry.answerMode || "instant",
+    }))
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+const buildMockProgress = (history = []) =>
+  normalizeMockHistory(history).reduce((acc, entry) => {
+    const current = acc[entry.paperId] || {
+      paperId: entry.paperId,
+      paperTitle: entry.paperTitle,
+      attempts: 0,
+      bestScore: 0,
+      bestPercent: 0,
+      lastScore: 0,
+      lastPercent: 0,
+      passed: false,
+      flagged: 0,
+      wrong: MOCK_TOTAL,
+      lastDate: "",
+    };
+    const isNewer = !current.lastDate || new Date(entry.date) > new Date(current.lastDate);
+    current.attempts += 1;
+    current.bestScore = Math.max(current.bestScore, entry.score);
+    current.bestPercent = Math.max(current.bestPercent, entry.percent);
+    current.passed = current.passed || entry.passed;
+    if (isNewer) {
+      current.lastScore = entry.score;
+      current.lastPercent = entry.percent;
+      current.flagged = entry.flagged;
+      current.wrong = entry.wrong;
+      current.lastDate = entry.date;
+    }
+    acc[entry.paperId] = current;
+    return acc;
+  }, {});
+
+const loadMockHistory = () => normalizeMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
+
+const loadMockProgress = () => {
+  const saved = readStore(STORAGE_KEYS.mockProgress, {});
+  const history = loadMockHistory();
+  const computed = buildMockProgress(history);
+  const merged = { ...saved, ...computed };
+  writeStore(STORAGE_KEYS.mockProgress, merged);
+  return merged;
+};
+
 const saveMockResult = (entry) => {
-  const existing = readStore(STORAGE_KEYS.mockHistory, []);
-  writeStore(STORAGE_KEYS.mockHistory, [entry, ...existing].slice(0, 8));
+  const history = [{ ...entry }, ...loadMockHistory()].slice(0, 80);
+  writeStore(STORAGE_KEYS.mockHistory, history);
+  writeStore(STORAGE_KEYS.mockProgress, buildMockProgress(history));
 };
 
 const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
@@ -636,6 +696,28 @@ const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
 const pickQuickRevisionCards = (items, count) => {
   const prepared = items.map((item, index) => ({ ...item, q: `${item.topic}|${item.front}|${index}` }));
   return pickRandomNoRepeat(prepared, count, STORAGE_KEYS.recentQuickRev, 220).map(({ q, ...item }) => item);
+};
+
+const isPassCoreCard = (item) => {
+  const text = `${item.topic} ${item.front} ${item.back} ${item.context} ${item.memory}`.toLowerCase();
+  return /history|wars|4 nations|parliament|elections|law|religion|festivals|landmarks|world orgs|key people|comparisons|symbols|geography|government & parliament|rights & everyday life|britain beyond the uk|anchor dates|world organisations|uk capitals|justice basics|voting basics|house of commons|house of lords|great britain|united kingdom|crown dependencies|overseas territories|council of europe|magna carta|1066|nhs|church of england|big ben/.test(text);
+};
+
+const isTrapCard = (item) => {
+  const text = `${item.topic} ${item.front} ${item.back} ${item.context} ${item.memory}`.toLowerCase();
+  return /comparison|trap|vs |versus|great britain|united kingdom|british isles|crown dependenc|channel islands|overseas territories|big ben|elizabeth tower|church of england|church of scotland|council of europe|eu|commonwealth|nato|thames|severn|highers|a-level|dunkirk|d-day|battle of britain|blitz/.test(text);
+};
+
+const getMockNextPaper = (progress = {}) => {
+  const attemptedIds = new Set(Object.keys(progress).map((key) => Number(key)));
+  return MOCK_PAPERS.find((paper) => !attemptedIds.has(paper.id)) || MOCK_PAPERS.find((paper) => (progress[paper.id]?.lastPercent || 0) < 75) || MOCK_PAPERS[0];
+};
+
+const formatAttemptDate = (value) => {
+  if (!value) return "Not started";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Not started";
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 };
 
 // ── HELPERS ──────────────────────────────────────────────────
@@ -950,10 +1032,10 @@ const seededShuffle = (items, seed) => {
 
 const classifyMockCategory = (question) => {
   const text = `${question.q} ${question.tip}`.toLowerCase();
-  if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote/.test(text)) return "traps";
+  if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote|british isles|republic of ireland|crown dependenc|channel islands|overseas territor/.test(text)) return "traps";
   if (/war|battle|roman|norman|tudor|stuart|victoria|magna carta|boudicca|athelstan|alfred|domesday|hastings|reformation|beveridge|nhs|wilberforce|chartist|peterloo|suffragette|general strike|union of crowns|james i|charles i|waterloo|world war/.test(text)) return "history";
   if (/prime minister|monarch|commons|lords|parliament|speaker|democracy|vote|ballot|constituenc|jury|magistrate|law|equality act|rule of law|innocent|community|volunteer|bank of england|10 downing street|government|human rights/.test(text)) return "civics";
-  if (/england|scotland|wales|northern ireland|belfast|cardiff|edinburgh|london|saint|shamrock|daffodil|thistle|rose|senedd|holyrood|stormont|union jack|capital city|loch|snowdonia|river|wall|castle|palace|museum|stonehenge|tower of london|windsor|buckingham|cenotaph/.test(text)) return "nations";
+  if (/england|scotland|wales|northern ireland|belfast|cardiff|edinburgh|london|saint|shamrock|daffodil|thistle|rose|senedd|holyrood|stormont|union jack|capital city|loch|snowdonia|river|wall|castle|palace|museum|stonehenge|tower of london|windsor|buckingham|cenotaph|welsh|gaelic|jersey|guernsey|isle of man/.test(text)) return "nations";
   return "culture";
 };
 
@@ -1176,8 +1258,11 @@ const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
 );
 
 // ── HOME ─────────────────────────────────────────────────────
-const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
+const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const latestMock = mockHistory[0];
+  const completedPapers = Object.keys(mockProgress).length;
+  const nextPaper = getMockNextPaper(mockProgress);
+  const bestPaperScore = completedPapers ? Math.max(...Object.values(mockProgress).map((item) => item.bestPercent)) : 0;
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const visibleFacts = useMemo(() => {
@@ -1218,9 +1303,28 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
       <div className="stats-grid" style={{ display: "grid", gap: 10, marginBottom: 14 }}>
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
         <StatTile label="Mock attempts saved" value={mockHistory.length} color="#3b82f6" />
+        <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
         <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
-        <StatTile label="Best recent result" value={mockHistory.length ? `${Math.max(...mockHistory.map((x) => x.percent))}%` : "0%"} color="#f59e0b" />
+        <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "0%"} color="#f59e0b" />
       </div>
+      <Card style={{ border: "1px solid color-mix(in srgb, #8b5cf6 35%, var(--card-border))", background: "color-mix(in srgb, #8b5cf6 8%, var(--card-bg))" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Mock progress saved on this device</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>
+              Your completed papers, best scores, and last results stay in local storage, so they still work after new app releases.
+            </div>
+          </div>
+          <Badge text={`${completedPapers}/${MOCK_PAPERS.length} papers tried`} color="#8b5cf6" />
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+          <Badge text={`Next paper: #${nextPaper.id}`} color={nextPaper.accent} />
+          <Badge text={latestMock ? `Last score ${latestMock.score}/24` : "No paper done yet"} color="#10b981" />
+        </div>
+        <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 14px", fontWeight: 800, cursor: "pointer" }}>
+          Open Mock Tracker
+        </button>
+      </Card>
 
       <Card style={{ border: "1px solid #334155" }}>
         <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>What this app covers for the Life in the UK test</div>
@@ -1570,9 +1674,21 @@ const TrueFalseSprintTab = () => {
   );
 };
 
+const QUICK_REVISION_MODES = [
+  { id: "core", label: "Pass Core", detail: "Highest-yield facts for passing quickly." },
+  { id: "traps", label: "Common Traps", detail: "Pairs and mix-ups that lose easy marks." },
+  { id: "full", label: "Full Course", detail: "Everything in the app's revision deck." },
+];
+
 const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
-  const topics = useMemo(() => ["All", ...Array.from(new Set(deck.map((item) => item.topic)))], [deck]);
+  const [mode, setMode] = useState("core");
+  const modeDeck = useMemo(() => {
+    if (mode === "traps") return deck.filter(isTrapCard);
+    if (mode === "full") return deck;
+    return deck.filter(isPassCoreCard);
+  }, [deck, mode]);
+  const topics = useMemo(() => ["All", ...Array.from(new Set(modeDeck.map((item) => item.topic)))], [modeDeck]);
   const [topic, setTopic] = useState("All");
   const [sessionSize, setSessionSize] = useState(12);
   const [session, setSession] = useState([]);
@@ -1580,7 +1696,7 @@ const QuickRevisionTab = ({ setActive }) => {
   const [revealed, setRevealed] = useState(false);
   const [completed, setCompleted] = useState(0);
   const [againCount, setAgainCount] = useState(0);
-  const filteredDeck = useMemo(() => topic === "All" ? deck : deck.filter((item) => item.topic === topic), [deck, topic]);
+  const filteredDeck = useMemo(() => topic === "All" ? modeDeck : modeDeck.filter((item) => item.topic === topic), [modeDeck, topic]);
   const current = session[index];
 
   const startSession = () => {
@@ -1624,8 +1740,12 @@ const QuickRevisionTab = ({ setActive }) => {
   const isFinished = session.length > 0 && index >= session.length;
 
   useEffect(() => {
+    if (topic !== "All" && !topics.includes(topic)) {
+      setTopic("All");
+      return;
+    }
     startSession();
-  }, [topic, sessionSize]);
+  }, [topic, sessionSize, mode]);
 
   return (
     <div style={{ padding: 20 }}>
@@ -1639,9 +1759,21 @@ const QuickRevisionTab = ({ setActive }) => {
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
           <Badge text={`${filteredDeck.length} in topic pool`} color="#3b82f6" />
           <Badge text="Fresh mix each session" color="#22c55e" />
+          <Badge text={QUICK_REVISION_MODES.find((item) => item.id === mode)?.label || "Pass Core"} color="#8b5cf6" />
         </div>
       </Card>
       <Card>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Revision mode</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+          {QUICK_REVISION_MODES.map((item) => (
+            <TabButton key={item.id} active={mode === item.id} onClick={() => setMode(item.id)}>
+              {item.label}
+            </TabButton>
+          ))}
+        </div>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
+          {QUICK_REVISION_MODES.find((item) => item.id === mode)?.detail}
+        </div>
         <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Topic filter</div>
         <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto" }}>
           {topics.map((item) => <TabButton key={item} active={topic === item} onClick={() => setTopic(item)}>{item}</TabButton>)}
@@ -2981,7 +3113,8 @@ const MockExamTab = () => {
   const [timerMode, setTimerMode] = useState("strict");
   const [reviewFilter, setReviewFilter] = useState("wrong");
   const [finishConfirm, setFinishConfirm] = useState(false);
-  const [mockHistory, setMockHistory] = useState(() => readStore(STORAGE_KEYS.mockHistory, []));
+  const [mockHistory, setMockHistory] = useState(() => loadMockHistory());
+  const [mockProgress, setMockProgress] = useState(() => loadMockProgress());
   const timerRef = useRef(null);
 
   const selectedPaper = MOCK_PAPERS.find((paper) => paper.id === selectedPaperId) || MOCK_PAPERS[0];
@@ -3044,12 +3177,20 @@ const MockExamTab = () => {
       score,
       percent: Math.round((score / MOCK_TOTAL) * 100),
       passed: score >= 18,
+      wrong: wrong.length,
+      flagged: flaggedCount,
+      answerMode,
     });
-    setMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
-  }, [finished, questions, answers, score, selectedPaper]);
+    setMockHistory(loadMockHistory());
+    setMockProgress(loadMockProgress());
+  }, [finished, questions, answers, score, selectedPaper, flaggedCount, answerMode]);
 
   if (!started) {
     const latestMock = mockHistory[0];
+    const completedPapers = Object.keys(mockProgress).length;
+    const nextPaper = getMockNextPaper(mockProgress);
+    const passedPapers = Object.values(mockProgress).filter((item) => item.passed).length;
+    const strongestPaper = completedPapers ? Math.max(...Object.values(mockProgress).map((item) => item.bestPercent)) : 0;
     const groupedPapers = Array.from({ length: Math.ceil(MOCK_PAPERS.length / 5) }, (_, index) => {
       const start = index * 5;
       const end = start + 5;
@@ -3073,12 +3214,28 @@ const MockExamTab = () => {
                 <Badge text="18 needed to pass" color="#22c55e" />
               </div>
               <div className="study-mode-grid" style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
-                <StatTile label="Mocks completed" value={mockHistory.length} color="#3b82f6" />
+                <StatTile label="Attempts saved" value={mockHistory.length} color="#3b82f6" />
+                <StatTile label="Papers completed" value={completedPapers} color="#8b5cf6" />
                 <StatTile label="Last result" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#22c55e" />
-                <StatTile label="Latest paper" value={latestMock?.paperTitle ? latestMock.paperTitle.replace("Mock Test ", "#") : "Paper #1"} color="#f97316" />
+                <StatTile label="Best paper" value={strongestPaper ? `${strongestPaper}%` : "0%"} color="#f59e0b" />
               </div>
             </div>
             <HeroIllustration variant="mock" />
+          </div>
+        </Card>
+        <Card style={{ border: "1px solid color-mix(in srgb, #8b5cf6 30%, var(--card-border))" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>Saved mock paper tracker</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>
+                Each paper keeps its attempts, best score, last score, and last attempt date on this device. Updates to the app keep this progress.
+              </div>
+            </div>
+            <Badge text={`${passedPapers} papers at pass standard`} color="#22c55e" />
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Badge text={`Next suggested paper: #${nextPaper.id}`} color={nextPaper.accent} />
+            <Badge text={latestMock ? `Last attempt ${formatAttemptDate(latestMock.date)}` : "No attempts yet"} color="#64748b" />
           </div>
         </Card>
         <Card>
@@ -3133,7 +3290,9 @@ const MockExamTab = () => {
           <Card key={group.title}>
             <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 12 }}>{group.title}</div>
             <div className="study-mode-grid" style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
-              {group.items.map((paper) => (
+              {group.items.map((paper) => {
+                const paperProgress = mockProgress[paper.id];
+                return (
                 <button
                   key={paper.id}
                   className="focus-ring"
@@ -3148,9 +3307,17 @@ const MockExamTab = () => {
                   <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                     <Badge text="Balanced" color="#22c55e" />
                     <Badge text="Fixed paper" color="#64748b" />
+                    {paperProgress ? <Badge text={`${paperProgress.bestScore}/24 best`} color={paperProgress.passed ? "#22c55e" : paper.accent} /> : <Badge text="New paper" color={paper.accent} />}
+                    {paperProgress?.attempts ? <Badge text={`${paperProgress.attempts} tries`} color="#8b5cf6" /> : null}
                   </div>
+                  {paperProgress && (
+                    <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
+                      Last: {paperProgress.lastScore}/24 on {formatAttemptDate(paperProgress.lastDate)}
+                    </div>
+                  )}
                 </button>
-              ))}
+                );
+              })}
             </div>
           </Card>
         ))}
@@ -3732,7 +3899,8 @@ const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => readStore(STORAGE_KEYS.theme, true));
   const [wrongQuestions, setWrongQuestions] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
-  const [mockHistory, setMockHistory] = useState(() => readStore(STORAGE_KEYS.mockHistory, []));
+  const [mockHistory, setMockHistory] = useState(() => loadMockHistory());
+  const [mockProgress, setMockProgress] = useState(() => loadMockProgress());
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [quickPanelOpen, setQuickPanelOpen] = useState(false);
   const [tabHistory, setTabHistory] = useState([]);
@@ -3754,7 +3922,8 @@ const App = () => {
     const metaDescription = document.querySelector('meta[name="description"]');
     if (metaDescription && seo.description) metaDescription.setAttribute("content", seo.description);
     setWrongQuestions(readStore(STORAGE_KEYS.wrongQuestions, []));
-    setMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
+    setMockHistory(loadMockHistory());
+    setMockProgress(loadMockProgress());
   }, [active]);
 
   useEffect(() => {
@@ -3821,7 +3990,7 @@ const App = () => {
 
   const renderTab = () => {
     switch (active) {
-      case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} />;
+      case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
       case "story": return <StoryModeTab setActive={navigateTo} />;
       case "daily10": return <DailyTenTab />;
@@ -3845,7 +4014,7 @@ const App = () => {
       case "mock": return <MockExamTab />;
       case "revise": return <ReviseTab />;
       case "rapidfire": return <RapidFireTab />;
-      default: return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} />;
+      default: return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
     }
   };
 

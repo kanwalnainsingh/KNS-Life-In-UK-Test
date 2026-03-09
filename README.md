@@ -2,15 +2,15 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 274 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
+> 📖 280 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.10.4`
+Current release: `v1.11.0`
 
 ---
 
 ## 🌐 Live Site
 
-[**→ Open the Study Guide**](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
+[**→ Open the Live Study Guide for ILR and Citizenship Prep**](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
 
 Official test info: https://www.gov.uk/life-in-the-uk-test
 
@@ -27,13 +27,15 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/mobile-nav.png" width="30%" alt="Mobile home and revision hub" />
+  <img src="screenshots/mobile-nav.png" width="22%" alt="Mobile home and revision hub" />
   &nbsp;
-  <img src="screenshots/timeline.png" width="30%" alt="Timeline revision on mobile" />
+  <img src="screenshots/timeline.png" width="22%" alt="Timeline revision on mobile" />
   &nbsp;
-  <img src="screenshots/figures.png" width="30%" alt="Key historical figures on mobile" />
+  <img src="screenshots/figures.png" width="22%" alt="Key historical figures on mobile" />
+  &nbsp;
+  <img src="screenshots/mock-progress.png" width="22%" alt="Mock paper tracker with saved scores" />
 </p>
-<p align="center"><strong>Current mobile views</strong> — revision hub, history timeline, and the upgraded key historical figures page.</p>
+<p align="center"><strong>Current mobile views</strong> — revision hub, history timeline, key figures, and the saved mock-paper tracker.</p>
 
 ---
 
@@ -57,7 +59,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | Section | What it does |
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
-| ↔️ Quick Revise | Short-session revision cards with answer, context, and memory clue |
+| ↔️ Quick Revise | Short-session revision cards with `Pass Core`, `Common Traps`, and `Full Course` modes |
 | 📚 Story Mode | Small handbook-style chapters for quick sequential revision |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
@@ -75,7 +77,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | 🎭 Arts | Literature, music, art, architecture, fashion, and film |
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7 |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
-| 📝 Mock Test | 30 fixed balanced mock papers with stronger review context |
+| 📝 Mock Test | 30 fixed balanced mock papers with saved per-paper scores, attempts, and next-paper guidance |
 | 🔥 Rapid Fire | Timed revision with broader randomisation and fewer repeats |
 | ♻️ Revise Mistakes | Retry the questions you got wrong |
 
@@ -86,9 +88,10 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 - Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
 - Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
 - More relevant grouped navigation with main actions first and topic subsections underneath
-- `Quick Revise` flash cards for fast revision
+- `Quick Revise` now has `Pass Core`, `Common Traps`, and `Full Course` session modes
 - `Mock Test` and `Revise Mistakes` modes
 - Answer reveal toggles for quiz and mock flows
+- Mock paper history is now saved per paper with best score, attempts, and last score kept in local storage across app updates
 - Visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`
 - Expanded `Key Historical Figures` with extra tested people, direct memory hooks, and comparison groups
 - Improved timeline with extra high-yield history anchors:
@@ -107,6 +110,11 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - `Crown Dependencies`
   - `Channel Islands`
   - `British Overseas Territories`
+- Added more direct high-yield question coverage for:
+  - Welsh and Scottish Gaelic language facts
+  - Holyrood and Stormont
+  - EU citizens and local-election voting
+  - census facts used across religion and society questions
 - Offline cache support after first online load
 - Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 
@@ -151,6 +159,7 @@ For GitHub Pages:
 - Bump `package.json` for each user-facing release
 - The current version is shown in the app footer and on the home screen
 - Users can tap `↻ Latest` in the footer to force-refresh cached mobile pages
+- Saved mock paper progress uses local storage, so attempts and scores stay available after new versions are deployed
 - Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point
 - Section pages now include more exam-anchor cards, memory clues, and compare points for faster revision
 - Once the app has loaded online, the service worker can cache it for offline train revision

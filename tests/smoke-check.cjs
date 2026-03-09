@@ -44,6 +44,10 @@ const assert = (condition, message) => {
   assert(/CramSheetTab/.test(appSource), "Cram UI missing");
   assert(/TopicTrackerTab/.test(appSource), "Tracker UI missing");
   assert(/MOCK_PAPER_COUNT = 30/.test(appSource), "Expected 30 fixed mock papers");
+  assert(/mockProgress/.test(appSource), "Mock progress storage missing");
+  assert(/QUICK_REVISION_MODES/.test(appSource), "Quick revision mode presets missing");
+  assert(/Pass Core/.test(appSource), "Pass Core quick revision mode missing");
+  assert(/Saved mock paper tracker/.test(appSource), "Mock tracker summary missing");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
   assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
   assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");

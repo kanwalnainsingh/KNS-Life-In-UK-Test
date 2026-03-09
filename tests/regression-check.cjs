@@ -36,6 +36,8 @@ const normalizeQuestion = (text) =>
     "Which church is Presbyterian and does NOT have the monarch as its head?",
     "Which organisation created the European Convention on Human Rights?",
     "What is the name of the tower that contains Big Ben?",
+    "Which language has official status and is spoken by many people in Wales?",
+    "Which group can vote in local elections but not UK general elections?",
   ];
 
   for (const expected of mustCover) {
