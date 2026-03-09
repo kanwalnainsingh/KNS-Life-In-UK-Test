@@ -17,7 +17,7 @@ const STORAGE_KEYS = {
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
 };
 
-const APP_VERSION = "v1.9.0";
+const APP_VERSION = "v1.10.1";
 
 const SEO_COPY = {
   home: {
@@ -899,7 +899,7 @@ const buildMockCategoryBreakdown = (questions, answers) =>
     .filter((row) => row.total > 0);
 
 // ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, onBack, canGoBack, openQuickPanel, onForceRefresh }) => {
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel }) => {
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === "Escape") setMenuOpen(false);
@@ -920,27 +920,10 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
         <button aria-label={menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={() => setMenuOpen(!menuOpen)} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
           ☰
         </button>
-        {active !== "home" && (
-          <button aria-label="Go back" className="focus-ring" onClick={onBack} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 12, padding: "8px 12px", cursor: canGoBack ? "pointer" : "default", fontSize: 15, fontWeight: 800 }}>
-            ←
-          </button>
-        )}
         <button aria-label="Go to home" className="focus-ring" onClick={() => setActive("home")} style={{ background: "none", border: "none", color: "#60a5fa", fontWeight: 800, fontSize: 18, cursor: "pointer", padding: 0 }}>
           🇬🇧 Life in the UK
         </button>
-        <span style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 800, border: "1px solid var(--card-border)", borderRadius: 999, padding: "4px 8px", background: "var(--chip-bg)", whiteSpace: "nowrap" }}>
-          {APP_VERSION}
-        </span>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
-          <button
-            aria-label="Get latest app version"
-            className="focus-ring"
-            onClick={onForceRefresh}
-            title="Reload latest version"
-            style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 13, fontWeight: 800 }}
-          >
-            ↻ Latest
-          </button>
           <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
             style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none", padding: "6px 10px", borderRadius: 999, border: "1px solid var(--card-border)", background: "var(--card-bg)", whiteSpace: "nowrap" }}>
             ⭐ GitHub
@@ -1044,6 +1027,26 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
   );
 };
 
+const AppFooterBar = ({ onForceRefresh }) => (
+  <div style={{ padding: "6px 16px 18px", paddingBottom: "max(18px, env(safe-area-inset-bottom))" }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", border: "1px solid var(--card-border)", background: "var(--panel-bg)", borderRadius: 14, padding: "10px 12px" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
+        <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Not seeing updates? Refresh the latest version.</div>
+      </div>
+      <button
+        aria-label="Get latest app version"
+        className="focus-ring"
+        onClick={onForceRefresh}
+        title="Reload latest version"
+        style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}
+      >
+        ↻ Latest
+      </button>
+    </div>
+  </div>
+);
+
 // ── HOME ─────────────────────────────────────────────────────
 const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
   const latestMock = mockHistory[0];
@@ -1081,10 +1084,6 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
           <Badge text="45 minutes" color="#10b981" />
           <Badge text="75% to pass" color="#f59e0b" />
           <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
-          <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
-        </div>
-        <div style={{ color: "var(--hero-copy)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
-          Not seeing the newest changes on your phone? Use the <strong>↻ Latest</strong> button in the header to force a fresh reload.
         </div>
       </Card>
 
@@ -3160,9 +3159,10 @@ const App = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 88 : 0 }}>
-      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} onBack={handleBack} canGoBack={tabHistory.length > 0} openQuickPanel={() => setQuickPanelOpen(true)} onForceRefresh={forceLatestAppReload} />
+    <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 112 : 12 }}>
+      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} />
       <div className="tabcontent">{renderTab()}</div>
+      <AppFooterBar onForceRefresh={forceLatestAppReload} />
       <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>
         Open Source — Share Freely ·{" "}
         <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" style={{ color: "#60a5fa", textDecoration: "none" }}>
