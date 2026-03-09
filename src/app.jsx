@@ -308,7 +308,7 @@ const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
 
 // ── HELPERS ──────────────────────────────────────────────────
 const Badge = ({ text, color = "#3b82f6" }) => (
-  <span className="app-badge" style={{ background: color + "22", color, border: `1px solid ${color}44`, borderRadius: 999, padding: "4px 10px", fontSize: 11, fontWeight: 700, letterSpacing: 0.3, fontFamily: "monospace" }}>{text}</span>
+  <span className="app-badge" style={{ background: color + "16", color, border: `1px solid ${color}30`, borderRadius: 999, padding: "3px 9px", fontSize: 10, fontWeight: 700, letterSpacing: 0.18 }}>{text}</span>
 );
 
 const Card = ({ children, style = {}, className = "", ...props }) => (
@@ -370,21 +370,21 @@ const HeroIllustration = ({ variant = "study" }) => {
 };
 
 const StatTile = ({ label, value, color }) => (
-  <div style={{ borderRadius: 16, padding: 14, background: color + "14", border: `1px solid ${color}33` }}>
-    <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
-    <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4 }}>{label}</div>
+  <div style={{ borderRadius: 16, padding: 13, background: color + "10", border: `1px solid ${color}26` }}>
+    <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
+    <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3 }}>{label}</div>
   </div>
 );
 
 const TabButton = ({ active, onClick, children }) => (
-  <button onClick={onClick} className="focus-ring" style={{ padding: "9px 14px", borderRadius: 999, border: "1px solid", cursor: "pointer", fontSize: 13, fontWeight: 700, background: active ? "#2563eb" : "var(--chip-bg)", borderColor: active ? "#3b82f6" : "var(--card-border)", color: active ? "#fff" : "var(--text)" }}>
+  <button onClick={onClick} className="focus-ring" style={{ padding: "8px 12px", borderRadius: 999, border: "1px solid", cursor: "pointer", fontSize: 12, fontWeight: 700, background: active ? "var(--accent)" : "var(--chip-bg)", borderColor: active ? "var(--accent)" : "var(--card-border)", color: active ? "#fff" : "var(--text)" }}>
     {children}
   </button>
 );
 
 const SettingGroup = ({ label, options, value, onChange }) => (
-  <div style={{ marginBottom: 14 }}>
-    <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 8 }}>{label}</div>
+  <div style={{ marginBottom: 12 }}>
+    <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 7 }}>{label}</div>
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
       {options.map((option) => (
         <TabButton key={option.value} active={value === option.value} onClick={() => onChange(option.value)}>
@@ -733,7 +733,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
         </div>
       </Card>
 
-      <div className="stats-grid" style={{ display: "grid", gap: 12, marginBottom: 16 }}>
+      <div className="stats-grid" style={{ display: "grid", gap: 10, marginBottom: 14 }}>
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
         <StatTile label="Mock attempts saved" value={mockHistory.length} color="#3b82f6" />
         <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
@@ -748,16 +748,16 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
       </Card>
 
       <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Visual memory clues</div>
             <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Short codes from the revision pack, now built into the app</div>
           </div>
           <Badge text={`${VISUAL_MNEMONICS.length} memory packs`} color="#06b6d4" />
         </div>
-        <div className="study-mode-grid" style={{ display: "grid", gap: 10 }}>
+        <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
           {VISUAL_MNEMONICS.map((item) => (
-            <div key={item.code} style={{ background: item.color + "18", border: `1px solid ${item.color}44`, borderRadius: 16, padding: 12 }}>
+            <div key={item.code} style={{ background: item.color + "14", border: `1px solid ${item.color}30`, borderRadius: 16, padding: 11 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
                 <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.icon} {item.title}</div>
                 <Badge text={item.code} color={item.color} />
@@ -770,14 +770,14 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
       </Card>
 
       <Card style={{ border: "1px solid var(--card-border)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Coverage checklist</div>
             <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Handbook-style areas organised for quick navigation</div>
           </div>
           <Badge text={`${COVERAGE_AREAS.length} areas covered`} color="#22c55e" />
         </div>
-        <div className="study-mode-grid" style={{ display: "grid", gap: 10 }}>
+        <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
           {COVERAGE_AREAS.map((item) => (
             <button key={item.title} className="focus-ring" onClick={() => setActive(item.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 16, padding: 12, textAlign: "left", cursor: "pointer" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
@@ -790,20 +790,20 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
         </div>
       </Card>
 
-      <div className="study-mode-grid" style={{ display: "grid", gap: 12, marginBottom: 20 }}>
+      <div className="study-mode-grid" style={{ display: "grid", gap: 10, marginBottom: 18 }}>
         {[
           { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
           { id: "confuse", icon: "⚖️", title: "Compare Confusions", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
           { id: "revise", icon: "🧩", title: "Revise Mistakes", desc: "Retry only the questions you previously got wrong.", color: "#ef4444" },
           { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
         ].map((item) => (
-          <button key={item.id} className="focus-ring" onClick={() => setActive(item.id)} style={{ background: "var(--card-bg)", border: `1px solid ${item.color}44`, borderRadius: 18, padding: 18, textAlign: "left", cursor: "pointer" }}>
+          <button key={item.id} className="focus-ring" onClick={() => setActive(item.id)} style={{ background: "var(--card-bg)", border: `1px solid ${item.color}30`, borderRadius: 18, padding: 15, textAlign: "left", cursor: "pointer" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
               <div style={{ fontSize: 26 }}>{item.icon}</div>
               <Badge text="Study mode" color={item.color} />
             </div>
-            <div style={{ color: "var(--text-strong)", fontSize: 17, fontWeight: 800, marginBottom: 6 }}>{item.title}</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.6 }}>{item.desc}</div>
+            <div style={{ color: "var(--text-strong)", fontSize: 16, fontWeight: 800, marginBottom: 5 }}>{item.title}</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{item.desc}</div>
           </button>
         ))}
       </div>
