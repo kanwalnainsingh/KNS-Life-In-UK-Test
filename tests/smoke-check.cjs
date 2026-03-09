@@ -50,7 +50,7 @@ const assert = (condition, message) => {
   assert(/Show details/.test(appSource), "Quick revision inline details control missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
   assert(/↻ Latest/.test(appSource), "Latest-version button missing");
-  assert(/APP_VERSION = \"v/.test(appSource), "App version constant missing");
+  assert(/const APP_VERSION = `v\$\{packageMeta\.version\}`;/.test(appSource), "App version should come from package.json");
   assert(/Remembered up to here/.test(appSource), "Timeline checkpoint UI missing");
   assert(/CompactVisualStrip/.test(appSource), "Compact visual strip helper missing");
   assert(/Cache-Control/.test(indexSource), "No-cache meta hints missing");

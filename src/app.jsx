@@ -5,6 +5,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import packageMeta from "../package.json";
 import {
   ALL_QUIZ,
   ANTHEM,
@@ -44,7 +45,7 @@ const STORAGE_KEYS = {
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
 };
 
-const APP_VERSION = "v1.10.1";
+const APP_VERSION = `v${packageMeta.version}`;
 
 const SEO_COPY = {
   home: {

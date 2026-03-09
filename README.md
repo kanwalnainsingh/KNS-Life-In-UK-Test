@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 262 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
-Current release: `v1.10.1`
+Current release: `v1.10.2`
 
 ---
 
@@ -137,8 +137,8 @@ For GitHub Pages:
 
 ## 🚀 Release Versioning
 
-- The visible app release version lives in `src/app.jsx` as `APP_VERSION`
-- Bump that value for each user-facing release
+- The visible app release version comes from `package.json`
+- Bump `package.json` for each user-facing release
 - The current version is shown in the header and on the home screen
 - Users can tap `↻ Latest` in the app header to force-refresh cached mobile pages
 - Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point

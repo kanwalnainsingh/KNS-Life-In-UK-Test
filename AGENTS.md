@@ -34,7 +34,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added grouped navigation for mobile and desktop.
 - Simplified the header so main study actions are first, with topic subsections grouped underneath.
 - Added `Quick Revise` swipe-style flash-card mode.
-- Added visible app release versioning via `APP_VERSION` in `src/app.jsx`.
+- Added visible app release versioning sourced from `package.json`.
 - Added `↻ Latest` refresh action to help mobile users pull the newest deployed version.
 - Added timeline checkpoint saving so learners can jump back to the point they last remembered.
 - Expanded fixed mock papers from 20 to 30 and added more handbook-style civics/everyday-life questions.
@@ -86,7 +86,7 @@ node tests/smoke-check.js
 ## Editing guidance
 - Prefer adding to existing topic structures instead of inventing new scattered sections.
 - Avoid duplicating facts already present unless the new version adds a clearer mnemonic or comparison value.
-- For any user-visible release, bump `APP_VERSION` in `src/app.jsx`.
+- For any user-visible release, bump `package.json` so the app version updates everywhere.
 - If changing quiz/mock/rapid behavior, keep the modes distinct:
   - `Quiz` = flexible practice
   - `Mock` = closest to official test
