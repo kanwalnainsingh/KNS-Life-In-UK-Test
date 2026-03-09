@@ -2,7 +2,7 @@
 
 A free, mobile-friendly study guide for the **Life in the UK citizenship test**.
 
-> 📖 236 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
+> 📖 242 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
 ---
 
@@ -17,22 +17,13 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/mobile-nav.png" width="30%" alt="Mobile navigation and revision hub" />
-</p>
-<p align="center"><strong>Mobile navigation</strong> — header controls, quick actions, and bottom navigation in one compact view.</p>
-
-<p align="center">
-  <img src="screenshots/home-light.png" width="48%" alt="Home — feature overview" />
+  <img src="screenshots/mobile-nav.png" width="30%" alt="Mobile home and revision hub" />
   &nbsp;
-  <img src="screenshots/timeline.png" width="48%" alt="Timeline — history revision" />
-</p>
-<p align="center"><strong>Core features</strong> — revision hub and timeline view.</p>
-<p align="center">
-  <img src="screenshots/quiz.png" width="48%" alt="Quiz mode" />
+  <img src="screenshots/timeline.png" width="30%" alt="Timeline revision on mobile" />
   &nbsp;
-  <img src="screenshots/home-dark.png" width="48%" alt="Dark mode home view" />
+  <img src="screenshots/figures.png" width="30%" alt="Key historical figures on mobile" />
 </p>
-<p align="center"><strong>Practice modes</strong> — quiz flow and dark-mode home.</p>
+<p align="center"><strong>Current mobile views</strong> — revision hub, history timeline, and the upgraded key historical figures page.</p>
 
 ---
 
@@ -65,7 +56,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | ⛪ Religion | Faith groups and major festivals |
 | 💡 Inventors | British inventors and key discoveries |
 | 🏅 Sports | Sports stars and high-yield exam facts |
-| 👑 Key People | Historic figures and what they are known for |
+| 👑 Key People | Historic figures, grouped memory links, and revision cues |
 | 🎭 Arts | Literature, music, art, architecture, fashion, and film |
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7 |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
@@ -78,10 +69,12 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## 🧠 What’s New
 
 - Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
+- More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` flash cards for fast revision
 - `Mock Test` and `Revise Mistakes` modes
 - Answer reveal toggles for quiz and mock flows
 - Visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`
+- Expanded `Key Historical Figures` with extra tested people, direct memory hooks, and comparison groups
 - Improved timeline with extra high-yield history anchors:
   - Boudicca
   - St Augustine

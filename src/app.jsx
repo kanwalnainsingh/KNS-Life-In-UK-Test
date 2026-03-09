@@ -15,12 +15,12 @@ const STORAGE_KEYS = {
   recentRapid: "lifeuk-recent-rapid",
 };
 
-const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "mock", "revise", "quiz", "rapidfire", "timeline", "confuse"];
-const PRIMARY_MOBILE_TABS = ["home", "quickrev", "quiz", "mock", "rapidfire", "timeline"];
+const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "quiz", "mock", "rapidfire", "timeline"];
+const PRIMARY_MOBILE_TABS = ["home", "quickrev", "quiz", "mock", "timeline"];
 const NAV_GROUPS = [
-  { title: "Study Modes", ids: ["home", "quickrev", "mock", "revise", "quiz", "rapidfire"] },
-  { title: "Core Topics", ids: ["timeline", "nations", "confuse", "quickfacts", "landmarks", "international"] },
-  { title: "People & Culture", ids: ["inventors", "sports", "figures", "religion", "arts", "anthem"] },
+  { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "quickrev", "quiz", "mock", "rapidfire", "revise"] },
+  { title: "History & Society", hint: "Timeline, nations, law, traps, landmarks", ids: ["timeline", "nations", "quickfacts", "confuse", "landmarks", "international"] },
+  { title: "People & Culture", hint: "Figures, religion, inventors, sports, arts", ids: ["figures", "religion", "inventors", "sports", "arts", "anthem"] },
 ];
 const COVERAGE_AREAS = [
   { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
@@ -445,6 +445,11 @@ const ScrollTopButton = ({ visible }) => (
   </button>
 );
 
+const getHashTab = () => {
+  const hash = window.location.hash.replace(/^#/, "").trim();
+  return TABS.some((tab) => tab.id === hash) ? hash : null;
+};
+
 const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
   useEffect(() => {
     if (!open) return undefined;
@@ -480,7 +485,8 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
           </button>
           {NAV_GROUPS.map((group) => (
             <div key={group.title}>
-              <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>{group.title}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{group.title}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 11, marginBottom: 8 }}>{group.hint}</div>
               <div className="mobile-sheet-grid">
                 {group.ids.map((id) => {
                   const item = TABS.find((tab) => tab.id === id);
@@ -500,21 +506,6 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
               </div>
             </div>
           ))}
-          <div>
-            <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>Browse all topics</div>
-            <div className="mobile-sheet-scroll-row">
-              {TABS.filter((tab) => !NAV_GROUPS.flatMap((group) => group.ids).includes(tab.id)).map((tab) => (
-                <button
-                  key={tab.id}
-                  className="focus-ring"
-                  onClick={() => { setActive(tab.id); onClose(); }}
-                  style={{ border: active === tab.id ? "1px solid #3b82f6" : "1px solid var(--card-border)", background: active === tab.id ? "#1d4ed822" : "var(--chip-bg)", color: active === tab.id ? "#60a5fa" : "var(--text)", borderRadius: 999, padding: "9px 12px", cursor: "pointer", whiteSpace: "nowrap", fontWeight: 700, fontSize: 12 }}
-                >
-                  {tab.icon} {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -595,9 +586,32 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
         </div>
         </div>
         <div className="desktop-nav-panel desktop-only">
-          {NAV_GROUPS.map((group) => (
+          <div className="desktop-nav-group">
+            <div className="desktop-nav-label">Main</div>
+            <div className="desktop-nav-row">
+              {TABS.filter((tab) => PRIMARY_DESKTOP_TABS.includes(tab.id)).map((tab) => (
+                <button
+                  key={tab.id}
+                  className="focus-ring desktop-nav-chip"
+                  onClick={() => setActive(tab.id)}
+                  data-active={active === tab.id ? "true" : "false"}
+                >
+                  {tab.icon} {tab.label}
+                </button>
+              ))}
+              <button
+                className="focus-ring desktop-nav-chip"
+                onClick={() => setMenuOpen(true)}
+                data-active={menuOpen ? "true" : "false"}
+              >
+                ☰ All Topics
+              </button>
+            </div>
+          </div>
+          {NAV_GROUPS.slice(1).map((group) => (
             <div key={group.title} className="desktop-nav-group">
               <div className="desktop-nav-label">{group.title}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>{group.hint}</div>
               <div className="desktop-nav-row">
                 {group.ids.map((id) => {
                   const tab = TABS.find((item) => item.id === id);
@@ -636,10 +650,12 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
       {menuOpen && (
         <div role="dialog" aria-modal="true" aria-label="Topics menu" style={{ position: "fixed", inset: 0, background: "#020617cc", zIndex: 200 }} onClick={() => setMenuOpen(false)}>
           <div style={{ background: "var(--card-bg)", width: 340, maxWidth: "86vw", height: "100%", overflowY: "auto", padding: 18, borderRight: "1px solid var(--card-border)" }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ color: "#60a5fa", fontWeight: 800, marginBottom: 16, fontSize: 18 }}>🇬🇧 Study Modes</div>
+            <div style={{ color: "#60a5fa", fontWeight: 800, marginBottom: 6, fontSize: 18 }}>🇬🇧 Study navigation</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 16 }}>Main study flows first, then grouped topic sections.</div>
             {NAV_GROUPS.map((group) => (
               <div key={group.title} style={{ marginBottom: 14 }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>{group.title}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{group.title}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 11, marginBottom: 8 }}>{group.hint}</div>
                 {group.ids.map((id) => {
                   const t = TABS.find((tab) => tab.id === id);
                   if (!t) return null;
@@ -651,13 +667,6 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
                   );
                 })}
               </div>
-            ))}
-            <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 8 }}>More topics</div>
-            {TABS.filter((tab) => !NAV_GROUPS.flatMap((group) => group.ids).includes(tab.id)).map((t) => (
-              <button key={t.id} className="focus-ring" onClick={() => { setActive(t.id); setMenuOpen(false); }}
-                style={{ display: "block", width: "100%", padding: "12px 16px", background: active === t.id ? "#1e3a5f" : "none", border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#bfdbfe" : "var(--text)", borderRadius: 12, marginBottom: 4, fontSize: 15 }}>
-                {t.icon} {t.label}
-              </button>
             ))}
           </div>
         </div>
@@ -1192,25 +1201,90 @@ const SportsTab = () => (
 );
 
 // ── KEY FIGURES ──────────────────────────────────────────────
-const FiguresTab = () => (
-  <div style={{ padding: 20 }}>
-    <SectionTitle icon="👑">Key Historical Figures</SectionTitle>
-    {KEY_FIGURES.map((f, i) => (
-      <Card key={i} style={{ border: `1px solid ${f.color}33` }}>
-        <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 8 }}>
-          <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
-          <div>
-            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
-            <div style={{ color: f.color, fontSize: 12, fontWeight: 700 }}>{f.role}</div>
-          </div>
+const FiguresTab = () => {
+  const figureOrder = [
+    "Boudicca",
+    "St Augustine",
+    "Alfred the Great",
+    "Athelstan",
+    "William the Conqueror",
+    "King John",
+    "Edward I",
+    "Robert the Bruce",
+    "Henry VIII",
+    "Elizabeth I",
+    "James VI and I",
+    "Oliver Cromwell",
+    "Sir Edmund Halley",
+    "Robert Walpole",
+    "Lord Nelson",
+    "Duke of Wellington",
+    "William Wilberforce",
+    "Sake Dean Mahomet",
+    "Florence Nightingale",
+    "Mary Seacole",
+    "Queen Victoria",
+    "Emmeline Pankhurst",
+    "Winston Churchill",
+    "William Beveridge",
+    "Clement Attlee",
+    "Aneurin (Nye) Bevan",
+    "Dr Ludwig Guttmann",
+    "Margaret Thatcher",
+    "Queen Elizabeth II",
+    "James Cook",
+    "Stephen Hawking",
+  ];
+  const orderMap = Object.fromEntries(figureOrder.map((name, index) => [name, index]));
+  const figures = [...KEY_FIGURES, ...EXTRA_KEY_FIGURES]
+    .filter((figure, index, arr) => arr.findIndex((item) => item.name === figure.name) === index)
+    .sort((a, b) => (orderMap[a.name] ?? 999) - (orderMap[b.name] ?? 999));
+  const figureGroups = [
+    { title: "Rulers & union", color: "#3b82f6", items: ["Alfred", "Athelstan", "William", "Henry VIII", "James VI and I"] },
+    { title: "Rights & reform", color: "#10b981", items: ["King John", "Wilberforce", "Pankhurst", "Beveridge", "Bevan"] },
+    { title: "War & defence", color: "#f97316", items: ["Boudicca", "Robert the Bruce", "Nelson", "Wellington", "Churchill"] },
+    { title: "Science & culture", color: "#a855f7", items: ["Halley", "Cook", "Hawking", "Sake Dean Mahomet", "Guttmann"] },
+  ];
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="👑" meta="High-yield people for the test, ordered for faster revision and comparison.">Key Historical Figures</SectionTitle>
+      <Card style={{ background: "linear-gradient(135deg, rgba(29,78,216,0.18), rgba(15,23,42,0.96))", border: "1px solid #1d4ed866" }}>
+        <div style={{ fontWeight: 800, color: "#bfdbfe", marginBottom: 8, fontSize: 15 }}>Quick figure map</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
+          Use the groups below to remember who belongs to conquest, rights, war, welfare, and science. These links reduce mix-ups in mocks.
         </div>
-        {f.facts.map((fact, fi) => (
-          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>• {fact}</div>
-        ))}
+        <div className="compare-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+          {figureGroups.map((group) => (
+            <div key={group.title} style={{ background: "var(--panel-bg)", border: `1px solid ${group.color}44`, borderRadius: 16, padding: 12 }}>
+              <div style={{ color: group.color, fontWeight: 800, fontSize: 12, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>{group.title}</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {group.items.map((item) => <Badge key={item} text={item} color={group.color} />)}
+              </div>
+            </div>
+          ))}
+        </div>
       </Card>
-    ))}
-  </div>
-);
+      {figures.map((f) => (
+        <Card key={f.name} style={{ border: `1px solid ${f.color}33` }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
+            <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
+              <div style={{ color: f.color, fontSize: 12, fontWeight: 700 }}>{f.role}</div>
+            </div>
+          </div>
+          <div style={{ display: "grid", gap: 6 }}>
+            {f.facts.map((fact, fi) => (
+              <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>• {fact}</div>
+            ))}
+          </div>
+          {FIGURE_MEMORY[f.name] && <MemoryHook text={FIGURE_MEMORY[f.name]} />}
+        </Card>
+      ))}
+    </div>
+  );
+};
 
 // ── RELIGION ─────────────────────────────────────────────────
 const ReligionTab = () => (
@@ -2101,7 +2175,7 @@ const RapidFireTab = () => {
 // ── ROOT ──────────────────────────────────────────────────────
 const App = () => {
   const isMobile = useViewportMobile();
-  const [active, setActive] = useState(() => readStore(STORAGE_KEYS.activeTab, "home"));
+  const [active, setActive] = useState(() => getHashTab() || readStore(STORAGE_KEYS.activeTab, "home"));
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => readStore(STORAGE_KEYS.theme, true));
   const [wrongQuestions, setWrongQuestions] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
@@ -2117,9 +2191,25 @@ const App = () => {
 
   useEffect(() => {
     writeStore(STORAGE_KEYS.activeTab, active);
+    if (window.location.hash !== `#${active}`) {
+      window.history.replaceState(null, "", `#${active}`);
+    }
     setWrongQuestions(readStore(STORAGE_KEYS.wrongQuestions, []));
     setMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
   }, [active]);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hashTab = getHashTab();
+      if (hashTab) {
+        setActive(hashTab);
+        setMenuOpen(false);
+        setQuickPanelOpen(false);
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 260);

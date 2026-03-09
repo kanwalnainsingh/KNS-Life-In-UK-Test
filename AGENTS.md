@@ -32,6 +32,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 
 ## Recent major changes
 - Added grouped navigation for mobile and desktop.
+- Simplified the header so main study actions are first, with topic subsections grouped underneath.
 - Added `Quick Revise` swipe-style flash-card mode.
 - Added coverage checklist on home so users can see no major area is skipped.
 - Added visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`.
@@ -42,6 +43,8 @@ It is designed to help learners revise quickly on mobile and desktop with:
   - optionally include memory/context
 - Added recent-history avoidance for quiz/mock/rapid-fire randomness to reduce repeated questions across sessions.
 - Added community/participation facts and questions.
+- Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
+- Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 
 ## Data model notes
 - `ALL_QUIZ` is the main bank. Each entry should keep:
@@ -51,6 +54,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
   - `tip`
 - `tip` is used for memory/context and sometimes category hints.
 - `VISUAL_MNEMONICS` powers the home memory panel and quick revision mode.
+- `KEY_FIGURES`, `EXTRA_KEY_FIGURES`, and `FIGURE_MEMORY` together power the people page.
 - `CONFUSABLES` powers compare/trap views and also seeds some mock/rapid content.
 
 ## UX expectations

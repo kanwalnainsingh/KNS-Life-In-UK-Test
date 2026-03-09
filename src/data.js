@@ -335,6 +335,51 @@ const KEY_FIGURES = [
   { name:"Stephen Hawking", role:"Cosmologist 1942–2018", icon:"🌌", color:"#1e293b", facts:["Theoretical physicist and cosmologist at Cambridge University","Wrote A Brief History of Time (1988) — sold 10 million+ copies","Suffered from ALS/motor neurone disease but continued groundbreaking work on black holes and the universe"] },
 ];
 
+const EXTRA_KEY_FIGURES = [
+  { name:"St Augustine", role:"Missionary to Kent, 597 AD", icon:"⛪", color:"#2563eb", facts:["Came from Rome to Kent in 597 AD","Helped establish Christianity in Anglo-Saxon England","Best remembered as the early Christian turning point in England"] },
+  { name:"Alfred the Great", role:"King of Wessex", icon:"🛡️", color:"#6d28d9", facts:["Defeated Viking armies and defended Anglo-Saxon England","Only king of England remembered as 'the Great'","Links directly to the Viking period in the timeline"] },
+  { name:"Athelstan", role:"First king of a united England", icon:"👑", color:"#1d4ed8", facts:["Recognised as the first king to rule a united England","Important date to remember is 927 AD","Easy confusion trap: Alfred fought Vikings, Athelstan united England"] },
+  { name:"Robert the Bruce", role:"King of Scots", icon:"🏴", color:"#003087", facts:["Defeated the English at Bannockburn in 1314","Remains one of Scotland's best-known national figures","Use him to remember Scotland remained independent in this period"] },
+  { name:"James VI and I", role:"Union of Crowns, 1603", icon:"👑", color:"#065f46", facts:["James VI of Scotland became James I of England in 1603","This joined the crowns, but not yet the parliaments","The first Union Flag followed in 1606"] },
+  { name:"Mary Seacole", role:"Crimean War nurse", icon:"🩺", color:"#db2777", facts:["Was born in Jamaica and later came to Britain","Travelled to the Crimea and cared for sick and wounded soldiers","Often compared with Florence Nightingale, but she is a different figure"] },
+  { name:"Queen Victoria", role:"Queen 1837–1901", icon:"👑", color:"#7e22ce", facts:["Became queen in 1837 at the age of 18","Reigned for nearly 64 years","Her reign is linked with the expansion of the British Empire and the Industrial Age"] },
+  { name:"Queen Elizabeth II", role:"Queen 1952–2022", icon:"👑", color:"#4338ca", facts:["Became queen in 1952 after the death of George VI","Her coronation in 1953 was the first to be televised","Her reign covered major post-war changes in Britain"] },
+];
+
+const FIGURE_MEMORY = {
+  "Boudicca": "Boudicca = Iceni queen = Roman revolt around 60 AD = Westminster Bridge statue.",
+  "St Augustine": "597 = Augustine to Kent = Christianity grows in Anglo-Saxon England.",
+  "Alfred the Great": "Alfred = Vikings defeated = only English king called 'the Great'.",
+  "Athelstan": "Athelstan = 927 = first king of a united England.",
+  "William the Conqueror": "1066 = Hastings = last successful invasion of England.",
+  "King John": "King John had no choice in 1215: Magna Carta at Runnymede.",
+  "Edward I": "Edward I = Wales annexed + Model Parliament.",
+  "Robert the Bruce": "1314 Bannockburn = Robert the Bruce wins for Scotland.",
+  "Henry VIII": "Henry VIII = 6 wives + Church of England.",
+  "Elizabeth I": "Elizabeth I = Spanish Armada 1588 = 'Virgin Queen'.",
+  "James VI and I": "1603 = crowns joined only. James VI Scotland = James I England.",
+  "Oliver Cromwell": "Cromwell = Civil War winner = republic before monarchy restored.",
+  "Sir Edmund Halley": "Halley = Halley's Comet = Royal Society science.",
+  "Robert Walpole": "Walpole = first PM = under George I and George II.",
+  "Lord Nelson": "Nelson = Trafalgar 1805 = died in victory.",
+  "Duke of Wellington": "Wellington = Waterloo 1815 = defeated Napoleon.",
+  "William Wilberforce": "1807 = slave trade banned. 1833 = slavery abolished.",
+  "Sake Dean Mahomet": "Sake Dean Mahomet = first Indian restaurant in UK + shampoo.",
+  "Florence Nightingale": "Lady with the Lamp = Florence Nightingale.",
+  "Mary Seacole": "Mary Seacole = Jamaican-born nurse in the Crimean War.",
+  "Queen Victoria": "Victoria = queen at 18 in 1837 = long empire age.",
+  "Emmeline Pankhurst": "Pankhurst = WSPU = votes for women.",
+  "Winston Churchill": "Churchill = wartime PM = back again in 1951.",
+  "Clement Attlee": "Attlee = post-war Labour PM = NHS era.",
+  "William Beveridge": "Beveridge Report 1942 = five giants = welfare blueprint.",
+  "Aneurin (Nye) Bevan": "Nye Bevan = NHS 1948.",
+  "Dr Ludwig Guttmann": "Guttmann = Stoke Mandeville = Paralympics.",
+  "Margaret Thatcher": "Thatcher = first woman PM = 1979 to 1990.",
+  "Queen Elizabeth II": "1953 coronation = first on TV for many families.",
+  "James Cook": "Cook = Pacific voyages = Australia mapped for Britain.",
+  "Stephen Hawking": "Hawking = black holes + A Brief History of Time.",
+};
+
 // ── ARTS & CULTURE ───────────────────────────────────────────
 const ARTS = {
   literature:[
@@ -788,6 +833,10 @@ const ALL_QUIZ = [
   { q:"What does the British Museum hold?", opts:["Only British exhibits","The Crown Jewels","World artefacts including the Rosetta Stone — free to visit","Military vehicles and aircraft"], a:2, tip:"💡 Good to know — British Museum = Bloomsbury, London. FREE entry. Holds Rosetta Stone (key to Egyptian hieroglyphics), Elgin Marbles. Founded 1753." },
   { q:"What is 10 Downing Street?", opts:["The monarch's London home","The Prime Minister's official residence","The Home Office","The Supreme Court"], a:1, tip:"⭐ Exam favourite — 10 Downing Street = Prime Minister's official residence in London. Chancellor of Exchequer lives at No. 11." },
   { q:"The Bank of England is the UK's…?", opts:["Biggest high street bank","Central bank — manages monetary policy and issues banknotes","Investment bank","A museum about money"], a:1, tip:"📌 Often tested — Bank of England = UK's central bank. Sets interest rates. Issues banknotes. Located in the City of London." },
+  { q:"Who was the only English king called 'the Great'?", opts:["Athelstan","Alfred the Great","Edward I","William I"], a:1, tip:"📌 Often tested — Alfred the Great defeated Vikings and is the only English king called 'the Great'." },
+  { q:"Who became James I of England in 1603?", opts:["James VI of Scotland","Charles I","William of Orange","Henry VIII"], a:0, tip:"📌 Often tested — 1603 = Union of Crowns. James VI of Scotland became James I of England." },
+  { q:"Which queen came to the throne in 1837 at the age of 18?", opts:["Elizabeth I","Mary I","Queen Victoria","Elizabeth II"], a:2, tip:"📌 Often tested — Queen Victoria became queen in 1837 aged 18 and reigned for nearly 64 years." },
+  { q:"Who is remembered for the 1942 report that helped shape the welfare state?", opts:["Clement Attlee","William Beveridge","Aneurin Bevan","Winston Churchill"], a:1, tip:"⭐ Exam favourite — William Beveridge wrote the 1942 report that became a blueprint for the welfare state." },
 ];
 
 // ── TABS ─────────────────────────────────────────────────────
