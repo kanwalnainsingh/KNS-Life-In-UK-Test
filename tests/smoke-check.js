@@ -32,7 +32,7 @@ vm.runInContext(`${dataSource}\nthis.__exports = { ${exportedNames.join(", ")} }
 const data = context.__exports;
 
 assert(Array.isArray(data.ALL_QUIZ), "ALL_QUIZ should be defined");
-assert(data.ALL_QUIZ.length >= 180, "Expected at least 180 quiz questions");
+assert(data.ALL_QUIZ.length >= 250, "Expected at least 250 quiz questions");
 assert(Array.isArray(data.CONFUSABLES) && data.CONFUSABLES.length >= 6, "Expected confusion pairs");
 assert(Array.isArray(data.TABS) && data.TABS.length >= 16, "Expected expanded tab list");
 assert(Array.isArray(data.VISUAL_MNEMONICS) && data.VISUAL_MNEMONICS.length >= 4, "Expected mnemonic packs");
@@ -42,7 +42,7 @@ assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missi
 assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
 assert(/ReviseTab/.test(appSource), "Revision UI missing");
 assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
-assert(/MOCK_PAPER_COUNT = 20/.test(appSource), "Expected 20 fixed mock papers");
+assert(/MOCK_PAPER_COUNT = 30/.test(appSource), "Expected 30 fixed mock papers");
 assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
 assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
 assert(/Show details/.test(appSource), "Quick revision inline details control missing");

@@ -37,6 +37,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added visible app release versioning via `APP_VERSION` in `src/app.jsx`.
 - Added `↻ Latest` refresh action to help mobile users pull the newest deployed version.
 - Added timeline checkpoint saving so learners can jump back to the point they last remembered.
+- Expanded fixed mock papers from 20 to 30 and added more handbook-style civics/everyday-life questions.
 - Added coverage checklist on home so users can see no major area is skipped.
 - Added visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`.
 - Added `Mock Test`, `Revise`, and better mobile quick panel navigation.

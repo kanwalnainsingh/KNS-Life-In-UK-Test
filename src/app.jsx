@@ -17,7 +17,7 @@ const STORAGE_KEYS = {
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
 };
 
-const APP_VERSION = "v1.8.0";
+const APP_VERSION = "v1.9.0";
 
 const SEO_COPY = {
   home: {
@@ -757,7 +757,7 @@ const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
 
 const MOCK_TOTAL = 24;
 const MOCK_LIMIT_SECONDS = 45 * 60;
-const MOCK_PAPER_COUNT = 20;
+const MOCK_PAPER_COUNT = 30;
 
 const MOCK_CATEGORY_META = {
   history: { label: "History", icon: "📜", color: "#f97316", hint: "Kings, wars, reform, dates, and welfare-state anchors." },
@@ -2240,16 +2240,15 @@ const MockExamTab = () => {
 
   if (!started) {
     const latestMock = mockHistory[0];
-    const groupedPapers = [
-      { title: "Papers 1-5", items: MOCK_PAPERS.slice(0, 5) },
-      { title: "Papers 6-10", items: MOCK_PAPERS.slice(5, 10) },
-      { title: "Papers 11-15", items: MOCK_PAPERS.slice(10, 15) },
-      { title: "Papers 16-20", items: MOCK_PAPERS.slice(15, 20) },
-    ];
+    const groupedPapers = Array.from({ length: Math.ceil(MOCK_PAPERS.length / 5) }, (_, index) => {
+      const start = index * 5;
+      const end = start + 5;
+      return { title: `Papers ${start + 1}-${Math.min(end, MOCK_PAPERS.length)}`, items: MOCK_PAPERS.slice(start, end) };
+    });
 
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="📝" meta="20 fixed mock papers, each with 24 questions and a balanced spread across history, government, 4 nations, and culture.">Mock Test</SectionTitle>
+        <SectionTitle icon="📝" meta="30 fixed mock papers, each with 24 questions and a balanced spread across history, government, 4 nations, and culture.">Mock Test</SectionTitle>
         <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #f97316 12%, var(--card-bg)), color-mix(in srgb, #0f172a 14%, var(--surface-soft)))", border: "1px solid color-mix(in srgb, #f97316 35%, var(--card-border))" }}>
           <div className="study-mode-grid" style={{ display: "grid", gap: 14, alignItems: "center" }}>
             <div>
@@ -2258,7 +2257,7 @@ const MockExamTab = () => {
                 Use these like proper papers. Each set stays fixed, covers the core handbook areas, and gives detailed review with memory tips after you finish.
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-                <Badge text="20 fixed papers" color="#f97316" />
+                <Badge text="30 fixed papers" color="#f97316" />
                 <Badge text="24 questions each" color="#3b82f6" />
                 <Badge text="45:00 official timer" color="#ef4444" />
                 <Badge text="18 needed to pass" color="#22c55e" />

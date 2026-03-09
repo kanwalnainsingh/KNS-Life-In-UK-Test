@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 242 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
+> 📖 257 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests
 
-Current release: `v1.8.0`
+Current release: `v1.9.0`
 
 ---
 
@@ -70,7 +70,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | 🎭 Arts | Literature, music, art, architecture, fashion, and film |
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7 |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
-| 📝 Mock Test | More official-style practice flow |
+| 📝 Mock Test | 30 fixed balanced mock papers with stronger review context |
 | 🔥 Rapid Fire | Timed revision with broader randomisation and fewer repeats |
 | ♻️ Revise Mistakes | Retry the questions you got wrong |
 
