@@ -2682,7 +2682,19 @@ const MockExamTab = () => {
           )}
           <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={() => setCurrent((value) => Math.max(0, value - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
-            <button className="focus-ring" onClick={() => setCurrent((value) => Math.min(MOCK_TOTAL - 1, value + 1))} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Next</button>
+            <button
+              className="focus-ring"
+              onClick={() => {
+                if (current + 1 >= MOCK_TOTAL) {
+                  setFinished(true);
+                  return;
+                }
+                setCurrent((value) => Math.min(MOCK_TOTAL - 1, value + 1));
+              }}
+              style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}
+            >
+              {current + 1 >= MOCK_TOTAL ? "Finish paper" : "Next"}
+            </button>
           </div>
           <Card style={{ marginTop: 12, border: `1px solid ${finishConfirm ? "#ef4444" : "var(--card-border)"}`, background: finishConfirm ? "color-mix(in srgb, #ef4444 10%, var(--card-bg))" : "var(--panel-bg)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
