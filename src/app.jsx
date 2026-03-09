@@ -775,14 +775,6 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
           <span>{item.label}</span>
         </button>
       ))}
-      <button
-        className="focus-ring"
-        onClick={openQuickPanel}
-        style={{ border: "none", background: "none", color: "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: "pointer", minWidth: 54 }}
-      >
-        <span style={{ fontSize: 18 }}>⋯</span>
-        <span>Panel</span>
-      </button>
     </div>
   );
 };
