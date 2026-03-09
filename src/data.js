@@ -910,6 +910,10 @@ const ALL_QUIZ = [
 const TABS = [
   { id:"home",          label:"Home",         icon:"🏠" },
   { id:"quickrev",      label:"Quick Revise", icon:"↔️" },
+  { id:"daily10",       label:"Daily 10",     icon:"🔟" },
+  { id:"sprint",        label:"T/F Sprint",   icon:"⚡" },
+  { id:"cram",          label:"Cram Sheet",   icon:"📄" },
+  { id:"tracker",       label:"Tracker",      icon:"✅" },
   { id:"mock",          label:"Mock Test",    icon:"📝" },
   { id:"revise",        label:"Revise",       icon:"🧩" },
   { id:"timeline",      label:"Timeline",     icon:"📅" },

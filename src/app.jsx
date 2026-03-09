@@ -14,6 +14,9 @@ const STORAGE_KEYS = {
   recentMock: "lifeuk-recent-mock",
   recentRapid: "lifeuk-recent-rapid",
   recentQuickRev: "lifeuk-recent-quickrev",
+  recentDaily10: "lifeuk-recent-daily10",
+  recentSprint: "lifeuk-recent-sprint",
+  topicTracker: "lifeuk-topic-tracker",
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
 };
 
@@ -25,6 +28,10 @@ const SEO_COPY = {
     description: "Free Life in the UK test revision app with mock tests, practice questions, memory clues, history timeline, and UK citizenship study topics.",
   },
   quickrev: { title: "Quick Revision Cards | Life in the UK Test Practice" },
+  daily10: { title: "Daily 10 Revision | Life in the UK Test Practice" },
+  sprint: { title: "True or False Sprint | Life in the UK Test Practice" },
+  cram: { title: "One Page Cram Sheet | Life in the UK Test Practice" },
+  tracker: { title: "Topic Completion Tracker | Life in the UK Test Practice" },
   quiz: { title: "Quiz Practice | Life in the UK Test Practice" },
   mock: { title: "Mock Test | Life in the UK Test Practice" },
   rapidfire: { title: "Rapid Fire Revision | Life in the UK Test Practice" },
@@ -41,7 +48,7 @@ const SEO_COPY = {
 const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "quiz", "mock", "rapidfire", "timeline"];
 const PRIMARY_MOBILE_TABS = ["home", "quickrev", "quiz", "mock", "timeline"];
 const NAV_GROUPS = [
-  { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "quickrev", "quiz", "mock", "rapidfire", "revise"] },
+  { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "quickrev", "daily10", "sprint", "mock", "cram", "tracker", "quiz", "rapidfire", "revise"] },
   { title: "History & Society", hint: "Timeline, wars, nations, law, traps, landmarks", ids: ["timeline", "wars", "nations", "quickfacts", "confuse", "landmarks", "international"] },
   { title: "People & Culture", hint: "Figures, religion, inventors, sports, arts", ids: ["figures", "religion", "inventors", "sports", "arts", "anthem"] },
 ];
@@ -143,6 +150,89 @@ const COVERAGE_CONTEXT = {
   anthem: "Includes the national anthem, Union Jack parts, and identity facts that often appear as short memory questions.",
   international: "The biggest traps are Council of Europe vs EU and voluntary bodies vs military alliances.",
 };
+
+const CRAM_SECTIONS = [
+  {
+    title: "Anchor dates",
+    color: "#f97316",
+    facts: [
+      "43 AD = Roman invasion under Claudius",
+      "1066 = Battle of Hastings",
+      "1215 = Magna Carta",
+      "1534 = Henry VIII creates Church of England",
+      "1707 = Act of Union creates Great Britain",
+      "1948 = NHS begins",
+    ],
+  },
+  {
+    title: "4 nations",
+    color: "#3b82f6",
+    facts: [
+      "London, Edinburgh, Cardiff, Belfast",
+      "St George, St Andrew, St David, St Patrick",
+      "Rose, thistle, daffodil, shamrock",
+      "England has no separate parliament",
+      "Holyrood = 129 MSPs, Senedd = 60 SMs, Stormont = 90 MLAs",
+    ],
+  },
+  {
+    title: "Government and law",
+    color: "#22c55e",
+    facts: [
+      "Commons = elected, Lords = appointed",
+      "650 MPs in the House of Commons",
+      "Speaker chosen by secret ballot",
+      "Rule of law = everyone is subject to the law",
+      "Jury service and obeying the law are public duties",
+    ],
+  },
+  {
+    title: "Wars and history",
+    color: "#ef4444",
+    facts: [
+      "Trafalgar = Nelson = 1805",
+      "Waterloo = Wellington = 1815",
+      "WWI = 1914–18, Armistice = 11 November 1918",
+      "WWII = 1939–45, Churchill in war, Attlee after war",
+      "Battle of Britain = air battle, Blitz = bombing, Dunkirk = evacuation, D-Day = 1944 landing",
+    ],
+  },
+  {
+    title: "Religion and festivals",
+    color: "#a855f7",
+    facts: [
+      "2011 census: 59% Christian, 25% no religion, 4.8% Muslim",
+      "Christmas and Easter are main Christian festivals",
+      "Diwali = festival of lights",
+      "Vaisakhi = 14 April",
+      "Eid al-Fitr ends Ramadan",
+    ],
+  },
+  {
+    title: "People and places",
+    color: "#0ea5e9",
+    facts: [
+      "William the Conqueror = 1066, King John = Magna Carta",
+      "Emmeline Pankhurst = votes for women",
+      "Beveridge 1942, Bevan 1948 NHS",
+      "Big Ben = bell, not tower",
+      "Severn = longest in UK, Thames = longest in England",
+    ],
+  },
+];
+
+const TRACKER_SECTIONS = [
+  { id: "timeline", label: "History timeline", detail: "Dates, rulers, reforms, and era anchors", tab: "timeline", icon: "📅" },
+  { id: "wars", label: "Wars and battles", detail: "Battle names, dates, WWI and WWII", tab: "wars", icon: "⚔️" },
+  { id: "nations", label: "4 nations", detail: "Capitals, saints, flowers, parliaments", tab: "nations", icon: "🏴" },
+  { id: "quickfacts", label: "Government and law", detail: "Parliament, voting, rights, duties, daily life", tab: "quickfacts", icon: "⚖️" },
+  { id: "figures", label: "Key people", detail: "Rulers, reformers, wartime leaders, welfare figures", tab: "figures", icon: "👑" },
+  { id: "religion", label: "Religion and festivals", detail: "2011 census and key festival facts", tab: "religion", icon: "⛪" },
+  { id: "landmarks", label: "Landmarks and places", detail: "Palaces, walls, rivers, mountains, museums", tab: "landmarks", icon: "🏛️" },
+  { id: "international", label: "World organisations", detail: "UN, NATO, Commonwealth, Council of Europe", tab: "international", icon: "🌍" },
+  { id: "inventors", label: "Inventors and science", detail: "Web, TV, radar, penicillin, vaccines", tab: "inventors", icon: "💡" },
+  { id: "culture", label: "Arts, sports, symbols", detail: "Writers, festivals, sport, anthem, Union Jack", tab: "arts", icon: "🎭" },
+];
 
 const buildQuickFactContext = (section, factIndex) => {
   const previous = section.facts[factIndex - 1];
@@ -1090,7 +1180,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", fontWeight: 800, cursor: "pointer" }}>Mock Test</button>
-            <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>Quick Revise</button>
+            <button className="focus-ring" onClick={() => setActive("daily10")} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>Daily 10</button>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
@@ -1161,8 +1251,11 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
       <div className="study-mode-grid" style={{ display: "grid", gap: 10, marginBottom: 18 }}>
         {[
           { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
+          { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
+          { id: "sprint", icon: "⚡", title: "True/False Sprint", desc: "Fast mobile revision with simple true/false calls.", color: "#0ea5e9" },
           { id: "confuse", icon: "⚖️", title: "Compare Confusions", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
-          { id: "revise", icon: "🧩", title: "Revise Mistakes", desc: "Retry only the questions you previously got wrong.", color: "#ef4444" },
+          { id: "cram", icon: "📄", title: "One-Page Cram", desc: "Night-before summary of the highest-yield facts.", color: "#f59e0b" },
+          { id: "tracker", icon: "✅", title: "Topic Tracker", desc: "Mark what feels done and see full-course progress.", color: "#22c55e" },
           { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
         ].map((item) => (
           <button key={item.id} className="focus-ring" onClick={() => setActive(item.id)} style={{ background: "var(--card-bg)", border: `1px solid ${item.color}30`, borderRadius: 18, padding: 15, textAlign: "left", cursor: "pointer" }}>
@@ -1194,6 +1287,261 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
           </div>
         ))}
       </Card>
+    </div>
+  );
+};
+
+const DailyTenTab = () => {
+  const topics = useMemo(() => ["All", ...Array.from(new Set(ALL_QUIZ.map((item) => inferTopic(item))))], []);
+  const [topic, setTopic] = useState("All");
+  const [session, setSession] = useState([]);
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+
+  const buildSession = () => {
+    const pool = topic === "All" ? ALL_QUIZ : ALL_QUIZ.filter((item) => inferTopic(item) === topic);
+    const picked = pickRandomNoRepeat(pool, Math.min(10, pool.length), STORAGE_KEYS.recentDaily10, 80);
+    setSession(picked);
+    setIndex(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setFinished(false);
+  };
+
+  useEffect(() => {
+    buildSession();
+  }, [topic]);
+
+  if (!session.length) return null;
+
+  const question = session[index];
+  const next = () => {
+    if (index + 1 >= session.length) {
+      setFinished(true);
+      return;
+    }
+    setIndex((value) => value + 1);
+    setSelected(null);
+    setConfirmed(false);
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="🔟" meta="Fresh 10-question phone practice for short sessions.">Daily 10</SectionTitle>
+      {!finished ? (
+        <>
+          <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>Pick a topic and start fast</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>A new set is generated each time you change topic or restart.</div>
+              </div>
+              <Badge text={`${score}/${session.length}`} color="#10b981" />
+            </div>
+            <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 12 }}>
+              {topics.map((item) => <TabButton key={item} active={topic === item} onClick={() => setTopic(item)}>{item}</TabButton>)}
+            </div>
+            <button className="focus-ring" onClick={buildSession} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+              Refresh 10
+            </button>
+          </Card>
+          <Badge text={`${index + 1} of ${session.length}`} color="#64748b" />
+          <div style={{ height: 10 }} />
+          <QuestionCard question={question} selected={selected} confirmed={confirmed} onSelect={(choice) => {
+            if (confirmed) return;
+            setSelected(choice);
+            setConfirmed(true);
+            if (choice === question.a) setScore((value) => value + 1);
+          }} />
+          {confirmed && (
+            <>
+              <MemoryHook text={question.tip} />
+              <button className="focus-ring" onClick={next} style={{ width: "100%", marginTop: 12, padding: "12px 14px", borderRadius: 14, background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", fontWeight: 800, cursor: "pointer" }}>
+                {index + 1 >= session.length ? "See Daily 10 results" : "Next question"}
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <Card style={{ textAlign: "center", border: `2px solid ${score >= 8 ? "#22c55e" : "#f59e0b"}` }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>{score >= 8 ? "✅" : "📚"}</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 8 }}>Daily 10 complete</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 12 }}>{topic} practice set</div>
+          <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)", marginBottom: 16 }}>{score}/10</div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={buildSession} style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 12, padding: "10px 18px", fontWeight: 800, cursor: "pointer" }}>New 10</button>
+            <button className="focus-ring" onClick={() => setTopic("All")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 18px", cursor: "pointer" }}>All topics</button>
+          </div>
+        </Card>
+      )}
+    </div>
+  );
+};
+
+const CramSheetTab = () => (
+  <div style={{ padding: 20 }}>
+    <SectionTitle icon="📄" meta="Use this the night before the test or while waiting outside the test centre.">One-Page Cram Sheet</SectionTitle>
+    <Card style={{ background: "color-mix(in srgb, #f59e0b 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))" }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>How to use this page</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • Read this page top to bottom once<br />
+        • Focus on dates, compare traps, and names you still mix up<br />
+        • If one area feels weak, jump back to that full tab afterwards
+      </div>
+      <MemoryHook text="This page is for compression, not first-time learning. Use it to tighten what you already studied." />
+    </Card>
+    {CRAM_SECTIONS.map((section) => (
+      <Card key={section.title} style={{ border: `1px solid ${section.color}33` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 16 }}>{section.title}</div>
+          <Badge text={`${section.facts.length} checks`} color={section.color} />
+        </div>
+        {section.facts.map((fact, index) => (
+          <div key={fact} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.7, padding: "6px 0", borderBottom: index < section.facts.length - 1 ? "1px solid var(--card-border)" : "none" }}>
+            <span style={{ color: section.color, marginRight: 6 }}>▸</span>{fact}
+          </div>
+        ))}
+      </Card>
+    ))}
+  </div>
+);
+
+const TopicTrackerTab = ({ setActive }) => {
+  const [progress, setProgress] = useState(() => readStore(STORAGE_KEYS.topicTracker, {}));
+  const completed = TRACKER_SECTIONS.filter((item) => progress[item.id]).length;
+  const percent = Math.round((completed / TRACKER_SECTIONS.length) * 100);
+
+  const toggle = (id) => {
+    const next = { ...progress, [id]: !progress[id] };
+    setProgress(next);
+    writeStore(STORAGE_KEYS.topicTracker, next);
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="✅" meta="Track what feels done and what still needs another pass.">Topic Completion Tracker</SectionTitle>
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Full-course progress</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Simple local tracker stored on this device.</div>
+          </div>
+          <Badge text={`${completed}/${TRACKER_SECTIONS.length} complete`} color="#22c55e" />
+        </div>
+        <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 10, marginBottom: 8 }}>
+          <div style={{ background: "#22c55e", borderRadius: 999, height: "100%", width: `${percent}%` }} />
+        </div>
+        <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{percent}% complete</div>
+      </Card>
+      {TRACKER_SECTIONS.map((item) => (
+        <Card key={item.id} style={{ border: `1px solid ${progress[item.id] ? "#22c55e55" : "var(--card-border)"}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+            <div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.icon} {item.label}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{item.detail}</div>
+            </div>
+            <Badge text={progress[item.id] ? "Done" : "Open"} color={progress[item.id] ? "#22c55e" : "#64748b"} />
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={() => toggle(item.id)} style={{ background: progress[item.id] ? "color-mix(in srgb, #22c55e 12%, var(--card-bg))" : "var(--chip-bg)", color: progress[item.id] ? "#16a34a" : "var(--text)", border: `1px solid ${progress[item.id] ? "#22c55e" : "var(--card-border)"}`, borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+              {progress[item.id] ? "Mark as not done" : "Mark complete"}
+            </button>
+            <button className="focus-ring" onClick={() => setActive(item.tab)} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+              Open topic
+            </button>
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
+const TrueFalseSprintTab = () => {
+  const buildRound = () => pickRandomNoRepeat(ALL_QUIZ, 18, STORAGE_KEYS.recentSprint, 120).map((question, index) => {
+    const useTrue = index % 2 === 0;
+    const wrongOptions = question.opts.filter((_, optionIndex) => optionIndex !== question.a);
+    const displayed = useTrue ? question.opts[question.a] : wrongOptions[index % wrongOptions.length];
+    return {
+      ...question,
+      statement: `For this question, the correct answer is: ${displayed}`,
+      isTrue: useTrue,
+      shownAnswer: displayed,
+    };
+  });
+
+  const [round, setRound] = useState(() => buildRound());
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+
+  const current = round[index];
+
+  const restart = () => {
+    setRound(buildRound());
+    setIndex(0);
+    setSelected(null);
+    setScore(0);
+    setFinished(false);
+  };
+
+  const answer = (value) => {
+    if (selected !== null) return;
+    setSelected(value);
+    if (value === current.isTrue) setScore((s) => s + 1);
+    setTimeout(() => {
+      if (index + 1 >= round.length) {
+        setFinished(true);
+        return;
+      }
+      setIndex((v) => v + 1);
+      setSelected(null);
+    }, 1100);
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="⚡" meta="Very fast mobile revision. Read the statement and call it true or false.">True / False Sprint</SectionTitle>
+      {!finished ? (
+        <>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <Badge text={`${index + 1}/${round.length}`} color="#64748b" />
+            <Badge text={`Score ${score}`} color="#22c55e" />
+          </div>
+          <Card style={{ border: "1px solid #1e3a5f", background: "linear-gradient(180deg, rgba(15,23,42,0.92), rgba(8,12,20,0.94))" }}>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>{current.q}</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, lineHeight: 1.6 }}>{current.statement}</div>
+          </Card>
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "1fr 1fr" }}>
+            <button className="focus-ring" onClick={() => answer(true)} style={{ padding: "14px 16px", borderRadius: 14, border: "1px solid #22c55e", background: selected === true ? "#0f1f0f" : "color-mix(in srgb, #22c55e 10%, var(--card-bg))", color: "#16a34a", fontWeight: 800, cursor: "pointer" }}>True</button>
+            <button className="focus-ring" onClick={() => answer(false)} style={{ padding: "14px 16px", borderRadius: 14, border: "1px solid #ef4444", background: selected === false ? "#220d0d" : "color-mix(in srgb, #ef4444 10%, var(--card-bg))", color: "#dc2626", fontWeight: 800, cursor: "pointer" }}>False</button>
+          </div>
+          {selected !== null && (
+            <Card style={{ border: `1px solid ${selected === current.isTrue ? "#22c55e" : "#ef4444"}` }}>
+              <div style={{ color: selected === current.isTrue ? "#16a34a" : "#dc2626", fontWeight: 800, marginBottom: 6 }}>
+                {selected === current.isTrue ? "Correct" : "Incorrect"}
+              </div>
+              <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.7 }}>
+                Correct answer: {current.opts[current.a]}
+              </div>
+              <MemoryHook text={current.tip} />
+            </Card>
+          )}
+        </>
+      ) : (
+        <Card style={{ textAlign: "center", border: `2px solid ${score >= 14 ? "#22c55e" : "#f59e0b"}` }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>{score >= 14 ? "⚡" : "📚"}</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 8 }}>Sprint finished</div>
+          <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)", marginBottom: 16 }}>{score}/{round.length}</div>
+          <button className="focus-ring" onClick={restart} style={{ background: "#0ea5e9", color: "#fff", border: "none", borderRadius: 12, padding: "10px 18px", fontWeight: 800, cursor: "pointer" }}>
+            New sprint
+          </button>
+        </Card>
+      )}
     </div>
   );
 };
@@ -3321,6 +3669,10 @@ const App = () => {
     switch (active) {
       case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
+      case "daily10": return <DailyTenTab />;
+      case "sprint": return <TrueFalseSprintTab />;
+      case "cram": return <CramSheetTab />;
+      case "tracker": return <TopicTrackerTab setActive={navigateTo} />;
       case "timeline": return <TimelineTab />;
       case "wars": return <WarsTab />;
       case "nations": return <NationsTab />;
