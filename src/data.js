@@ -178,6 +178,14 @@ const SPORTS_STARS = [
   { name:"Sir Francis Drake", sport:"Exploration 🌍", icon:"⚓", achievement:"Co-commanded defeat of Spanish Armada (1588). First Englishman to circumnavigate the world. Ship = Golden Hind.", memory:"Drake = Armada + circumnavigation. Golden Hind was his ship.", year:"1580s" },
 ];
 
+const SPORTS_FACTS = [
+  { name:"Wimbledon Championships", icon:"🎾", fact:"Oldest tennis tournament in the world. Played at Wimbledon, London, and strongly linked with Andy Murray's 2013 win.", memory:"Wimbledon = oldest tennis tournament. Murray = 2013 British men's winner." },
+  { name:"FA Cup", icon:"⚽", fact:"Oldest football competition in the world. Handbook-style questions often use it as the key football competition fact.", memory:"FA Cup = football's oldest cup competition." },
+  { name:"Grand National", icon:"🐎", fact:"Famous horse race run at Aintree, near Liverpool. Easy to confuse with Formula 1 or boat race questions.", memory:"Grand National = horses at Aintree." },
+  { name:"The Boat Race", icon:"🚣", fact:"Annual rowing race between Oxford and Cambridge universities on the River Thames in London.", memory:"Boat Race = Oxford vs Cambridge on the Thames." },
+  { name:"London Marathon", icon:"🏃", fact:"Major annual marathon and charity event, closely associated with elite racing and mass public fundraising.", memory:"London Marathon = running + charity." },
+];
+
 // ── CONFUSABLES ──────────────────────────────────────────────
 const CONFUSABLES = [
   { title:"Great Britain vs United Kingdom", icon:"🗺️",
@@ -267,6 +275,7 @@ const RELIGIONS = [
 
 const FESTIVALS = [
   { name:"Christmas", date:"25 Dec", faith:"Christian 🎄", detail:"Birth of Jesus. Gift-giving, family meals. Boxing Day = 26 Dec (also a public holiday)." },
+  { name:"Boxing Day", date:"26 Dec", faith:"UK tradition 🎁", detail:"Public holiday on the day after Christmas. Often remembered together with Christmas in handbook-style revision." },
   { name:"Easter", date:"Mar/Apr", faith:"Christian 🐣", detail:"Good Friday = death of Jesus. Easter Sunday = resurrection. Hot cross buns, Easter eggs." },
   { name:"Diwali", date:"Oct/Nov", faith:"Hindu & Sikh 🪔", detail:"'Festival of Lights' — good over evil. Famous celebration in Leicester." },
   { name:"Hanukkah", date:"Nov/Dec", faith:"Jewish ✡️", detail:"8 days. Celebrates Jews' struggle for religious freedom." },
@@ -397,6 +406,7 @@ const ARTS = {
   literature:[
     { who:"William Shakespeare", what:"Playwright, actor, poet — Hamlet, Macbeth, Romeo & Juliet, A Midsummer Night's Dream, 154 sonnets. Born Stratford-upon-Avon.", mem:"Born + died 23 April (St George's Day). Sonnets = 14 lines." },
     { who:"Geoffrey Chaucer", what:"Canterbury Tales — pilgrims travelling from London to Canterbury. Medieval English poetry.", mem:"Chaucer = Canterbury Tales = pilgrims London→Canterbury." },
+    { who:"Sir Walter Scott", what:"Scottish novelist and poet — Ivanhoe, Rob Roy, The Heart of Midlothian. Strong Scotland literature anchor.", mem:"Walter Scott = Scottish novels + poetry. Think Edinburgh + Scotland's literary tradition." },
     { who:"John Milton", what:"Paradise Lost — Protestant epic poem inspired by religious views.", mem:"Milton = Paradise Lost = Protestant epic poem." },
     { who:"Jane Austen", what:"Pride and Prejudice, Sense and Sensibility, Emma — social observation and romance.", mem:"Austen = Pride and Prejudice. Social + romance. 19th century." },
     { who:"Charles Dickens", what:"Oliver Twist, A Christmas Carol, Great Expectations — highlighted Victorian poverty.", mem:"Dickens = Victorian poverty. Oliver Twist. Christmas Carol." },
@@ -456,6 +466,7 @@ const ARTS = {
   ],
   film:[
     { who:"Charlie Chaplin", what:"British silent film actor. 'The Tramp' character. Career in Hollywood.", mem:"Chaplin = British silent film = The Tramp." },
+    { who:"Sir Laurence Olivier", what:"Major British actor and director, especially famous for Shakespeare on stage and screen. Important 20th-century theatre and film figure.", mem:"Laurence Olivier = Shakespeare + classic British theatre and film." },
     { who:"Sir Alfred Hitchcock", what:"'Master of Suspense'. The 39 Steps, Psycho, The Birds, Vertigo. British director.", mem:"Hitchcock = Master of Suspense. British director." },
     { who:"David Lean", what:"Directed Brief Encounter and Lawrence of Arabia.", mem:"David Lean = Lawrence of Arabia." },
     { who:"Carol Reed", what:"Directed The Third Man.", mem:"Carol Reed = The Third Man." },

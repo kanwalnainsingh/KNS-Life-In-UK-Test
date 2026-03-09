@@ -1723,7 +1723,7 @@ const InventorsTab = () => {
 // ── SPORTS ───────────────────────────────────────────────────
 const SportsTab = () => (
   <div style={{ padding: 20 }}>
-    <SectionTitle icon="🏅" meta="Use a few anchor names and dates rather than trying to memorise every sporting detail.">British Sports Stars</SectionTitle>
+    <SectionTitle icon="🏅" meta="Use event anchors first, then attach the star names and dates to them.">British Sport & Sports Stars</SectionTitle>
     <Card style={{ background: "#0f1f0f", border: "1px solid #166534", marginBottom: 16 }}>
       <div style={{ fontWeight: 800, color: "#4ade80", marginBottom: 8 }}>🏟️ Olympics Key Facts</div>
       <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.8 }}>
@@ -1732,6 +1732,17 @@ const SportsTab = () => (
         • Scotland has 5 ski resorts
       </div>
       <MemoryHook text="Three times: 1908, 1948, 2012." />
+    </Card>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Classic sports event anchors</div>
+      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+        • `Wimbledon` = oldest tennis tournament in the world<br />
+        • `FA Cup` = oldest football competition in the world<br />
+        • `Grand National` = horse race at Aintree<br />
+        • `Boat Race` = Oxford vs Cambridge on the Thames<br />
+        • `London Marathon` = major charity and mass-participation race
+      </div>
+      <MemoryHook text="If the question is about British sport rather than a person, think event first: Wimbledon, FA Cup, Grand National, Boat Race." />
     </Card>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
       <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Quick sports recall</div>
@@ -1743,6 +1754,18 @@ const SportsTab = () => (
       </div>
       <MemoryHook text="2012 Olympics is the easiest sports memory spine: Farah, Ennis-Hill, Wiggins, then Murray in 2013." />
     </Card>
+    {SPORTS_FACTS.map((item) => (
+      <Card key={item.name}>
+        <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ fontSize: 28, flexShrink: 0 }}>{item.icon}</div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15, marginBottom: 4 }}>{item.name}</div>
+            <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{item.fact}</div>
+            <MemoryHook text={item.memory} />
+          </div>
+        </div>
+      </Card>
+    ))}
     {SPORTS_STARS.map((s, i) => (
       <Card key={i}>
         <div style={{ display: "flex", gap: 12 }}>
@@ -1882,6 +1905,7 @@ const ReligionTab = () => (
       <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Festival memory clues</div>
       <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
         • `Christmas` and `Easter` are the main Christian festivals<br />
+        • `Boxing Day` = 26 December public holiday after Christmas<br />
         • `Diwali` = festival of lights<br />
         • `Vaisakhi` = Sikh New Year / Khalsa<br />
         • `Hanukkah` = Jewish festival of lights<br />
@@ -2010,6 +2034,17 @@ const ArtsTab = () => {
           • `BAFTA` = British film and television awards
         </div>
         <MemoryHook text="If you forget an arts fact, first place it under literature, music, art, architecture, fashion, or film." />
+      </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Arts places and event anchors</div>
+        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
+          • `Stratford-upon-Avon` = Shakespeare<br />
+          • `Royal Albert Hall` = BBC Proms<br />
+          • `Edinburgh` = Fringe, largest arts festival in the world<br />
+          • `West End` = The Mousetrap since 1952<br />
+          • `Liverpool` = Beatles
+        </div>
+        <MemoryHook text="A lot of arts questions become easy if you remember the place or event attached to the person." />
       </Card>
       {(ARTS[active] || []).map((item, i) => (
         <Card key={i}>
