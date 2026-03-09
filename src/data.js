@@ -91,7 +91,7 @@ const TIMELINE = [
   { year:"1998", era:"Modern", event:"Good Friday Agreement — Northern Ireland peace deal. NI Assembly (Stormont) created. Human Rights Act also passed.", icon:"🤝", color:"#065f46", memory:"Good Friday Agreement = 1998 = NI peace = Assembly at Stormont." },
   { year:"1999", era:"Modern", event:"Devolution — Scottish Parliament (Holyrood) and Welsh Senedd (Cardiff Bay) formally open. Hereditary peers lose automatic right to House of Lords.", icon:"🏛️", color:"#6d28d9", memory:"Devolution = 1999. Scotland → Holyrood. Wales → Senedd." },
   { year:"2009", era:"Modern", event:"UK Supreme Court established — highest court in the land, replacing Law Lords in Parliament. UK leaves Iraq.", icon:"⚖️", color:"#1e293b", memory:"Supreme Court = 2009. Highest court." },
-  { year:"2010", era:"Modern", event:"No party wins election — Conservative + Liberal Democrats form coalition government under David Cameron.", icon:"🗳️", color:"#0369a1", memory:"2010 = coalition govt = Cameron (Conservatives + Lib Dems)." },
+  { year:"2010", era:"Modern", event:"No party wins election — Conservative + Liberal Democrats form coalition government under David Cameron. Equality Act 2010 passed — protects 9 characteristics from discrimination.", icon:"🗳️", color:"#0369a1", memory:"2010 = coalition govt = Cameron (Conservatives + Lib Dems). Equality Act = 9 protected characteristics." },
   { year:"2012", era:"Modern", event:"London Olympics — UK's 3rd time hosting (1908, 1948, 2012). Stratford, East London. UK finishes 3rd in medal table.", icon:"🏅", color:"#b45309", memory:"2012 Olympics = Stratford, East London. UK 3rd in medals." },
   { year:"2016", era:"Modern", event:"Brexit Referendum — UK votes to leave the European Union.", icon:"🗳️", color:"#dc2626", memory:"Brexit Referendum = 2016. Leave vote wins." },
   { year:"2020", era:"Modern", event:"UK leaves the European Union (Brexit complete).", icon:"🇬🇧", color:"#dc2626", memory:"2020 = UK officially leaves EU. Brexit complete." },
@@ -256,6 +256,9 @@ const LANDMARKS = [
   { name:"Bodant Gardens 🌸", where:"Wales", fact:"Famous gardens in Wales.", trap:"Bodant Gardens = Wales." },
   { name:"Millennium Stadium 🏟️", where:"Cardiff, Wales", fact:"Major sports stadium in Cardiff, Wales.", trap:"Millennium Stadium = Cardiff = Wales." },
   { name:"Jodrell Bank 🔭", where:"Cheshire, England", fact:"World-famous radio telescope observatory built by Sir Bernard Lovell. Made major astronomy discoveries.", trap:"Jodrell Bank = Cheshire = radio telescope = Sir Bernard Lovell." },
+  { name:"Windsor Castle 🏰", where:"Berkshire, England", fact:"Official royal residence outside London. Oldest and largest occupied castle in the world. Used for state occasions and royal weekends. Royal family's weekend home.", trap:"Windsor Castle = BERKSHIRE. Weekend/ceremonial. Buckingham Palace = official LONDON home of monarch." },
+  { name:"British Museum 🏛️", where:"Bloomsbury, London", fact:"One of the world's greatest museums — FREE to visit. Holds the Rosetta Stone (key to deciphering Egyptian hieroglyphics) and the Elgin Marbles. Founded 1753.", trap:"Rosetta Stone = British Museum, London. Free entry. Founded 1753." },
+  { name:"River Severn 🌊", where:"Wales → England", fact:"LONGEST river in the UK — 354 km. Flows from Wales through the West Midlands and into the Bristol Channel. The Thames (346 km) is the LONGEST in ENGLAND.", trap:"Severn = longest in UK. Thames = longest in ENGLAND only. Different questions!" },
 ];
 
 // ── INTERNATIONAL ORGANISATIONS ──────────────────────────────
@@ -290,6 +293,7 @@ const KEY_FIGURES = [
   { name:"Dr Ludwig Guttmann", role:"Paralympic founder 1899–1980", icon:"🦽", color:"#059669", facts:["German-Jewish refugee who came to Britain in 1939","Founded Paralympic movement at Stoke Mandeville hospital, Buckinghamshire","First Stoke Mandeville Games 1948. Paralypmics = his legacy."] },
   { name:"Sir Edmund Halley", role:"Astronomer 1656–1742", icon:"☄️", color:"#6d28d9", facts:["Member of the Royal Society (founded by Charles II)","Predicted the return of Halley's Comet","Worked closely with Isaac Newton"] },
   { name:"James Cook", role:"Explorer 1728–1779", icon:"🗺️", color:"#0891b2", facts:["Mapped the coast of Australia","Made three voyages of exploration in the Pacific","Claimed Australia for Britain"] },
+  { name:"Stephen Hawking", role:"Cosmologist 1942–2018", icon:"🌌", color:"#1e293b", facts:["Theoretical physicist and cosmologist at Cambridge University","Wrote A Brief History of Time (1988) — sold 10 million+ copies","Suffered from ALS/motor neurone disease but continued groundbreaking work on black holes and the universe"] },
 ];
 
 // ── ARTS & CULTURE ───────────────────────────────────────────
@@ -409,6 +413,7 @@ const QUICK_FACTS = [
     "Civil: High Court (Eng/Wales/NI) or Court of Session, Edinburgh (Scotland)",
     "Habeas Corpus = cannot be imprisoned without charge (law since 1679)",
     "UK Supreme Court = highest court. Established 2009.",
+    "Equality Act 2010 — protects 9 characteristics: age, disability, gender reassignment, marriage/civil partnership, pregnancy, race, religion/belief, sex, sexual orientation",
   ]},
   { cat:"Rights & Everyday Life", icon:"🏅", color:"#f43f5e", facts:[
     "UK, Commonwealth AND Irish citizens in UK can vote in ALL elections",
@@ -662,6 +667,21 @@ const ALL_QUIZ = [
   { q:"What does Britannia symbolise?", opts:["Scotland","The whole of Britain — a female figure with shield and trident","Wales","Northern Ireland"], a:1, tip:"💡 Good to know — Britannia = female personification of Britain. Appears on coins. Helmet + trident + shield." },
   { q:"Where is the official London residence of the monarch?", opts:["10 Downing Street","Windsor Castle","Buckingham Palace","Tower of London"], a:2, tip:"⭐ Exam favourite — Buckingham Palace = London. Windsor Castle = weekend/ceremonial. 10 Downing Street = PM." },
   { q:"What is the Cenotaph used for?", opts:["Royal weddings","Remembrance Day ceremony — honouring war dead","Parliament opening","Olympic ceremonies"], a:1, tip:"📌 Often tested — Cenotaph = Whitehall = Remembrance Day (11 Nov). PM + monarch lay wreaths. 🌺" },
+  // ── FROM STUDY EXPORT (new facts & mock test questions) ─────
+  { q:"How many jurors sit in a Crown Court jury in England, Wales or N. Ireland?", opts:["6","9","12","15"], a:2, tip:"⭐ Exam favourite — Crown Court jury = 12 people. Scotland (Sheriff Court) = up to 15. Jurors must be on the electoral register aged 18–70." },
+  { q:"What is the longest river in the UK?", opts:["River Thames","River Severn","River Tyne","River Clyde"], a:1, tip:"⭐ Exam favourite — River Severn = longest in UK (354 km, flows Wales→England). Thames = longest in ENGLAND only (346 km)." },
+  { q:"What is the current voting age in the UK?", opts:["16","17","18","21"], a:2, tip:"⭐ Exam favourite — Voting age = 18 (lowered from 21 to 18 in 1969). Both men and women." },
+  { q:"What is the FA Cup?", opts:["An athletics competition","The oldest football competition in the world","A rugby league cup","A cycling championship"], a:1, tip:"📌 Often tested — FA Cup = oldest football competition in the world. Any English team can enter (from non-league to Premier League)." },
+  { q:"Windsor Castle is used as what?", opts:["The Prime Minister's residence","A museum only","The monarch's official residence outside London — weekends and state occasions","The Houses of Parliament overflow"], a:2, tip:"📌 Often tested — Windsor Castle = Berkshire = monarch's WEEKEND/ceremonial home. Buckingham Palace = official LONDON residence." },
+  { q:"What is the River Thames known for?", opts:["UK's longest river","Longest river in England only","Starting in Scotland","Flowing north to south"], a:1, tip:"📌 Often tested — Thames = longest river in ENGLAND (346 km). The Severn (354 km) is longer and crosses into Wales = UK's longest." },
+  { q:"Which Act protects people from discrimination based on age, race, disability, and other characteristics?", opts:["Human Rights Act 1998","Freedom Act 2000","Equality Act 2010","Civil Rights Act 2005"], a:2, tip:"⭐ Exam favourite — Equality Act 2010 = protects 9 characteristics including age, disability, race, religion, sex. Replaced earlier discrimination laws." },
+  { q:"What is the capital city of Scotland?", opts:["Glasgow","Stirling","Aberdeen","Edinburgh"], a:3, tip:"📌 Often tested — Edinburgh = capital of Scotland. Glasgow = largest city. Scottish Parliament = Holyrood, Edinburgh." },
+  { q:"What is the capital city of Wales?", opts:["Swansea","Newport","Cardiff","Bangor"], a:2, tip:"📌 Often tested — Cardiff = capital of Wales. Welsh Parliament (Senedd) = Cardiff Bay." },
+  { q:"What is the capital city of Northern Ireland?", opts:["Derry","Londonderry","Armagh","Belfast"], a:3, tip:"📌 Often tested — Belfast = capital of Northern Ireland. NI Assembly (Stormont) meets in Belfast." },
+  { q:"Stephen Hawking was famous for work in which field?", opts:["Chemistry and molecules","Theoretical physics and cosmology (black holes, universe)","Marine biology","Quantum computing"], a:1, tip:"💡 Good to know — Stephen Hawking = Cambridge cosmologist. A Brief History of Time = 1988. Studied black holes and the Big Bang despite severe disability." },
+  { q:"What does the British Museum hold?", opts:["Only British exhibits","The Crown Jewels","World artefacts including the Rosetta Stone — free to visit","Military vehicles and aircraft"], a:2, tip:"💡 Good to know — British Museum = Bloomsbury, London. FREE entry. Holds Rosetta Stone (key to Egyptian hieroglyphics), Elgin Marbles. Founded 1753." },
+  { q:"What is 10 Downing Street?", opts:["The monarch's London home","The Prime Minister's official residence","The Home Office","The Supreme Court"], a:1, tip:"⭐ Exam favourite — 10 Downing Street = Prime Minister's official residence in London. Chancellor of Exchequer lives at No. 11." },
+  { q:"The Bank of England is the UK's…?", opts:["Biggest high street bank","Central bank — manages monetary policy and issues banknotes","Investment bank","A museum about money"], a:1, tip:"📌 Often tested — Bank of England = UK's central bank. Sets interest rates. Issues banknotes. Located in the City of London." },
 ];
 
 // ── TABS ─────────────────────────────────────────────────────

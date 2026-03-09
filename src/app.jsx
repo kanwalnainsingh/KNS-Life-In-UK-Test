@@ -579,7 +579,7 @@ const QuizTab = () => {
     advanceRef.current = setTimeout(() => {
       if (current + 1 >= questions.length) { setFinished(true); return; }
       setCurrent(c => c + 1); setSelected(null); setConfirmed(false);
-    }, 1500);
+    }, 2500);
   };
   useEffect(() => { return () => { if (advanceRef.current) clearTimeout(advanceRef.current); }; }, []);
   const skipToNext = () => {
