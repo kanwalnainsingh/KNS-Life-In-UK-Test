@@ -81,6 +81,21 @@ const readStore = (key, fallback) => {
   }
 };
 
+const forceLatestAppReload = async () => {
+  try {
+    if ("caches" in window) {
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+    }
+  } catch (err) {
+    // Ignore cache API failures and still force a hard reload path.
+  }
+
+  const target = new URL(window.location.href);
+  target.searchParams.set("refresh", String(Date.now()));
+  window.location.replace(target.toString());
+};
+
 const writeStore = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
@@ -864,7 +879,7 @@ const buildMockCategoryBreakdown = (questions, answers) =>
     .filter((row) => row.total > 0);
 
 // ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, onBack, canGoBack, openQuickPanel }) => {
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, onBack, canGoBack, openQuickPanel, onForceRefresh }) => {
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === "Escape") setMenuOpen(false);
@@ -892,6 +907,15 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
           🇬🇧 Life in the UK
         </button>
         <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
+          <button
+            aria-label="Get latest app version"
+            className="focus-ring"
+            onClick={onForceRefresh}
+            title="Reload latest version"
+            style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 13, fontWeight: 800 }}
+          >
+            ↻ Latest
+          </button>
           <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
             style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none", padding: "6px 10px", borderRadius: 999, border: "1px solid var(--card-border)", background: "var(--card-bg)", whiteSpace: "nowrap" }}>
             ⭐ GitHub
@@ -1032,6 +1056,9 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory }) => {
           <Badge text="45 minutes" color="#10b981" />
           <Badge text="75% to pass" color="#f59e0b" />
           <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
+        </div>
+        <div style={{ color: "var(--hero-copy)", fontSize: 12, lineHeight: 1.6, marginTop: 10 }}>
+          Not seeing the newest changes on your phone? Use the <strong>↻ Latest</strong> button in the header to force a fresh reload.
         </div>
       </Card>
 
@@ -2883,7 +2910,7 @@ const App = () => {
 
   return (
     <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 88 : 0 }}>
-      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} onBack={handleBack} canGoBack={tabHistory.length > 0} openQuickPanel={() => setQuickPanelOpen(true)} />
+      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} onBack={handleBack} canGoBack={tabHistory.length > 0} openQuickPanel={() => setQuickPanelOpen(true)} onForceRefresh={forceLatestAppReload} />
       <div className="tabcontent">{renderTab()}</div>
       <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>
         Open Source — Share Freely ·{" "}
