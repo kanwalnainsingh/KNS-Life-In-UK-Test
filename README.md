@@ -2,6 +2,10 @@
 
 Mobile-first revision app for the UK citizenship test. It is built to help learners revise quickly, compare confusing facts, and practise under exam-style conditions without wading through long pages.
 
+## Live site
+
+[Open the study app](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
+
 ## What is in the app
 
 - `Quick Revise` flash cards for left/right tap revision and fast fact recall
@@ -37,7 +41,12 @@ The content is organised so the major official handbook areas are not skipped:
 - government, law, and your role as a citizen
 - geography, landmarks, symbols, religion, arts, sport, and notable people
 
-Current validated quiz bank: `223` questions.
+Current validated quiz bank: `236` questions.
+
+## Useful links
+
+- Live app: `https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/`
+- Official test guide: `https://www.gov.uk/life-in-the-uk-test`
 
 ## Screenshots
 
