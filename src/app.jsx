@@ -13,6 +13,7 @@ const STORAGE_KEYS = {
   recentQuiz: "lifeuk-recent-quiz",
   recentMock: "lifeuk-recent-mock",
   recentRapid: "lifeuk-recent-rapid",
+  recentQuickRev: "lifeuk-recent-quickrev",
 };
 
 const SEO_COPY = {
@@ -474,6 +475,11 @@ const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
   const updatedRecent = [...picked.map((item) => item.q), ...recent].filter((value, index, arr) => arr.indexOf(value) === index).slice(0, recentLimit);
   writeStore(storageKey, updatedRecent);
   return picked;
+};
+
+const pickQuickRevisionCards = (items, count) => {
+  const prepared = items.map((item, index) => ({ ...item, q: `${item.topic}|${item.front}|${index}` }));
+  return pickRandomNoRepeat(prepared, count, STORAGE_KEYS.recentQuickRev, 220).map(({ q, ...item }) => item);
 };
 
 // ── HELPERS ──────────────────────────────────────────────────
@@ -1004,57 +1010,58 @@ const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
   const topics = useMemo(() => ["All", ...Array.from(new Set(deck.map((item) => item.topic)))], [deck]);
   const [topic, setTopic] = useState("All");
+  const [sessionSize, setSessionSize] = useState(12);
+  const [session, setSession] = useState([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const touchStartRef = useRef(null);
+  const [completed, setCompleted] = useState(0);
+  const [againCount, setAgainCount] = useState(0);
   const filteredDeck = useMemo(() => topic === "All" ? deck : deck.filter((item) => item.topic === topic), [deck, topic]);
-  const current = filteredDeck[index] || filteredDeck[0];
+  const current = session[index];
 
-  const move = (direction) => {
-    setIndex((value) => {
-      if (!filteredDeck.length) return 0;
-      if (direction === "next") return (value + 1) % filteredDeck.length;
-      return (value - 1 + filteredDeck.length) % filteredDeck.length;
-    });
+  const startSession = () => {
+    const picked = pickQuickRevisionCards(filteredDeck, sessionSize);
+    setSession(picked);
+    setIndex(0);
+    setCompleted(0);
+    setAgainCount(0);
     setRevealed(false);
   };
 
-  const jumpRandom = () => {
-    if (!filteredDeck.length) return;
-    setIndex(Math.floor(Math.random() * filteredDeck.length));
+  const moveToNext = () => {
+    setIndex((value) => value + 1);
+    setCompleted((value) => value + 1);
     setRevealed(false);
   };
 
-  const onTouchStart = (event) => {
-    touchStartRef.current = event.changedTouches[0].clientX;
+  const markAgain = () => {
+    if (!current) return;
+    setSession((items) => [...items, current]);
+    setAgainCount((value) => value + 1);
+    moveToNext();
   };
 
-  const onTouchEnd = (event) => {
-    if (touchStartRef.current === null) return;
-    const delta = event.changedTouches[0].clientX - touchStartRef.current;
-    if (Math.abs(delta) > 45) move(delta < 0 ? "next" : "prev");
-    touchStartRef.current = null;
-  };
+  const markGotIt = () => moveToNext();
+
+  const remaining = Math.max(session.length - index, 0);
+  const isFinished = session.length > 0 && index >= session.length;
 
   useEffect(() => {
-    setIndex(0);
-    setRevealed(false);
-  }, [topic]);
-
-  if (!current) return null;
+    startSession();
+  }, [topic, sessionSize]);
 
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="↔️" meta="Bigger revision deck with answer, context, and memory clue on every card.">Quick Revision</SectionTitle>
+      <SectionTitle icon="↔️" meta="Short fresh sessions for when you only have a few minutes.">Quick Revision</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
-        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Rapid revision with more detail</div>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Fresh rapid revision</div>
         <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
-          Read the prompt first, then reveal the answer, context, and memory clue when you are ready. Filter by topic if you want focused revision.
+          Start a small session, get a fresh mix of facts, reveal the answer only when you want it, then choose whether the card should come back again later.
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
-          <Badge text={`${filteredDeck.length} in view`} color="#3b82f6" />
-          <Badge text="Answer + context + memory" color="#22c55e" />
+          <Badge text={`${filteredDeck.length} in topic pool`} color="#3b82f6" />
+          <Badge text="Fresh mix each session" color="#22c55e" />
         </div>
       </Card>
       <Card>
@@ -1062,15 +1069,43 @@ const QuickRevisionTab = ({ setActive }) => {
         <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto" }}>
           {topics.map((item) => <TabButton key={item} active={topic === item} onClick={() => setTopic(item)}>{item}</TabButton>)}
         </div>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, margin: "12px 0 8px" }}>Session length</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {[12, 24, 40].map((count) => (
+            <TabButton key={count} active={sessionSize === count} onClick={() => setSessionSize(count)}>
+              {count === 12 ? "Few mins" : count === 24 ? "Medium" : "Deep"}
+            </TabButton>
+          ))}
+          <button className="focus-ring" onClick={startSession} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>
+            New mix
+          </button>
+        </div>
       </Card>
+      {isFinished ? (
+        <Card style={{ textAlign: "center", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
+          <div style={{ fontSize: 42, marginBottom: 8 }}>✅</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 6 }}>Session complete</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
+            You went through {completed} cards. {againCount > 0 ? `${againCount} cards were marked to come back again later.` : "No cards were marked for repeat."}
+          </div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={startSession} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>Start new mix</button>
+            <button className="focus-ring" onClick={() => setActive(topic === "All" ? "home" : "quickfacts")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Back to topics</button>
+          </div>
+        </Card>
+      ) : current && (
+      <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-        <button className="focus-ring" onClick={() => move("prev")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>← Previous</button>
-        <button className="focus-ring" onClick={() => setRevealed((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{revealed ? "Hide answer" : "Show answer"}</button>
-        <button className="focus-ring" onClick={jumpRandom} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Random</button>
-        <button className="focus-ring" onClick={() => move("next")} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>Next →</button>
-        <div style={{ marginLeft: "auto" }}><Badge text={`${index + 1} / ${filteredDeck.length}`} color={current.color} /></div>
+        <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
+        <Badge text={`${remaining} left`} color="#64748b" />
+        <Badge text={`${completed} done`} color="#22c55e" />
+        {againCount > 0 && <Badge text={`${againCount} repeat later`} color="#f59e0b" />}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <button className="focus-ring" onClick={startSession} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>New mix</button>
+          <button className="focus-ring" onClick={() => setRevealed((v) => !v)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>{revealed ? "Hide answer" : "Show answer"}</button>
+        </div>
       </div>
-      <Card className="quick-revision-card" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <Card className="quick-revision-card" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
           <Badge text={current.topic} color={current.color} />
           <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{revealed ? "Answer shown" : "Question only"}</div>
@@ -1100,6 +1135,19 @@ const QuickRevisionTab = ({ setActive }) => {
           )}
         </div>
       </Card>
+      {revealed && (
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+          <button className="focus-ring" onClick={markAgain} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Again later</button>
+          <button className="focus-ring" onClick={markGotIt} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#15803d", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Got it</button>
+        </div>
+      )}
+      {!revealed && (
+        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7, marginBottom: 12 }}>
+          Use this like a quick self-test: think first, reveal the answer, then choose whether it should come back again later.
+        </div>
+      )}
+      </>
+      )}
       <Card>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Coverage checklist</div>
         <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
