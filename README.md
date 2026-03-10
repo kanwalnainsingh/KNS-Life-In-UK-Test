@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 326 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.14.2`
+Current release: `v1.14.3`
 
 ---
 
@@ -66,7 +66,7 @@ UI stack now uses:
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
 | ↔️ Quick Revise | Session-first quick revision with `5/10/15 min` runs, `Fresh mix`, `Pass core`, `Weak areas`, `Common traps`, `Dates`, and `4 Nations` focuses |
 | 📚 Story Mode | Chronological chapter-by-chapter revision for the main history and modern-Britain story |
-| 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions |
+| 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
 | 📄 Cram Sheet | One-page night-before summary |
 | ✅ Tracker | Full-course completion tracker stored on device |
@@ -91,6 +91,14 @@ UI stack now uses:
 ## 🧠 What’s New
 
 - Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
+- Bottom mobile navigation now keeps the main study flow visible:
+  - `Home`
+  - `Revise`
+  - `Quiz`
+  - `Mock`
+  - `Menu`
+- The bottom nav now highlights the correct parent area when you are inside related study modes like `Story`, `Daily 10`, `Rapid Fire`, or `Revise Mistakes`
+- Long mobile pages now include both `Top` and `End` floating scroll helpers
 - UI migration to Tailwind CSS plus shadcn-style reusable primitives for cards, buttons, badges, progress, and sheets
 - Class-based dark mode now initializes before render and respects system preference when no saved choice exists
 - Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
@@ -101,6 +109,11 @@ UI stack now uses:
   - `Fresh mix`, `Pass core`, `Weak areas`, `Common traps`, `Dates`, and `4 Nations` focuses
   - session continuity across refreshes
   - `Hard / Okay / Easy` feedback so weaker facts can come back later
+- `Daily 10` now ends with a proper review block for wrong answers:
+  - your answer
+  - correct answer
+  - why it matters
+  - memory clue
 - `Mock Test` and `Revise Mistakes` modes
 - Answer reveal toggles for quiz and mock flows
 - Mock paper history is now saved per paper with best score, attempts, and last score kept in local storage across app updates

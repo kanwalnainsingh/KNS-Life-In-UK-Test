@@ -1227,7 +1227,16 @@ const SettingGroup = ({ label, options, value, onChange }) => (
   </div>
 );
 
-const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => {
+const getPrimaryNavKey = (tabId) => {
+  if (["home"].includes(tabId)) return "home";
+  if (["quickrev", "story", "daily10", "sprint", "cram", "tracker"].includes(tabId)) return "revise";
+  if (["quiz", "rapidfire", "revise"].includes(tabId)) return "quiz";
+  if (["mock"].includes(tabId)) return "mock";
+  return "menu";
+};
+
+const BottomNav = ({ active, setActive, openQuickPanel }) => {
+  const primaryActive = getPrimaryNavKey(active);
   const items = [
     { id: "home", icon: "🏠", label: "Home" },
     { id: "quickrev", icon: "↔️", label: "Revise" },
@@ -1245,9 +1254,9 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
           style={{
             border: "none",
             background: "none",
-            color: active === item.id ? "var(--accent-text)" : "var(--text-muted)",
+            color: primaryActive === item.id ? "var(--accent-text)" : "var(--text-muted)",
             fontSize: 11,
-            fontWeight: active === item.id ? 800 : 600,
+            fontWeight: primaryActive === item.id ? 800 : 600,
             cursor: "pointer",
           }}
         >
@@ -1258,10 +1267,10 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
       <button
         className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1"
         onClick={openQuickPanel}
-        style={{ border: "none", background: "none", color: "var(--text-muted)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
+        style={{ border: "none", background: "none", color: primaryActive === "menu" ? "var(--accent-text)" : "var(--text-muted)", fontSize: 11, fontWeight: primaryActive === "menu" ? 800 : 700, cursor: "pointer" }}
       >
         <span style={{ fontSize: 18 }}>☰</span>
-        <span>More</span>
+        <span>Menu</span>
       </button>
     </div>
   );
@@ -1291,7 +1300,7 @@ const ScrollBottomButton = ({ visible }) => (
       transform: visible ? "translateY(0)" : "translateY(12px)",
     }}
   >
-    ↓ Bottom
+    ↓ End
   </button>
 );
 
@@ -1305,8 +1314,8 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
     <Sheet open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <SheetContent side="bottom" hideClose className="mobile-sheet overflow-y-auto p-4">
         <SheetHeader className="mb-3 pr-14">
-          <SheetTitle>Quick access</SheetTitle>
-          <SheetDescription>Move around without scrolling.</SheetDescription>
+          <SheetTitle>Study menu</SheetTitle>
+          <SheetDescription>Start a study action or jump straight to a topic.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-3">
           <Button
@@ -1318,10 +1327,10 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
             <span className="text-xs text-muted-foreground">{canGoBack ? "Previous screen" : "No history yet"}</span>
           </Button>
           <div className="rounded-2xl border border-border bg-secondary/70 p-3">
-            <div className="mb-1 text-xs font-bold text-muted-foreground">Main actions</div>
-            <div className="mb-2 text-[11px] text-muted-foreground">Use the bottom bar for the main study flow, or jump directly from here.</div>
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Study now</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">These are the best places to start if you want to revise or test yourself right now.</div>
             <div className="mobile-sheet-grid">
-              {["home", "quickrev", "quiz", "mock", "daily10", "story"].map((id) => {
+              {["home", "quickrev", "daily10", "quiz", "mock", "story", "rapidfire", "revise"].map((id) => {
                 const item = TABS.find((tab) => tab.id === id);
                 if (!item) return null;
                 return (
@@ -1976,6 +1985,7 @@ const DailyTenTab = () => {
   const [confirmed, setConfirmed] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [wrongAnswers, setWrongAnswers] = useState([]);
 
   const buildSession = () => {
     const pool = topic === "All" ? ALL_QUIZ : ALL_QUIZ.filter((item) => inferTopic(item) === topic);
@@ -1987,6 +1997,7 @@ const DailyTenTab = () => {
     setConfirmed(false);
     setScore(0);
     setFinished(false);
+    setWrongAnswers([]);
     scrollPageTop();
   };
 
@@ -2034,6 +2045,7 @@ const DailyTenTab = () => {
             setSelected(choice);
             setConfirmed(true);
             if (choice === question.a) setScore((value) => value + 1);
+            else setWrongAnswers((value) => [...value, { ...question, chosen: choice }]);
           }} />
           {confirmed && (
             <>
@@ -2045,16 +2057,51 @@ const DailyTenTab = () => {
           )}
         </>
       ) : (
-        <Card style={{ textAlign: "center", border: `2px solid ${score >= 8 ? "#22c55e" : "#f59e0b"}` }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>{score >= 8 ? "✅" : "📚"}</div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 8 }}>Daily 10 complete</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 12 }}>{topic} practice set</div>
-          <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)", marginBottom: 16 }}>{score}/10</div>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={buildSession} style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 12, padding: "10px 18px", fontWeight: 800, cursor: "pointer" }}>New 10</button>
-            <button className="focus-ring" onClick={() => setTopic("All")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 18px", cursor: "pointer" }}>All topics</button>
-          </div>
-        </Card>
+        <>
+          <Card style={{ textAlign: "center", border: `2px solid ${score >= 8 ? "#22c55e" : "#f59e0b"}` }}>
+            <div style={{ fontSize: 48, marginBottom: 8 }}>{score >= 8 ? "✅" : "📚"}</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 8 }}>Daily 10 complete</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 12 }}>{topic} practice set</div>
+            <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)", marginBottom: 16 }}>{score}/10</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 18 }}>
+              {wrongAnswers.length ? `${wrongAnswers.length} to review before you move on.` : "Perfect run. No wrong answers to review."}
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+              <button className="focus-ring" onClick={buildSession} style={{ background: "#10b981", color: "#fff", border: "none", borderRadius: 12, padding: "10px 18px", fontWeight: 800, cursor: "pointer" }}>New 10</button>
+              <button className="focus-ring" onClick={() => setTopic("All")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 18px", cursor: "pointer" }}>All topics</button>
+            </div>
+          </Card>
+          {wrongAnswers.length > 0 && (
+            <Card style={{ border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", background: "color-mix(in srgb, #f59e0b 10%, var(--card-bg))" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+                <div>
+                  <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Review the ones you missed</div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Read the correct answer and memory clue before starting another set.</div>
+                </div>
+                <Badge text={`${wrongAnswers.length} wrong`} color="#f59e0b" />
+              </div>
+              <div style={{ display: "grid", gap: 12 }}>
+                {wrongAnswers.map((item, wrongIndex) => (
+                  <div key={`${item.q}-${wrongIndex}`} style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 800, lineHeight: 1.6, marginBottom: 8 }}>{item.q}</div>
+                    <div style={{ display: "grid", gap: 8 }}>
+                      <div style={{ color: "#f59e0b", fontSize: 13, lineHeight: 1.6 }}>
+                        <strong>Your answer:</strong> {item.opts[item.chosen]}
+                      </div>
+                      <div style={{ color: "#22c55e", fontSize: 13, lineHeight: 1.6 }}>
+                        <strong>Correct answer:</strong> {item.opts[item.a]}
+                      </div>
+                      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.65 }}>
+                        <strong style={{ color: "var(--text-strong)" }}>Why this matters:</strong> {buildMockAnswerContext(item)}
+                      </div>
+                      <MemoryHook text={item.tip} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+        </>
       )}
     </div>
   );
@@ -4774,6 +4821,7 @@ const App = () => {
   const [mockHistory, setMockHistory] = useState(() => loadMockHistory());
   const [mockProgress, setMockProgress] = useState(() => loadMockProgress());
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [quickPanelOpen, setQuickPanelOpen] = useState(false);
   const [tabHistory, setTabHistory] = useState([]);
   const [isOffline, setIsOffline] = useState(() => !navigator.onLine);
@@ -4813,7 +4861,12 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setShowScrollTop(window.scrollY > 260);
+    const onScroll = () => {
+      const current = window.scrollY;
+      const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
+      setShowScrollTop(current > 260);
+      setShowScrollBottom(maxScroll > 320 && current < maxScroll - 220);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -4903,9 +4956,9 @@ const App = () => {
           github.com/kanwalnainsingh/KNS-Life-In-UK-Test
         </a>
       </div>
-      {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
+      {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} />}
       {isMobile && <ScrollTopButton visible={showScrollTop} />}
-      {isMobile && <ScrollBottomButton visible={showScrollTop} />}
+      {isMobile && <ScrollBottomButton visible={showScrollBottom} />}
       {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
     </div>
     </div>
