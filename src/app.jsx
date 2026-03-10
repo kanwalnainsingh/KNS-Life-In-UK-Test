@@ -644,6 +644,71 @@ const CONFUSABLE_GROUP_ORDER = [
   "History, Dates and Places",
 ];
 
+const QUICK_FACT_CATEGORY_PRIORITY = {
+  "Government & Parliament": { order: 1, label: "Must know first", color: "#ef4444" },
+  "Law & Courts": { order: 2, label: "Must know first", color: "#ef4444" },
+  "Rights & Everyday Life": { order: 3, label: "Easy marks", color: "#22c55e" },
+  "4 Nations & Places": { order: 4, label: "Easy marks", color: "#22c55e" },
+  "Citizenship & Settlement": { order: 5, label: "Important context", color: "#3b82f6" },
+  "Community & Participation": { order: 6, label: "Good to know", color: "#64748b" },
+  "Currency & Finance": { order: 7, label: "Easy marks", color: "#22c55e" },
+  "Britain Beyond the UK": { order: 8, label: "Common mix-up", color: "#f59e0b" },
+  "Population & Geography": { order: 9, label: "Good to know", color: "#64748b" },
+  "History Extras": { order: 10, label: "Good to know", color: "#64748b" },
+};
+
+const CORE_FIGURES = new Set([
+  "William the Conqueror",
+  "King John",
+  "Henry VIII",
+  "Elizabeth I",
+  "Emmeline Pankhurst",
+  "Winston Churchill",
+  "William Beveridge",
+  "Aneurin (Nye) Bevan",
+  "Clement Attlee",
+  "Margaret Thatcher",
+]);
+
+const CORE_INVENTORS = new Set([
+  "Alexander Fleming",
+  "Tim Berners-Lee",
+  "John Logie Baird",
+  "Frank Whittle",
+  "Alan Turing",
+  "James Watt",
+  "Isaac Newton",
+  "Edward Jenner",
+]);
+
+const CORE_LANDMARK_NAMES = new Set([
+  "Big Ben 🔔",
+  "Buckingham Palace 👑",
+  "Windsor Castle 🏰",
+  "Stonehenge 🗿",
+  "Tower of London 🏯",
+  "Hadrian's Wall 🧱",
+  "River Severn 🌊",
+  "Loch Ness 🐉",
+  "Cenotaph 🌺",
+]);
+
+const CORE_INT_ORGS = new Set([
+  "Commonwealth 🌐",
+  "United Nations 🕊️",
+  "NATO 🛡️",
+  "Council of Europe ⚖️",
+]);
+
+const ARTS_CORE_BY_SECTION = {
+  literature: new Set(["William Shakespeare", "Charles Dickens", "Robert Burns", "Agatha Christie"]),
+  music: new Set(["George Frideric Handel", "Sir Edward Elgar", "The Beatles", "BBC Proms"]),
+  art: new Set(["Joseph Turner", "John Constable", "Henry Moore", "David Hockney"]),
+  architecture: new Set(["Sir Christopher Wren", "Sir Edwin Lutyens", "Gothic Revival (19th century)"]),
+  fashion: new Set(["Mary Quant", "Alexander McQueen", "Vivienne Westwood"]),
+  film: new Set(["Charlie Chaplin", "Sir Laurence Olivier", "Sir Alfred Hitchcock"]),
+};
+
 const pickRandom = (items, count) => [...items].sort(() => Math.random() - 0.5).slice(0, count);
 
 const saveWrongQuestions = (items) => {
@@ -2670,13 +2735,28 @@ const ConfuseTab = () => {
 const InventorsTab = () => {
   const cats = ["All", "Medicine", "Computing", "Engineering", "Electronics", "Physics", "Biology"];
   const [cat, setCat] = useState("All");
-  const filtered = INVENTORS.filter((i) => cat === "All" || i.link === cat);
+  const filtered = INVENTORS
+    .filter((i) => cat === "All" || i.link === cat)
+    .sort((a, b) => Number(CORE_INVENTORS.has(b.who)) - Number(CORE_INVENTORS.has(a.who)));
+  const coreVisible = filtered.filter((item) => CORE_INVENTORS.has(item.who));
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="💡" meta="Inventors are easier to remember by category and visual icon.">British Inventors & Scientists</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {cats.map((c) => <TabButton key={c} active={cat === c} onClick={() => setCat(c)}>{c}</TabButton>)}
       </div>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Must know inventors first</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the names most worth locking in before the longer science list.</div>
+          </div>
+          <Badge text={cat === "All" ? "Core inventors" : `${cat} core`} color="#ef4444" />
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {coreVisible.map((item) => <Badge key={item.who} text={item.who} color="#ef4444" />)}
+        </div>
+      </Card>
       {filtered.map((inv, i) => (
         <Card key={i}>
           <div style={{ display: "flex", gap: 12 }}>
@@ -2686,6 +2766,7 @@ const InventorsTab = () => {
                 <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{inv.who}</span>
                 <Badge text={inv.nation} color="#64748b" />
                 <Badge text={inv.link} color="#3b82f6" />
+                <Badge text={CORE_INVENTORS.has(inv.who) ? "Exam core" : "More detail"} color={CORE_INVENTORS.has(inv.who) ? "#ef4444" : "#64748b"} />
                 {inv.when && <Badge text={inv.when} color="#d97706" />}
               </div>
               <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{inv.what}</div>
@@ -2801,7 +2882,11 @@ const FiguresTab = () => {
   const orderMap = Object.fromEntries(figureOrder.map((name, index) => [name, index]));
   const figures = [...KEY_FIGURES, ...EXTRA_KEY_FIGURES]
     .filter((figure, index, arr) => arr.findIndex((item) => item.name === figure.name) === index)
-    .sort((a, b) => (orderMap[a.name] ?? 999) - (orderMap[b.name] ?? 999));
+    .sort((a, b) => {
+      const coreDiff = Number(CORE_FIGURES.has(b.name)) - Number(CORE_FIGURES.has(a.name));
+      if (coreDiff) return coreDiff;
+      return (orderMap[a.name] ?? 999) - (orderMap[b.name] ?? 999);
+    });
   const figureGroups = [
     { title: "Rulers & union", color: "#3b82f6", items: ["Alfred", "Athelstan", "William", "Henry VIII", "James VI and I"] },
     { title: "Rights & reform", color: "#10b981", items: ["King John", "Wilberforce", "Pankhurst", "Beveridge", "Bevan"] },
@@ -2829,6 +2914,18 @@ const FiguresTab = () => {
         </div>
       </Card>
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Most tested figures first</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Learn the high-frequency names first, then use the rest as supporting context.</div>
+          </div>
+          <Badge text="Exam core" color="#ef4444" />
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {figures.filter((item) => CORE_FIGURES.has(item.name)).map((item) => <Badge key={item.name} text={item.name} color="#ef4444" />)}
+        </div>
+      </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Figure date anchors</div>
         <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
           • `1066` William the Conqueror<br />
@@ -2844,7 +2941,10 @@ const FiguresTab = () => {
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
             <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 4 }}>
+                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
+                <Badge text={CORE_FIGURES.has(f.name) ? "Exam core" : "More detail"} color={CORE_FIGURES.has(f.name) ? "#ef4444" : "#64748b"} />
+              </div>
               <div style={{ color: f.color, fontSize: 12, fontWeight: 700 }}>{f.role}</div>
             </div>
           </div>
@@ -2929,11 +3029,34 @@ const LandmarksTab = () => (
       </div>
       <MemoryHook text="For landmarks, pair each place with one test clue: location, superlative, or why it is famous." />
     </Card>
-    {LANDMARKS.map((l, i) => (
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+        <div>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Must know landmarks first</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the places most worth locking in before the longer list.</div>
+        </div>
+        <Badge text="Exam favourites first" color="#ef4444" />
+      </div>
+      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+        {LANDMARKS.filter((item) => CORE_LANDMARK_NAMES.has(item.name)).map((item) => (
+          <div key={item.name} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.name}</div>
+              <Badge text="Exam favourite" color="#ef4444" />
+            </div>
+            <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item.trap}</div>
+          </div>
+        ))}
+      </div>
+    </Card>
+    {LANDMARKS.sort((a, b) => Number(CORE_LANDMARK_NAMES.has(b.name)) - Number(CORE_LANDMARK_NAMES.has(a.name))).map((l, i) => (
       <Card key={i}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
           <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{l.name}</div>
-          <Badge text={l.where} color="#64748b" />
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <Badge text={l.where} color="#64748b" />
+            <Badge text={CORE_LANDMARK_NAMES.has(l.name) ? "Exam favourite" : "More places"} color={CORE_LANDMARK_NAMES.has(l.name) ? "#ef4444" : "#64748b"} />
+          </div>
         </div>
         <div style={{ color: "var(--text)", fontSize: 14, marginTop: 8, lineHeight: 1.7 }}>{l.fact}</div>
         <TrapAlert text={l.trap} />
@@ -2958,22 +3081,28 @@ const InternationalTab = () => (
       ]}
     />
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>World organisations quick map</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `UN` = international peace and security<br />
-        • `NATO` = military alliance<br />
-        • `Commonwealth` = voluntary association<br />
-        • `Council of Europe` = human rights, cannot make laws
+      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Must know first</div>
+      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+        {INT_ORGS.filter((item) => CORE_INT_ORGS.has(item.name)).map((item) => (
+          <div key={item.name} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.name}</div>
+              <Badge text="Exam favourite" color="#ef4444" />
+            </div>
+            <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item.memory}</div>
+          </div>
+        ))}
       </div>
-      <MemoryHook text="Ask one question first: is this a military alliance, a voluntary network, or a human-rights organisation?" />
+      <MemoryHook text="Ask one question first: military alliance, voluntary association, global peace body, or human-rights organisation?" />
     </Card>
     <div style={{ marginTop: 16 }}>
-      {INT_ORGS.map((o, i) => (
+      {INT_ORGS.sort((a, b) => Number(CORE_INT_ORGS.has(b.name)) - Number(CORE_INT_ORGS.has(a.name))).map((o, i) => (
         <Card key={i}>
           <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 16, marginBottom: 6 }}>{o.name}</div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
             <Badge text={o.members} color="#3b82f6" />
             <Badge text={o.power} color={o.power.includes("CANNOT") ? "#ef4444" : "#10b981"} />
+            <Badge text={CORE_INT_ORGS.has(o.name) ? "Exam favourite" : "More detail"} color={CORE_INT_ORGS.has(o.name) ? "#ef4444" : "#64748b"} />
           </div>
           <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 4, lineHeight: 1.6 }}><strong style={{ color: "var(--text-muted)" }}>Purpose:</strong> {o.purpose}</div>
           <div style={{ fontSize: 13, color: "var(--text)", marginBottom: 8, lineHeight: 1.6 }}><strong style={{ color: "var(--text-muted)" }}>UK's role:</strong> {o.ukRole}</div>
@@ -2996,6 +3125,8 @@ const ArtsTab = () => {
   ];
   const [active, setActive] = useState("literature");
   const sec = sections.find((s) => s.key === active);
+  const activeCore = ARTS_CORE_BY_SECTION[active] || new Set();
+  const orderedItems = [...(ARTS[active] || [])].sort((a, b) => Number(activeCore.has(b.who)) - Number(activeCore.has(a.who)));
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="🎭" meta="This section works best through anchor names: one writer, one composer, one artist, one architect, one fashion name, one film clue.">Arts & Culture</SectionTitle>
@@ -3024,9 +3155,26 @@ const ArtsTab = () => {
         </div>
         <MemoryHook text="A lot of arts questions become easy if you remember the place or event attached to the person." />
       </Card>
-      {(ARTS[active] || []).map((item, i) => (
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Most important names first</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Start with the big recognition names in this category, then use the rest as extra support.</div>
+          </div>
+          <Badge text={sec ? sec.label : "Arts"} color={sec ? sec.color : "#64748b"} />
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {[...(ARTS[active] || []).filter((item) => activeCore.has(item.who)).map((item) => (
+            <Badge key={item.who} text={item.who} color="#ef4444" />
+          ))]}
+        </div>
+      </Card>
+      {orderedItems.map((item, i) => (
         <Card key={i}>
-          <div style={{ fontWeight: 800, color: sec ? sec.color : "#f9fafb", fontSize: 14, marginBottom: 4 }}>{item.who}</div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+            <div style={{ fontWeight: 800, color: sec ? sec.color : "#f9fafb", fontSize: 14 }}>{item.who}</div>
+            <Badge text={activeCore.has(item.who) ? "Exam core" : "More detail"} color={activeCore.has(item.who) ? "#ef4444" : "#64748b"} />
+          </div>
           <div style={{ color: "var(--text)", fontSize: 13, marginBottom: 6, lineHeight: 1.6 }}>{item.what}</div>
           <MemoryHook text={item.mem} />
         </Card>
@@ -3095,9 +3243,14 @@ const QuickFactsTab = () => (
       </div>
       <MemoryHook text="Use one keyword per fact: Hansard-record, PMQs-Wednesday, NI-benefits, council tax-local, 999-emergency." />
     </Card>
-    {QUICK_FACTS.map((section, si) => (
+    {[...QUICK_FACTS]
+      .sort((a, b) => (QUICK_FACT_CATEGORY_PRIORITY[a.cat]?.order ?? 99) - (QUICK_FACT_CATEGORY_PRIORITY[b.cat]?.order ?? 99))
+      .map((section, si) => (
       <Card key={si} style={{ border: `1px solid ${section.color}33` }}>
-        <div style={{ fontWeight: 800, color: section.color, marginBottom: 10, fontSize: 15 }}>{section.icon} {section.cat}</div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+          <div style={{ fontWeight: 800, color: section.color, fontSize: 15 }}>{section.icon} {section.cat}</div>
+          <Badge text={QUICK_FACT_CATEGORY_PRIORITY[section.cat]?.label || "Reference"} color={QUICK_FACT_CATEGORY_PRIORITY[section.cat]?.color || "#64748b"} />
+        </div>
         {section.facts.map((f, fi) => (
           <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < section.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>
             <span style={{ color: section.color, marginRight: 6 }}>▸</span>{f}

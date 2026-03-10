@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 310 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.5`
+Current release: `v1.11.6`
 
 ---
 
@@ -149,6 +149,10 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - the Speaker's role in Commons debates
   - political neutrality
   - the fact that the Speaker still remains an MP
+- Reordered weaker reference-heavy sections so the most important facts appear first:
+  - `Quick Facts` now labels sections like `Must know first`, `Easy marks`, and `Good to know`
+  - `Key People`, `Inventors`, `Arts`, `Landmarks`, and `World Orgs` now surface exam-core names and facts before the fuller reference list
+  - broader facts are still included, but moved lower with clearer labels instead of competing with the highest-yield material
 - Rebalanced the fixed mock papers to a more exam-like spread:
   - `7` history
   - `7` government and law
