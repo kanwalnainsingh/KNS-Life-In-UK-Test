@@ -1,15 +1,15 @@
-const CACHE_VERSION = "lifeuk-static-0898d5ec9f";
+const CACHE_VERSION = "lifeuk-static-3e73a6031f";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./assets/app.0898d5ec9f.js",
+  "./assets/app.3e73a6031f.js",
   "./robots.txt",
   "./sitemap.xml",
 ];
 const NETWORK_FIRST_PATHS = new Set([
   "/",
   "/index.html",
-  "/assets/app.0898d5ec9f.js",
+  "/assets/app.3e73a6031f.js",
 ]);
 
 const CDN_ASSETS = [
@@ -17,6 +17,12 @@ const CDN_ASSETS = [
   "https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js",
   "https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js",
 ];
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener("install", (event) => {
   event.waitUntil(

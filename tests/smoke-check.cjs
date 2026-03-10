@@ -57,6 +57,10 @@ const assert = (condition, message) => {
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
   assert(/↻ Latest/.test(appSource), "Latest-version button missing");
   assert(/registration\.update\(\)/.test(indexSource), "Service worker should check for updates on load");
+  assert(/updateViaCache:\s*"none"/.test(indexSource), "Service worker registration should bypass HTTP cache");
+  assert(/controllerchange/.test(indexSource), "Service worker should reload when a new controller takes over");
+  assert(/SKIP_WAITING/.test(indexSource), "Service worker registration should activate waiting workers");
+  assert(/SKIP_WAITING/.test(serviceWorkerSource), "Service worker should support skip-waiting activation");
   assert(/appVersion/.test(appSource), "Forced refresh should include an app version cache-buster");
   assert(/const APP_VERSION = `v\$\{packageMeta\.version\}`;/.test(appSource), "App version should come from package.json");
   assert(/Remembered up to here/.test(appSource), "Timeline checkpoint UI missing");

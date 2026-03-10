@@ -265,12 +265,40 @@
 
   <script type="module" src="./assets/app.js"></script>
   <script>
+    window.__APP_VERSION__ = "__APP_VERSION_VALUE__";
     window.__offlineReady = false;
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js").then((registration) => {
+        let refreshing = false;
+        const activateWaitingWorker = (registration) => {
+          if (registration && registration.waiting) {
+            registration.waiting.postMessage({ type: "SKIP_WAITING" });
+          }
+        };
+
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (refreshing) return;
+          refreshing = true;
+          const url = new URL(window.location.href);
+          url.searchParams.set("updated", String(Date.now()));
+          window.location.replace(url.toString());
+        });
+
+        navigator.serviceWorker.register(`./service-worker.js?v=${window.__APP_VERSION__}`, {
+          updateViaCache: "none",
+        }).then((registration) => {
           registration.update().catch(() => {
             // Ignore update failures and continue with the current registration.
+          });
+          if (registration.waiting) activateWaitingWorker(registration);
+          registration.addEventListener("updatefound", () => {
+            const newWorker = registration.installing;
+            if (!newWorker) return;
+            newWorker.addEventListener("statechange", () => {
+              if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                activateWaitingWorker(registration);
+              }
+            });
           });
           window.__offlineReady = true;
           window.dispatchEvent(new CustomEvent("lifeuk-offline-ready"));

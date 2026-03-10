@@ -11,6 +11,7 @@ const assetsDir = path.join(outdir, "assets");
 const screenshotsSrc = path.join(root, "screenshots");
 const screenshotsDest = path.join(outdir, "screenshots");
 const tempBundleDir = path.join(root, ".tmp-build");
+const packageMeta = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 
 const removeDir = (target) => {
   if (!fs.existsSync(target)) return;
@@ -49,7 +50,9 @@ const bundlePath = path.join(assetsDir, bundleFileName);
 fs.writeFileSync(bundlePath, bundleBuffer);
 
 const indexTemplate = fs.readFileSync(path.join(root, "index.html"), "utf8");
-const builtIndex = indexTemplate.replace("./assets/app.js", `./assets/${bundleFileName}`);
+const builtIndex = indexTemplate
+  .replace("./assets/app.js", `./assets/${bundleFileName}`)
+  .replace(/__APP_VERSION_VALUE__/g, packageMeta.version);
 fs.writeFileSync(path.join(outdir, "index.html"), builtIndex);
 
 const serviceWorkerTemplate = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");

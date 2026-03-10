@@ -186,8 +186,11 @@ const forceLatestAppReload = async () => {
       await Promise.all(registrations.map(async (registration) => {
         try {
           await registration.update();
+          if (registration.waiting) {
+            registration.waiting.postMessage({ type: "SKIP_WAITING" });
+          }
         } catch (err) {
-          // Ignore update-check failures and continue with unregister.
+          // Ignore update-check failures and continue with cleanup.
         }
         return registration.unregister();
       }));
@@ -206,6 +209,7 @@ const forceLatestAppReload = async () => {
   }
 
   const target = new URL(window.location.href);
+  target.search = "";
   target.searchParams.set("refresh", String(Date.now()));
   target.searchParams.set("appVersion", APP_VERSION);
   window.location.replace(target.toString());
