@@ -35,6 +35,10 @@ const getChromePath = () => {
 
   const found = candidates.find((candidate) => fs.existsSync(candidate));
   if (!found) {
+    if (!process.env.CI) {
+      console.log("Browser smoke test skipped: no supported Chrome/Chromium executable found locally.");
+      return null;
+    }
     throw new Error("No supported Chrome/Chromium executable found for browser smoke test.");
   }
   return found;
@@ -82,9 +86,13 @@ const clickByText = async (page, text) => {
 (async () => {
   assert(fs.existsSync(path.join(DOCS_DIR, "index.html")), "Built docs/ output is required. Run npm run build first.");
 
+  const chromePath = getChromePath();
+  if (!chromePath) return;
+
   const { server, url } = await startServer();
+
   const browser = await puppeteer.launch({
-    executablePath: getChromePath(),
+    executablePath: chromePath,
     headless: true,
     args: ["--no-sandbox", "--disable-dev-shm-usage"],
   });

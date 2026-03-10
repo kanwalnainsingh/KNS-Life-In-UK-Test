@@ -23,6 +23,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./components/ui/sheet.jsx";
+import {
+  InventorsTab,
+  LandmarksTab,
+  ReligionTab,
+  SectionStudyActions,
+  SportsTab,
+} from "./components/reference-tabs.jsx";
 import { cn } from "./lib/utils.js";
 import {
   ALL_QUIZ,
@@ -3047,25 +3054,6 @@ const StoryModeTab = ({ setActive }) => {
   );
 };
 
-const SectionStudyActions = ({ title = "Study this next", note = "When you finish reading, move straight into recall while the facts are still fresh.", actions = [] }) => (
-  <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-      <div>
-        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>{title}</div>
-        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{note}</div>
-      </div>
-      <Badge text={`${actions.length} next steps`} color="#3b82f6" />
-    </div>
-    <div className="flex flex-wrap gap-2">
-      {actions.map((action) => (
-        <Button key={action.label} variant={action.primary ? "default" : "secondary"} className={action.primary ? "bg-orange-500 hover:bg-orange-500/90" : ""} onClick={action.onClick}>
-          {action.label}
-        </Button>
-      ))}
-    </div>
-  </Card>
-);
-
 // ── TIMELINE ─────────────────────────────────────────────────
 const TimelineTab = () => {
   const eras = ["All", "Ancient", "Roman", "Medieval", "Tudor", "Stuart", "Georgian", "Victorian", "Modern"];
@@ -3549,6 +3537,8 @@ const NationsTab = ({ setActive }) => (
       </Card>
     ))}
     <SectionStudyActions
+      Card={Card}
+      Badge={Badge}
       title="Use these nation facts right away"
       note="This page is best followed by compare-heavy or question-heavy revision while the capitals, systems, and saints are still fresh."
       actions={[
@@ -3642,137 +3632,6 @@ const ConfuseTab = () => {
     </div>
   );
 };
-
-// ── INVENTORS ────────────────────────────────────────────────
-const InventorsTab = ({ setActive }) => {
-  const cats = ["All", "Medicine", "Computing", "Engineering", "Electronics", "Physics", "Biology"];
-  const [cat, setCat] = useState("All");
-  const filtered = INVENTORS
-    .filter((i) => cat === "All" || i.link === cat)
-    .sort((a, b) => Number(CORE_INVENTORS.has(b.who)) - Number(CORE_INVENTORS.has(a.who)));
-  const coreVisible = filtered.filter((item) => CORE_INVENTORS.has(item.who));
-  return (
-    <div className="topic-page">
-      <SectionTitle icon="💡" meta="Inventors are easier to remember by category and visual icon.">British Inventors & Scientists</SectionTitle>
-      <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
-        {cats.map((c) => <TabButton key={c} active={cat === c} onClick={() => setCat(c)}>{c}</TabButton>)}
-      </div>
-      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-          <div>
-            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Must know inventors first</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the names most worth locking in before the longer science list.</div>
-          </div>
-          <Badge text={cat === "All" ? "Core inventors" : `${cat} core`} color="#ef4444" />
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {coreVisible.map((item) => <Badge key={item.who} text={item.who} color="#ef4444" />)}
-        </div>
-      </Card>
-      {filtered.map((inv, i) => (
-        <Card key={i}>
-          <div style={{ display: "flex", gap: 12 }}>
-            <div style={{ fontSize: 36, flexShrink: 0 }}>{inv.icon}</div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-                <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{inv.who}</span>
-                <Badge text={inv.nation} color="#64748b" />
-                <Badge text={inv.link} color="#3b82f6" />
-                <Badge text={CORE_INVENTORS.has(inv.who) ? "Exam core" : "More detail"} color={CORE_INVENTORS.has(inv.who) ? "#ef4444" : "#64748b"} />
-                {inv.when && <Badge text={inv.when} color="#d97706" />}
-              </div>
-              <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{inv.what}</div>
-              <MemoryHook text={inv.memory} />
-            </div>
-          </div>
-        </Card>
-      ))}
-      <SectionStudyActions
-        title="Turn inventors into quick recall"
-        note="Inventors are easiest to keep if you follow them with a short topic-focused run instead of trying to memorise the full list in one go."
-        actions={[
-          { label: "Quick Revise Inventors", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Inventors", sessionType: "short" }) },
-          { label: "Daily 10", onClick: () => setActive("daily10") },
-          { label: "Back to Home", onClick: () => setActive("home") },
-        ]}
-      />
-    </div>
-  );
-};
-
-// ── SPORTS ───────────────────────────────────────────────────
-const SportsTab = ({ setActive }) => (
-  <div className="topic-page">
-    <SectionTitle icon="🏅" meta="Use event anchors first, then attach the star names and dates to them.">British Sport & Sports Stars</SectionTitle>
-    <Card style={{ background: "#0f1f0f", border: "1px solid #166534", marginBottom: 16 }}>
-      <div style={{ fontWeight: 800, color: "#4ade80", marginBottom: 8 }}>🏟️ Olympics Key Facts</div>
-      <div style={{ color: "#d1fae5", fontSize: 14, lineHeight: 1.8 }}>
-        • UK hosted Olympics 3 times: 1908, 1948, 2012<br />
-        • 2012: UK finished 3rd in the medal table<br />
-        • Scotland has 5 ski resorts
-      </div>
-      <MemoryHook text="Three times: 1908, 1948, 2012." />
-    </Card>
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Classic sports event anchors</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `Wimbledon` = oldest tennis tournament in the world<br />
-        • `FA Cup` = oldest football competition in the world<br />
-        • `Grand National` = horse race at Aintree<br />
-        • `Boat Race` = Oxford vs Cambridge on the Thames<br />
-        • `London Marathon` = major charity and mass-participation race
-      </div>
-      <MemoryHook text="If the question is about British sport rather than a person, think event first: Wimbledon, FA Cup, Grand National, Boat Race." />
-    </Card>
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Quick sports recall</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `Mo Farah` = double long-distance Olympic gold in 2012<br />
-        • `Jessica Ennis-Hill` = heptathlon gold in London 2012<br />
-        • `Andy Murray` = first British men's Wimbledon winner in 77 years (2013)<br />
-        • `Bradley Wiggins` = first British Tour de France winner (2012)
-      </div>
-      <MemoryHook text="2012 Olympics is the easiest sports memory spine: Farah, Ennis-Hill, Wiggins, then Murray in 2013." />
-    </Card>
-    {SPORTS_FACTS.map((item) => (
-      <Card key={item.name}>
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ fontSize: 28, flexShrink: 0 }}>{item.icon}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15, marginBottom: 4 }}>{item.name}</div>
-            <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{item.fact}</div>
-            <MemoryHook text={item.memory} />
-          </div>
-        </div>
-      </Card>
-    ))}
-    {SPORTS_STARS.map((s, i) => (
-      <Card key={i}>
-        <div style={{ display: "flex", gap: 12 }}>
-          <div style={{ fontSize: 32, flexShrink: 0 }}>{s.icon}</div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
-              <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{s.name}</span>
-              <Badge text={s.sport} color="#f59e0b" />
-              {s.year && <Badge text={s.year} color="#64748b" />}
-            </div>
-            <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{s.achievement}</div>
-            <MemoryHook text={s.memory} />
-          </div>
-        </div>
-        </Card>
-      ))}
-    <SectionStudyActions
-      title="Keep sports revision short"
-      note="Sports is best revised as event anchors plus a few names, then tested quickly before the details fade."
-      actions={[
-        { label: "Quick Revise Sports", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Sports", sessionType: "short" }) },
-        { label: "Daily 10", onClick: () => setActive("daily10") },
-        { label: "Take a Mock", onClick: () => setActive("mock") },
-      ]}
-    />
-  </div>
-);
 
 // ── KEY FIGURES ──────────────────────────────────────────────
 const FiguresTab = ({ setActive }) => {
@@ -3917,6 +3776,8 @@ const FiguresTab = ({ setActive }) => {
         </Card>
       ))}
       <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
         title="Turn people into recall"
         note="After reading figures, move into quick revision or a mock so the names stay attached to the right dates and events."
         actions={[
@@ -3928,129 +3789,6 @@ const FiguresTab = ({ setActive }) => {
     </div>
   );
 };
-
-// ── RELIGION ─────────────────────────────────────────────────
-const ReligionTab = ({ setActive }) => (
-  <div className="topic-page">
-    <SectionTitle icon="⛪" meta="This section is mostly short factual recall: census proportions, major Christian dates, and key non-Christian festivals.">Religion & Festivals</SectionTitle>
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-      <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>📊 2011 Census — Religious Identity</div>
-      {RELIGIONS.map((r) => (
-        <div key={r.faith} style={{ marginBottom: 12 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginBottom: 4, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 15 }}>{r.icon} <span style={{ color: "var(--text-strong)", fontWeight: 700 }}>{r.faith}</span></span>
-            <Badge text={r.pct} color={r.color} />
-          </div>
-          <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 10, overflow: "hidden" }}>
-            <div className="bar-fill" style={{ height: "100%", borderRadius: 999, background: r.color, width: `${Math.min(r.bar, 100)}%` }} />
-          </div>
-          <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 4, lineHeight: 1.5 }}>{r.note}</div>
-        </div>
-      ))}
-    </Card>
-    <Card style={{ background: "color-mix(in srgb, #f59e0b 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Festival memory clues</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `Christmas` and `Easter` are the main Christian festivals<br />
-        • `Boxing Day` = 26 December public holiday after Christmas<br />
-        • `Diwali` = festival of lights<br />
-        • `Vaisakhi` = Sikh New Year / Khalsa<br />
-        • `Hanukkah` = Jewish festival of lights<br />
-        • `Eid al-Fitr` ends Ramadan
-      </div>
-      <MemoryHook text="If a festival name appears in a question, first identify the faith, then the key clue or season." />
-    </Card>
-    {FESTIVALS.map((f, i) => (
-      <Card key={i}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
-          <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</span>
-          <Badge text={f.date} color="#d97706" />
-        </div>
-        <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>{f.faith}</div>
-        <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{f.detail}</div>
-      </Card>
-    ))}
-    <SectionStudyActions
-      title="Turn festivals into quick marks"
-      note="Religion questions are usually short recall. Move into a quick run while the faith and festival links are still in your head."
-      actions={[
-        { label: "Quick Revise Religion", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Religion", sessionType: "short" }) },
-        { label: "Daily 10", onClick: () => setActive("daily10") },
-        { label: "Take a Mock", onClick: () => setActive("mock") },
-      ]}
-    />
-  </div>
-);
-
-// ── LANDMARKS ────────────────────────────────────────────────
-const LandmarksTab = ({ setActive }) => (
-  <div className="topic-page">
-    <SectionTitle icon="🏛️" meta="Use location + one distinctive clue for each landmark.">Landmarks & Places</SectionTitle>
-    <CompactVisualStrip
-      title="Place clues"
-      accent="#0ea5e9"
-      items={[
-        { icon: "🔔", label: "Big Ben", text: "bell" },
-        { icon: "🗿", label: "Stonehenge", text: "prehistoric" },
-        { icon: "👑", label: "Buckingham", text: "London home" },
-        { icon: "🏰", label: "Windsor", text: "outside London" },
-      ]}
-    />
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Landmark anchor clues</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `Big Ben` = bell, not tower<br />
-        • `Buckingham Palace` = monarch's London home<br />
-        • `Windsor Castle` = outside London, weekends and ceremonies<br />
-        • `Severn` = longest in UK, `Thames` = longest in England<br />
-        • `Hadrian's Wall` = Roman, not Norman or Tudor
-      </div>
-      <MemoryHook text="For landmarks, pair each place with one test clue: location, superlative, or why it is famous." />
-    </Card>
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-        <div>
-          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Must know landmarks first</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the places most worth locking in before the longer list.</div>
-        </div>
-        <Badge text="Exam favourites first" color="#ef4444" />
-      </div>
-      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
-        {LANDMARKS.filter((item) => CORE_LANDMARK_NAMES.has(item.name)).map((item) => (
-          <div key={item.name} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
-              <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.name}</div>
-              <Badge text="Exam favourite" color="#ef4444" />
-            </div>
-            <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item.trap}</div>
-          </div>
-        ))}
-      </div>
-    </Card>
-    {LANDMARKS.sort((a, b) => Number(CORE_LANDMARK_NAMES.has(b.name)) - Number(CORE_LANDMARK_NAMES.has(a.name))).map((l, i) => (
-      <Card key={i}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
-          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{l.name}</div>
-          <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <Badge text={l.where} color="#64748b" />
-            <Badge text={CORE_LANDMARK_NAMES.has(l.name) ? "Exam favourite" : "More places"} color={CORE_LANDMARK_NAMES.has(l.name) ? "#ef4444" : "#64748b"} />
-          </div>
-        </div>
-        <div style={{ color: "var(--text)", fontSize: 14, marginTop: 8, lineHeight: 1.7 }}>{l.fact}</div>
-        <TrapAlert text={l.trap} />
-      </Card>
-    ))}
-    <SectionStudyActions
-      title="Turn places into quick recall"
-      note="Landmark questions usually depend on one clue like location, bell vs tower, or longest river. Switch into short recall while those anchors are fresh."
-      actions={[
-        { label: "Quick Revise Landmarks", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Landmarks", sessionType: "short" }) },
-        { label: "Open Traps", onClick: () => setActive("confuse") },
-        { label: "Start Quiz", onClick: () => setActive("quiz") },
-      ]}
-    />
-  </div>
-);
 
 // ── INTERNATIONAL ────────────────────────────────────────────
 const InternationalTab = ({ setActive }) => (
@@ -4098,6 +3836,8 @@ const InternationalTab = ({ setActive }) => (
       ))}
     </div>
     <SectionStudyActions
+      Card={Card}
+      Badge={Badge}
       title="Lock in the organisation labels"
       note="International questions are mostly about choosing the right label quickly, so use a compare or quiz mode next."
       actions={[
@@ -4176,6 +3916,8 @@ const ArtsTab = ({ setActive }) => {
         </Card>
       ))}
       <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
         title="Keep arts revision short"
         note="Arts works best as a short anchor pass, then a broader revision mode so these names do not crowd out higher-yield history and civics."
         actions={[
@@ -4264,6 +4006,8 @@ const QuickFactsTab = ({ setActive }) => (
       </Card>
     ))}
     <SectionStudyActions
+      Card={Card}
+      Badge={Badge}
       title="These are your fast marks"
       note="After reading quick facts, go straight into a broad practice mode so government, law, and everyday-life points become automatic."
       actions={[
@@ -5443,11 +5187,58 @@ const App = () => {
       case "wars": return <WarsTab />;
       case "nations": return <NationsTab setActive={navigateTo} />;
       case "confuse": return <ConfuseTab />;
-      case "inventors": return <InventorsTab setActive={navigateTo} />;
-      case "sports": return <SportsTab setActive={navigateTo} />;
+      case "inventors": return (
+        <InventorsTab
+          setActive={navigateTo}
+          SectionTitle={SectionTitle}
+          Card={Card}
+          Badge={Badge}
+          MemoryHook={MemoryHook}
+          TabButton={TabButton}
+          launchQuickRevision={launchQuickRevision}
+          INVENTORS={INVENTORS}
+          CORE_INVENTORS={CORE_INVENTORS}
+        />
+      );
+      case "sports": return (
+        <SportsTab
+          setActive={navigateTo}
+          SectionTitle={SectionTitle}
+          Card={Card}
+          Badge={Badge}
+          MemoryHook={MemoryHook}
+          launchQuickRevision={launchQuickRevision}
+          SPORTS_FACTS={SPORTS_FACTS}
+          SPORTS_STARS={SPORTS_STARS}
+        />
+      );
       case "figures": return <FiguresTab setActive={navigateTo} />;
-      case "religion": return <ReligionTab setActive={navigateTo} />;
-      case "landmarks": return <LandmarksTab setActive={navigateTo} />;
+      case "religion": return (
+        <ReligionTab
+          setActive={navigateTo}
+          SectionTitle={SectionTitle}
+          Card={Card}
+          Badge={Badge}
+          MemoryHook={MemoryHook}
+          launchQuickRevision={launchQuickRevision}
+          RELIGIONS={RELIGIONS}
+          FESTIVALS={FESTIVALS}
+        />
+      );
+      case "landmarks": return (
+        <LandmarksTab
+          setActive={navigateTo}
+          SectionTitle={SectionTitle}
+          Card={Card}
+          Badge={Badge}
+          MemoryHook={MemoryHook}
+          TrapAlert={TrapAlert}
+          CompactVisualStrip={CompactVisualStrip}
+          launchQuickRevision={launchQuickRevision}
+          LANDMARKS={LANDMARKS}
+          CORE_LANDMARK_NAMES={CORE_LANDMARK_NAMES}
+        />
+      );
       case "international": return <InternationalTab setActive={navigateTo} />;
       case "arts": return <ArtsTab setActive={navigateTo} />;
       case "anthem": return <AnthemTab />;

@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.15.7`
+Current release: `v1.15.8`
 
 ---
 
@@ -123,6 +123,8 @@ UI stack now uses:
 - Shared mobile density is now lighter too, with tighter card padding and more consistent long-page spacing across the heavier revision sections
 - `Story Mode` chapter actions and the follow-up actions in `Religion`, `Landmarks`, `Inventors`, and `Sports` now open focused `Quick Revise` runs instead of generic reading dead ends
 - Added a browser smoke test using `puppeteer-core` and Chrome to validate Home, Quick Revision, Story Mode handoff, Mock start, Rapid Fire, and follow-up actions after each build
+- `Religion`, `Sports`, `Landmarks`, and `Inventors` are now more pass-first: each starts with `must know first` anchors before the longer reference list
+- Lower-priority reference tabs were extracted into a dedicated module so future UI changes are safer and `src/app.jsx` is less overloaded
 - More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` has been redesigned around short return-friendly sessions:
   - `5 min`, `10 min`, and `15 min` runs

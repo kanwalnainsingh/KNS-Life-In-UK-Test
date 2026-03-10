@@ -71,6 +71,8 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.
 - Added focused follow-up actions on the heavier topic pages so `Story Mode`, `Religion`, `Landmarks`, `Inventors`, and `Sports` can jump straight into topic-specific quick revision.
 - Added a browser smoke test with `puppeteer-core` to validate core flows after build.
+- Extracted the lighter reference tabs into `src/components/reference-tabs.jsx` so `Religion`, `Sports`, `Landmarks`, and `Inventors` can evolve without making `src/app.jsx` even larger.
+- Reordered those lighter reference pages to put `must know first` anchors before the longer supporting lists.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 - Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
 - Added direct `Boxing Day` quiz coverage to close the last festival audit gap.
