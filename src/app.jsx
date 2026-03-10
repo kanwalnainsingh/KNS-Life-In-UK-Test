@@ -52,6 +52,7 @@ const STORAGE_KEYS = {
   theme: "lifeuk-theme",
   activeTab: "lifeuk-active-tab",
   wrongQuestions: "lifeuk-wrong-questions",
+  bookmarks: "lifeuk-bookmarks",
   mockHistory: "lifeuk-mock-history",
   mockProgress: "lifeuk-mock-progress",
   recentQuiz: "lifeuk-recent-quiz",
@@ -63,6 +64,7 @@ const STORAGE_KEYS = {
   quickRevState: "lifeuk-quickrev-state",
   quickRevRatings: "lifeuk-quickrev-ratings",
   topicTracker: "lifeuk-topic-tracker",
+  passPlan: "lifeuk-pass-plan",
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
   storyChapter: "lifeuk-story-chapter",
   storyCompleted: "lifeuk-story-completed",
@@ -123,6 +125,83 @@ const COVERAGE_AREAS = [
   { title: "Symbols and everyday life", detail: "Anthem, currency, identity, practical facts", tab: "anthem", icon: "🎵" },
   { title: "International organisations", detail: "UN, NATO, Commonwealth, Council of Europe", tab: "international", icon: "🌍" },
   { title: "Community and participation", detail: "Volunteering, jury service, magistrates, respect", tab: "quickfacts", icon: "🤝" },
+];
+
+const START_HERE_PATHS = [
+  {
+    id: "new",
+    title: "New learner",
+    note: "Best if the handbook feels too dense and you want the course explained first.",
+    steps: [
+      { label: "Start with Story Mode", tab: "story" },
+      { label: "Then do Quick Revise Pass Core", tab: "quickrev" },
+      { label: "Use Traps before your first mock", tab: "confuse" },
+    ],
+    color: "#3b82f6",
+  },
+  {
+    id: "soon",
+    title: "Test soon",
+    note: "Best if your exam is close and you need the highest-yield route first.",
+    steps: [
+      { label: "Quick Revise Pass Core", tab: "quickrev" },
+      { label: "Daily 10 or One-Page Cram", tab: "daily10" },
+      { label: "Take a balanced mock paper", tab: "mock" },
+    ],
+    color: "#f97316",
+  },
+  {
+    id: "practice",
+    title: "Just practise tests",
+    note: "Best if you already know the course and want question pressure and mistake review.",
+    steps: [
+      { label: "Start with Mock Test 1", tab: "mock" },
+      { label: "Use Revise Mistakes after each paper", tab: "revise" },
+      { label: "Use Traps for repeat confusions", tab: "confuse" },
+    ],
+    color: "#22c55e",
+  },
+];
+
+const PASS_PLANS = [
+  {
+    id: "7day",
+    title: "7-day pass plan",
+    note: "Best if you want the full course but in a clear order.",
+    steps: [
+      { id: "story", label: "Story Mode + Timeline", tab: "story" },
+      { id: "nations", label: "4 Nations + Symbols + Landmarks", tab: "nations" },
+      { id: "facts", label: "Quick Facts + Religion + World Orgs", tab: "quickfacts" },
+      { id: "people", label: "Key People + Wars & Battles", tab: "figures" },
+      { id: "core", label: "Quick Revise Pass Core", tab: "quickrev" },
+      { id: "mock1", label: "Mock Test + Revise Mistakes", tab: "mock" },
+      { id: "final", label: "Cram Sheet + Traps + final mock", tab: "cram" },
+    ],
+    color: "#3b82f6",
+  },
+  {
+    id: "3day",
+    title: "3-day push",
+    note: "Best if the test is close and you need only the highest-yield sequence.",
+    steps: [
+      { id: "day1", label: "Story Mode + 4 Nations + Traps", tab: "story" },
+      { id: "day2", label: "Quick Revise Pass Core + Daily 10", tab: "quickrev" },
+      { id: "day3", label: "Mock Test + Revise Mistakes + Cram Sheet", tab: "mock" },
+    ],
+    color: "#f97316",
+  },
+  {
+    id: "tonight",
+    title: "Night-before cram",
+    note: "Best if you only need the shortest pass-focused route tonight.",
+    steps: [
+      { id: "cram", label: "One-Page Cram Sheet", tab: "cram" },
+      { id: "core", label: "Quick Revise Pass Core", tab: "quickrev" },
+      { id: "traps", label: "Traps + 4 Nations quick pass", tab: "confuse" },
+      { id: "mock", label: "One mock paper or Daily 10", tab: "mock" },
+    ],
+    color: "#10b981",
+  },
 ];
 
 const STORY_TESTED_POINTS = {
@@ -966,6 +1045,26 @@ const saveMockResult = (entry) => {
   writeStore(STORAGE_KEYS.mockProgress, buildMockProgress(history));
 };
 
+const loadBookmarks = () => {
+  const saved = readStore(STORAGE_KEYS.bookmarks, { questions: [], cards: [] });
+  return {
+    questions: Array.isArray(saved.questions) ? saved.questions : [],
+    cards: Array.isArray(saved.cards) ? saved.cards : [],
+  };
+};
+
+const toggleBookmarkEntry = (type, id) => {
+  const current = loadBookmarks();
+  const list = type === "question" ? current.questions : current.cards;
+  const exists = list.includes(id);
+  const next = {
+    ...current,
+    [type === "question" ? "questions" : "cards"]: exists ? list.filter((item) => item !== id) : [id, ...list],
+  };
+  writeStore(STORAGE_KEYS.bookmarks, next);
+  return next;
+};
+
 const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
   const unique = items.filter((item, index, arr) => arr.findIndex((x) => x.q === item.q) === index);
   const recent = readStore(storageKey, []);
@@ -1002,6 +1101,7 @@ const QUICK_REVISION_FOCUS_OPTIONS = [
   { id: "fresh", label: "Fresh mix", detail: "Balanced coverage across the course with new cards first." },
   { id: "core", label: "Pass core", detail: "Highest-yield facts to pass quickly." },
   { id: "weak", label: "Weak areas", detail: "Cards you marked hard or struggle with most." },
+  { id: "saved", label: "Saved facts", detail: "Bookmarked facts you want to come back to quickly." },
   { id: "traps", label: "Common traps", detail: "Comparison cards and high-confusion facts." },
   { id: "dates", label: "Dates only", detail: "Timeline, wars, and major year anchors." },
   { id: "nations", label: "4 Nations", detail: "Capitals, saints, parliaments, symbols, and places." },
@@ -1025,6 +1125,11 @@ const getQuickRevisionFocusPool = (deck, focus, ratings) => {
   if (focus === "traps") return deck.filter(isTrapCard);
   if (focus === "dates") return deck.filter(isDateHeavyCard);
   if (focus === "nations") return deck.filter((item) => ["4 Nations", "Geography", "Landmarks", "Symbols"].includes(item.topic));
+  if (focus === "saved") {
+    const saved = loadBookmarks().cards;
+    const pool = deck.filter((item) => saved.includes(item.id));
+    return pool.length ? pool : deck.filter(isPassCoreCard);
+  }
   if (focus === "weak") {
     const weak = deck
       .filter((item) => (ratings[item.id]?.hard || 0) > 0 || (ratings[item.id]?.seen || 0) > 0)
@@ -1796,6 +1901,24 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const completedPapers = Object.keys(mockProgress).length;
   const nextPaper = getMockNextPaper(mockProgress);
   const bestPaperScore = completedPapers ? Math.max(...Object.values(mockProgress).map((item) => item.bestPercent)) : 0;
+  const bookmarks = useMemo(() => loadBookmarks(), []);
+  const trackerProgress = useMemo(() => readStore(STORAGE_KEYS.topicTracker, {}), []);
+  const trackerCompleted = TRACKER_SECTIONS.filter((item) => trackerProgress[item.id]).length;
+  const quickRevRatings = useMemo(() => readStore(STORAGE_KEYS.quickRevRatings, {}), []);
+  const hardCardCount = Object.values(quickRevRatings).filter((item) => (item?.hard || 0) > (item?.easy || 0)).length;
+  const [selectedPlan, setSelectedPlan] = useState(() => readStore(STORAGE_KEYS.passPlan, { planId: "7day", done: {} }).planId || "7day");
+  const [planProgress, setPlanProgress] = useState(() => readStore(STORAGE_KEYS.passPlan, { planId: "7day", done: {} }));
+  const readiness = Math.max(0, Math.min(100, Math.round((bestPaperScore * 0.55) + (trackerCompleted / TRACKER_SECTIONS.length) * 30 + (wrongQuestions.length ? Math.max(0, 20 - Math.min(20, wrongQuestions.length)) : 15))));
+  const weakestTopic = wrongQuestions.length ? buildRevisionBuckets(wrongQuestions)[0]?.topic || "General review" : "No weak area saved yet";
+  const currentPlan = PASS_PLANS.find((plan) => plan.id === selectedPlan) || PASS_PLANS[0];
+  const completedPlanSteps = currentPlan.steps.filter((step) => planProgress.done?.[`${currentPlan.id}:${step.id}`]).length;
+  const nextBestAction = wrongQuestions.length > 6
+    ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
+    : bestPaperScore < 75
+      ? { title: `Take ${nextPaper.title}`, detail: "You need repeated exam-format practice to reach a safe pass score.", tab: "mock" }
+      : hardCardCount > 0
+        ? { title: "Run a Weak Areas quick session", detail: `${hardCardCount} quick-revision cards are still marked hard.`, tab: "quickrev" }
+        : { title: "Use Traps for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const visibleFacts = useMemo(() => {
@@ -1811,6 +1934,21 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
     const pages = Math.max(1, Math.ceil(factOrder.length / 10));
     setFactPage((value) => (value + 1) % pages);
   };
+  const choosePlan = (planId) => {
+    setSelectedPlan(planId);
+    const next = { ...(readStore(STORAGE_KEYS.passPlan, { planId, done: {} })), planId };
+    setPlanProgress(next);
+    writeStore(STORAGE_KEYS.passPlan, next);
+  };
+  const togglePlanStep = (stepId) => {
+    const key = `${currentPlan.id}:${stepId}`;
+    const next = {
+      planId: currentPlan.id,
+      done: { ...(planProgress.done || {}), [key]: !planProgress.done?.[key] },
+    };
+    setPlanProgress(next);
+    writeStore(STORAGE_KEYS.passPlan, next);
+  };
 
   return (
     <div className="px-4 py-5 sm:px-5">
@@ -1825,9 +1963,9 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
               </CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("mock")}>Mock Test</Button>
-              <Button variant="secondary" onClick={() => setActive("daily10")}>Daily 10</Button>
-              <Button variant="outline" onClick={() => setActive("quickrev")}>Quick Revise</Button>
+              <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("quickrev")}>Start Here</Button>
+              <Button variant="secondary" onClick={() => setActive("mock")}>Mock Test</Button>
+              <Button variant="outline" onClick={() => setActive("daily10")}>Daily 10</Button>
             </div>
           </div>
         </CardHeader>
@@ -1859,8 +1997,82 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </CardContent>
       </Card>
 
+      <div className="feature-grid mb-4">
+        <Card className="border-primary/20 bg-primary/5">
+          <div className="mb-2 text-lg font-extrabold text-foreground">Start here</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">Pick the route that matches how close you are to the test and how confident you already feel.</div>
+          <div className="grid gap-3">
+            {START_HERE_PATHS.map((path) => (
+              <div key={path.id} className="rounded-2xl border border-border bg-card/80 p-3">
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <div className="font-extrabold text-foreground">{path.title}</div>
+                  <Badge text="Pass path" color={path.color} />
+                </div>
+                <div className="mb-2 text-xs leading-6 text-muted-foreground">{path.note}</div>
+                <div className="grid gap-2">
+                  {path.steps.map((step) => (
+                    <button key={step.label} className="focus-ring rounded-xl border border-border bg-secondary/70 px-3 py-2 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
+                      {step.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card className="border-emerald-500/20 bg-emerald-500/5">
+          <div className="mb-2 text-lg font-extrabold text-foreground">Pass plan</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">Use a saved plan so you always know what to do next instead of choosing from every mode each time.</div>
+          <div className="mb-3 flex flex-wrap gap-2">
+            {PASS_PLANS.map((plan) => (
+              <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
+            ))}
+          </div>
+          <div className="mb-3 flex flex-wrap gap-2">
+            <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} done`} color={currentPlan.color} />
+            <Badge text={currentPlan.note} color="#64748b" />
+          </div>
+          <div className="grid gap-2">
+            {currentPlan.steps.map((step, idx) => {
+              const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
+              return (
+                <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-card/80 p-3">
+                  <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-secondary text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
+                    {done ? "✓" : idx + 1}
+                  </button>
+                  <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
+                    {step.label}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+        <Card className="border-amber-500/20 bg-amber-500/5">
+          <div className="mb-2 text-lg font-extrabold text-foreground">Next best action</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
+          <div className="mb-4">
+            <div className="mb-1 text-base font-extrabold text-foreground">{nextBestAction.title}</div>
+            <Button onClick={() => setActive(nextBestAction.tab)}>Open now</Button>
+          </div>
+          <div className="grid gap-3">
+            <div className="rounded-2xl border border-border bg-card/85 p-3">
+              <div className="eyebrow mb-1">Readiness score</div>
+              <div className="big-number">{readiness}%</div>
+              <div className="mt-1 text-xs leading-6 text-muted-foreground">Built from mock scores, tracker progress, and saved mistakes.</div>
+            </div>
+            <div className="rounded-2xl border border-border bg-card/85 p-3">
+              <div className="eyebrow mb-1">Weakest area</div>
+              <div className="text-base font-extrabold text-foreground">{weakestTopic}</div>
+              <div className="mt-1 text-xs leading-6 text-muted-foreground">Use `Revise Mistakes` or `Weak areas` in Quick Revise to tighten this next.</div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
       <div className="metric-grid mb-4">
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
+        <StatTile label="Bookmarked facts" value={bookmarks.cards.length + bookmarks.questions.length} color="#14b8a6" />
         <StatTile label="Mock attempts saved" value={mockHistory.length} color="#3b82f6" />
         <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
         <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
@@ -2284,6 +2496,7 @@ const QuickRevisionTab = ({ setActive }) => {
   const [hardCount, setHardCount] = useState(0);
   const [sessionMeta, setSessionMeta] = useState({ newCount: 0, reviewCount: 0, buckets: {} });
   const [ratings, setRatings] = useState(() => readStore(STORAGE_KEYS.quickRevRatings, {}));
+  const [bookmarks, setBookmarks] = useState(() => loadBookmarks());
   const current = session[index];
 
   const selectedSession = QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === sessionType) || QUICK_REVISION_SESSION_OPTIONS[1];
@@ -2354,6 +2567,10 @@ const QuickRevisionTab = ({ setActive }) => {
     setIndex(Math.floor(Math.random() * session.length));
     setRevealed(false);
   };
+  const toggleCurrentBookmark = () => {
+    if (!current) return;
+    setBookmarks(toggleBookmarkEntry("card", current.id));
+  };
 
   const remaining = Math.max(session.length - index, 0);
   const isFinished = session.length > 0 && index >= session.length;
@@ -2404,6 +2621,7 @@ const QuickRevisionTab = ({ setActive }) => {
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
           <Badge text="Default: 10 min fresh mix" color="#8b5cf6" />
           <Badge text="New cards + smart review" color="#22c55e" />
+          <Badge text={`${bookmarks.cards.length} saved facts`} color="#14b8a6" />
         </div>
       </Card>
       <Card className="mb-4">
@@ -2430,6 +2648,7 @@ const QuickRevisionTab = ({ setActive }) => {
         <div className="flex flex-wrap gap-2">
           <Button onClick={() => startSession("fresh", "medium")}>Start default session</Button>
           <Button variant="secondary" onClick={() => startSession(focus, sessionType)}>Start custom session</Button>
+          {bookmarks.cards.length > 0 && <Button variant="outline" onClick={() => startSession("saved", "short")}>Open saved facts</Button>}
         </div>
       </Card>
       {!session.length && (
@@ -2439,7 +2658,10 @@ const QuickRevisionTab = ({ setActive }) => {
           <div className="mb-4 text-sm leading-7 text-muted-foreground">
             Pick a short session and a focus, then come back later for a new mix without losing your progress.
           </div>
-          <Button onClick={() => startSession("fresh", "medium")}>Start now</Button>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button onClick={() => startSession("fresh", "medium")}>Start now</Button>
+            <Button variant="secondary" onClick={() => startSession("core", "medium")}>Pass core</Button>
+          </div>
         </Card>
       )}
       {isFinished ? (
@@ -2457,6 +2679,7 @@ const QuickRevisionTab = ({ setActive }) => {
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
             <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>New fresh session</button>
             <button className="focus-ring" onClick={() => startSession("weak", "short")} style={{ background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review hard cards</button>
+            {bookmarks.cards.length > 0 && <button className="focus-ring" onClick={() => startSession("saved", "short")} style={{ background: "color-mix(in srgb, #14b8a6 12%, var(--card-bg))", color: "#0f766e", border: "1px solid color-mix(in srgb, #14b8a6 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review saved facts</button>}
             <button className="focus-ring" onClick={() => setActive("home")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Back home</button>
           </div>
         </Card>
@@ -2474,7 +2697,12 @@ const QuickRevisionTab = ({ setActive }) => {
       </div>
       <Card className="quick-revision-card overflow-hidden" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <Badge text={current.topic} color={current.color} />
+          <div className="flex flex-wrap gap-2">
+            <Badge text={current.topic} color={current.color} />
+            <button className="focus-ring" onClick={toggleCurrentBookmark} style={{ border: "1px solid var(--card-border)", background: bookmarks.cards.includes(current.id) ? "color-mix(in srgb, #14b8a6 12%, var(--card-bg))" : "var(--panel-bg)", color: bookmarks.cards.includes(current.id) ? "#0f766e" : "var(--text)", borderRadius: 999, padding: "7px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+              {bookmarks.cards.includes(current.id) ? "★ Saved" : "☆ Save"}
+            </button>
+          </div>
           <div className="text-xs text-muted-foreground">{revealed ? "Answer shown" : "Question only"} · {current.bucket}</div>
         </div>
         <div className="grid gap-3">
@@ -3833,6 +4061,7 @@ const QuizTab = () => {
   const [filter, setFilter] = useState("all");
   const [answerMode, setAnswerMode] = useState("instant");
   const [showContext, setShowContext] = useState(true);
+  const [bookmarks, setBookmarks] = useState(() => loadBookmarks());
   const advanceRef = useRef(null);
 
   const filters = [
@@ -4001,7 +4230,12 @@ const QuizTab = () => {
         <Badge text={`${current + 1} / ${questions.length}`} color="#64748b" />
         <Badge text={`Score: ${score}`} color="#22c55e" />
       </div>
-      <Button variant="secondary" className="mb-3" onClick={() => setStarted(false)}>← Back to quiz setup</Button>
+      <div className="mb-3 flex flex-wrap gap-2">
+        <Button variant="secondary" onClick={() => setStarted(false)}>← Back to quiz setup</Button>
+        <Button variant="secondary" className={bookmarks.questions.includes(q.q) ? "border-teal-500/30 bg-teal-500/10 text-teal-700 dark:text-teal-300" : ""} onClick={() => setBookmarks(toggleBookmarkEntry("question", q.q))}>
+          {bookmarks.questions.includes(q.q) ? "★ Saved question" : "☆ Save question"}
+        </Button>
+      </div>
       <Progress value={((current + 1) / questions.length) * 100} className="mb-4 h-2.5" />
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {confirmed && answerMode === "instant" && (
@@ -4022,7 +4256,7 @@ const QuizTab = () => {
 };
 
 // ── MOCK EXAM ────────────────────────────────────────────────
-const MockExamTab = () => {
+const MockExamTab = ({ setActive }) => {
   const [selectedPaperId, setSelectedPaperId] = useState(1);
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -4038,6 +4272,7 @@ const MockExamTab = () => {
   const [finishConfirm, setFinishConfirm] = useState(false);
   const [mockHistory, setMockHistory] = useState(() => loadMockHistory());
   const [mockProgress, setMockProgress] = useState(() => loadMockProgress());
+  const [bookmarks, setBookmarks] = useState(() => loadBookmarks());
   const timerRef = useRef(null);
 
   const selectedPaper = MOCK_PAPERS.find((paper) => paper.id === selectedPaperId) || MOCK_PAPERS[0];
@@ -4046,6 +4281,12 @@ const MockExamTab = () => {
   const flaggedCount = Object.values(flagged).filter(Boolean).length;
   const score = questions.reduce((sum, question, index) => sum + (answers[index] === question.a ? 1 : 0), 0);
   const breakdown = buildMockCategoryBreakdown(questions, answers);
+  const weakestArea = [...breakdown].sort((left, right) => (left.correct / Math.max(left.total, 1)) - (right.correct / Math.max(right.total, 1)))[0];
+  const weakestAreaTab = weakestArea?.label === "History" ? "story"
+    : weakestArea?.label === "Government & Law" ? "quickfacts"
+      : weakestArea?.label === "4 Nations & Places" ? "nations"
+        : weakestArea?.label === "People & Culture" ? "figures"
+          : "confuse";
   const reviewItems = questions
     .map((question, index) => ({ ...question, chosen: answers[index], index }))
     .filter((item) => {
@@ -4285,6 +4526,22 @@ const MockExamTab = () => {
             ))}
           </div>
         </Card>
+        <Card style={{ border: "1px solid color-mix(in srgb, #3b82f6 30%, var(--card-border))", background: "color-mix(in srgb, #3b82f6 8%, var(--card-bg))" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>What to do next</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>
+                {passed ? "Turn this paper into targeted revision instead of jumping straight into another random test." : "Use the weakest area first, then come back to another paper."}
+              </div>
+            </div>
+            {weakestArea && <Badge text={`Weakest: ${weakestArea.label}`} color={weakestArea.color} />}
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Button variant="secondary" onClick={() => setActive("revise")}>Revise mistakes</Button>
+            <Button variant="secondary" onClick={() => setActive(weakestAreaTab)}>Open weakest area</Button>
+            <Button variant="secondary" onClick={() => setActive("confuse")}>Review traps</Button>
+          </div>
+        </Card>
         <Card>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
             <div>
@@ -4342,6 +4599,9 @@ const MockExamTab = () => {
         <Button variant="secondary" onClick={() => { setStarted(false); setFinished(false); }}>← Back to papers</Button>
         <Button variant="secondary" className={flagged[current] ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300" : ""} onClick={() => setFlagged((prev) => ({ ...prev, [current]: !prev[current] }))}>
           {flagged[current] ? "★ Flagged" : "☆ Flag for review"}
+        </Button>
+        <Button variant="secondary" className={bookmarks.questions.includes(currentQuestion?.q) ? "border-teal-500/30 bg-teal-500/10 text-teal-700 dark:text-teal-300" : ""} onClick={() => setBookmarks(toggleBookmarkEntry("question", currentQuestion.q))}>
+          {bookmarks.questions.includes(currentQuestion?.q) ? "★ Saved question" : "☆ Save question"}
         </Button>
       </div>
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)] xl:items-start">
@@ -4448,8 +4708,9 @@ const MockExamTab = () => {
 };
 
 // ── REVISE ───────────────────────────────────────────────────
-const ReviseTab = () => {
+const ReviseTab = ({ setActive }) => {
   const [bank, setBank] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
+  const [bookmarks, setBookmarks] = useState(() => loadBookmarks());
   const [session, setSession] = useState([]);
   const [started, setStarted] = useState(false);
   const [current, setCurrent] = useState(0);
@@ -4457,6 +4718,7 @@ const ReviseTab = () => {
   const [confirmed, setConfirmed] = useState(false);
   const [score, setScore] = useState(0);
   const [sessionAnswers, setSessionAnswers] = useState({});
+  const bookmarkedQuestions = useMemo(() => ALL_QUIZ.filter((item) => bookmarks.questions.includes(item.q)), [bookmarks]);
 
   const buckets = useMemo(() => buildRevisionBuckets(bank), [bank]);
 
@@ -4536,6 +4798,8 @@ const ReviseTab = () => {
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 <button className="focus-ring" onClick={() => startRevision(bank)} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 12, padding: "12px 18px", fontWeight: 800, cursor: "pointer" }}>Revise All Mistakes</button>
+                {bookmarkedQuestions.length > 0 && <button className="focus-ring" onClick={() => startRevision(bookmarkedQuestions)} style={{ background: "#0f766e", color: "#fff", border: "none", borderRadius: 12, padding: "12px 18px", fontWeight: 800, cursor: "pointer" }}>Saved Questions</button>}
+                <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ background: "#1d4ed8", color: "#fff", border: "none", borderRadius: 12, padding: "12px 18px", fontWeight: 800, cursor: "pointer" }}>Weak Facts in Quick Revise</button>
                 <button className="focus-ring" onClick={clearBank} style={{ background: "transparent", color: "#fecaca", border: "1px solid #7f1d1d", borderRadius: 12, padding: "12px 18px", cursor: "pointer" }}>Clear Saved Mistakes</button>
               </div>
         </Card>
@@ -4559,6 +4823,9 @@ const ReviseTab = () => {
       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
         <Badge text={`${current + 1} / ${session.length}`} color="#64748b" />
         <Badge text={`Correct this round: ${score}`} color="#22c55e" />
+        <button className="focus-ring" onClick={() => setBookmarks(toggleBookmarkEntry("question", q.q))} style={{ border: "1px solid var(--card-border)", background: bookmarks.questions.includes(q.q) ? "color-mix(in srgb, #14b8a6 12%, var(--card-bg))" : "var(--panel-bg)", color: bookmarks.questions.includes(q.q) ? "#0f766e" : "var(--text)", borderRadius: 999, padding: "7px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+          {bookmarks.questions.includes(q.q) ? "★ Saved question" : "☆ Save question"}
+        </button>
       </div>
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {confirmed && (
@@ -4937,8 +5204,8 @@ const App = () => {
       case "anthem": return <AnthemTab />;
       case "quickfacts": return <QuickFactsTab />;
       case "quiz": return <QuizTab />;
-      case "mock": return <MockExamTab />;
-      case "revise": return <ReviseTab />;
+      case "mock": return <MockExamTab setActive={navigateTo} />;
+      case "revise": return <ReviseTab setActive={navigateTo} />;
       case "rapidfire": return <RapidFireTab />;
       default: return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
     }

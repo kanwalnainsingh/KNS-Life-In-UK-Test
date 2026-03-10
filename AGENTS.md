@@ -64,6 +64,9 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
 - Expanded `Key People` again with fuller exam-focused facts, especially Henry VIII, plus extra civics/culture coverage like Jacobites, coalition government, civil servants, school governors, Tate galleries, Turner Prize, and rugby origin.
 - Redesigned `Quick Revise` into a session-first mode with short runs, focus presets, saved session continuity, and `Hard / Okay / Easy` feedback.
+- Added a pass-focused learner layer on `Home` with start routes, saved pass plans, readiness cues, and next-best-action guidance.
+- Added bookmarks for quick-revision cards and question flows, plus a `Saved facts` quick-revision focus.
+- Mock results now point learners to the weakest area and the most useful next revision step.
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 - Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
