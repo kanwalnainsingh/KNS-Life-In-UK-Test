@@ -1068,7 +1068,6 @@ const ALL_QUIZ = [
   { q:"What is Hogmanay?", opts:["Scottish New Year celebration","A Welsh harvest festival","An Irish saint's day","A legal holiday for judges"], a:0, tip:"💡 Good to know — Hogmanay = Scottish New Year celebration on 31 December, often bigger than Christmas in Scotland." },
   { q:"What is Boxing Day?", opts:["A public holiday on 26 December","The first day of Lent","A harvest festival in Wales","The day Parliament opens"], a:0, tip:"💡 Good to know — Boxing Day is the public holiday on 26 December, the day after Christmas." },
   { q:"When is Mothering Sunday in the UK?", opts:["Second Sunday in March","Three Sundays before Easter","1 May","Last Sunday in January"], a:1, tip:"💡 Good to know — Mothering Sunday is three Sundays before Easter, so the date changes each year." },
-  { q:"When is St David's Day?", opts:["1 March","17 March","23 April","30 November"], a:0, tip:"⭐ Exam favourite — St David's Day = 1 March." },
   { q:"When is St Patrick's Day?", opts:["1 March","17 March","23 April","30 November"], a:1, tip:"⭐ Exam favourite — St Patrick's Day = 17 March." },
   { q:"When is St Andrew's Day?", opts:["1 March","17 March","23 April","30 November"], a:3, tip:"⭐ Exam favourite — St Andrew's Day = 30 November." },
   { q:"How long does Hanukkah last?", opts:["1 day","3 days","7 days","8 days"], a:3, tip:"💡 Good to know — Hanukkah = 8 days in Nov/Dec. Jewish festival. Menorah candles lit each night." },
@@ -1174,7 +1173,6 @@ const ALL_QUIZ = [
   { q:"The monarch is head of the Church of England. What about Church of Scotland?", opts:["Also head of it","Has NO special role","Head of it too but different title","Banned from it"], a:1, tip:"⭐ Exam favourite — Monarch = head of Church of England ONLY. Church of Scotland = Presbyterian = no monarch role." },
   { q:"Commonwealth (54) vs EU (27) — which is the UK still a member of?", opts:["EU","Commonwealth","Both","Neither"], a:1, tip:"⭐ Exam favourite — UK left EU in 2020 (Brexit). UK is still in the Commonwealth (54 countries)." },
   { q:"What does the word 'cenotaph' mean?", opts:["A victory arch","An empty tomb","A Roman road","A royal palace"], a:1, tip:"💡 Good to know — Cenotaph comes from Greek and means 'empty tomb'. In the UK, it is the national war memorial in Whitehall." },
-  { q:"Where is Maiden Castle?", opts:["Dorset","Wiltshire","Cornwall","Northumberland"], a:0, tip:"💡 Good to know — Maiden Castle is in Dorset and is one of the largest Iron Age hill forts in Europe." },
   { q:"What does council tax pay for?", opts:["Only pensions","Local services through the local authority","Only the NHS","Only the armed forces"], a:1, tip:"📌 Often tested — Council tax is paid to the local authority for local services. It is not the same as National Insurance." },
   { q:"What is the main role of a Police and Crime Commissioner?", opts:["To run Parliament","To oversee local policing priorities","To lead the armed forces","To appoint judges"], a:1, tip:"💡 Good to know — PCCs oversee local policing priorities in England and Wales. They were first elected in 2012." },
   // ── INVENTORS (additional) ──────────────────────────────────

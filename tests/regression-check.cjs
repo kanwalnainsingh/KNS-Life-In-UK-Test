@@ -61,6 +61,10 @@ const normalizeQuestion = (text) =>
     assert(pool.some((item) => item.name === figure), `Missing key figure coverage: ${figure}`);
   }
 
+  const contains = (fragment) => data.ALL_QUIZ.filter((question) => question.q.toLowerCase().includes(fragment.toLowerCase()));
+  assert(contains("st david's day").length === 1, "St David's Day should only be tested once directly");
+  assert(contains("maiden castle").length === 1, "Maiden Castle should only have one direct quiz question");
+
   console.log("Regression check passed:");
   console.log(`- ${data.ALL_QUIZ.length} unique quiz questions`);
   console.log(`- ${data.STORY_CHAPTERS.length} story chapters with recap coverage`);
