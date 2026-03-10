@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 307 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 310 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.4`
+Current release: `v1.11.5`
 
 ---
 
@@ -144,6 +144,11 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Scotland uses `Highers`
   - Northern Ireland requires photo ID at polling stations
   - nation-specific court, church, and devolution compare points
+- Expanded `Speaker of the House of Commons` coverage across the app:
+  - how the Speaker is chosen
+  - the Speaker's role in Commons debates
+  - political neutrality
+  - the fact that the Speaker still remains an MP
 - Rebalanced the fixed mock papers to a more exam-like spread:
   - `7` history
   - `7` government and law
