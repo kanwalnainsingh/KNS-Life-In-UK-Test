@@ -611,6 +611,39 @@ const TOP_TESTED_FACTS = [
   "PM = head of government. Monarch = head of state.",
 ];
 
+const TOP_TRAP_TITLES = new Set([
+  "Great Britain vs United Kingdom",
+  "British Isles vs United Kingdom",
+  "House of Commons vs House of Lords",
+  "Church of England vs Church of Scotland",
+  "1603 Union of Crowns vs 1707 Act of Union",
+  "Slave Trade 1807 vs Slavery Abolished 1833",
+  "Council of Europe vs European Union",
+  "Big Ben vs Elizabeth Tower",
+]);
+
+const getConfusableGroup = (title) => {
+  if (TOP_TRAP_TITLES.has(title)) return "Top Exam Traps";
+  if (/great britain|united kingdom|british isles|saints|crown dependencies|highers|a-levels|westminster|devolved|england and wales legal system/i.test(title)) return "Nations and Identity";
+  if (/prime minister|monarch|pcc|councillor|commonwealth & irish voting rights|voting rights|commons|lords|national insurance|council tax/i.test(title)) return "Government, Law and Voting";
+  return "History, Dates and Places";
+};
+
+const getConfusableLevel = (title) => {
+  if (TOP_TRAP_TITLES.has(title)) return { text: "Exam favourite", color: "#ef4444" };
+  if (/criminal courts|civil courts|youth court|children's hearing|highers|a-levels|river severn|river thames|battle of britain|blitz|dunkirk|d-day|trafalgar|waterloo/i.test(title)) {
+    return { text: "Common mix-up", color: "#f59e0b" };
+  }
+  return { text: "Good to know", color: "#64748b" };
+};
+
+const CONFUSABLE_GROUP_ORDER = [
+  "Top Exam Traps",
+  "Nations and Identity",
+  "Government, Law and Voting",
+  "History, Dates and Places",
+];
+
 const pickRandom = (items, count) => [...items].sort(() => Math.random() - 0.5).slice(0, count);
 
 const saveWrongQuestions = (items) => {
@@ -2551,41 +2584,87 @@ const NationsTab = () => (
 );
 
 // ── CONFUSABLES ──────────────────────────────────────────────
-const ConfuseTab = () => (
-  <div style={{ padding: 20 }}>
-    <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam traps.">Don't Confuse These</SectionTitle>
-    <Card style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.14), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        <div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Comparison revision pack</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Best for facts that are similar enough to confuse, but different enough to cost marks.</div>
+const ConfuseTab = () => {
+  const grouped = CONFUSABLE_GROUP_ORDER.map((group) => ({
+    group,
+    items: CONFUSABLES.filter((item) => getConfusableGroup(item.title) === group),
+  })).filter((entry) => entry.items.length > 0);
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam traps.">Don't Confuse These</SectionTitle>
+      <Card style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.14), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Comparison revision pack</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Grouped by the areas people actually mix up in the test, with the highest-risk traps first.</div>
+          </div>
+          <Badge text={`${CONFUSABLES.length} comparison cards`} color="#f97316" />
         </div>
-        <Badge text={`${CONFUSABLES.length} comparison cards`} color="#f97316" />
-      </div>
-      <MemoryHook text="Use these in pairs: read the left side, cover the right side, then say the difference out loud before checking." />
-    </Card>
-    {CONFUSABLES.map((c, i) => (
-      <Card key={i} style={{ border: "1px solid #374151" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
-          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{c.icon} {c.title}</div>
-          <Badge text="Exam trap comparison" color="#f97316" />
-        </div>
-        <div className="compare-grid" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
-          {[c.left, c.right].map((side, si) => (
-            <div key={si} style={{ background: side.color + "11", border: `1px solid ${side.color}44`, borderRadius: 14, padding: 12 }}>
-              <div style={{ fontWeight: 800, color: side.color, marginBottom: 8, fontSize: 13 }}>{side.label}</div>
-              {side.points.map((p, pi) => (
-                <div key={pi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: pi < side.points.length - 1 ? `1px solid ${side.color}22` : "none", lineHeight: 1.55 }}>{p}</div>
-              ))}
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
+          {[
+            "Top Exam Traps = start here if you only have a few minutes.",
+            "Nations and Identity = UK/GB, saints, parliaments, systems, and symbols.",
+            "Government, Law and Voting = public roles, courts, law, tax, and election traps.",
+            "History, Dates and Places = dates, reforms, battles, and place-based mixes.",
+          ].map((item) => (
+            <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
+              {item}
             </div>
           ))}
         </div>
-        <MemoryHook text={c.memory} />
-        <TrapAlert text={c.alert} />
+        <MemoryHook text="Use these in pairs: read the left side, cover the right side, then say the difference out loud before checking." />
       </Card>
-    ))}
-  </div>
-);
+      {grouped.map(({ group, items }) => (
+        <div key={group} style={{ display: "grid", gap: 12 }}>
+          <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{group}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>
+                  {group === "Top Exam Traps"
+                    ? "Start here first. These are the comparisons most likely to cost easy marks."
+                    : group === "Nations and Identity"
+                      ? "Nation names, systems, parliaments, symbols, and location-based confusion points."
+                      : group === "Government, Law and Voting"
+                        ? "Public roles, courts, elections, duties, and everyday public-system differences."
+                        : "Dates, reforms, battles, and places that are easy to swap under pressure."}
+                </div>
+              </div>
+              <Badge text={`${items.length} cards`} color={group === "Top Exam Traps" ? "#ef4444" : "#3b82f6"} />
+            </div>
+          </Card>
+          {items.map((c, i) => {
+            const level = getConfusableLevel(c.title);
+            return (
+              <Card key={`${group}-${i}`} style={{ border: "1px solid #374151" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+                  <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{c.icon} {c.title}</div>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <Badge text={group} color="#64748b" />
+                    <Badge text={level.text} color={level.color} />
+                  </div>
+                </div>
+                <div className="compare-grid" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
+                  {[c.left, c.right].map((side, si) => (
+                    <div key={si} style={{ background: side.color + "11", border: `1px solid ${side.color}44`, borderRadius: 14, padding: 12 }}>
+                      <div style={{ fontWeight: 800, color: side.color, marginBottom: 8, fontSize: 13 }}>{side.label}</div>
+                      {side.points.map((p, pi) => (
+                        <div key={pi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: pi < side.points.length - 1 ? `1px solid ${side.color}22` : "none", lineHeight: 1.55 }}>{p}</div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+                <MemoryHook text={c.memory} />
+                <TrapAlert text={c.alert} />
+              </Card>
+            );
+          })}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 // ── INVENTORS ────────────────────────────────────────────────
 const InventorsTab = () => {
