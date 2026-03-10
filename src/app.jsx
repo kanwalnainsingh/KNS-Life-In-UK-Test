@@ -1456,7 +1456,7 @@ const ScrollBottomButton = ({ visible }) => (
     }}
   >
     <span aria-hidden="true">↓</span>
-    <span>End</span>
+    <span>Bottom</span>
   </button>
 );
 
@@ -5139,7 +5139,7 @@ const App = () => {
     const onScroll = () => {
       const current = window.scrollY;
       const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
-      setShowScrollTop(maxScroll > 220);
+      setShowScrollTop(maxScroll > 220 && current > 140);
       setShowScrollBottom(maxScroll > 220 && current < maxScroll - 120);
     };
     onScroll();
