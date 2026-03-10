@@ -53,7 +53,7 @@ const assert = (condition, message) => {
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
   assert(/Small sessions, fresh coverage/.test(appSource), "Quick revision hero missing");
   assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");
-  assert(/Show details/.test(appSource), "Quick revision inline details control missing");
+  assert(/Quick answer view/.test(appSource), "Quick revision auto-answer view missing");
   assert(/Review the ones you missed/.test(appSource), "Daily 10 wrong-answer review missing");
   assert(/<span>Menu<\/span>/.test(appSource), "Bottom menu label missing");
   assert(/Start here/.test(appSource), "Pass-focused start guidance missing");

@@ -2509,7 +2509,7 @@ const QuickRevisionTab = ({ setActive }) => {
     setIndex(0);
     setCompleted(0);
     setHardCount(0);
-    setRevealed(false);
+    setRevealed(true);
     setSessionMeta({ newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets });
     scrollPageTop();
     persistQuickRevisionState({
@@ -2519,7 +2519,7 @@ const QuickRevisionTab = ({ setActive }) => {
       index: 0,
       completed: 0,
       hardCount: 0,
-      revealed: false,
+      revealed: true,
       sessionMeta: { newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets },
     });
   };
@@ -2527,7 +2527,7 @@ const QuickRevisionTab = ({ setActive }) => {
   const moveToNext = () => {
     setIndex((value) => value + 1);
     setCompleted((value) => value + 1);
-    setRevealed(false);
+    setRevealed(true);
   };
 
   const markCard = (result) => {
@@ -2556,12 +2556,12 @@ const QuickRevisionTab = ({ setActive }) => {
       if (direction === "next") return (value + 1) % session.length;
       return (value - 1 + session.length) % session.length;
     });
-    setRevealed(false);
+    setRevealed(true);
   };
   const jumpRandomCard = () => {
     if (!session.length) return;
     setIndex(Math.floor(Math.random() * session.length));
-    setRevealed(false);
+    setRevealed(true);
   };
   const toggleCurrentBookmark = () => {
     if (!current) return;
@@ -2584,7 +2584,7 @@ const QuickRevisionTab = ({ setActive }) => {
     setIndex(Math.min(saved.index || 0, Math.max(restoredCards.length - 1, 0)));
     setCompleted(saved.completed || 0);
     setHardCount(saved.hardCount || 0);
-    setRevealed(Boolean(saved.revealed));
+    setRevealed(true);
     setSessionMeta(saved.sessionMeta || { newCount: 0, reviewCount: 0, buckets: {} });
   }, [deck]);
 
@@ -2699,37 +2699,25 @@ const QuickRevisionTab = ({ setActive }) => {
               {bookmarks.cards.includes(current.id) ? "★ Saved" : "☆ Save"}
             </button>
           </div>
-          <div className="text-xs text-muted-foreground">{revealed ? "Answer shown" : "Question only"} · {current.bucket}</div>
+          <div className="text-xs text-muted-foreground">Quick answer view · {current.bucket}</div>
         </div>
         <div className="grid gap-3">
           <div className="rounded-2xl border border-border bg-card/80 p-4">
             <div className="mb-1 text-[11px] font-bold text-muted-foreground">PROMPT</div>
             <div className="text-[22px] font-black leading-8 text-foreground">{current.front}</div>
           </div>
-          {!revealed && (
-            <div className="px-1 pt-1 text-sm leading-7 text-muted-foreground">
-              Think of the answer first, then use <strong style={{ color: "var(--text-strong)" }}>Show answer</strong> to check yourself.
-            </div>
-          )}
-          {revealed && (
-            <>
-              <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
-                <div className="mb-1 text-[11px] font-bold text-muted-foreground">ANSWER</div>
-                <div className="text-xl font-extrabold leading-8 text-foreground">{current.back}</div>
-              </div>
-              <div className="rounded-2xl border border-border bg-card/80 p-4">
-                <div className="mb-1 text-[11px] font-bold text-muted-foreground">WHY THIS MATTERS</div>
-                <div className="text-sm leading-7 text-foreground">{current.context}</div>
-              </div>
-              <MemoryHook text={current.memory} />
-            </>
-          )}
+          <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
+            <div className="mb-1 text-[11px] font-bold text-muted-foreground">ANSWER</div>
+            <div className="text-xl font-extrabold leading-8 text-foreground">{current.back}</div>
+          </div>
+          <div className="rounded-2xl border border-border bg-card/80 p-4">
+            <div className="mb-1 text-[11px] font-bold text-muted-foreground">WHY THIS MATTERS</div>
+            <div className="text-sm leading-7 text-foreground">{current.context}</div>
+          </div>
+          <MemoryHook text={current.memory} />
         </div>
         <div className="mt-4 grid gap-2">
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setRevealed((value) => !value)} className="min-w-[160px] flex-1">
-              {revealed ? "Hide details" : "Show details"}
-            </Button>
             <Button variant="secondary" onClick={() => moveCard("prev")}>
               ← Previous
             </Button>
@@ -2740,17 +2728,11 @@ const QuickRevisionTab = ({ setActive }) => {
               Next →
             </Button>
           </div>
-          {revealed ? (
-            <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" className="min-w-[140px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
-              <Button variant="secondary" className="min-w-[140px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
-              <Button variant="secondary" className="min-w-[140px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
-            </div>
-          ) : (
-            <div className="text-sm leading-7 text-muted-foreground">
-              Think first, then use <strong style={{ color: "var(--text-strong)" }}>Show details</strong> to reveal the answer, why it matters, and the memory clue.
-            </div>
-          )}
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" className="min-w-[140px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
+            <Button variant="secondary" className="min-w-[140px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
+            <Button variant="secondary" className="min-w-[140px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
+          </div>
         </div>
       </Card>
       </>
