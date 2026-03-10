@@ -212,6 +212,13 @@ const getInitialTheme = () => {
   return true;
 };
 
+const scrollPageTop = () => {
+  if (typeof window === "undefined") return;
+  window.requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  });
+};
+
 const forceLatestAppReload = async () => {
   try {
     if ("serviceWorker" in navigator) {
@@ -1950,6 +1957,7 @@ const DailyTenTab = () => {
     setConfirmed(false);
     setScore(0);
     setFinished(false);
+    scrollPageTop();
   };
 
   useEffect(() => {
@@ -2128,6 +2136,7 @@ const TrueFalseSprintTab = () => {
     setSelected(null);
     setScore(0);
     setFinished(false);
+    scrollPageTop();
   };
 
   const answer = (value) => {
@@ -2216,6 +2225,7 @@ const QuickRevisionTab = ({ setActive }) => {
     setHardCount(0);
     setRevealed(false);
     setSessionMeta({ newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets });
+    scrollPageTop();
     persistQuickRevisionState({
       focus: overrideFocus,
       sessionType: overrideType,
@@ -2467,6 +2477,7 @@ const StoryModeTab = ({ setActive }) => {
 
   useEffect(() => {
     writeStore(STORAGE_KEYS.storyChapter, chapterIndex);
+    scrollPageTop();
   }, [chapterIndex]);
 
   if (!current) return null;
@@ -3744,6 +3755,7 @@ const QuizTab = () => {
     setFinished(false);
     setReviewMode(false);
     setStarted(true);
+    scrollPageTop();
   };
 
   const startQuiz = () => resetFlow(filterQuestions());
@@ -3947,6 +3959,7 @@ const MockExamTab = () => {
     setFinishConfirm(false);
     setStarted(true);
     setFinished(false);
+    scrollPageTop();
   };
 
   useEffect(() => {
@@ -4352,6 +4365,7 @@ const ReviseTab = () => {
     setScore(0);
     setSessionAnswers({});
     setStarted(true);
+    scrollPageTop();
   };
 
   const clearBank = () => {
@@ -4487,6 +4501,7 @@ const RapidFireTab = () => {
     setFinished(false);
     setTimeLeft(timePerQuestion);
     setStarted(true);
+    scrollPageTop();
   };
 
   const advance = (isCorrect, chosen, q) => {

@@ -54,6 +54,7 @@ const assert = (condition, message) => {
   assert(/Small sessions, fresh coverage/.test(appSource), "Quick revision hero missing");
   assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");
   assert(/Show details/.test(appSource), "Quick revision inline details control missing");
+  assert(/const scrollPageTop =/.test(appSource), "Shared session scroll-top helper missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
   assert(/↻ Latest/.test(appSource), "Latest-version button missing");
   assert(/registration\.update\(\)/.test(indexSource), "Service worker should check for updates on load");
@@ -76,6 +77,7 @@ const assert = (condition, message) => {
   assert(/MobileQuickPanel/.test(appSource), "Quick panel component missing");
   assert(/ScrollBottomButton/.test(appSource), "Scroll-to-bottom helper missing");
   assert(/mobile-scroll-bottom/.test(indexSource), "Scroll-to-bottom styling missing");
+  assert(/scrollPageTop\(\);/.test(appSource), "Expected session start scroll-top calls");
   assert(/desktop-nav-panel/.test(indexSource), "Desktop grouped navigation styling missing");
   assert(/AppFooterBar/.test(appSource), "Footer version bar missing");
   assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");
