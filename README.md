@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 307 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.3`
+Current release: `v1.11.4`
 
 ---
 
@@ -77,7 +77,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | 🎭 Arts | Literature, music, art, architecture, fashion, and film |
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7 |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
-| 📝 Mock Test | 30 fixed balanced mock papers with saved per-paper scores, attempts, and next-paper guidance |
+| 📝 Mock Test | 40 fixed balanced mock papers with saved per-paper scores, attempts, and next-paper guidance |
 | 🔥 Rapid Fire | Timed revision with broader randomisation and fewer repeats |
 | ♻️ Revise Mistakes | Retry the questions you got wrong |
 
@@ -144,6 +144,14 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Scotland uses `Highers`
   - Northern Ireland requires photo ID at polling stations
   - nation-specific court, church, and devolution compare points
+- Rebalanced the fixed mock papers to a more exam-like spread:
+  - `7` history
+  - `7` government and law
+  - `5` 4 nations and places
+  - `4` people and culture
+  - `1` compare trap
+- Increased fixed papers from `30` to `40`
+- Added a dedicated mock-balance regression test so every paper stays at `24` questions with the intended coverage split
 - Offline cache support after first online load
 - Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 

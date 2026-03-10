@@ -998,7 +998,7 @@ const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
 
 const MOCK_TOTAL = 24;
 const MOCK_LIMIT_SECONDS = 45 * 60;
-const MOCK_PAPER_COUNT = 30;
+const MOCK_PAPER_COUNT = 40;
 
 const MOCK_CATEGORY_META = {
   history: { label: "History", icon: "📜", color: "#f97316", hint: "Kings, wars, reform, dates, and welfare-state anchors." },
@@ -1009,11 +1009,25 @@ const MOCK_CATEGORY_META = {
 };
 
 const MOCK_DISTRIBUTION = [
-  { id: "history", count: 8 },
-  { id: "civics", count: 6 },
-  { id: "nations", count: 4 },
+  { id: "history", count: 7 },
+  { id: "civics", count: 7 },
+  { id: "nations", count: 5 },
   { id: "culture", count: 4 },
-  { id: "traps", count: 2 },
+  { id: "traps", count: 1 },
+];
+
+const MOCK_SUBGROUP_DISTRIBUTION = [
+  { id: "history-early", count: 3 },
+  { id: "history-modern", count: 2 },
+  { id: "history-conflicts", count: 2 },
+  { id: "civics-government", count: 3 },
+  { id: "civics-law", count: 2 },
+  { id: "civics-everyday", count: 2 },
+  { id: "nations-identity", count: 3 },
+  { id: "nations-places", count: 2 },
+  { id: "culture-people", count: 2 },
+  { id: "culture-society", count: 2 },
+  { id: "traps", count: 1 },
 ];
 
 const createSeededRandom = (seed) => {
@@ -1043,11 +1057,59 @@ const classifyMockCategory = (question) => {
   return "culture";
 };
 
+const classifyMockSubgroup = (question) => {
+  const text = `${question.q} ${question.tip}`.toLowerCase();
+  const category = classifyMockCategory(question);
+
+  if (category === "traps") return "traps";
+
+  if (category === "history") {
+    if (/world war|trafalgar|waterloo|armada|crimean|boer|dunkirk|blitz|d-day|boyne|culloden|bannockburn|agincourt|bosworth|hastings|battle/.test(text)) return "history-conflicts";
+    if (/reform|vote|suffragette|chartist|peterloo|general strike|beveridge|nhs|wind of change|industrial revolution|butler act|decolonisation|eec|brexit|devolution|olympics/.test(text)) return "history-modern";
+    return "history-early";
+  }
+
+  if (category === "civics") {
+    if (/jury|magistrate|court|crime|criminal|civil|habeas corpus|equality act|innocent|rule of law|human rights/.test(text)) return "civics-law";
+    if (/national insurance|council tax|lottery|drive|driving|moped|school|education|training|blood donation|community|volunteer|charity|census|photo id|language requirement|citizenship|settlement/.test(text)) return "civics-everyday";
+    return "civics-government";
+  }
+
+  if (category === "nations") {
+    if (/stonehenge|tower of london|windsor|buckingham|cenotaph|loch|river|wall|castle|museum|palace|giant|angel of the north|eden project/.test(text)) return "nations-places";
+    return "nations-identity";
+  }
+
+  if (/christmas|easter|diwali|hanukkah|eid|vaisakhi|bonfire|remembrance|burns|hogmanay|mothering|faith|religion|festival|anthem|union jack|world wide web|penicillin|invention|invent|scientist|writer|artist|poet|playwright|beatles|fashion|sport|wimbledon|fa cup|marathon|olympic|paralympic|commonwealth|nato|united nations|council of europe|g7/.test(text)) {
+    return "culture-society";
+  }
+  return "culture-people";
+};
+
 const buildMockBuckets = () => {
-  const bucketed = { history: [], civics: [], nations: [], culture: [], traps: [] };
+  const bucketed = {
+    history: [],
+    civics: [],
+    nations: [],
+    culture: [],
+    traps: [],
+    "history-early": [],
+    "history-modern": [],
+    "history-conflicts": [],
+    "civics-government": [],
+    "civics-law": [],
+    "civics-everyday": [],
+    "nations-identity": [],
+    "nations-places": [],
+    "culture-people": [],
+    "culture-society": [],
+  };
   [...ALL_QUIZ, ...buildConfusionDeck()].forEach((question, index) => {
     const key = classifyMockCategory(question);
-    bucketed[key].push({ ...question, mockKey: `${key}:${index}:${question.q}` });
+    const subgroup = classifyMockSubgroup(question);
+    const enriched = { ...question, mockKey: `${key}:${index}:${question.q}` };
+    bucketed[key].push(enriched);
+    bucketed[subgroup].push(enriched);
   });
   return bucketed;
 };
@@ -1072,11 +1134,20 @@ const buildFixedMockPaper = (paperNumber) => {
   const used = new Set();
   const questions = [];
 
-  MOCK_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
+  MOCK_SUBGROUP_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
     const items = buckets[id];
     const startIndex = ((paperNumber - 1) * (count + bucketIndex + 2)) % items.length;
     questions.push(...takeFixedQuestions(items, count, startIndex, used));
   });
+
+  if (questions.length < MOCK_TOTAL) {
+    const fallbackGroups = MOCK_DISTRIBUTION.flatMap(({ id }) => seededShuffle(buckets[id], 2000 + paperNumber + id.length));
+    fallbackGroups.forEach((question) => {
+      if (questions.length >= MOCK_TOTAL || used.has(question.q)) return;
+      questions.push(question);
+      used.add(question.q);
+    });
+  }
 
   if (questions.length < MOCK_TOTAL) {
     const fallback = seededShuffle([...ALL_QUIZ, ...buildConfusionDeck()], 1000 + paperNumber);
@@ -3261,7 +3332,7 @@ const MockExamTab = () => {
 
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="📝" meta="30 fixed mock papers, each with 24 questions and a balanced spread across history, government, 4 nations, and culture.">Mock Test</SectionTitle>
+        <SectionTitle icon="📝" meta="40 fixed mock papers, each with 24 questions and a more exam-like spread across history, government, nations, culture, and a smaller number of compare traps.">Mock Test</SectionTitle>
         <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #f97316 12%, var(--card-bg)), color-mix(in srgb, #0f172a 14%, var(--surface-soft)))", border: "1px solid color-mix(in srgb, #f97316 35%, var(--card-border))" }}>
           <div className="study-mode-grid" style={{ display: "grid", gap: 14, alignItems: "center" }}>
             <div>
@@ -3270,7 +3341,7 @@ const MockExamTab = () => {
                 Use these like proper papers. Each set stays fixed, covers the core handbook areas, and gives detailed review with memory tips after you finish.
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-                <Badge text="30 fixed papers" color="#f97316" />
+                <Badge text="40 fixed papers" color="#f97316" />
                 <Badge text="24 questions each" color="#3b82f6" />
                 <Badge text="45:00 official timer" color="#ef4444" />
                 <Badge text="18 needed to pass" color="#22c55e" />

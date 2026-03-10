@@ -43,7 +43,7 @@ const assert = (condition, message) => {
   assert(/TrueFalseSprintTab/.test(appSource), "Sprint UI missing");
   assert(/CramSheetTab/.test(appSource), "Cram UI missing");
   assert(/TopicTrackerTab/.test(appSource), "Tracker UI missing");
-  assert(/MOCK_PAPER_COUNT = 30/.test(appSource), "Expected 30 fixed mock papers");
+  assert(/MOCK_PAPER_COUNT = 40/.test(appSource), "Expected 40 fixed mock papers");
   assert(/mockProgress/.test(appSource), "Mock progress storage missing");
   assert(/QUICK_REVISION_MODES/.test(appSource), "Quick revision mode presets missing");
   assert(/Pass Core/.test(appSource), "Pass Core quick revision mode missing");
