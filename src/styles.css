@@ -5,22 +5,22 @@
 @layer base {
   :root {
     color-scheme: light;
-    --background: 214 45% 97%;
-    --foreground: 214 31% 17%;
+    --background: 42 33% 97%;
+    --foreground: 218 28% 17%;
     --card: 0 0% 100%;
-    --card-foreground: 214 31% 17%;
+    --card-foreground: 218 28% 17%;
     --popover: 0 0% 100%;
-    --popover-foreground: 214 31% 17%;
+    --popover-foreground: 218 28% 17%;
     --primary: 220 79% 54%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 212 67% 96%;
-    --secondary-foreground: 214 31% 17%;
-    --muted: 210 38% 95%;
-    --muted-foreground: 215 16% 40%;
+    --secondary: 36 25% 95%;
+    --secondary-foreground: 218 28% 17%;
+    --muted: 36 18% 93%;
+    --muted-foreground: 216 14% 36%;
     --accent: 214 100% 97%;
     --accent-foreground: 220 79% 54%;
-    --border: 214 32% 88%;
-    --input: 214 32% 88%;
+    --border: 217 22% 83%;
+    --input: 217 22% 83%;
     --ring: 220 79% 54%;
   }
 
@@ -67,9 +67,9 @@
   .app-shell {
     @apply min-h-screen bg-background text-foreground;
     background-image:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 30%),
-      linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0)),
-      linear-gradient(180deg, #f5f7fb, #eef3fa);
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.10), transparent 30%),
+      linear-gradient(180deg, rgba(255,255,255,0.50), rgba(255,255,255,0)),
+      linear-gradient(180deg, #faf7f0, #f3f4f8);
   }
 
   .dark .app-shell {
@@ -93,5 +93,61 @@
 
   .section-wrap {
     @apply space-y-4;
+  }
+
+  .hero-panel {
+    @apply overflow-hidden rounded-[28px] border border-primary/20 bg-gradient-to-br from-primary/15 via-card to-card shadow-soft;
+  }
+
+  .metric-grid {
+    @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-5;
+  }
+
+  .feature-grid {
+    @apply grid gap-3 md:grid-cols-2 xl:grid-cols-3;
+  }
+
+  .focus-panel {
+    @apply rounded-3xl border border-border bg-card/85 shadow-soft backdrop-blur;
+  }
+
+  .subtle-panel {
+    @apply rounded-2xl border border-border bg-secondary/70;
+  }
+
+  .setup-card {
+    @apply rounded-[26px] border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card shadow-soft;
+  }
+
+  .choice-grid {
+    @apply grid gap-2 sm:grid-cols-2;
+  }
+
+  .choice-tile {
+    @apply rounded-2xl border border-border bg-card px-4 py-3 text-left text-sm font-semibold text-foreground transition-colors;
+  }
+
+  .choice-tile-active {
+    @apply border-primary bg-primary/10 text-primary shadow-sm;
+  }
+
+  .status-panel {
+    @apply rounded-2xl border border-border bg-card/90 p-4 shadow-soft;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground;
+  }
+
+  .big-number {
+    @apply text-3xl font-black tracking-tight text-foreground sm:text-4xl;
+  }
+
+  .option-button {
+    @apply rounded-2xl border-2 px-4 py-3.5 text-left text-sm font-medium transition-all duration-150;
+  }
+
+  .navigator-tile {
+    @apply grid min-h-[52px] place-items-center rounded-2xl border text-sm font-extrabold transition-colors;
   }
 }
