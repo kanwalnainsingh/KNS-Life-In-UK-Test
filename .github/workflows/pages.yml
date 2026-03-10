@@ -36,6 +36,15 @@ jobs:
       - name: Build site
         run: npm run build
 
+      - name: Setup Chrome
+        id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Run browser smoke test
+        env:
+          CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
+        run: npm run test:browser
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:

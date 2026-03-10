@@ -1,0 +1,143 @@
+const fs = require("fs");
+const http = require("http");
+const path = require("path");
+const puppeteer = require("puppeteer-core");
+
+const ROOT = path.resolve(__dirname, "..");
+const DOCS_DIR = path.join(ROOT, "docs");
+
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".svg": "image/svg+xml",
+  ".xml": "application/xml; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+};
+
+const assert = (condition, message) => {
+  if (!condition) throw new Error(message);
+};
+
+const getChromePath = () => {
+  const candidates = [
+    process.env.CHROME_BIN,
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium-browser",
+    "/usr/bin/chromium",
+  ].filter(Boolean);
+
+  const found = candidates.find((candidate) => fs.existsSync(candidate));
+  if (!found) {
+    throw new Error("No supported Chrome/Chromium executable found for browser smoke test.");
+  }
+  return found;
+};
+
+const startServer = () => {
+  const server = http.createServer((req, res) => {
+    const requestPath = decodeURIComponent((req.url || "/").split("?")[0]).replace(/^\/+/, "");
+    const filePath = path.join(DOCS_DIR, requestPath || "index.html");
+    const safePath = filePath.startsWith(DOCS_DIR) ? filePath : path.join(DOCS_DIR, "index.html");
+    const target = fs.existsSync(safePath) && fs.statSync(safePath).isFile() ? safePath : path.join(DOCS_DIR, "index.html");
+    const ext = path.extname(target).toLowerCase();
+    res.writeHead(200, { "Content-Type": MIME[ext] || "application/octet-stream" });
+    res.end(fs.readFileSync(target));
+  });
+
+  return new Promise((resolve) => {
+    server.listen(0, "127.0.0.1", () => {
+      const { port } = server.address();
+      resolve({
+        server,
+        url: `http://127.0.0.1:${port}`,
+      });
+    });
+  });
+};
+
+const waitForText = async (page, text) => {
+  await page.waitForFunction(
+    (value) => document.body && document.body.innerText.includes(value),
+    { timeout: 15000 },
+    text,
+  );
+};
+
+const clickByText = async (page, text) => {
+  const handles = await page.$x(`//button[contains(normalize-space(.), "${text}")]`);
+  assert(handles.length > 0, `Could not find button with text: ${text}`);
+  await handles[0].evaluate((element) => {
+    element.scrollIntoView({ block: "center", inline: "center" });
+    element.click();
+  });
+};
+
+(async () => {
+  assert(fs.existsSync(path.join(DOCS_DIR, "index.html")), "Built docs/ output is required. Run npm run build first.");
+
+  const { server, url } = await startServer();
+  const browser = await puppeteer.launch({
+    executablePath: getChromePath(),
+    headless: true,
+    args: ["--no-sandbox", "--disable-dev-shm-usage"],
+  });
+
+  try {
+    const page = await browser.newPage();
+    page.setDefaultTimeout(15000);
+
+    await page.goto(url, { waitUntil: "networkidle0" });
+    await waitForText(page, "Pass guide");
+    await waitForText(page, "Check Update");
+    await waitForText(page, "Continue your revision");
+
+    await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Quick Revision");
+    await waitForText(page, "Topic filter");
+    await clickByText(page, "Start now");
+    await waitForText(page, "PROMPT");
+    await waitForText(page, "ANSWER");
+
+    await page.goto(`${url}/#story`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Story Mode");
+    await waitForText(page, "Dates and names to remember");
+    await clickByText(page, "Test this chapter");
+    await page.waitForFunction(() => window.location.hash === "#quickrev", { timeout: 15000 });
+    await waitForText(page, "PROMPT");
+    await waitForText(page, "ANSWER");
+
+    await page.goto(`${url}/#mock`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Mock Test");
+    await clickByText(page, "Mock Test 1");
+    await waitForText(page, "Question 1 of 24");
+
+    await page.goto(`${url}/#rapidfire`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Rapid Fire");
+    await waitForText(page, "Reset progress");
+    await waitForText(page, "Start Rapid Fire");
+
+    await page.goto(`${url}/#landmarks`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Turn places into quick recall");
+
+    console.log("Browser smoke test passed:");
+    console.log("- home loads with pass-guide shortcuts");
+    console.log("- quick revision topic filter and card flow render");
+    console.log("- story mode chapter handoff to quick revision works");
+    console.log("- mock paper flow starts in the browser");
+    console.log("- rapid fire reset control renders");
+    console.log("- topic-page follow-up actions render");
+  } finally {
+    await browser.close();
+    await new Promise((resolve) => server.close(resolve));
+  }
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

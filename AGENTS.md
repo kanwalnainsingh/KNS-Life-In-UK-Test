@@ -45,7 +45,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added stable `Story Mode` chapters sourced from `src/data.js`.
 - Rewrote `Story Mode` into a cleaner chronological history-to-modern-Britain course with stronger date anchors.
 - Added visible app release versioning sourced from `package.json`.
-- Added `↻ Latest` refresh action to help mobile users pull the newest deployed version.
+- Added `↻ Check Update` refresh action to help mobile users pull the newest deployed version.
 - Added timeline checkpoint saving so learners can jump back to the point they last remembered.
 - Expanded fixed mock papers from 20 to 30 and added more handbook-style civics/everyday-life questions.
 - Added more revision-anchor cards across sports, arts, symbols, religion, landmarks, world organisations, figures, and quick facts.
@@ -64,10 +64,13 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
 - Expanded `Key People` again with fuller exam-focused facts, especially Henry VIII, plus extra civics/culture coverage like Jacobites, coalition government, civil servants, school governors, Tate galleries, Turner Prize, and rugby origin.
 - Redesigned `Quick Revise` into a session-first mode with short runs, focus presets, saved session continuity, and `Hard / Okay / Easy` feedback.
+- Simplified the visible `Quick Revise` UI so the card answer, context, and memory clue show immediately while recent-history tracking stays in the background.
 - Added a pass-focused learner layer on `Home` with start routes, saved pass plans, readiness cues, and next-best-action guidance.
 - Added bookmarks for quick-revision cards and question flows, plus a `Saved facts` quick-revision focus.
 - Mock results now point learners to the weakest area and the most useful next revision step.
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.
+- Added focused follow-up actions on the heavier topic pages so `Story Mode`, `Religion`, `Landmarks`, `Inventors`, and `Sports` can jump straight into topic-specific quick revision.
+- Added a browser smoke test with `puppeteer-core` to validate core flows after build.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 - Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
 - Added direct `Boxing Day` quiz coverage to close the last festival audit gap.
@@ -106,6 +109,7 @@ node tests/smoke-check.cjs
 node tests/coverage-audit.cjs
 npm test
 npm run build
+npm run test:browser
 ```
 - This validates:
   - quiz bank shape
@@ -115,6 +119,7 @@ npm run build
   - key UI hooks and mobile navigation markers
   - fact/question coverage alignment
   - production bundle output
+  - core browser flows after the built site is served locally
 
 ## Editing guidance
 - Prefer adding to existing topic structures instead of inventing new scattered sections.

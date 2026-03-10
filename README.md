@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.15.6`
+Current release: `v1.15.7`
 
 ---
 
@@ -64,7 +64,7 @@ UI stack now uses:
 | Section | What it does |
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
-| ↔️ Quick Revise | Fast card-by-card revision with `5/10/15 min` timing, topic filters, `Fresh mix`, `Pass core`, `Weak areas`, `Saved facts`, `Common traps`, `Dates`, and `4 Nations` focuses |
+| ↔️ Quick Revise | Fast card-by-card revision with topic filters, `Fresh mix`, `Pass core`, `Weak areas`, `Saved facts`, `Common traps`, `Dates`, and `4 Nations` focuses |
 | 📚 Story Mode | Chronological chapter-by-chapter revision with explicit dates, names, and pass-first memory anchors for the main history and modern-Britain story |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
@@ -121,6 +121,8 @@ UI stack now uses:
 - Home is now cleaner above the fold with a simpler pass path, quieter surfaces, and less repeated guidance competing for attention
 - Longer topic pages now end with clear follow-up actions so `4 Nations`, `Quick Facts`, `Key People`, `Arts`, and `World Orgs` can lead straight into practice instead of feeling like dead-end reading screens
 - Shared mobile density is now lighter too, with tighter card padding and more consistent long-page spacing across the heavier revision sections
+- `Story Mode` chapter actions and the follow-up actions in `Religion`, `Landmarks`, `Inventors`, and `Sports` now open focused `Quick Revise` runs instead of generic reading dead ends
+- Added a browser smoke test using `puppeteer-core` and Chrome to validate Home, Quick Revision, Story Mode handoff, Mock start, Rapid Fire, and follow-up actions after each build
 - More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` has been redesigned around short return-friendly sessions:
   - `5 min`, `10 min`, and `15 min` runs
@@ -269,6 +271,8 @@ UI stack now uses:
 ```bash
 npm install
 npm run build
+npm test
+npm run test:browser
 python3 -m http.server 4173 -d docs
 ```
 
@@ -286,7 +290,7 @@ For GitHub Pages:
 - The visible app release version comes from `package.json`
 - Bump `package.json` for each user-facing release
 - The current version is shown in the app footer and on the home screen
-- Users can tap `↻ Latest` in the footer to force-refresh cached mobile pages
+- Users can tap `↻ Check Update` in the footer to force-refresh cached mobile pages
 - Saved mock paper progress uses local storage, so attempts and scores stay available after new versions are deployed
 - Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point
 - Section pages now include more exam-anchor cards, memory clues, and compare points for faster revision

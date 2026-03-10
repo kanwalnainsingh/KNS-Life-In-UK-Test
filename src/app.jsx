@@ -62,6 +62,7 @@ const STORAGE_KEYS = {
   recentDaily10: "lifeuk-recent-daily10",
   recentSprint: "lifeuk-recent-sprint",
   quickRevState: "lifeuk-quickrev-state",
+  quickRevLaunch: "lifeuk-quickrev-launch",
   quickRevRatings: "lifeuk-quickrev-ratings",
   topicTracker: "lifeuk-topic-tracker",
   passPlan: "lifeuk-pass-plan",
@@ -1053,6 +1054,11 @@ const loadBookmarks = () => {
   };
 };
 
+const launchQuickRevision = (setActive, prefs = {}) => {
+  writeStore(STORAGE_KEYS.quickRevLaunch, prefs);
+  setActive("quickrev");
+};
+
 const toggleBookmarkEntry = (type, id) => {
   const current = loadBookmarks();
   const list = type === "question" ? current.questions : current.cards;
@@ -1944,6 +1950,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const bestPaperScore = completedPapers ? Math.max(...Object.values(mockProgress).map((item) => item.bestPercent)) : 0;
   const bookmarks = useMemo(() => loadBookmarks(), []);
   const trackerProgress = useMemo(() => readStore(STORAGE_KEYS.topicTracker, {}), []);
+  const storyChapterIndex = useMemo(() => readStore(STORAGE_KEYS.storyChapter, 0), []);
   const trackerCompleted = TRACKER_SECTIONS.filter((item) => trackerProgress[item.id]).length;
   const quickRevRatings = useMemo(() => readStore(STORAGE_KEYS.quickRevRatings, {}), []);
   const hardCardCount = Object.values(quickRevRatings).filter((item) => (item?.hard || 0) > (item?.easy || 0)).length;
@@ -1953,6 +1960,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const weakestTopic = wrongQuestions.length ? buildRevisionBuckets(wrongQuestions)[0]?.topic || "General review" : "No weak area saved yet";
   const currentPlan = PASS_PLANS.find((plan) => plan.id === selectedPlan) || PASS_PLANS[0];
   const completedPlanSteps = currentPlan.steps.filter((step) => planProgress.done?.[`${currentPlan.id}:${step.id}`]).length;
+  const nextStoryChapter = STORY_CHAPTERS[Math.min(storyChapterIndex, STORY_CHAPTERS.length - 1)];
   const nextBestAction = wrongQuestions.length > 6
     ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
     : bestPaperScore < 75
@@ -2101,6 +2109,33 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
               })}
             </div>
           </div>
+        </div>
+      </Card>
+
+      <Card className="mb-4 quiet-tint">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-lg font-extrabold text-foreground">Continue your revision</div>
+            <div className="text-sm leading-6 text-muted-foreground">Use these shortcuts when you want the app to pick up from where you last left off.</div>
+          </div>
+          <Badge text="Personal shortcuts" color="#14b8a6" />
+        </div>
+        <div className="grid gap-3 md:grid-cols-3">
+          <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
+            <div className="eyebrow mb-2">Hard cards</div>
+            <div className="text-base font-extrabold text-foreground">{hardCardCount || 0} hard cards saved</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">Run a short weak-areas revision with the cards you marked hard.</div>
+          </button>
+          <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
+            <div className="eyebrow mb-2">Saved facts</div>
+            <div className="text-base font-extrabold text-foreground">{bookmarks.cards.length} saved cards</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">Jump back into the facts you bookmarked for later revision.</div>
+          </button>
+          <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("story")}>
+            <div className="eyebrow mb-2">Story mode</div>
+            <div className="text-base font-extrabold text-foreground">{nextStoryChapter?.title || "Continue history story"}</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">Return to your last chapter and keep the history sequence in order.</div>
+          </button>
         </div>
       </Card>
 
@@ -2623,6 +2658,14 @@ const QuickRevisionTab = ({ setActive }) => {
   const isFinished = session.length > 0 && index >= session.length;
 
   useEffect(() => {
+    const launch = readStore(STORAGE_KEYS.quickRevLaunch, null);
+    if (!launch) return undefined;
+    writeStore(STORAGE_KEYS.quickRevLaunch, null);
+    startSession(launch.focus || "fresh", launch.sessionType || "short", launch.topic || "All topics");
+    return undefined;
+  }, []);
+
+  useEffect(() => {
     const saved = readStore(STORAGE_KEYS.quickRevState, null);
     if (!saved?.sessionIds?.length) return;
     const restoredCards = saved.sessionIds
@@ -2987,8 +3030,8 @@ const StoryModeTab = ({ setActive }) => {
           <button className="focus-ring" onClick={toggleChapterComplete} style={{ border: "1px solid var(--card-border)", background: isCurrentComplete ? "color-mix(in srgb, #22c55e 14%, var(--card-bg))" : "var(--panel-bg)", color: isCurrentComplete ? "#15803d" : "var(--text)", borderRadius: 12, padding: "12px 14px", cursor: "pointer", fontWeight: 700 }}>
             {isCurrentComplete ? "Mark as not done" : "Mark chapter done"}
           </button>
-          <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 12, padding: "12px 14px", cursor: "pointer", fontWeight: 700 }}>
-            Mix with Quick Revision
+          <button className="focus-ring" onClick={() => launchQuickRevision(setActive, { focus: current.id === "wars-modern-britain" ? "dates" : current.id === "citizenship-settlement-basics" ? "nations" : "fresh", topic: current.id === "wars-modern-britain" ? "Wars" : current.id === "citizenship-settlement-basics" ? "4 Nations" : current.id === "world-stage" ? "World Orgs" : "History", sessionType: "short" })} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 12, padding: "12px 14px", cursor: "pointer", fontWeight: 700 }}>
+            Test this chapter
           </button>
           <button
             className="focus-ring"
@@ -3509,7 +3552,7 @@ const NationsTab = ({ setActive }) => (
       title="Use these nation facts right away"
       note="This page is best followed by compare-heavy or question-heavy revision while the capitals, systems, and saints are still fresh."
       actions={[
-        { label: "Quick Revise 4 Nations", primary: true, onClick: () => setActive("quickrev") },
+        { label: "Quick Revise 4 Nations", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "nations", topic: "4 Nations", sessionType: "short" }) },
         { label: "Open Traps", onClick: () => setActive("confuse") },
         { label: "Take a Mock", onClick: () => setActive("mock") },
       ]}
@@ -3601,7 +3644,7 @@ const ConfuseTab = () => {
 };
 
 // ── INVENTORS ────────────────────────────────────────────────
-const InventorsTab = () => {
+const InventorsTab = ({ setActive }) => {
   const cats = ["All", "Medicine", "Computing", "Engineering", "Electronics", "Physics", "Biology"];
   const [cat, setCat] = useState("All");
   const filtered = INVENTORS
@@ -3644,12 +3687,21 @@ const InventorsTab = () => {
           </div>
         </Card>
       ))}
+      <SectionStudyActions
+        title="Turn inventors into quick recall"
+        note="Inventors are easiest to keep if you follow them with a short topic-focused run instead of trying to memorise the full list in one go."
+        actions={[
+          { label: "Quick Revise Inventors", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Inventors", sessionType: "short" }) },
+          { label: "Daily 10", onClick: () => setActive("daily10") },
+          { label: "Back to Home", onClick: () => setActive("home") },
+        ]}
+      />
     </div>
   );
 };
 
 // ── SPORTS ───────────────────────────────────────────────────
-const SportsTab = () => (
+const SportsTab = ({ setActive }) => (
   <div className="topic-page">
     <SectionTitle icon="🏅" meta="Use event anchors first, then attach the star names and dates to them.">British Sport & Sports Stars</SectionTitle>
     <Card style={{ background: "#0f1f0f", border: "1px solid #166534", marginBottom: 16 }}>
@@ -3708,8 +3760,17 @@ const SportsTab = () => (
             <MemoryHook text={s.memory} />
           </div>
         </div>
-      </Card>
-    ))}
+        </Card>
+      ))}
+    <SectionStudyActions
+      title="Keep sports revision short"
+      note="Sports is best revised as event anchors plus a few names, then tested quickly before the details fade."
+      actions={[
+        { label: "Quick Revise Sports", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Sports", sessionType: "short" }) },
+        { label: "Daily 10", onClick: () => setActive("daily10") },
+        { label: "Take a Mock", onClick: () => setActive("mock") },
+      ]}
+    />
   </div>
 );
 
@@ -3859,7 +3920,7 @@ const FiguresTab = ({ setActive }) => {
         title="Turn people into recall"
         note="After reading figures, move into quick revision or a mock so the names stay attached to the right dates and events."
         actions={[
-          { label: "Quick Revise Key People", primary: true, onClick: () => setActive("quickrev") },
+          { label: "Quick Revise Key People", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Key People", sessionType: "short" }) },
           { label: "Open Story Mode", onClick: () => setActive("story") },
           { label: "Take a Mock", onClick: () => setActive("mock") },
         ]}
@@ -3869,7 +3930,7 @@ const FiguresTab = ({ setActive }) => {
 };
 
 // ── RELIGION ─────────────────────────────────────────────────
-const ReligionTab = () => (
+const ReligionTab = ({ setActive }) => (
   <div className="topic-page">
     <SectionTitle icon="⛪" meta="This section is mostly short factual recall: census proportions, major Christian dates, and key non-Christian festivals.">Religion & Festivals</SectionTitle>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
@@ -3909,12 +3970,21 @@ const ReligionTab = () => (
         <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{f.detail}</div>
       </Card>
     ))}
+    <SectionStudyActions
+      title="Turn festivals into quick marks"
+      note="Religion questions are usually short recall. Move into a quick run while the faith and festival links are still in your head."
+      actions={[
+        { label: "Quick Revise Religion", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Religion", sessionType: "short" }) },
+        { label: "Daily 10", onClick: () => setActive("daily10") },
+        { label: "Take a Mock", onClick: () => setActive("mock") },
+      ]}
+    />
   </div>
 );
 
 // ── LANDMARKS ────────────────────────────────────────────────
-const LandmarksTab = () => (
-  <div style={{ padding: 20 }}>
+const LandmarksTab = ({ setActive }) => (
+  <div className="topic-page">
     <SectionTitle icon="🏛️" meta="Use location + one distinctive clue for each landmark.">Landmarks & Places</SectionTitle>
     <CompactVisualStrip
       title="Place clues"
@@ -3970,6 +4040,15 @@ const LandmarksTab = () => (
         <TrapAlert text={l.trap} />
       </Card>
     ))}
+    <SectionStudyActions
+      title="Turn places into quick recall"
+      note="Landmark questions usually depend on one clue like location, bell vs tower, or longest river. Switch into short recall while those anchors are fresh."
+      actions={[
+        { label: "Quick Revise Landmarks", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Landmarks", sessionType: "short" }) },
+        { label: "Open Traps", onClick: () => setActive("confuse") },
+        { label: "Start Quiz", onClick: () => setActive("quiz") },
+      ]}
+    />
   </div>
 );
 
@@ -5364,11 +5443,11 @@ const App = () => {
       case "wars": return <WarsTab />;
       case "nations": return <NationsTab setActive={navigateTo} />;
       case "confuse": return <ConfuseTab />;
-      case "inventors": return <InventorsTab />;
-      case "sports": return <SportsTab />;
+      case "inventors": return <InventorsTab setActive={navigateTo} />;
+      case "sports": return <SportsTab setActive={navigateTo} />;
       case "figures": return <FiguresTab setActive={navigateTo} />;
-      case "religion": return <ReligionTab />;
-      case "landmarks": return <LandmarksTab />;
+      case "religion": return <ReligionTab setActive={navigateTo} />;
+      case "landmarks": return <LandmarksTab setActive={navigateTo} />;
       case "international": return <InternationalTab setActive={navigateTo} />;
       case "arts": return <ArtsTab setActive={navigateTo} />;
       case "anthem": return <AnthemTab />;

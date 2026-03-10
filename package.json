@@ -1,6 +1,6 @@
 {
   "name": "life-in-the-uk-test-practice",
-  "version": "1.15.6",
+  "version": "1.15.7",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,7 @@
     "test:coverage": "node tests/coverage-audit.cjs",
     "test:regression": "node tests/regression-check.cjs",
     "test:mockbalance": "node tests/mock-balance-check.cjs",
+    "test:browser": "node tests/browser-smoke.cjs",
     "test": "npm run test:smoke && npm run test:coverage && npm run test:regression && npm run test:mockbalance"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "autoprefixer": "^10.4.27",
     "esbuild": "0.17.19",
     "postcss": "^8.5.8",
+    "puppeteer-core": "^13.7.0",
     "tailwindcss": "^3.4.17"
   }
 }
