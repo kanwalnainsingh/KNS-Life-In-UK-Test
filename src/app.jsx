@@ -1440,7 +1440,8 @@ const ScrollTopButton = ({ visible }) => (
       transform: visible ? "translateY(0)" : "translateY(12px)",
     }}
   >
-    ↑ Top
+    <span aria-hidden="true">↑</span>
+    <span>Top</span>
   </button>
 );
 
@@ -1454,7 +1455,8 @@ const ScrollBottomButton = ({ visible }) => (
       transform: visible ? "translateY(0)" : "translateY(12px)",
     }}
   >
-    ↓ End
+    <span aria-hidden="true">↓</span>
+    <span>End</span>
   </button>
 );
 
@@ -5137,8 +5139,8 @@ const App = () => {
     const onScroll = () => {
       const current = window.scrollY;
       const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
-      setShowScrollTop(current > 260);
-      setShowScrollBottom(maxScroll > 320 && current < maxScroll - 220);
+      setShowScrollTop(maxScroll > 220);
+      setShowScrollBottom(maxScroll > 220 && current < maxScroll - 120);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
