@@ -100,6 +100,12 @@ const NAV_GROUPS = [
   { title: "History & Society", hint: "Timeline, wars, nations, law, traps, landmarks", ids: ["timeline", "wars", "nations", "quickfacts", "confuse", "landmarks", "international"] },
   { title: "People & Culture", hint: "Figures, religion, inventors, sports, arts", ids: ["figures", "religion", "inventors", "sports", "arts", "anthem"] },
 ];
+const MOBILE_MORE_GROUPS = [
+  { title: "History", hint: "Main history sections and people", ids: ["timeline", "wars", "figures"] },
+  { title: "Nations & Society", hint: "4 nations, civics, religion, landmarks", ids: ["nations", "quickfacts", "religion", "landmarks"] },
+  { title: "Culture & Knowledge", hint: "Arts, sport, inventors, symbols, world organisations", ids: ["arts", "sports", "inventors", "anthem", "international"] },
+  { title: "High-Yield", hint: "Best sections for fast marks and traps", ids: ["confuse", "cram", "tracker", "revise"] },
+];
 const COVERAGE_AREAS = [
   { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
   { title: "Wars and battles", detail: "Major conflicts, battle dates, WWI and WWII anchors", tab: "wars", icon: "⚔️" },
@@ -1213,39 +1219,25 @@ const SettingGroup = ({ label, options, value, onChange }) => (
 const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => {
   const items = [
     { id: "home", icon: "🏠", label: "Home" },
-    { id: "quickrev", icon: "↔️", label: "Quick" },
-    { id: "mock", icon: "📝", label: "Mock" },
+    { id: "quickrev", icon: "↔️", label: "Revise" },
     { id: "quiz", icon: "🧠", label: "Quiz" },
+    { id: "mock", icon: "📝", label: "Mock" },
   ];
 
   return (
     <div className="mobile-bottom-nav">
-      <button
-        className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-[11px] font-bold"
-        onClick={onBack}
-        style={{ border: "none", background: "none", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", cursor: canGoBack ? "pointer" : "default" }}
-      >
-        <span className="text-lg">←</span>
-        <span>Back</span>
-      </button>
       {items.map((item) => (
         <button
           key={item.id}
-          className="focus-ring"
+          className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1"
           onClick={() => setActive(item.id)}
           style={{
             border: "none",
             background: "none",
             color: active === item.id ? "var(--accent-text)" : "var(--text-muted)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 4,
             fontSize: 11,
             fontWeight: active === item.id ? 800 : 600,
             cursor: "pointer",
-            minWidth: 54,
           }}
         >
           <span style={{ fontSize: 18 }}>{item.icon}</span>
@@ -1253,12 +1245,12 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
         </button>
       ))}
       <button
-        className="focus-ring"
+        className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1"
         onClick={openQuickPanel}
-        style={{ border: "none", background: "none", color: "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: "pointer", minWidth: 54 }}
+        style={{ border: "none", background: "none", color: "var(--text-muted)", fontSize: 11, fontWeight: 700, cursor: "pointer" }}
       >
         <span style={{ fontSize: 18 }}>☰</span>
-        <span>Menu</span>
+        <span>More</span>
       </button>
     </div>
   );
@@ -1314,7 +1306,32 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
             <span>← Back</span>
             <span className="text-xs text-muted-foreground">{canGoBack ? "Previous screen" : "No history yet"}</span>
           </Button>
-          {NAV_GROUPS.map((group) => (
+          <div className="rounded-2xl border border-border bg-secondary/70 p-3">
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Main actions</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">Use the bottom bar for the main study flow, or jump directly from here.</div>
+            <div className="mobile-sheet-grid">
+              {["home", "quickrev", "quiz", "mock", "daily10", "story"].map((id) => {
+                const item = TABS.find((tab) => tab.id === id);
+                if (!item) return null;
+                return (
+                  <button
+                    key={item.id}
+                    className={cn(
+                      "focus-ring rounded-2xl border px-3 py-3 text-left transition-colors",
+                      active === item.id
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-card text-foreground"
+                    )}
+                    onClick={() => { setActive(item.id); onClose(); }}
+                  >
+                    <div className="mb-1.5 text-xl">{item.icon}</div>
+                    <div className="text-sm font-bold">{item.label}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {MOBILE_MORE_GROUPS.map((group) => (
             <div key={group.title}>
               <div className="mb-1 text-xs font-bold text-muted-foreground">{group.title}</div>
               <div className="mb-2 text-[11px] text-muted-foreground">{group.hint}</div>
