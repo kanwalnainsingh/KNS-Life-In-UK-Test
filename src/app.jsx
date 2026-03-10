@@ -320,6 +320,28 @@ const CRAM_SECTIONS = [
       "Severn = longest in UK, Thames = longest in England",
     ],
   },
+  {
+    title: "Inventors, symbols and world orgs",
+    color: "#8b5cf6",
+    facts: [
+      "Berners-Lee = World Wide Web, Baird = television, Fleming = penicillin",
+      "God Save the King = national anthem, Britannia = female figure with shield and trident",
+      "Union Jack = St George + St Andrew + St Patrick",
+      "UN = peace, NATO = defence, Commonwealth = voluntary, Council of Europe = rights",
+      "Council of Europe is not the EU",
+    ],
+  },
+  {
+    title: "Arts and sport",
+    color: "#f59e0b",
+    facts: [
+      "Shakespeare, Dickens, Burns, Milton, and Rowling are strong literature anchors",
+      "Handel = Messiah, Elgar = Land of Hope and Glory, Vaughan Williams = folk influence",
+      "Wimbledon and FA Cup are core sports event facts",
+      "Torvill and Dean = ice dancing gold 1984, Murray = Wimbledon 2013",
+      "Tate Britain = British art, Tate Modern = modern art, Turner Prize = contemporary art",
+    ],
+  },
 ];
 
 const TRACKER_SECTIONS = [
@@ -332,7 +354,10 @@ const TRACKER_SECTIONS = [
   { id: "landmarks", label: "Landmarks and places", detail: "Palaces, walls, rivers, mountains, museums", tab: "landmarks", icon: "🏛️" },
   { id: "international", label: "World organisations", detail: "UN, NATO, Commonwealth, Council of Europe", tab: "international", icon: "🌍" },
   { id: "inventors", label: "Inventors and science", detail: "Web, TV, radar, penicillin, vaccines", tab: "inventors", icon: "💡" },
-  { id: "culture", label: "Arts, sports, symbols", detail: "Writers, festivals, sport, anthem, Union Jack", tab: "arts", icon: "🎭" },
+  { id: "arts", label: "Arts and culture", detail: "Writers, music, art, architecture, galleries", tab: "arts", icon: "🎭" },
+  { id: "sports", label: "Sports and events", detail: "Stars, Wimbledon, FA Cup, marathon, cricket", tab: "sports", icon: "🏅" },
+  { id: "symbols", label: "Symbols and anthem", detail: "Anthem, Union Jack, Britannia, nation clues", tab: "anthem", icon: "🎵" },
+  { id: "traps", label: "Compare traps", detail: "High-yield side-by-side confusion cards", tab: "confuse", icon: "⚠️" },
 ];
 
 const buildQuickFactContext = (section, factIndex) => {
@@ -456,6 +481,30 @@ const buildQuickRevisionDeck = () => {
     });
   });
 
+  SPORTS_FACTS.forEach((item) => {
+    deck.push({
+      front: `${item.icon} ${item.name}`,
+      back: item.fact,
+      context: "These are the sport-event anchors that show up more often than long lists of players or clubs.",
+      memory: item.memory,
+      topic: "Sports",
+      color: "#8b5cf6",
+    });
+  });
+
+  Object.entries(ARTS).forEach(([group, items]) => {
+    items.forEach((item) => {
+      deck.push({
+        front: `${item.who}`,
+        back: item.what,
+        context: `Arts topic: ${group}. Use one title, work, or place clue to lock this in quickly.`,
+        memory: item.mem,
+        topic: "Arts",
+        color: "#f59e0b",
+      });
+    });
+  });
+
   RELIGIONS.forEach((item) => {
     deck.push({
       front: `${item.icon} ${item.faith}`,
@@ -534,6 +583,8 @@ const buildQuickRevisionDeck = () => {
     { front: "📜 Anchor dates", back: "43, 1066, 1215, 1534, 1948.", context: "Roman invasion, Hastings, Magna Carta, Church of England, NHS.", memory: "Use these as a history spine for the whole course.", topic: "History", color: "#f97316" },
     { front: "🌍 World organisations", back: "UN, NATO, Commonwealth, Council of Europe.", context: "The most common trap is Council of Europe versus EU.", memory: "Council of Europe ≠ EU.", topic: "International", color: "#0ea5e9" },
     { front: "🎵 National anthem", back: ANTHEM.title, context: ANTHEM.note, memory: ANTHEM.memory, topic: "Symbols", color: "#3b82f6" },
+    { front: "🇬🇧 Union Jack", back: "St George + St Andrew + St Patrick", context: "The Union Jack combines three crosses. Wales is not shown separately because it was already united with England when the first Union Flag was created.", memory: "Union Jack = 3 crosses. Wales not shown separately.", topic: "Symbols", color: "#3b82f6" },
+    { front: "🪙 Britannia", back: "Female symbol of Britain with shield and trident.", context: "Britannia appears on coins and works as a short identity/symbol question.", memory: "Britannia = Britain personified.", topic: "Symbols", color: "#3b82f6" },
   );
 
   return deck;

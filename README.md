@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 323 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.12.0`
+Current release: `v1.12.1`
 
 ---
 
@@ -157,6 +157,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Turner Prize
   - rugby originating in England
 - Fixed the old mock-answer bias by shuffling option order safely across quiz, mock, rapid fire, sprint, and mistake-revision sessions
+- Expanded the revision layer so `Quick Revise`, `Cram Sheet`, and `Tracker` cover arts, sports-event anchors, symbols, and compare topics more evenly across the course
   - nation-specific court, church, and devolution compare points
 - Expanded `Speaker of the House of Commons` coverage across the app:
   - how the Speaker is chosen
