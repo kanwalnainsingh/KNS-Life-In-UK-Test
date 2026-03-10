@@ -1545,24 +1545,24 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
 
 const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
   <>
-    <Card className="border-border bg-gradient-to-b from-secondary/70 to-card">
+    <Card className="question-shell">
       <div className="text-[17px] font-extrabold leading-7 text-foreground">{question.q}</div>
       <div className="mt-3"><Badge text={inferTopic(question)} color="#60a5fa" /></div>
     </Card>
     <div className="grid gap-2">
       {question.opts.map((opt, oi) => {
-        let bg = "var(--card-bg)";
+        let bg = "color-mix(in srgb, var(--card-bg) 92%, var(--secondary))";
         let border = "var(--card-border)";
         let color = "var(--text)";
         if (confirmed) {
-          if (oi === question.a) { bg = "#0f1f0f"; border = "#22c55e"; color = "#4ade80"; }
-          else if (oi === selected && oi !== question.a) { bg = "#220d0d"; border = "#ef4444"; color = "#fca5a5"; }
+          if (oi === question.a) { bg = "color-mix(in srgb, #22c55e 14%, var(--card-bg))"; border = "#22c55e"; color = "color-mix(in srgb, #15803d 72%, white)"; }
+          else if (oi === selected && oi !== question.a) { bg = "color-mix(in srgb, #ef4444 12%, var(--card-bg))"; border = "#ef4444"; color = "color-mix(in srgb, #b91c1c 78%, white)"; }
           else { color = "var(--text-muted)"; }
         } else if (selected === oi) {
-          bg = "var(--accent-soft)"; border = "var(--accent)"; color = "var(--accent-text)";
+          bg = "color-mix(in srgb, #3b82f6 12%, var(--card-bg))"; border = "#3b82f6"; color = "var(--text-strong)";
         }
         return (
-          <button key={oi} className="focus-ring rounded-2xl px-4 py-3.5 text-left text-sm font-medium transition-all" onClick={() => onSelect(oi)}
+          <button key={oi} className="focus-ring option-button" onClick={() => onSelect(oi)}
             style={{ border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer", background: bg, color }}>
             <span className="mr-2 font-bold opacity-70">{["A", "B", "C", "D"][oi]}.</span>{opt}
             {confirmed && oi === question.a && " ✓"}
@@ -1931,7 +1931,7 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 
 const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
   <div className="px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-2">
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/80 px-3 py-3 shadow-soft">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/88 px-3 py-3 shadow-soft backdrop-blur-xl">
       <div className="flex flex-wrap items-center gap-2">
         <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
         <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
@@ -2007,39 +2007,44 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   };
 
   return (
-    <div className="px-4 py-5 sm:px-5">
+    <div className="page-stack">
       <Card className="hero-panel">
         <CardHeader className="pb-4">
-          <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="hero-grid items-start">
             <div className="max-w-2xl">
               <div className="eyebrow mb-2">Free study guide for ILR and citizenship</div>
-              <CardTitle className="text-2xl font-black text-foreground">Life in the UK test practice for ILR and citizenship</CardTitle>
-              <CardDescription className="mt-2 text-sm leading-6">
+              <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">Life in the UK test practice for ILR and citizenship</CardTitle>
+              <CardDescription className="mt-3 max-w-2xl text-sm leading-7">
                 Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.
               </CardDescription>
+              <div className="section-strip mt-4">
+                <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
+                <Badge text="24 questions" color="#3b82f6" />
+                <Badge text="45 minutes" color="#10b981" />
+                <Badge text="75% to pass" color="#f59e0b" />
+                <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("quickrev")}>Start Here</Button>
-              <Button variant="secondary" onClick={() => setActive("mock")}>Mock Test</Button>
-              <Button variant="outline" onClick={() => setActive("daily10")}>Daily 10</Button>
+            <div className="dashboard-card">
+              <div className="eyebrow mb-2">Start your revision</div>
+              <div className="mb-2 text-lg font-extrabold text-foreground">Use a fast path, then move into practice</div>
+              <div className="mb-4 text-sm leading-6 text-muted-foreground">Start with quick recall, lock in the main traps, then test yourself in a real paper format.</div>
+              <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
+                <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("quickrev")}>Start Here</Button>
+                <Button variant="secondary" onClick={() => setActive("mock")}>Mock Test</Button>
+                <Button variant="outline" onClick={() => setActive("daily10")}>Daily 10</Button>
+              </div>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-        <div className="mb-4 flex flex-wrap gap-2">
-          <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
-          <Badge text="24 questions" color="#3b82f6" />
-          <Badge text="45 minutes" color="#10b981" />
-          <Badge text="75% to pass" color="#f59e0b" />
-          <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
-        </div>
-        <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr]">
-          <div className="subtle-panel p-4">
+        <div className="hero-summary-grid">
+          <div className="support-card-strong">
             <div className="eyebrow mb-2">Best starting path</div>
             <div className="text-base font-extrabold text-foreground">Quick Revise → Traps → Mock</div>
             <div className="mt-2 text-sm leading-6 text-muted-foreground">Use short revision first, lock in the main mix-ups, then move into balanced full papers.</div>
           </div>
-          <div className="subtle-panel p-4">
+          <div className="support-card">
             <div className="eyebrow mb-2">Right now</div>
             <div className="text-base font-extrabold text-foreground">{nextBestAction.title}</div>
             <div className="mt-2 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
@@ -2048,7 +2053,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </CardContent>
       </Card>
 
-      <Card className="mb-4 quiet-tint">
+      <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Pass guide</div>
@@ -2059,9 +2064,9 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
             <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
           </div>
         </div>
-        <div className="grid gap-3 lg:grid-cols-[1.15fr_0.85fr]">
-          <div className="grid gap-3">
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
+        <div className="dashboard-grid">
+          <div className="card-stack">
+          <div className="dashboard-card">
             <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Start Here</div>
             <div className="mb-3 grid gap-2">
               {START_HERE_PATHS.map((path) => (
@@ -2075,7 +2080,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
               ))}
             </div>
           </div>
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
+          <div className="dashboard-card">
             <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Next Best Action</div>
             <div className="mb-1 text-base font-extrabold text-foreground">{nextBestAction.title}</div>
             <div className="mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
@@ -2092,7 +2097,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
             </div>
           </div>
           </div>
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
+          <div className="dashboard-card">
             <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
             <div className="mb-3 flex flex-wrap gap-2">
               {PASS_PLANS.map((plan) => (
@@ -2119,7 +2124,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <Card className="mb-4 quiet-tint">
+      <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Continue your revision</div>
@@ -2146,13 +2151,13 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <div className="metric-grid mb-4">
+      <div className="metric-grid">
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
         <StatTile label="Bookmarked facts" value={bookmarks.cards.length + bookmarks.questions.length} color="#14b8a6" />
         <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
         <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "0%"} color="#f59e0b" />
       </div>
-      <Card className="mb-4 quiet-tint">
+      <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Mock progress saved on this device</div>
@@ -2169,7 +2174,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <Button variant="secondary" onClick={() => setActive("mock")}>Open Mock Tracker</Button>
       </Card>
 
-      <Card className="mb-4 quiet-tint">
+      <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Visual memory clues</div>
@@ -2191,7 +2196,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <Card className="mb-4" style={{ border: "1px solid var(--card-border)" }}>
+      <Card style={{ border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Coverage checklist</div>
@@ -2212,7 +2217,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <div className="feature-grid mb-5">
+      <div className="feature-grid">
         {[
           { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
           { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
@@ -2709,7 +2714,7 @@ const QuickRevisionTab = ({ setActive }) => {
   }, [focus, selectedTopic, sessionType, session, index, completed, hardCount, revealed, sessionMeta, isFinished]);
 
   return (
-    <div className="px-4 py-5 sm:px-5">
+    <div className="page-stack">
       <SectionTitle icon="↔️" meta="Fast card-by-card revision that remembers your place and brings in fresh facts over time.">Quick Revision</SectionTitle>
       <Card className="setup-card mb-4">
         <div className="mb-2 text-lg font-extrabold text-foreground">Quick cards, full-course coverage</div>
@@ -2723,7 +2728,7 @@ const QuickRevisionTab = ({ setActive }) => {
           <Badge text={`${bookmarks.cards.length} saved facts`} color="#14b8a6" />
         </div>
       </Card>
-      <Card className="mb-4">
+      <Card className="setup-card">
         <div className="mb-2 text-xs text-muted-foreground">Time</div>
         <div className="choice-grid mb-3">
           {QUICK_REVISION_SESSION_OPTIONS.map((item) => (
@@ -2809,7 +2814,7 @@ const QuickRevisionTab = ({ setActive }) => {
           <Button variant="secondary" onClick={() => startSession(focus, sessionType, selectedTopic)}>New mix</Button>
         </div>
       </div>
-      <Card className="quick-revision-card overflow-hidden" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
+      <Card className="quick-revision-card overflow-hidden" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}10, color-mix(in srgb, var(--card-bg) 82%, white))`, userSelect: "none" }}>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap gap-2">
             <Badge text={current.topic} color={current.color} />
@@ -2820,7 +2825,7 @@ const QuickRevisionTab = ({ setActive }) => {
           <div className="text-xs text-muted-foreground">Quick answer view · {current.bucket}</div>
         </div>
         <div className="grid gap-3">
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
+          <div className="rounded-2xl border border-border bg-card/86 p-4">
             <div className="mb-1 text-[11px] font-bold text-muted-foreground">PROMPT</div>
             <div className="text-[22px] font-black leading-8 text-foreground">{current.front}</div>
           </div>
@@ -2828,7 +2833,7 @@ const QuickRevisionTab = ({ setActive }) => {
             <div className="mb-1 text-[11px] font-bold text-muted-foreground">ANSWER</div>
             <div className="text-xl font-extrabold leading-8 text-foreground">{current.back}</div>
           </div>
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
+          <div className="rounded-2xl border border-border bg-card/86 p-4">
             <div className="mb-1 text-[11px] font-bold text-muted-foreground">WHY THIS MATTERS</div>
             <div className="text-sm leading-7 text-foreground">{current.context}</div>
           </div>
@@ -4116,16 +4121,28 @@ const QuizTab = () => {
   if (!started) {
     const pool = filterQuestions();
     return (
-      <div className="px-4 py-5 sm:px-5">
+      <div className="page-stack">
         <SectionTitle icon="🧠" meta="Use this for broad recall with instant feedback.">Quiz Me</SectionTitle>
         <Card className="setup-card text-center">
               <div className="mb-2 text-[40px]">🎯</div>
               <div className="mb-2 text-[22px] font-extrabold text-foreground">Test your knowledge</div>
-              <div className="mb-5 text-sm text-muted-foreground">{pool.length} questions available</div>
+              <div className="mb-5 text-sm leading-6 text-muted-foreground">{pool.length} questions available in this current filter.</div>
               <div className="mb-4">
                 <div className="mb-2 text-sm text-muted-foreground">Filter by frequency</div>
                 <div className="flex flex-wrap justify-center gap-2">
                   {filters.map((f) => <TabButton key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>{f.icon} {f.label}</TabButton>)}
+                </div>
+              </div>
+              <div className="option-grid mb-4">
+                <div className="support-card text-left">
+                  <div className="eyebrow mb-2">Best for learning</div>
+                  <div className="text-sm font-extrabold text-foreground">Show answers after each</div>
+                  <div className="mt-1 text-xs leading-6 text-muted-foreground">Use this when you want quick correction and memory clues while the question is still fresh.</div>
+                </div>
+                <div className="support-card text-left">
+                  <div className="eyebrow mb-2">Best for testing</div>
+                  <div className="text-sm font-extrabold text-foreground">Show answers at end</div>
+                  <div className="mt-1 text-xs leading-6 text-muted-foreground">Use this when you want a more paper-like run before reviewing all mistakes together.</div>
                 </div>
               </div>
               <SettingGroup
@@ -4167,8 +4184,8 @@ const QuizTab = () => {
     const pct = Math.round((score / questions.length) * 100);
     const pass = pct >= 75;
     return (
-      <div className="px-4 py-5 sm:px-5">
-        <Card className="status-panel text-center" style={{ borderColor: pass ? "#22c55e55" : "#ef444455" }}>
+      <div className="page-stack">
+        <Card className="result-shell text-center" style={{ borderColor: pass ? "#22c55e55" : "#ef444455" }}>
           <div className="mb-2 text-[56px]">{pass ? "🎉" : "📚"}</div>
           <div className="mb-1 text-2xl font-black" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Strong recall" : "Revision needed"}</div>
           <div className="big-number">{score}/{questions.length}</div>
@@ -4180,12 +4197,12 @@ const QuizTab = () => {
           </div>
         </Card>
         {answerMode === "deferred" && wrong.length === 0 && (
-          <Card style={{ border: "1px solid #166534", background: "#0f1f0f" }}>
+          <Card className="status-panel" style={{ border: "1px solid color-mix(in srgb, #22c55e 38%, var(--card-border))", background: "color-mix(in srgb, #22c55e 8%, var(--card-bg))" }}>
             <div style={{ color: "#bbf7d0", fontWeight: 700 }}>All answers were correct. Deferred review is ready when you miss questions.</div>
           </Card>
         )}
         {reviewMode && wrong.map((w, i) => (
-          <Card key={i} style={{ border: "1px solid #7f1d1d", background: "#1a0a0a" }}>
+          <Card key={i} className="status-panel" style={{ border: "1px solid color-mix(in srgb, #ef4444 38%, var(--card-border))", background: "color-mix(in srgb, #ef4444 8%, var(--card-bg))" }}>
             <div style={{ fontWeight: 700, color: "var(--text-strong)", marginBottom: 8 }}>Q: {w.q}</div>
             <div style={{ color: "#fca5a5", marginBottom: 4 }}>✗ You chose: {w.opts[w.chosen]}</div>
             <div style={{ color: "#4ade80", marginBottom: 8 }}>✓ Correct: {w.opts[w.a]}</div>
@@ -4198,7 +4215,7 @@ const QuizTab = () => {
 
   const q = questions[current];
   return (
-    <div className="px-4 py-5 sm:px-5">
+    <div className="page-stack">
       <div className="mb-3 flex flex-wrap justify-between gap-2">
         <Badge text={`${current + 1} / ${questions.length}`} color="#64748b" />
         <Badge text={`Score: ${score}`} color="#22c55e" />
@@ -4336,9 +4353,9 @@ const MockExamTab = ({ setActive }) => {
     });
 
     return (
-      <div style={{ padding: 20 }}>
+      <div className="page-stack">
         <SectionTitle icon="📝" meta="40 fixed mock papers, each with 24 questions and a more exam-like spread across history, government, nations, culture, and a smaller number of compare traps.">Mock Test</SectionTitle>
-        <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #f97316 12%, var(--card-bg)), color-mix(in srgb, #0f172a 14%, var(--surface-soft)))", border: "1px solid color-mix(in srgb, #f97316 35%, var(--card-border))" }}>
+        <Card className="setup-card" style={{ background: "linear-gradient(135deg, color-mix(in srgb, #f97316 10%, var(--card-bg)), color-mix(in srgb, #3b82f6 4%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #f97316 35%, var(--card-border))" }}>
           <div className="study-mode-grid" style={{ display: "grid", gap: 14, alignItems: "center" }}>
             <div>
               <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 22, marginBottom: 8 }}>Balanced fixed mock papers</div>
@@ -4376,7 +4393,7 @@ const MockExamTab = ({ setActive }) => {
             <Badge text={latestMock ? `Last attempt ${formatAttemptDate(latestMock.date)}` : "No attempts yet"} color="#64748b" />
           </div>
         </Card>
-        <Card>
+        <Card className="setup-card">
           <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Mock settings</div>
           <SettingGroup
             label="When should answers be shown?"
@@ -4468,9 +4485,9 @@ const MockExamTab = ({ setActive }) => {
     const passed = score >= 18;
 
     return (
-      <div className="px-4 py-5 sm:px-5">
+      <div className="page-stack">
         <SectionTitle icon="📝" meta="Review your answers, check weak areas, and use the memory clues to lock in corrections.">Mock Results</SectionTitle>
-        <Card className="status-panel text-center" style={{ borderColor: passed ? "#22c55e55" : "#ef444455" }}>
+        <Card className="result-shell text-center" style={{ borderColor: passed ? "#22c55e55" : "#ef444455" }}>
           <div className="mb-2 text-[54px]">{passed ? "✅" : "📘"}</div>
           <div className="mb-1 text-sm text-muted-foreground">{selectedPaper.title}</div>
           <div className="text-[26px] font-black" style={{ color: passed ? "#22c55e" : "#ef4444" }}>{passed ? "Pass standard reached" : "Below pass mark"}</div>
@@ -4557,7 +4574,7 @@ const MockExamTab = ({ setActive }) => {
   }
 
   return (
-    <div className="px-4 py-5 sm:px-5">
+    <div className="page-stack">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div className="flex flex-wrap gap-2">
           <Badge text={selectedPaper.title} color={selectedPaper.accent} />
