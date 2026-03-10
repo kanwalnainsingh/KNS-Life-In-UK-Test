@@ -665,6 +665,12 @@ video {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+.subtle-panel {
+  border-radius: 1.25rem;
+  border-width: 1px;
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--card) / 0.8);
+}
 .setup-card {
   border-radius: 26px;
   border-width: 1px;
@@ -870,6 +876,13 @@ video {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+.setup-section {
+  border-radius: 1.25rem;
+  border-width: 1px;
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--card) / 0.8);
+  padding: 1rem;
 }
 .option-grid {
   display: grid;

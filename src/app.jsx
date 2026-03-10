@@ -2903,9 +2903,9 @@ const StoryModeTab = ({ setActive }) => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="page-stack">
       <SectionTitle icon="📚" meta="Read the history and modern Britain course in a clear order, with dates and names called out for the test.">Story Mode</SectionTitle>
-      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #f97316 10%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #f97316 30%, var(--card-border))" }}>
+      <Card className="setup-card" style={{ border: "1px solid color-mix(in srgb, #f97316 26%, var(--card-border))" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 20 }}>{current.icon} {current.title}</div>
@@ -2924,7 +2924,7 @@ const StoryModeTab = ({ setActive }) => {
         </div>
       </Card>
 
-      <Card>
+      <Card className="setup-section">
         <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Chapters</div>
         <div className="noscroll" style={{ display: "flex", gap: 8, overflowX: "auto" }}>
           {chapters.map((chapter, index) => (
@@ -2935,7 +2935,7 @@ const StoryModeTab = ({ setActive }) => {
         </div>
       </Card>
 
-      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <Card className="support-card-strong">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Most tested in this chapter</div>
@@ -2953,7 +2953,7 @@ const StoryModeTab = ({ setActive }) => {
         </div>
       </Card>
 
-      <Card style={{ border: `1px solid ${current.color}44`, background: "var(--surface-strong)" }}>
+      <Card className="support-card" style={{ border: `1px solid ${current.color}33` }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Dates and names to remember</div>
@@ -2962,7 +2962,7 @@ const StoryModeTab = ({ setActive }) => {
           <Badge text={`${rememberDates.length + rememberNames.length} key anchors`} color={current.color} />
         </div>
         <div className="study-mode-grid" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
-          <div style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+          <div className="subtle-panel" style={{ padding: 14 }}>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>Dates first</div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
               {rememberDates.map((item) => <Badge key={item} text={item} color={current.color} />)}
@@ -2971,7 +2971,7 @@ const StoryModeTab = ({ setActive }) => {
               Use the dates as the spine. Then attach the right person or event to each one.
             </div>
           </div>
-          <div style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+          <div className="subtle-panel" style={{ padding: 14 }}>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>Names to know</div>
             <div style={{ display: "grid", gap: 6 }}>
               {rememberNames.map((item) => (
@@ -2979,7 +2979,7 @@ const StoryModeTab = ({ setActive }) => {
               ))}
             </div>
           </div>
-          <div style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+          <div className="subtle-panel" style={{ padding: 14 }}>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>Pass-first notes</div>
             <div style={{ display: "grid", gap: 6 }}>
               {passFirst.map((item) => (
@@ -2992,17 +2992,17 @@ const StoryModeTab = ({ setActive }) => {
 
       <div style={{ display: "grid", gap: 12 }}>
         {current.items.map((item, index) => (
-          <Card key={`${current.id}-${index}`} style={{ border: `1px solid ${current.color}44`, background: `linear-gradient(135deg, ${current.color}10, var(--card-bg))` }}>
+          <Card key={`${current.id}-${index}`} className="quick-revision-card" style={{ border: `1px solid ${current.color}33`, background: `linear-gradient(180deg, color-mix(in srgb, ${current.color} 7%, var(--card-bg)), var(--card-bg))` }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
               <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{index + 1}. {item.title}</div>
               <Badge text={current.title.replace("Chapter ", "")} color={current.color} />
             </div>
             <div style={{ display: "grid", gap: 10 }}>
-              <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "12px 13px" }}>
+              <div className="subtle-panel" style={{ padding: "12px 13px" }}>
                 <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>FACT</div>
                 <div style={{ color: "var(--text-strong)", fontWeight: 700, fontSize: 16, lineHeight: 1.6 }}>{item.fact}</div>
               </div>
-              <div style={{ background: "color-mix(in srgb, var(--accent) 8%, var(--panel-bg))", borderRadius: 14, padding: "11px 12px" }}>
+              <div className="subtle-panel" style={{ background: "color-mix(in srgb, var(--accent) 22%, var(--card-bg))", padding: "11px 12px" }}>
                 <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>WHY IT MATTERS</div>
                 <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.65 }}>{item.context}</div>
               </div>
@@ -3013,7 +3013,7 @@ const StoryModeTab = ({ setActive }) => {
       </div>
 
       {Array.isArray(current.recap) && current.recap.length > 0 && (
-        <Card style={{ border: `1px solid ${current.color}44`, background: "var(--surface-strong)" }}>
+        <Card className="support-card" style={{ border: `1px solid ${current.color}33` }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Chapter recap</div>
             <Badge text={`${current.recap.length} lock-in points`} color={current.color} />
@@ -3029,7 +3029,7 @@ const StoryModeTab = ({ setActive }) => {
         </Card>
       )}
 
-      <Card>
+      <Card className="setup-section">
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
           <button
             className="focus-ring"
@@ -3153,9 +3153,9 @@ const TimelineTab = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="page-stack">
       <SectionTitle icon="📅" meta="Use short date anchors first, then the memory clue.">British History Timeline</SectionTitle>
-      <Card style={{ background: "color-mix(in srgb, #3b82f6 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #3b82f6 35%, var(--card-border))" }}>
+      <Card className="support-card-strong" style={{ border: "1px solid color-mix(in srgb, #3b82f6 28%, var(--card-border))" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 4 }}>Remembered up to here</div>
@@ -3175,7 +3175,7 @@ const TimelineTab = () => {
           </div>
         </div>
       </Card>
-      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), var(--surface-strong))", border: "1px solid var(--card-border)" }}>
+      <Card className="setup-card">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>History anchors to memorise first</div>
@@ -3206,11 +3206,11 @@ const TimelineTab = () => {
         ]}
       />
       <input className="focus-ring" placeholder="Search events, years, or people..." value={search} onChange={(e) => setSearch(e.target.value)}
-        style={{ width: "100%", background: "var(--input-bg)", border: "1px solid var(--input-border)", borderRadius: 14, padding: "11px 14px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14 }} />
+        style={{ width: "100%", background: "var(--card-bg)", border: "1px solid var(--input-border)", borderRadius: 16, padding: "12px 14px", color: "var(--text-strong)", marginBottom: 12, fontSize: 14, boxShadow: "var(--shadow-soft)" }} />
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {eras.map((value) => <TabButton key={value} active={era === value} onClick={() => setEra(value)}>{value}</TabButton>)}
       </div>
-      <Card style={{ background: "color-mix(in srgb, var(--surface-strong) 86%, var(--card-bg))", border: "1px solid var(--card-border)" }}>
+      <Card className="support-card">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>
             {era === "All" ? "Cross-era revision points" : `${era} revision points`}
@@ -3239,7 +3239,7 @@ const TimelineTab = () => {
             <div style={{ width: 22, height: 22, borderRadius: "50%", background: ev.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>{ev.icon}</div>
             <div style={{ width: 2, flexGrow: 1, background: "var(--surface-muted)", marginTop: 2, minHeight: 38 }} />
           </div>
-          <Card style={{ marginBottom: 0, background: "color-mix(in srgb, var(--surface-soft) 88%, var(--card-bg))", border: `1px solid ${isCheckpoint ? "#3b82f6" : `${ev.color}33`}` }}>
+          <Card className="quick-revision-card" style={{ marginBottom: 0, background: "color-mix(in srgb, var(--card-bg) 90%, white)", border: `1px solid ${isCheckpoint ? "#3b82f6" : `${ev.color}2f`}` }}>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
               <Badge text={ev.era} color={ev.color} />
               <Badge text={ev.year} color="#64748b" />
@@ -3415,20 +3415,20 @@ const WarsTab = () => {
 const NationsTab = ({ setActive }) => (
   <div className="topic-page">
     <SectionTitle icon="🏴" meta="Use comparison blocks to separate nation facts quickly.">The 4 Nations</SectionTitle>
-    <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #3b82f6 12%, var(--card-bg)), color-mix(in srgb, #ef4444 10%, var(--card-bg)))", border: "1px solid var(--card-border)" }}>
+    <Card className="setup-card">
       <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
-        <div style={{ background: "color-mix(in srgb, #3b82f6 12%, var(--panel-bg))", borderRadius: 14, padding: 12 }}>
-          <div style={{ fontWeight: 800, color: "var(--accent-text)", marginBottom: 6 }}>Great Britain</div>
+        <div className="subtle-panel" style={{ background: "color-mix(in srgb, #3b82f6 12%, var(--card-bg))", padding: 12 }}>
+          <div style={{ fontWeight: 800, color: "#2563eb", marginBottom: 6 }}>Great Britain</div>
           <div style={{ color: "var(--text)", fontSize: 14 }}>England + Scotland + Wales = 3 nations</div>
         </div>
-        <div style={{ background: "color-mix(in srgb, #ef4444 12%, var(--panel-bg))", borderRadius: 14, padding: 12 }}>
-          <div style={{ fontWeight: 800, color: "#fecaca", marginBottom: 6 }}>United Kingdom</div>
+        <div className="subtle-panel" style={{ background: "color-mix(in srgb, #ef4444 12%, var(--card-bg))", padding: 12 }}>
+          <div style={{ fontWeight: 800, color: "#dc2626", marginBottom: 6 }}>United Kingdom</div>
           <div style={{ color: "var(--text)", fontSize: 14 }}>Great Britain + Northern Ireland = 4 nations</div>
         </div>
       </div>
       <MemoryHook text="UK = GB + Northern Ireland. One extra nation." />
     </Card>
-    <Card style={{ background: "color-mix(in srgb, var(--surface-strong) 88%, var(--card-bg))", border: "1px solid var(--card-border)" }}>
+    <Card className="support-card-strong">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
         <div>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>4 Nations quick compare</div>
@@ -3453,7 +3453,7 @@ const NationsTab = ({ setActive }) => (
         ))}
       </div>
     </Card>
-    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+    <Card className="support-card">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
         <div>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Cross-nation compare pack</div>
@@ -3496,7 +3496,7 @@ const NationsTab = ({ setActive }) => (
             ],
           },
         ].map((item) => (
-          <div key={item.title} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)" }}>
+          <div key={item.title} className="subtle-panel" style={{ padding: 12 }}>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>{item.title}</div>
             <div style={{ display: "grid", gap: 6 }}>
               {item.points.map((point) => (
@@ -3508,7 +3508,7 @@ const NationsTab = ({ setActive }) => (
       </div>
     </Card>
     {NATIONS.map((n) => (
-      <Card key={n.name} style={{ border: `1px solid ${n.color}44` }}>
+      <Card key={n.name} className="quick-revision-card" style={{ border: `1px solid ${n.color}33` }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
           <span style={{ fontSize: 36 }}>{n.flag}</span>
           <div>
@@ -3518,26 +3518,26 @@ const NationsTab = ({ setActive }) => (
         </div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 8, marginBottom: 10 }}>
           {[["🙏 Saint", n.saint], ["📅 Day", n.day], ["🌸 Flower", n.flower], ["🏙️ Capital", n.capital], ["🗣️ Language", n.lang], ["🍽️ Food", n.food]].map(([label, val]) => (
-            <div key={label} style={{ background: "var(--panel-bg)", borderRadius: 12, padding: "10px 12px" }}>
+            <div key={label} className="subtle-panel" style={{ padding: "10px 12px" }}>
               <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>{label}</div>
               <div style={{ fontSize: 13, color: "var(--text-strong)", fontWeight: 600 }}>{val}</div>
             </div>
           ))}
         </div>
-        <div style={{ background: "var(--surface-strong)", borderRadius: 12, padding: 10, marginBottom: 8 }}>
-          <div style={{ fontSize: 12, color: "#818cf8", fontWeight: 800, marginBottom: 4 }}>🏛️ Parliament</div>
-          <div style={{ fontSize: 13, color: "#c7d2fe", lineHeight: 1.6 }}>{n.parliament}</div>
+        <div className="subtle-panel" style={{ padding: 10, marginBottom: 8, background: "color-mix(in srgb, var(--accent) 18%, var(--card-bg))" }}>
+          <div style={{ fontSize: 12, color: "#4f46e5", fontWeight: 800, marginBottom: 4 }}>🏛️ Parliament</div>
+          <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{n.parliament}</div>
         </div>
         <div style={{ display: "grid", gap: 6, marginBottom: 10 }}>
           {NATION_KEY_POINTS[n.name].map((point) => (
-            <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55, background: "var(--panel-bg)", borderRadius: 12, padding: "10px 12px" }}>
+            <div key={point} className="subtle-panel" style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55, padding: "10px 12px" }}>
               <span style={{ color: n.color, fontWeight: 800 }}>•</span>
               <span>{point}</span>
             </div>
           ))}
         </div>
         {n.tricks.map((t, i) => (
-          <div key={i} style={{ fontSize: 13, color: "#fde68a", padding: "5px 0", borderBottom: i < n.tricks.length - 1 ? "1px solid #27272a" : "none" }}>⚡ {t}</div>
+          <div key={i} style={{ fontSize: 13, color: "var(--text)", padding: "6px 0", borderBottom: i < n.tricks.length - 1 ? "1px solid var(--card-border)" : "none" }}>⚡ {t}</div>
         ))}
       </Card>
     ))}
@@ -3697,14 +3697,14 @@ const FiguresTab = ({ setActive }) => {
   return (
     <div className="topic-page">
       <SectionTitle icon="👑" meta="High-yield people for the test, ordered for faster revision and comparison.">Key Historical Figures</SectionTitle>
-      <Card style={{ background: "linear-gradient(135deg, rgba(29,78,216,0.18), rgba(15,23,42,0.96))", border: "1px solid #1d4ed866" }}>
-        <div style={{ fontWeight: 800, color: "#bfdbfe", marginBottom: 8, fontSize: 15 }}>Quick figure map</div>
+      <Card className="setup-card" style={{ border: "1px solid color-mix(in srgb, #1d4ed8 24%, var(--card-border))" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8, fontSize: 15 }}>Quick figure map</div>
         <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
           Use the groups below to remember who belongs to monarchy, reform, war, welfare, and science. These links reduce mix-ups in mocks.
         </div>
         <div className="compare-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
           {figureGroups.map((group) => (
-            <div key={group.title} style={{ background: "var(--panel-bg)", border: `1px solid ${group.color}44`, borderRadius: 16, padding: 12 }}>
+            <div key={group.title} className="subtle-panel" style={{ border: `1px solid ${group.color}33`, padding: 12 }}>
               <div style={{ color: group.color, fontWeight: 800, fontSize: 12, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>{group.title}</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {group.items.map((item) => <Badge key={item} text={item} color={group.color} />)}
@@ -3713,7 +3713,7 @@ const FiguresTab = ({ setActive }) => {
           ))}
         </div>
       </Card>
-      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <Card className="support-card-strong">
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
             <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Most tested figures first</div>
@@ -3725,7 +3725,7 @@ const FiguresTab = ({ setActive }) => {
           {figures.filter((item) => CORE_FIGURES.has(item.name)).map((item) => <Badge key={item.name} text={item.name} color="#ef4444" />)}
         </div>
       </Card>
-      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <Card className="support-card">
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Figure date anchors</div>
         <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
           • `1066` William the Conqueror<br />
@@ -3739,7 +3739,7 @@ const FiguresTab = ({ setActive }) => {
         </div>
         <MemoryHook text="Link people to dates, not just names: 1066 William, 1215 John, 1485 Henry VII, 1534 Henry VIII, 1588 Elizabeth I, 1948 Bevan." />
       </Card>
-      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <Card className="support-card">
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>High-yield person pairs</div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
           {[
@@ -3750,14 +3750,14 @@ const FiguresTab = ({ setActive }) => {
             "Beveridge = welfare blueprint. Bevan = NHS.",
             "Newton = gravity. Fleming = penicillin. Berners-Lee = web.",
           ].map((item) => (
-            <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
               {item}
             </div>
           ))}
         </div>
       </Card>
       {figures.map((f) => (
-        <Card key={f.name} style={{ border: `1px solid ${f.color}33` }}>
+        <Card key={f.name} className="quick-revision-card" style={{ border: `1px solid ${f.color}33` }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
             <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
             <div style={{ minWidth: 0 }}>
@@ -3774,7 +3774,7 @@ const FiguresTab = ({ setActive }) => {
           </div>
           <div style={{ display: "grid", gap: 6 }}>
             {f.facts.map((fact, fi) => (
-              <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>• {fact}</div>
+              <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "6px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid var(--card-border)" : "none", lineHeight: 1.6 }}>• {fact}</div>
             ))}
           </div>
           {FIGURE_MEMORY[f.name] && <MemoryHook text={FIGURE_MEMORY[f.name]} />}
