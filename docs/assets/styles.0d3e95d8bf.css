@@ -572,15 +572,15 @@ video {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
     background-image:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.10), transparent 30%),
-      linear-gradient(180deg, rgba(255,255,255,0.50), rgba(255,255,255,0)),
-      linear-gradient(180deg, #faf7f0, #f3f4f8);
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0)),
+      linear-gradient(180deg, #fbf8f2, #f4f5f8);
 }
 .dark .app-shell {
     background-image:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 30%),
-      linear-gradient(180deg, rgba(2,6,23,0.52), rgba(2,6,23,0)),
-      linear-gradient(180deg, #080c14, #0f172a);
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 28%),
+      linear-gradient(180deg, rgba(2,6,23,0.44), rgba(2,6,23,0)),
+      linear-gradient(180deg, #0a0f18, #0f172a);
   }
 .surface-card {
   border-radius: 1.25rem;
@@ -600,9 +600,9 @@ video {
   overflow: hidden;
   border-radius: 28px;
   border-width: 1px;
-  border-color: hsl(var(--primary) / 0.2);
+  border-color: hsl(var(--primary) / 0.15);
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
-  --tw-gradient-from: hsl(var(--primary) / 0.15) var(--tw-gradient-from-position);
+  --tw-gradient-from: hsl(var(--primary) / 0.1) var(--tw-gradient-from-position);
   --tw-gradient-to: hsl(var(--primary) / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
   --tw-gradient-to: hsl(var(--card) / 0)  var(--tw-gradient-to-position);
@@ -648,12 +648,12 @@ video {
   border-radius: 1.25rem;
   border-width: 1px;
   border-color: hsl(var(--border));
-  background-color: hsl(var(--secondary) / 0.7);
+  background-color: hsl(var(--card) / 0.8);
 }
 .setup-card {
   border-radius: 26px;
   border-width: 1px;
-  border-color: hsl(var(--primary) / 0.2);
+  border-color: hsl(var(--primary) / 0.15);
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
   --tw-gradient-from: hsl(var(--primary) / 0.1) var(--tw-gradient-from-position);
   --tw-gradient-to: hsl(var(--primary) / 0) var(--tw-gradient-to-position);
@@ -710,6 +710,11 @@ video {
   --tw-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
   --tw-shadow-colored: 0 16px 40px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.quiet-tint {
+  border-width: 1px;
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--card) / 0.9);
 }
 .eyebrow {
   font-size: 11px;
@@ -1045,9 +1050,6 @@ video {
 .border-border {
   border-color: hsl(var(--border));
 }
-.border-cyan-500\/25 {
-  border-color: rgb(6 182 212 / 0.25);
-}
 .border-emerald-500\/10 {
   border-color: rgb(16 185 129 / 0.1);
 }
@@ -1081,9 +1083,6 @@ video {
 .border-transparent {
   border-color: transparent;
 }
-.border-violet-500\/25 {
-  border-color: rgb(139 92 246 / 0.25);
-}
 .bg-amber-500\/10 {
   background-color: rgb(245 158 11 / 0.1);
 }
@@ -1101,9 +1100,6 @@ video {
 }
 .bg-card\/90 {
   background-color: hsl(var(--card) / 0.9);
-}
-.bg-cyan-500\/5 {
-  background-color: rgb(6 182 212 / 0.05);
 }
 .bg-emerald-500\/10 {
   background-color: rgb(16 185 129 / 0.1);
@@ -1125,9 +1121,6 @@ video {
 .bg-primary\/10 {
   background-color: hsl(var(--primary) / 0.1);
 }
-.bg-primary\/5 {
-  background-color: hsl(var(--primary) / 0.05);
-}
 .bg-red-500\/10 {
   background-color: rgb(239 68 68 / 0.1);
 }
@@ -1137,6 +1130,12 @@ video {
 }
 .bg-secondary {
   background-color: hsl(var(--secondary));
+}
+.bg-secondary\/40 {
+  background-color: hsl(var(--secondary) / 0.4);
+}
+.bg-secondary\/50 {
+  background-color: hsl(var(--secondary) / 0.5);
 }
 .bg-secondary\/60 {
   background-color: hsl(var(--secondary) / 0.6);
@@ -1155,9 +1154,6 @@ video {
 }
 .bg-transparent {
   background-color: transparent;
-}
-.bg-violet-500\/5 {
-  background-color: rgb(139 92 246 / 0.05);
 }
 .bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
@@ -1635,10 +1631,16 @@ video {
     padding-right: 1.25rem;
   }
 }
+@media (min-width: 768px) {
+
+  .md\:grid-cols-\[1\.2fr_0\.8fr\] {
+    grid-template-columns: 1.2fr 0.8fr;
+  }
+}
 @media (min-width: 1024px) {
 
-  .lg\:grid-cols-\[1\.1fr_1fr_1fr\] {
-    grid-template-columns: 1.1fr 1fr 1fr;
+  .lg\:grid-cols-\[1\.15fr_0\.85fr\] {
+    grid-template-columns: 1.15fr 0.85fr;
   }
 }
 @media (min-width: 1280px) {

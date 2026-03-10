@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.15.3`
+Current release: `v1.15.4`
 
 ---
 
@@ -118,6 +118,7 @@ UI stack now uses:
 - Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
 - Story Mode now reads as a clearer chronological course with stronger date anchors from Roman Britain to devolution and modern civic life
 - Story Mode now surfaces exact `dates to remember`, `names to know`, and `pass-first notes` in every chapter so history revision is easier to lock in before a mock
+- Home is now cleaner above the fold with a simpler pass path, quieter surfaces, and less repeated guidance competing for attention
 - More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` has been redesigned around short return-friendly sessions:
   - `5 min`, `10 min`, and `15 min` runs

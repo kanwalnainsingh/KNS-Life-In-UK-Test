@@ -67,16 +67,16 @@
   .app-shell {
     @apply min-h-screen bg-background text-foreground;
     background-image:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.10), transparent 30%),
-      linear-gradient(180deg, rgba(255,255,255,0.50), rgba(255,255,255,0)),
-      linear-gradient(180deg, #faf7f0, #f3f4f8);
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 28%),
+      linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0)),
+      linear-gradient(180deg, #fbf8f2, #f4f5f8);
   }
 
   .dark .app-shell {
     background-image:
-      radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 30%),
-      linear-gradient(180deg, rgba(2,6,23,0.52), rgba(2,6,23,0)),
-      linear-gradient(180deg, #080c14, #0f172a);
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 28%),
+      linear-gradient(180deg, rgba(2,6,23,0.44), rgba(2,6,23,0)),
+      linear-gradient(180deg, #0a0f18, #0f172a);
   }
 
   .surface-card {
@@ -96,7 +96,7 @@
   }
 
   .hero-panel {
-    @apply overflow-hidden rounded-[28px] border border-primary/20 bg-gradient-to-br from-primary/15 via-card to-card shadow-soft;
+    @apply overflow-hidden rounded-[28px] border border-primary/15 bg-gradient-to-br from-primary/10 via-card to-card shadow-soft;
   }
 
   .metric-grid {
@@ -112,11 +112,11 @@
   }
 
   .subtle-panel {
-    @apply rounded-2xl border border-border bg-secondary/70;
+    @apply rounded-2xl border border-border bg-card/80;
   }
 
   .setup-card {
-    @apply rounded-[26px] border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card shadow-soft;
+    @apply rounded-[26px] border border-primary/15 bg-gradient-to-br from-primary/10 via-card to-card shadow-soft;
   }
 
   .choice-grid {
@@ -133,6 +133,10 @@
 
   .status-panel {
     @apply rounded-2xl border border-border bg-card/90 p-4 shadow-soft;
+  }
+
+  .quiet-tint {
+    @apply border border-border bg-card/90;
   }
 
   .eyebrow {

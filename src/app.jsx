@@ -2018,38 +2018,34 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           <Badge text="75% to pass" color="#f59e0b" />
           <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
         </div>
-        <div className="feature-grid">
+        <div className="grid gap-3 md:grid-cols-[1.2fr_0.8fr]">
           <div className="subtle-panel p-4">
             <div className="eyebrow mb-2">Best starting path</div>
             <div className="text-base font-extrabold text-foreground">Quick Revise → Traps → Mock</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">Use short sessions first, then compare common mix-ups, then test yourself with full papers.</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">Use short revision first, lock in the main mix-ups, then move into balanced full papers.</div>
           </div>
           <div className="subtle-panel p-4">
-            <div className="eyebrow mb-2">Best for short breaks</div>
-            <div className="text-base font-extrabold text-foreground">Daily 10 or T/F Sprint</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">Fast revision modes for a few minutes on your phone without losing progress.</div>
-          </div>
-          <div className="subtle-panel p-4">
-            <div className="eyebrow mb-2">Exam confidence</div>
-            <div className="text-base font-extrabold text-foreground">{completedPapers ? `${bestPaperScore}% best mock result` : "No mock yet"}</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">{completedPapers ? `Next suggested paper: ${nextPaper.title}.` : "Start with Mock Test 1 for a balanced first paper."}</div>
+            <div className="eyebrow mb-2">Right now</div>
+            <div className="text-base font-extrabold text-foreground">{nextBestAction.title}</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
           </div>
         </div>
         </CardContent>
       </Card>
 
-      <Card className="mb-4 border-primary/20 bg-primary/5">
+      <Card className="mb-4 quiet-tint">
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Pass guide</div>
-            <div className="text-sm leading-6 text-muted-foreground">Start in the right place, follow a short plan, then use the next best action instead of guessing what to study.</div>
+            <div className="text-sm leading-6 text-muted-foreground">Pick a clear route, follow a short plan, then use the next best action instead of guessing what to study next.</div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} plan steps done`} color={currentPlan.color} />
             <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
           </div>
         </div>
-        <div className="grid gap-3 lg:grid-cols-[1.1fr_1fr_1fr]">
+        <div className="grid gap-3 lg:grid-cols-[1.15fr_0.85fr]">
+          <div className="grid gap-3">
           <div className="rounded-2xl border border-border bg-card/80 p-4">
             <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Start Here</div>
             <div className="mb-3 grid gap-2">
@@ -2062,30 +2058,6 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
                   <div className="text-xs leading-6 text-muted-foreground">{path.steps.map((step) => step.label).join(" → ")}</div>
                 </button>
               ))}
-            </div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card/80 p-4">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
-            <div className="mb-3 flex flex-wrap gap-2">
-              {PASS_PLANS.map((plan) => (
-                <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
-              ))}
-            </div>
-            <div className="mb-2 text-xs leading-6 text-muted-foreground">{currentPlan.note}</div>
-            <div className="grid gap-2">
-              {currentPlan.steps.map((step, idx) => {
-                const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
-                return (
-                  <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2.5">
-                    <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-card text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
-                      {done ? "✓" : idx + 1}
-                    </button>
-                    <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
-                      {step.label}
-                    </button>
-                  </div>
-                );
-              })}
             </div>
           </div>
           <div className="rounded-2xl border border-border bg-card/80 p-4">
@@ -2104,18 +2076,41 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
               </div>
             </div>
           </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-card/80 p-4">
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {PASS_PLANS.map((plan) => (
+                <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
+              ))}
+            </div>
+            <div className="mb-3 rounded-xl border border-border bg-secondary/50 p-3 text-xs leading-6 text-muted-foreground">{currentPlan.note}</div>
+            <div className="grid gap-2">
+              {currentPlan.steps.map((step, idx) => {
+                const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
+                return (
+                  <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-secondary/40 px-3 py-2.5">
+                    <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-card text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
+                      {done ? "✓" : idx + 1}
+                    </button>
+                    <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
+                      {step.label}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </Card>
 
       <div className="metric-grid mb-4">
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
         <StatTile label="Bookmarked facts" value={bookmarks.cards.length + bookmarks.questions.length} color="#14b8a6" />
-        <StatTile label="Mock attempts saved" value={mockHistory.length} color="#3b82f6" />
         <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
-        <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
         <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "0%"} color="#f59e0b" />
       </div>
-      <Card className="mb-4 border-violet-500/25 bg-violet-500/5">
+      <Card className="mb-4 quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Mock progress saved on this device</div>
@@ -2132,14 +2127,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <Button variant="secondary" onClick={() => setActive("mock")}>Open Mock Tracker</Button>
       </Card>
 
-      <Card className="mb-4">
-        <div className="mb-2 text-lg font-extrabold text-foreground">What this app covers for the Life in the UK test</div>
-        <div className="text-sm leading-7 text-foreground">
-          This free Life in the UK study guide is built for people preparing for the official test as part of British citizenship or ILR applications. It covers British history, the 4 nations, government and Parliament, British values, religion and festivals, landmarks, key historical figures, world organisations, and exam-style practice questions.
-        </div>
-      </Card>
-
-      <Card className="mb-4 border-cyan-500/25 bg-cyan-500/5">
+      <Card className="mb-4 quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Visual memory clues</div>
