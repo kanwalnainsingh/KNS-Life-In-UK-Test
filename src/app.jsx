@@ -6,6 +6,24 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import packageMeta from "../package.json";
+import { Button } from "./components/ui/button.jsx";
+import {
+  Card as UiCard,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./components/ui/card.jsx";
+import { Badge as UiBadge } from "./components/ui/badge.jsx";
+import { Progress } from "./components/ui/progress.jsx";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "./components/ui/sheet.jsx";
+import { cn } from "./lib/utils.js";
 import {
   ALL_QUIZ,
   ANTHEM,
@@ -177,6 +195,15 @@ const readStore = (key, fallback) => {
   } catch (err) {
     return fallback;
   }
+};
+
+const getInitialTheme = () => {
+  const saved = readStore(STORAGE_KEYS.theme, null);
+  if (typeof saved === "boolean") return saved;
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+  return true;
 };
 
 const forceLatestAppReload = async () => {
@@ -1064,32 +1091,46 @@ const formatAttemptDate = (value) => {
 };
 
 // ── HELPERS ──────────────────────────────────────────────────
+const getBadgeVariant = (color) => {
+  if (["#22c55e", "#10b981", "#16a34a"].includes(color)) return "success";
+  if (["#f59e0b", "#f97316", "#eab308"].includes(color)) return "warning";
+  if (["#ef4444", "#dc2626", "#f87171"].includes(color)) return "destructive";
+  if (["#64748b", "#94a3b8"].includes(color)) return "secondary";
+  return "default";
+};
+
 const Badge = ({ text, color = "#3b82f6" }) => (
-  <span className="app-badge" style={{ background: color + "16", color, border: `1px solid ${color}30`, borderRadius: 999, padding: "3px 9px", fontSize: 10, fontWeight: 700, letterSpacing: 0.18 }}>{text}</span>
+  <UiBadge className="app-badge text-[10px] font-bold tracking-[0.18em]" variant={getBadgeVariant(color)}>{text}</UiBadge>
 );
 
 const Card = ({ children, style = {}, className = "", ...props }) => (
-  <div {...props} className={`app-card ${className}`.trim()} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", borderRadius: 18, padding: 16, marginBottom: 12, boxShadow: "var(--shadow-lg)", ...style }}>{children}</div>
+  <UiCard
+    {...props}
+    className={cn("app-card mb-3 rounded-[18px] border bg-card/90 p-4 shadow-soft", className)}
+    style={style}
+  >
+    {children}
+  </UiCard>
 );
 
 const SectionTitle = ({ children, icon, meta }) => (
-  <div className="section-title-wrap" style={{ marginBottom: 16 }}>
-    <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-strong)", marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
+  <div className="section-title-wrap mb-4">
+    <h2 className="flex items-center gap-2 text-[22px] font-extrabold text-foreground">
       {icon && <span>{icon}</span>}{children}
     </h2>
-    {meta && <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{meta}</p>}
+    {meta && <p className="mt-1 text-sm text-muted-foreground">{meta}</p>}
   </div>
 );
 
 const MemoryHook = ({ text }) => (
-  <div className="memory-hook" style={{ background: "var(--success-surface)", border: "1px solid var(--success-border)", borderRadius: 12, padding: "10px 12px", marginTop: 8, fontSize: 13, color: "var(--success-text)" }}>
-    <span style={{ color: "#4ade80", fontWeight: 800 }}>💡 Memory: </span>{text}
+  <div className="memory-hook mt-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2.5 text-[13px] text-emerald-800 dark:text-emerald-200">
+    <span className="font-extrabold text-emerald-600 dark:text-emerald-300">💡 Memory: </span>{text}
   </div>
 );
 
 const TrapAlert = ({ text }) => (
-  <div className="trap-alert" style={{ background: "linear-gradient(135deg, #331515, #281010)", border: "1px solid #991b1b", borderRadius: 12, padding: "10px 12px", marginTop: 8, fontSize: 13, color: "#fecaca" }}>
-    <span style={{ color: "#f87171", fontWeight: 800 }}>🚨 Exam trap: </span>{text}
+  <div className="trap-alert mt-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-[13px] text-red-800 dark:text-red-200">
+    <span className="font-extrabold text-red-600 dark:text-red-300">🚨 Exam trap: </span>{text}
   </div>
 );
 
@@ -1127,16 +1168,16 @@ const HeroIllustration = ({ variant = "study" }) => {
 };
 
 const CompactVisualStrip = ({ title, items, accent = "#3b82f6" }) => (
-  <div style={{ borderRadius: 14, border: `1px solid ${accent}30`, background: `${accent}10`, padding: 10, marginBottom: 12 }}>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-      <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 13 }}>{title}</div>
+  <div className="mb-3 rounded-[14px] border border-border bg-secondary/70 p-2.5">
+    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+      <div className="text-sm font-extrabold text-foreground">{title}</div>
       <Badge text="Visual clue" color={accent} />
     </div>
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <div className="flex flex-wrap gap-2">
       {items.map((item) => (
-        <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 10px", borderRadius: 999, background: "var(--panel-bg)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 12, lineHeight: 1.3 }}>
-          <span style={{ fontSize: 15 }}>{item.icon}</span>
-          <span><strong style={{ color: "var(--text-strong)" }}>{item.label}</strong>{item.text ? ` · ${item.text}` : ""}</span>
+        <div key={item.label} className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-2 text-xs leading-[1.3] text-foreground">
+          <span className="text-[15px]">{item.icon}</span>
+          <span><strong className="text-foreground">{item.label}</strong>{item.text ? ` · ${item.text}` : ""}</span>
         </div>
       ))}
     </div>
@@ -1144,22 +1185,22 @@ const CompactVisualStrip = ({ title, items, accent = "#3b82f6" }) => (
 );
 
 const StatTile = ({ label, value, color }) => (
-  <div style={{ borderRadius: 16, padding: 13, background: color + "10", border: `1px solid ${color}26` }}>
-    <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
-    <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3 }}>{label}</div>
+  <div className="rounded-2xl border border-border bg-secondary/70 p-3.5">
+    <div style={{ color }} className="text-[22px] font-extrabold">{value}</div>
+    <div className="mt-1 text-xs text-muted-foreground">{label}</div>
   </div>
 );
 
 const TabButton = ({ active, onClick, children }) => (
-  <button onClick={onClick} className="focus-ring" style={{ padding: "8px 12px", borderRadius: 999, border: "1px solid", cursor: "pointer", fontSize: 12, fontWeight: 700, background: active ? "var(--accent)" : "var(--chip-bg)", borderColor: active ? "var(--accent)" : "var(--card-border)", color: active ? "#fff" : "var(--text)" }}>
+  <Button onClick={onClick} variant={active ? "default" : "secondary"} size="sm" className="rounded-full text-xs">
     {children}
-  </button>
+  </Button>
 );
 
 const SettingGroup = ({ label, options, value, onChange }) => (
-  <div style={{ marginBottom: 12 }}>
-    <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 7 }}>{label}</div>
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+  <div className="mb-3">
+    <div className="mb-2 text-xs text-muted-foreground">{label}</div>
+    <div className="flex flex-wrap gap-2">
       {options.map((option) => (
         <TabButton key={option.value} active={value === option.value} onClick={() => onChange(option.value)}>
           {option.label}
@@ -1180,11 +1221,11 @@ const BottomNav = ({ active, setActive, openQuickPanel, onBack, canGoBack }) => 
   return (
     <div className="mobile-bottom-nav">
       <button
-        className="focus-ring"
+        className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1 text-[11px] font-bold"
         onClick={onBack}
-        style={{ border: "none", background: "none", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, fontSize: 11, fontWeight: 700, cursor: canGoBack ? "pointer" : "default", minWidth: 54 }}
+        style={{ border: "none", background: "none", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", cursor: canGoBack ? "pointer" : "default" }}
       >
-        <span style={{ fontSize: 18 }}>←</span>
+        <span className="text-lg">←</span>
         <span>Back</span>
       </button>
       {items.map((item) => (
@@ -1243,42 +1284,26 @@ const getHashTab = () => {
 };
 
 const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   return (
-    <div className="mobile-sheet-backdrop" onClick={onClose}>
-      <div className="mobile-sheet" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="Quick actions">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-          <div>
-            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Quick access</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Move around without scrolling</div>
-          </div>
-          <button className="focus-ring" onClick={onClose} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontWeight: 700 }}>
-            Close
-          </button>
-        </div>
-        <div style={{ display: "grid", gap: 10 }}>
-          <button
-            className="focus-ring"
+    <Sheet open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
+      <SheetContent side="bottom" hideClose className="mobile-sheet overflow-y-auto p-4">
+        <SheetHeader className="mb-3 pr-14">
+          <SheetTitle>Quick access</SheetTitle>
+          <SheetDescription>Move around without scrolling.</SheetDescription>
+        </SheetHeader>
+        <div className="grid gap-3">
+          <Button
+            variant="secondary"
+            className="h-auto w-full justify-between rounded-2xl px-4 py-3 text-left"
             onClick={() => { if (canGoBack) onBack(); onClose(); }}
-            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", border: "1px solid var(--card-border)", background: canGoBack ? "var(--chip-bg)" : "var(--panel-bg)", color: canGoBack ? "var(--text-strong)" : "var(--text-muted)", borderRadius: 14, padding: "12px 14px", cursor: canGoBack ? "pointer" : "default" }}
           >
             <span>← Back</span>
-            <span style={{ fontSize: 12 }}>{canGoBack ? "Previous screen" : "No history yet"}</span>
-          </button>
+            <span className="text-xs text-muted-foreground">{canGoBack ? "Previous screen" : "No history yet"}</span>
+          </Button>
           {NAV_GROUPS.map((group) => (
             <div key={group.title}>
-              <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{group.title}</div>
-              <div style={{ color: "var(--text-muted)", fontSize: 11, marginBottom: 8 }}>{group.hint}</div>
+              <div className="mb-1 text-xs font-bold text-muted-foreground">{group.title}</div>
+              <div className="mb-2 text-[11px] text-muted-foreground">{group.hint}</div>
               <div className="mobile-sheet-grid">
                 {group.ids.map((id) => {
                   const item = TABS.find((tab) => tab.id === id);
@@ -1286,12 +1311,16 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
                   return (
                     <button
                       key={item.id}
-                      className="focus-ring"
+                      className={cn(
+                        "focus-ring rounded-2xl border px-3 py-3 text-left transition-colors",
+                        active === item.id
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border bg-secondary/70 text-foreground"
+                      )}
                       onClick={() => { setActive(item.id); onClose(); }}
-                      style={{ border: active === item.id ? "1px solid #3b82f6" : "1px solid var(--card-border)", background: active === item.id ? "#1d4ed822" : "var(--chip-bg)", color: active === item.id ? "#60a5fa" : "var(--text)", borderRadius: 14, padding: "12px 10px", cursor: "pointer", textAlign: "left" }}
                     >
-                      <div style={{ fontSize: 20, marginBottom: 6 }}>{item.icon}</div>
-                      <div style={{ fontWeight: 700, fontSize: 13 }}>{item.label}</div>
+                      <div className="mb-1.5 text-xl">{item.icon}</div>
+                      <div className="text-sm font-bold">{item.label}</div>
                     </button>
                   );
                 })}
@@ -1299,18 +1328,18 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
             </div>
           ))}
         </div>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 
 const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
   <>
-    <Card style={{ background: "linear-gradient(180deg, color-mix(in srgb, var(--surface-soft) 92%, var(--card-bg)), color-mix(in srgb, var(--surface-strong) 86%, var(--card-bg)))", border: "1px solid var(--card-border)" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17, lineHeight: 1.5 }}>{question.q}</div>
-      <div style={{ marginTop: 10 }}><Badge text={inferTopic(question)} color="#60a5fa" /></div>
+    <Card className="border-border bg-gradient-to-b from-secondary/70 to-card">
+      <div className="text-[17px] font-extrabold leading-7 text-foreground">{question.q}</div>
+      <div className="mt-3"><Badge text={inferTopic(question)} color="#60a5fa" /></div>
     </Card>
-    <div style={{ display: "grid", gap: 8 }}>
+    <div className="grid gap-2">
       {question.opts.map((opt, oi) => {
         let bg = "var(--card-bg)";
         let border = "var(--card-border)";
@@ -1323,9 +1352,9 @@ const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
           bg = "var(--accent-soft)"; border = "var(--accent)"; color = "var(--accent-text)";
         }
         return (
-          <button key={oi} className="focus-ring" onClick={() => onSelect(oi)}
-            style={{ padding: "14px 16px", borderRadius: 14, border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer", background: bg, color, textAlign: "left", fontSize: 14, transition: "all 0.15s" }}>
-            <span style={{ marginRight: 8, opacity: 0.7, fontWeight: 700 }}>{["A", "B", "C", "D"][oi]}.</span>{opt}
+          <button key={oi} className="focus-ring rounded-2xl px-4 py-3.5 text-left text-sm font-medium transition-all" onClick={() => onSelect(oi)}
+            style={{ border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer", background: bg, color }}>
+            <span className="mr-2 font-bold opacity-70">{["A", "B", "C", "D"][oi]}.</span>{opt}
             {confirmed && oi === question.a && " ✓"}
             {confirmed && oi === selected && oi !== question.a && " ✗"}
           </button>
@@ -1572,21 +1601,20 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 
   return (
     <>
-      <div style={{ borderBottom: "1px solid var(--card-border)", background: "var(--header-bg)", position: "sticky", top: 0, zIndex: 100, backdropFilter: "blur(12px)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 16px" }}>
-        <button aria-label={isMobile ? "Open quick panel" : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring" onClick={handleMenuButton} style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 18 }}>
+      <div className="sticky top-0 z-[100] border-b border-border bg-background/85 backdrop-blur-xl">
+        <div className="flex items-center gap-2 px-4 py-3">
+        <button aria-label={isMobile ? "Open quick panel" : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring rounded-xl border border-border bg-card px-3 py-2 text-lg text-foreground shadow-sm" onClick={handleMenuButton}>
           ☰
         </button>
-        <button aria-label="Go to home" className="focus-ring" onClick={() => setActive("home")} style={{ background: "none", border: "none", color: "#60a5fa", fontWeight: 800, fontSize: 18, cursor: "pointer", padding: 0 }}>
+        <button aria-label="Go to home" className="focus-ring rounded-xl bg-transparent px-0 text-lg font-extrabold text-primary" onClick={() => setActive("home")} style={{ border: "none", cursor: "pointer" }}>
           🇬🇧 Life in the UK
         </button>
-        <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
+        <div className="ml-auto flex items-center gap-2">
           <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener"
-            style={{ color: "var(--text-muted)", fontSize: 12, textDecoration: "none", padding: "6px 10px", borderRadius: 999, border: "1px solid var(--card-border)", background: "var(--card-bg)", whiteSpace: "nowrap" }}>
+            className="hidden whitespace-nowrap rounded-full border border-border bg-card px-3 py-1.5 text-xs text-muted-foreground no-underline shadow-sm sm:inline-flex">
             ⭐ GitHub
           </a>
-          <button aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} className="focus-ring" onClick={toggleDark} title={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "6px 10px", cursor: "pointer", fontSize: 15 }}>
+          <button aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"} className="focus-ring rounded-xl border border-border bg-card px-3 py-2 text-[15px] text-foreground shadow-sm" onClick={toggleDark} title={isDark ? "Switch to light mode" : "Switch to dark mode"}>
             {isDark ? "☀️" : "🌙"}
           </button>
         </div>
@@ -1667,21 +1695,21 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 };
 
 const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
-  <div style={{ padding: "6px 16px 18px", paddingBottom: "max(18px, env(safe-area-inset-bottom))" }}>
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", border: "1px solid var(--card-border)", background: "var(--panel-bg)", borderRadius: 14, padding: "10px 12px" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+  <div className="px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-2">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card/80 px-3 py-3 shadow-soft">
+      <div className="flex flex-wrap items-center gap-2">
         <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
         <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
       </div>
-      <button
+      <Button
         aria-label="Get latest app version"
-        className="focus-ring"
+        variant="secondary"
         onClick={onForceRefresh}
         title="Reload latest version"
-        style={{ background: "var(--card-bg)", border: "1px solid var(--card-border)", color: "var(--text-strong)", borderRadius: 12, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 800, whiteSpace: "nowrap" }}
+        className="h-10 whitespace-nowrap rounded-xl text-xs font-extrabold"
       >
         ↻ Latest
-      </button>
+      </Button>
     </div>
   </div>
 );
@@ -1709,24 +1737,30 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <Card style={{ background: "var(--hero-bg)", border: "1px solid var(--hero-border)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-          <div>
-            <h1 style={{ color: "var(--hero-title)", fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Life in the UK test practice for ILR and citizenship</h1>
-            <p style={{ color: "var(--hero-copy)", fontSize: 14, lineHeight: 1.6 }}>Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.</p>
+    <div className="px-4 py-5 sm:px-5">
+      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card">
+        <CardHeader className="pb-4">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="max-w-2xl">
+              <CardTitle className="text-2xl font-black text-foreground">Life in the UK test practice for ILR and citizenship</CardTitle>
+              <CardDescription className="mt-2 text-sm leading-6">
+                Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.
+              </CardDescription>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("mock")}>Mock Test</Button>
+              <Button variant="secondary" onClick={() => setActive("daily10")}>Daily 10</Button>
+            </div>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", fontWeight: 800, cursor: "pointer" }}>Mock Test</button>
-            <button className="focus-ring" onClick={() => setActive("daily10")} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "12px 16px", fontWeight: 700, cursor: "pointer" }}>Daily 10</button>
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 12 }}>
+        </CardHeader>
+        <CardContent className="pt-0">
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 0 }}>
           <Badge text="24 questions" color="#3b82f6" />
           <Badge text="45 minutes" color="#10b981" />
           <Badge text="75% to pass" color="#f59e0b" />
           <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
         </div>
+        </CardContent>
       </Card>
 
       <div className="stats-grid" style={{ display: "grid", gap: 10, marginBottom: 14 }}>
@@ -4593,9 +4627,7 @@ const RapidFireTab = () => {
         <Badge text={`Score: ${score}`} color="#22c55e" />
         <Badge text={`${timeLeft}s`} color={timerColor} />
       </div>
-      <div style={{ background: "#1f2937", borderRadius: 999, height: 10, marginBottom: 16, overflow: "hidden" }}>
-        <div style={{ background: timerColor, height: "100%", borderRadius: 999, width: `${timerPct}%`, transition: "width 1s linear, background 0.3s" }} />
-      </div>
+      <Progress value={timerPct} className="mb-4 h-2.5" indicatorClassName="transition-transform duration-1000" />
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {answerMode === "instant" && confirmed && (
         <>
@@ -4630,7 +4662,7 @@ const App = () => {
   const isMobile = useViewportMobile();
   const [active, setActive] = useState(() => getHashTab() || readStore(STORAGE_KEYS.activeTab, "home"));
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(() => readStore(STORAGE_KEYS.theme, true));
+  const [isDark, setIsDark] = useState(() => getInitialTheme());
   const [wrongQuestions, setWrongQuestions] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
   const [mockHistory, setMockHistory] = useState(() => loadMockHistory());
   const [mockProgress, setMockProgress] = useState(() => loadMockProgress());
@@ -4641,6 +4673,7 @@ const App = () => {
   const [offlineReady, setOfflineReady] = useState(() => Boolean(window.__offlineReady));
 
   useEffect(() => {
+    document.documentElement.classList.toggle("dark", isDark);
     document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
     writeStore(STORAGE_KEYS.theme, isDark);
   }, [isDark]);
@@ -4752,19 +4785,21 @@ const App = () => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", maxWidth: 1120, margin: "0 auto", paddingBottom: isMobile ? 112 : 12 }}>
+    <div className="app-shell" style={{ minHeight: "100vh" }}>
+    <div className="mx-auto max-w-[1120px]" style={{ paddingBottom: isMobile ? 112 : 12 }}>
       <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} isMobile={isMobile} />
       <div className="tabcontent">{renderTab()}</div>
       <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />
-      <div style={{ textAlign: "center", padding: "24px 16px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 12 }}>
+      <div className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
         Open Source — Share Freely ·{" "}
-        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" style={{ color: "#60a5fa", textDecoration: "none" }}>
+        <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" className="text-primary no-underline">
           github.com/kanwalnainsingh/KNS-Life-In-UK-Test
         </a>
       </div>
       {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
       {isMobile && <ScrollTopButton visible={showScrollTop} />}
       {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
+    </div>
     </div>
   );
 };

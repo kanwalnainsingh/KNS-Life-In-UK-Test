@@ -25,6 +25,22 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇧</text></svg>" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="stylesheet" href="./assets/styles.bfbdc7b3cf.css" />
+  <script>
+    (() => {
+      const key = "lifeuk-theme";
+      let wantsDark = false;
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored !== null) wantsDark = JSON.parse(stored);
+        else wantsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      } catch (err) {
+        wantsDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
+      document.documentElement.classList.toggle("dark", wantsDark);
+      document.documentElement.dataset.theme = wantsDark ? "dark" : "light";
+    })();
+  </script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -263,9 +279,9 @@
 <body>
   <div id="root"></div>
 
-  <script type="module" src="./assets/app.3e73a6031f.js"></script>
+  <script type="module" src="./assets/app.fc3026de46.js"></script>
   <script>
-    window.__APP_VERSION__ = "1.13.1";
+    window.__APP_VERSION__ = "1.14.0";
     window.__offlineReady = false;
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {

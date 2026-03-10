@@ -12,6 +12,8 @@ It is designed to help learners revise quickly on mobile and desktop with:
 ## Stack
 - Plain `index.html`
 - Local bundled React app with `esbuild`
+- Tailwind CSS with a custom PostCSS build step into `docs/assets`
+- shadcn-style open-source UI primitives under `src/components/ui`
 - `src/data.js` for all facts, mnemonics, tabs, and question bank
 - `src/app.jsx` for UI and state
 - `src/main.jsx` as bundle entry
@@ -33,6 +35,10 @@ It is designed to help learners revise quickly on mobile and desktop with:
   - community and participation
 
 ## Recent major changes
+- Added `MIGRATION_NOTES.md` to document the safe UI migration plan.
+- Added Tailwind CSS and shadcn-style primitives while preserving the single-app quiz/mock logic.
+- Switched theme initialization to class-based dark mode with system preference fallback.
+- Migrated shared primitives such as cards, badges, footer actions, the quick-panel sheet, and question cards toward the new styling system.
 - Added grouped navigation for mobile and desktop.
 - Simplified mobile navigation by removing the extra mobile primary strip and relying on header menu + bottom nav + quick panel.
 - Added `Quick Revise` short-session card mode.
@@ -86,6 +92,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 ```bash
 node tests/smoke-check.cjs
 node tests/coverage-audit.cjs
+npm test
 npm run build
 ```
 - This validates:

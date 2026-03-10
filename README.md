@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 323 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.13.1`
+Current release: `v1.14.0`
 
 ---
 
@@ -13,6 +13,11 @@ Current release: `v1.13.1`
 [**→ Open the Live Study Guide for ILR and Citizenship Prep**](https://kanwalnainsingh.github.io/KNS-Life-In-UK-Test/)
 
 Official test info: https://www.gov.uk/life-in-the-uk-test
+
+UI stack now uses:
+- Tailwind CSS
+- shadcn-style open-source UI primitives
+- class-based dark mode with persisted preference
 
 ---
 
@@ -86,6 +91,8 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 ## 🧠 What’s New
 
 - Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
+- UI migration to Tailwind CSS plus shadcn-style reusable primitives for cards, buttons, badges, progress, and sheets
+- Class-based dark mode now initializes before render and respects system preference when no saved choice exists
 - Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
 - More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` has been redesigned around short return-friendly sessions:

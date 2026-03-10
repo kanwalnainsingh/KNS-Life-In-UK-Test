@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --background: 214 45% 97%;
+    --foreground: 214 31% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 214 31% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 214 31% 17%;
+    --primary: 220 79% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 212 67% 96%;
+    --secondary-foreground: 214 31% 17%;
+    --muted: 210 38% 95%;
+    --muted-foreground: 215 16% 40%;
+    --accent: 214 100% 97%;
+    --accent-foreground: 220 79% 54%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --ring: 220 79% 54%;
+  }
+
+  .dark {
+    color-scheme: dark;
+    --background: 222 47% 9%;
+    --foreground: 210 40% 96%;
+    --card: 222 38% 13%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 38% 13%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 69%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 217 91% 60%;
+    --border: 217 24% 24%;
+    --input: 217 24% 24%;
+    --ring: 217 91% 60%;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  button, [role="button"] {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply min-h-screen bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.12), transparent 30%),
+      linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0)),
+      linear-gradient(180deg, #f5f7fb, #eef3fa);
+  }
+
+  .dark .app-shell {
+    background-image:
+      radial-gradient(circle at top, rgba(59, 130, 246, 0.16), transparent 30%),
+      linear-gradient(180deg, rgba(2,6,23,0.52), rgba(2,6,23,0)),
+      linear-gradient(180deg, #080c14, #0f172a);
+  }
+
+  .surface-card {
+    @apply rounded-2xl border bg-card/90 text-card-foreground shadow-soft backdrop-blur;
+  }
+
+  .dark .surface-card {
+    box-shadow: 0 16px 40px rgba(2, 6, 23, 0.28);
+  }
+
+  .study-chip {
+    @apply inline-flex items-center rounded-full border bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground;
+  }
+
+  .section-wrap {
+    @apply space-y-4;
+  }
+}

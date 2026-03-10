@@ -2,6 +2,9 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import esbuild from "esbuild";
+import postcss from "postcss";
+import tailwindcss from "tailwindcss";
+import autoprefixer from "autoprefixer";
 
 const { build } = esbuild;
 
@@ -49,8 +52,19 @@ const bundleFileName = `app.${bundleHash}.js`;
 const bundlePath = path.join(assetsDir, bundleFileName);
 fs.writeFileSync(bundlePath, bundleBuffer);
 
+const stylesSource = fs.readFileSync(path.join(root, "src", "styles.css"), "utf8");
+const cssResult = await postcss([
+  tailwindcss(path.join(root, "tailwind.config.cjs")),
+  autoprefixer,
+]).process(stylesSource, { from: path.join(root, "src", "styles.css") });
+const stylesBuffer = Buffer.from(cssResult.css);
+const stylesHash = crypto.createHash("sha256").update(stylesBuffer).digest("hex").slice(0, 10);
+const stylesFileName = `styles.${stylesHash}.css`;
+fs.writeFileSync(path.join(assetsDir, stylesFileName), stylesBuffer);
+
 const indexTemplate = fs.readFileSync(path.join(root, "index.html"), "utf8");
 const builtIndex = indexTemplate
+  .replace("./assets/styles.css", `./assets/${stylesFileName}`)
   .replace("./assets/app.js", `./assets/${bundleFileName}`)
   .replace(/__APP_VERSION_VALUE__/g, packageMeta.version);
 fs.writeFileSync(path.join(outdir, "index.html"), builtIndex);
