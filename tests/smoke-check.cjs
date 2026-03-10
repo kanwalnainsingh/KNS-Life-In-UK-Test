@@ -54,7 +54,8 @@ const assert = (condition, message) => {
   assert(/Saved mock paper tracker/.test(appSource), "Mock tracker summary missing");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
   assert(/Quick cards, full-course coverage/.test(appSource), "Quick revision hero missing");
-  assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");
+  assert(/Date-first memory flow/.test(appSource), "Story mode chapter hero missing");
+  assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
   assert(/Quick answer view/.test(appSource), "Quick revision auto-answer view missing");
   assert(/Show all now/.test(appSource), "Quick revision show-all action missing");
   assert(/Reset progress/.test(appSource), "Quick revision reset action missing");

@@ -29,6 +29,9 @@ const normalizeQuestion = (text) =>
     assert(!chapterIds.has(chapter.id), `Duplicate story chapter id: ${chapter.id}`);
     chapterIds.add(chapter.id);
     assert(Array.isArray(chapter.recap) && chapter.recap.length >= 3, `Story chapter ${index + 1} recap is too thin`);
+    assert(Array.isArray(chapter.remember?.dates) && chapter.remember.dates.length >= 1, `Story chapter ${index + 1} should have dates to remember`);
+    assert(Array.isArray(chapter.remember?.names) && chapter.remember.names.length >= 1, `Story chapter ${index + 1} should have names to remember`);
+    assert(Array.isArray(chapter.remember?.pass) && chapter.remember.pass.length >= 1, `Story chapter ${index + 1} should have pass-first notes`);
   });
 
   const mustCover = [

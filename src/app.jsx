@@ -2846,6 +2846,9 @@ const StoryModeTab = ({ setActive }) => {
   if (!current) return null;
 
   const testedPoints = STORY_TESTED_POINTS[current.id] || current.recap || [];
+  const rememberDates = current.remember?.dates || [];
+  const rememberNames = current.remember?.names || [];
+  const passFirst = current.remember?.pass || [];
   const completedCount = Object.values(completedChapters).filter(Boolean).length;
   const isCurrentComplete = Boolean(completedChapters[current.id]);
   const toggleChapterComplete = () => {
@@ -2858,7 +2861,7 @@ const StoryModeTab = ({ setActive }) => {
 
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="📚" meta="Read the course as short chapters so you can revise the full test more naturally.">Story Mode</SectionTitle>
+      <SectionTitle icon="📚" meta="Read the history and modern Britain course in a clear order, with dates and names called out for the test.">Story Mode</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #f97316 10%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #f97316 30%, var(--card-border))" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
@@ -2869,7 +2872,7 @@ const StoryModeTab = ({ setActive }) => {
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge text={`${current.items.length} fact cards`} color="#64748b" />
-          <Badge text="Short narrative chapters" color="#22c55e" />
+          <Badge text="Date-first memory flow" color="#22c55e" />
           <Badge text={`${completedCount}/${chapters.length} chapters done`} color="#8b5cf6" />
           {isCurrentComplete && <Badge text="Completed" color="#22c55e" />}
           <button className="focus-ring" onClick={() => setActive(current.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>
@@ -2893,7 +2896,7 @@ const StoryModeTab = ({ setActive }) => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Most tested in this chapter</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use these first if you want the shortest version of the chapter.</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use these first if you only want the shortest pass-focused version.</div>
           </div>
           <Badge text={`${testedPoints.length} exam anchors`} color={current.color} />
         </div>
@@ -2904,6 +2907,43 @@ const StoryModeTab = ({ setActive }) => {
               <span>{point}</span>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card style={{ border: `1px solid ${current.color}44`, background: "var(--surface-strong)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Dates and names to remember</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>If you are short on time, lock in these exact anchors before the extra detail.</div>
+          </div>
+          <Badge text={`${rememberDates.length + rememberNames.length} key anchors`} color={current.color} />
+        </div>
+        <div className="study-mode-grid" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          <div style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>Dates first</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+              {rememberDates.map((item) => <Badge key={item} text={item} color={current.color} />)}
+            </div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.7 }}>
+              Use the dates as the spine. Then attach the right person or event to each one.
+            </div>
+          </div>
+          <div style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>Names to know</div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {rememberNames.map((item) => (
+                <div key={item} style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.6 }}>• {item}</div>
+              ))}
+            </div>
+          </div>
+          <div style={{ borderRadius: 16, border: "1px solid var(--card-border)", background: "var(--panel-bg)", padding: 14 }}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>Pass-first notes</div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {passFirst.map((item) => (
+                <div key={item} style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.6 }}>• {item}</div>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
 

@@ -718,6 +718,11 @@ const STORY_CHAPTERS = [
       "Boudicca = Roman-period revolt, not conquest.",
       "122 AD Hadrian's Wall, 597 AD Augustine, 927 AD Athelstan.",
     ],
+    remember:{
+      dates:["55 BC", "43 AD", "60-61 AD", "122 AD", "597 AD", "927 AD"],
+      names:["Julius Caesar", "Claudius", "Boudicca", "St Augustine", "Alfred the Great", "Athelstan"],
+      pass:["Caesar fails, Claudius succeeds.", "Boudicca = revolt.", "Athelstan = first king of a united England."],
+    },
   },
   {
     id:"conquest-crown-law",
@@ -739,6 +744,11 @@ const STORY_CHAPTERS = [
       "Magna Carta = nobody above the law.",
       "William = conquest, John = law, Edward I = Wales/Parliament, Robert the Bruce = Bannockburn.",
     ],
+    remember:{
+      dates:["1066", "1086", "1215", "1284", "1295", "1314", "1415"],
+      names:["William the Conqueror", "King John", "Edward I", "Robert the Bruce", "Henry V"],
+      pass:["1066 = Hastings.", "1215 = Magna Carta.", "1295 = Model Parliament."],
+    },
   },
   {
     id:"nations-symbols-places",
@@ -760,6 +770,11 @@ const STORY_CHAPTERS = [
       "Henry VIII = six wives, 1534, monasteries, Wales laws.",
       "Elizabeth I = Spanish Armada 1588.",
     ],
+    remember:{
+      dates:["1485", "1534", "1536-1543", "1588"],
+      names:["Henry VII", "Henry VIII", "Elizabeth I", "Sir Francis Drake"],
+      pass:["Henry VIII is the key Tudor figure.", "1534 = break with Rome.", "1588 = Armada."],
+    },
   },
   {
     id:"rights-duties-everyday",
@@ -782,6 +797,11 @@ const STORY_CHAPTERS = [
       "1642 Civil War, 1649 Charles I executed, 1660 Restoration.",
       "1688 Glorious Revolution and 1689 Bill of Rights change monarchy for good.",
     ],
+    remember:{
+      dates:["1603", "1605", "1642", "1649", "1660", "1688", "1689", "1690"],
+      names:["James I", "Guy Fawkes", "Charles I", "Oliver Cromwell", "Charles II", "William of Orange"],
+      pass:["1603 = crowns only.", "1649 = Charles I executed.", "1688-1689 = Glorious Revolution and Bill of Rights."],
+    },
   },
   {
     id:"faith-community",
@@ -803,6 +823,11 @@ const STORY_CHAPTERS = [
       "Walpole = first PM.",
       "1807 slave trade, 1833 slavery, 1805 Trafalgar, 1815 Waterloo.",
     ],
+    remember:{
+      dates:["1707", "1721-1742", "1805", "1807", "1815", "1833"],
+      names:["Robert Walpole", "William Wilberforce", "Admiral Nelson", "Duke of Wellington"],
+      pass:["1707 = Great Britain.", "1807 trade, 1833 slavery.", "Nelson = Trafalgar, Wellington = Waterloo."],
+    },
   },
   {
     id:"people-who-shaped-britain",
@@ -824,6 +849,11 @@ const STORY_CHAPTERS = [
       "Nightingale and Seacole are the Crimean pair.",
       "Victorian Britain mixes industry, empire, protest, and reform.",
     ],
+    remember:{
+      dates:["1832", "1837", "1851"],
+      names:["Queen Victoria", "Florence Nightingale", "Mary Seacole", "William Wilberforce"],
+      pass:["1832 = Reform Act.", "1837 = Victoria.", "1851 = Great Exhibition."],
+    },
   },
   {
     id:"culture-sport-arts",
@@ -845,6 +875,11 @@ const STORY_CHAPTERS = [
       "1918, 1928, and 1969 are the vote timeline dates.",
       "Pankhurst = the key person for women's votes.",
     ],
+    remember:{
+      dates:["1819", "1903", "1918", "1926", "1928", "1969"],
+      names:["Emmeline Pankhurst", "Chartists"],
+      pass:["1903 = WSPU.", "1918 first votes for women, 1928 equal votes.", "1969 = voting age 18."],
+    },
   },
   {
     id:"wars-modern-britain",
@@ -866,6 +901,11 @@ const STORY_CHAPTERS = [
       "WWII sequence = 1939 start, 1940 defend/evacuate, 1944 D-Day, 1945 end.",
       "1942 Beveridge, 1948 NHS and Windrush, 1953 Elizabeth II coronation.",
     ],
+    remember:{
+      dates:["1914-1918", "11 November 1918", "1939-1945", "1940", "1942", "1944", "1948", "1953"],
+      names:["Winston Churchill", "Clement Attlee", "Aneurin Bevan"],
+      pass:["Battle of Britain = air, Blitz = bombing.", "Dunkirk = evacuation, D-Day = landing.", "1948 = NHS and Windrush."],
+    },
   },
   {
     id:"citizenship-settlement-basics",
@@ -888,6 +928,11 @@ const STORY_CHAPTERS = [
       "England has no separate parliament; Scotland, Wales and NI do.",
       "England/Wales share a legal system; Scotland and NI are separate.",
     ],
+    remember:{
+      dates:["1960", "1998", "1999"],
+      names:["Harold Macmillan"],
+      pass:["UK = GB + Northern Ireland.", "England has no separate parliament.", "Good Friday Agreement = 1998."],
+    },
   },
   {
     id:"world-stage",
@@ -910,6 +955,11 @@ const STORY_CHAPTERS = [
       "999/112, drive left, NI funds services.",
       "The test supports citizenship or settlement applications.",
     ],
+    remember:{
+      dates:["18", "999 / 112"],
+      names:["Speaker of the House of Commons"],
+      pass:["UN peace, NATO defence, Commonwealth voluntary, Council of Europe rights.", "Speaker = neutral.", "Rule of law = nobody above the law."],
+    },
   },
 ];
 
