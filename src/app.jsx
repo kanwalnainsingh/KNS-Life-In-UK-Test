@@ -44,6 +44,8 @@ const STORAGE_KEYS = {
   recentSprint: "lifeuk-recent-sprint",
   topicTracker: "lifeuk-topic-tracker",
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
+  storyChapter: "lifeuk-story-chapter",
+  storyCompleted: "lifeuk-story-completed",
 };
 
 const APP_VERSION = `v${packageMeta.version}`;
@@ -91,6 +93,59 @@ const COVERAGE_AREAS = [
   { title: "Community and participation", detail: "Volunteering, jury service, magistrates, respect", tab: "quickfacts", icon: "🤝" },
 ];
 
+const STORY_TESTED_POINTS = {
+  "britain-begins": [
+    "55 BC vs 43 AD is the first big date trap: Caesar fails, Claudius succeeds.",
+    "597 AD Augustine and 927 Athelstan are strong early-England anchors.",
+    "Hadrian's Wall = Roman, 122 AD, northern England.",
+  ],
+  "conquest-crown-law": [
+    "1066, 1215, 1295, 1534, 1603, and 1707 are core chapter dates.",
+    "Magna Carta = nobody above the law.",
+    "1603 is crowns; 1707 is parliament and Great Britain.",
+  ],
+  "nations-symbols-places": [
+    "UK = GB + Northern Ireland.",
+    "England has no separate parliament.",
+    "Scotland uses Highers; Northern Ireland needs photo ID at polling stations.",
+  ],
+  "rights-duties-everyday": [
+    "Speaker = secret ballot, neutral, still an MP.",
+    "18 + FPTP + jury service + rule of law are core civic anchors.",
+    "National Insurance and emergency numbers are easy marks.",
+  ],
+  "faith-community": [
+    "59%, 25%, 4.8% are the census numbers to lock in.",
+    "Christmas, Easter, Diwali, Vaisakhi, Eid al-Fitr, and Hanukkah are the high-yield festivals.",
+    "Good citizenship includes volunteering, participation, and respect.",
+  ],
+  "people-who-shaped-britain": [
+    "William = 1066, John = 1215, Churchill = WWII.",
+    "Pankhurst = votes, Beveridge = welfare, Bevan = NHS.",
+    "Nightingale and Seacole are the Crimean War pair.",
+  ],
+  "culture-sport-arts": [
+    "Wimbledon and the FA Cup are the two strongest event anchors.",
+    "Shakespeare, Dickens, Burns, Beatles, and McQueen are broad recognition names.",
+    "Use place clues like Liverpool, Stratford-upon-Avon, and Royal Albert Hall.",
+  ],
+  "wars-modern-britain": [
+    "Trafalgar = Nelson, Waterloo = Wellington.",
+    "WWI = 1914–1918, Armistice = 11 November 1918.",
+    "WWII sequence = 1939 start, 1940 defend, 1944 D-Day, 1945 end.",
+  ],
+  "citizenship-settlement-basics": [
+    "The test matters for citizenship or settlement applications.",
+    "Knowledge requirement = language + life in the UK.",
+    "Under 18 or 65+ are exempt because of age.",
+  ],
+  "world-stage": [
+    "UN = peace, NATO = defence, Commonwealth = voluntary, Council of Europe = rights.",
+    "Council of Europe and ECHR are not the EU.",
+    "1947 and 1960 matter for decolonisation context.",
+  ],
+};
+
 const useViewportMobile = () => {
   const getValue = () => window.matchMedia("(max-width: 820px)").matches;
   const [isMobile, setIsMobile] = useState(getValue);
@@ -123,7 +178,14 @@ const forceLatestAppReload = async () => {
   try {
     if ("serviceWorker" in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map((registration) => registration.unregister()));
+      await Promise.all(registrations.map(async (registration) => {
+        try {
+          await registration.update();
+        } catch (err) {
+          // Ignore update-check failures and continue with unregister.
+        }
+        return registration.unregister();
+      }));
     }
   } catch (err) {
     // Ignore service worker cleanup failures and still force a hard reload path.
@@ -140,6 +202,7 @@ const forceLatestAppReload = async () => {
 
   const target = new URL(window.location.href);
   target.searchParams.set("refresh", String(Date.now()));
+  target.searchParams.set("appVersion", APP_VERSION);
   window.location.replace(target.toString());
 };
 
@@ -2061,10 +2124,26 @@ const QuickRevisionTab = ({ setActive }) => {
 
 const StoryModeTab = ({ setActive }) => {
   const chapters = useMemo(() => STORY_CHAPTERS, []);
-  const [chapterIndex, setChapterIndex] = useState(0);
+  const [chapterIndex, setChapterIndex] = useState(() => readStore(STORAGE_KEYS.storyChapter, 0));
+  const [completedChapters, setCompletedChapters] = useState(() => readStore(STORAGE_KEYS.storyCompleted, {}));
   const current = chapters[chapterIndex];
 
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.storyChapter, chapterIndex);
+  }, [chapterIndex]);
+
   if (!current) return null;
+
+  const testedPoints = STORY_TESTED_POINTS[current.id] || current.recap || [];
+  const completedCount = Object.values(completedChapters).filter(Boolean).length;
+  const isCurrentComplete = Boolean(completedChapters[current.id]);
+  const toggleChapterComplete = () => {
+    setCompletedChapters((existing) => {
+      const next = { ...existing, [current.id]: !existing[current.id] };
+      writeStore(STORAGE_KEYS.storyCompleted, next);
+      return next;
+    });
+  };
 
   return (
     <div style={{ padding: 20 }}>
@@ -2080,6 +2159,8 @@ const StoryModeTab = ({ setActive }) => {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge text={`${current.items.length} fact cards`} color="#64748b" />
           <Badge text="Short narrative chapters" color="#22c55e" />
+          <Badge text={`${completedCount}/${chapters.length} chapters done`} color="#8b5cf6" />
+          {isCurrentComplete && <Badge text="Completed" color="#22c55e" />}
           <button className="focus-ring" onClick={() => setActive(current.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>
             Open related section
           </button>
@@ -2091,8 +2172,26 @@ const StoryModeTab = ({ setActive }) => {
         <div className="noscroll" style={{ display: "flex", gap: 8, overflowX: "auto" }}>
           {chapters.map((chapter, index) => (
             <TabButton key={chapter.id} active={index === chapterIndex} onClick={() => setChapterIndex(index)}>
-              {chapter.icon} {index + 1}
+              {chapter.icon} {index + 1}{completedChapters[chapter.id] ? " ✓" : ""}
             </TabButton>
+          ))}
+        </div>
+      </Card>
+
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Most tested in this chapter</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use these first if you want the shortest version of the chapter.</div>
+          </div>
+          <Badge text={`${testedPoints.length} exam anchors`} color={current.color} />
+        </div>
+        <div style={{ display: "grid", gap: 8 }}>
+          {testedPoints.map((point) => (
+            <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 14, lineHeight: 1.6 }}>
+              <span style={{ color: current.color, fontWeight: 800 }}>•</span>
+              <span>{point}</span>
+            </div>
           ))}
         </div>
       </Card>
@@ -2145,6 +2244,9 @@ const StoryModeTab = ({ setActive }) => {
             style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: chapterIndex === 0 ? "var(--text-muted)" : "var(--text)", borderRadius: 12, padding: "12px 14px", cursor: chapterIndex === 0 ? "default" : "pointer", fontWeight: 700 }}
           >
             ← Previous chapter
+          </button>
+          <button className="focus-ring" onClick={toggleChapterComplete} style={{ border: "1px solid var(--card-border)", background: isCurrentComplete ? "color-mix(in srgb, #22c55e 14%, var(--card-bg))" : "var(--panel-bg)", color: isCurrentComplete ? "#15803d" : "var(--text)", borderRadius: 12, padding: "12px 14px", cursor: "pointer", fontWeight: 700 }}>
+            {isCurrentComplete ? "Mark as not done" : "Mark chapter done"}
           </button>
           <button className="focus-ring" onClick={() => setActive("quickrev")} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 12, padding: "12px 14px", cursor: "pointer", fontWeight: 700 }}>
             Mix with Quick Revision

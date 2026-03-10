@@ -263,12 +263,15 @@
 <body>
   <div id="root"></div>
 
-  <script type="module" src="./assets/app.25d81d0fd0.js"></script>
+  <script type="module" src="./assets/app.21c64dc340.js"></script>
   <script>
     window.__offlineReady = false;
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./service-worker.js").then(() => {
+        navigator.serviceWorker.register("./service-worker.js").then((registration) => {
+          registration.update().catch(() => {
+            // Ignore update failures and continue with the current registration.
+          });
           window.__offlineReady = true;
           window.dispatchEvent(new CustomEvent("lifeuk-offline-ready"));
         }).catch(() => {

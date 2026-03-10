@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 310 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.6`
+Current release: `v1.11.8`
 
 ---
 
@@ -153,6 +153,14 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - `Quick Facts` now labels sections like `Must know first`, `Easy marks`, and `Good to know`
   - `Key People`, `Inventors`, `Arts`, `Landmarks`, and `World Orgs` now surface exam-core names and facts before the fuller reference list
   - broader facts are still included, but moved lower with clearer labels instead of competing with the highest-yield material
+- Improved `Story Mode` as a guided revision flow:
+  - remembers the last chapter you were on
+  - shows `Most tested in this chapter` anchors
+  - lets you mark chapters done
+  - shows progress across all chapters
+- Tightened the `↻ Latest` refresh path:
+  - refresh now forces a service-worker update check before unregistering old registrations
+  - reload adds stronger cache-busting parameters so phones are more likely to fetch the newest bundle immediately
 - Rebalanced the fixed mock papers to a more exam-like spread:
   - `7` history
   - `7` government and law
