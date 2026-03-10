@@ -41,8 +41,24 @@ const normalizeQuestion = (text) =>
     "Why do many people take the Life in the UK Test?",
   ];
 
+  const requiredFigures = [
+    "Henry VIII",
+    "Elizabeth I",
+    "Henry VII",
+    "Charles II",
+    "Sir Francis Drake",
+    "Isaac Newton",
+    "Alexander Fleming",
+    "Sir Tim Berners-Lee",
+  ];
+
   for (const expected of mustCover) {
     assert(data.ALL_QUIZ.some((question) => question.q === expected), `Missing key comparison question: ${expected}`);
+  }
+
+  for (const figure of requiredFigures) {
+    const pool = [...data.KEY_FIGURES, ...data.EXTRA_KEY_FIGURES];
+    assert(pool.some((item) => item.name === figure), `Missing key figure coverage: ${figure}`);
   }
 
   console.log("Regression check passed:");

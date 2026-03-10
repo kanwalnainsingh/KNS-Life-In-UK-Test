@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 323 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 326 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.14.0`
+Current release: `v1.14.1`
 
 ---
 
@@ -104,8 +104,11 @@ UI stack now uses:
 - Answer reveal toggles for quiz and mock flows
 - Mock paper history is now saved per paper with best score, attempts, and last score kept in local storage across app updates
 - Visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`
-- Expanded `Key Historical Figures` with extra tested people, direct memory hooks, and comparison groups
-- Expanded `Key People` again with fuller exam-focused fact sets, especially for `Henry VIII`
+- Expanded `Key Historical Figures` into a stronger single-place revision page with:
+  - fuller exam-focused fact sets
+  - stronger date anchors
+  - missing high-yield names like `Henry VII`, `Charles II`, `Sir Francis Drake`, `Isaac Newton`, `Alexander Fleming`, and `Sir Tim Berners-Lee`
+  - especially fuller coverage for `Henry VIII`
 - Improved timeline with extra high-yield history anchors:
   - Boudicca
   - St Augustine

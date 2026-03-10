@@ -68,7 +68,13 @@ const STORAGE_KEYS = {
   storyCompleted: "lifeuk-story-completed",
 };
 
-const APP_VERSION = `v${packageMeta.version}`;
+const RUNTIME_APP_VERSION = (() => {
+  if (typeof window !== "undefined" && typeof window.__APP_VERSION__ === "string" && window.__APP_VERSION__) {
+    return window.__APP_VERSION__;
+  }
+  return packageMeta.version;
+})();
+const APP_VERSION = `v${RUNTIME_APP_VERSION}`;
 
 const SEO_COPY = {
   home: {
@@ -251,7 +257,7 @@ const forceLatestAppReload = async () => {
   const target = new URL(window.location.href);
   target.search = "";
   target.searchParams.set("refresh", String(Date.now()));
-  target.searchParams.set("appVersion", APP_VERSION);
+  target.searchParams.set("appVersion", RUNTIME_APP_VERSION);
   window.location.replace(target.toString());
 };
 
@@ -1740,13 +1746,13 @@ const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
         <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
       </div>
       <Button
-        aria-label="Get latest app version"
+        aria-label={`Check update for ${APP_VERSION}`}
         variant="secondary"
         onClick={onForceRefresh}
-        title="Reload latest version"
+        title={`Check update for ${APP_VERSION}`}
         className="h-10 whitespace-nowrap rounded-xl text-xs font-extrabold"
       >
-        ↻ Latest
+        ↻ Check Update
       </Button>
     </div>
   </div>
@@ -1795,6 +1801,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </CardHeader>
         <CardContent className="pt-0">
         <div className="mb-4 flex flex-wrap gap-2">
+          <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
           <Badge text="24 questions" color="#3b82f6" />
           <Badge text="45 minutes" color="#10b981" />
           <Badge text="75% to pass" color="#f59e0b" />
@@ -3305,10 +3312,16 @@ const FiguresTab = () => {
     "King John",
     "Edward I",
     "Robert the Bruce",
+    "Henry VII",
     "Henry VIII",
     "Elizabeth I",
+    "Sir Francis Drake",
     "James VI and I",
+    "Charles II",
     "Oliver Cromwell",
+    "Isaac Newton",
+    "Alexander Fleming",
+    "Sir Tim Berners-Lee",
     "Sir Edmund Halley",
     "Robert Walpole",
     "Lord Nelson",
@@ -3338,10 +3351,10 @@ const FiguresTab = () => {
       return (orderMap[a.name] ?? 999) - (orderMap[b.name] ?? 999);
     });
   const figureGroups = [
-    { title: "Rulers & union", color: "#3b82f6", items: ["Alfred", "Athelstan", "William", "Henry VIII", "James VI and I"] },
-    { title: "Rights & reform", color: "#10b981", items: ["King John", "Wilberforce", "Pankhurst", "Beveridge", "Bevan"] },
-    { title: "War & defence", color: "#f97316", items: ["Boudicca", "Robert the Bruce", "Nelson", "Wellington", "Churchill"] },
-    { title: "Science & culture", color: "#a855f7", items: ["Halley", "Cook", "Hawking", "Sake Dean Mahomet", "Guttmann"] },
+    { title: "Kings, queens & union", color: "#3b82f6", items: ["Alfred", "Athelstan", "William", "Henry VII", "Henry VIII", "Elizabeth I", "James VI and I", "Charles II"] },
+    { title: "Rights, reform & welfare", color: "#10b981", items: ["King John", "Wilberforce", "Pankhurst", "Beveridge", "Bevan", "Attlee"] },
+    { title: "War & defence", color: "#f97316", items: ["Boudicca", "Robert the Bruce", "Drake", "Nelson", "Wellington", "Churchill"] },
+    { title: "Science & modern Britain", color: "#a855f7", items: ["Newton", "Fleming", "Berners-Lee", "Halley", "Hawking", "Guttmann"] },
   ];
 
   return (
@@ -3350,7 +3363,7 @@ const FiguresTab = () => {
       <Card style={{ background: "linear-gradient(135deg, rgba(29,78,216,0.18), rgba(15,23,42,0.96))", border: "1px solid #1d4ed866" }}>
         <div style={{ fontWeight: 800, color: "#bfdbfe", marginBottom: 8, fontSize: 15 }}>Quick figure map</div>
         <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-          Use the groups below to remember who belongs to conquest, rights, war, welfare, and science. These links reduce mix-ups in mocks.
+          Use the groups below to remember who belongs to monarchy, reform, war, welfare, and science. These links reduce mix-ups in mocks.
         </div>
         <div className="compare-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
           {figureGroups.map((group) => (
@@ -3380,11 +3393,31 @@ const FiguresTab = () => {
         <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
           • `1066` William the Conqueror<br />
           • `1215` King John and Magna Carta<br />
+          • `1485` Henry VII and Tudor dynasty begins<br />
           • `1534` Henry VIII and Church of England<br />
+          • `1588` Elizabeth I and the Armada<br />
+          • `1660` Charles II and the Restoration<br />
           • `1918 / 1928` Emmeline Pankhurst and votes for women<br />
           • `1942 / 1948` Beveridge and Bevan
         </div>
-        <MemoryHook text="Link people to dates, not just names. Date-linked people are much easier to recall in mocks." />
+        <MemoryHook text="Link people to dates, not just names: 1066 William, 1215 John, 1485 Henry VII, 1534 Henry VIII, 1588 Elizabeth I, 1948 Bevan." />
+      </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>High-yield person pairs</div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {[
+            "Henry VII starts the Tudors. Henry VIII breaks with Rome.",
+            "Elizabeth I = Armada. James VI and I = Union of Crowns.",
+            "Cromwell = republic. Charles II = monarchy restored.",
+            "Nightingale and Seacole = Crimean War care.",
+            "Beveridge = welfare blueprint. Bevan = NHS.",
+            "Newton = gravity. Fleming = penicillin. Berners-Lee = web.",
+          ].map((item) => (
+            <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
+              {item}
+            </div>
+          ))}
+        </div>
       </Card>
       {figures.map((f) => (
         <Card key={f.name} style={{ border: `1px solid ${f.color}33` }}>
@@ -3397,6 +3430,10 @@ const FiguresTab = () => {
               </div>
               <div style={{ color: f.color, fontSize: 12, fontWeight: 700 }}>{f.role}</div>
             </div>
+          </div>
+          <div style={{ marginBottom: 10, borderRadius: 12, padding: "10px 12px", background: `${f.color}12`, border: `1px solid ${f.color}33` }}>
+            <div style={{ color: f.color, fontSize: 11, fontWeight: 800, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.4 }}>Remember first</div>
+            <div style={{ color: "var(--text-strong)", fontSize: 13, lineHeight: 1.55 }}>{f.facts[0]}</div>
           </div>
           <div style={{ display: "grid", gap: 6 }}>
             {f.facts.map((fact, fi) => (
