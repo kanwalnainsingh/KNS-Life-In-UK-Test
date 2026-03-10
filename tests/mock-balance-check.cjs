@@ -63,7 +63,7 @@ const prepareQuestionVariant = (question, seed = 0) => {
 
 const classifyMockCategory = (question) => {
   const text = `${question.q} ${question.tip}`.toLowerCase();
-  if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote|british isles|republic of ireland|crown dependenc|channel islands|overseas territor/.test(text)) return "traps";
+  if (/compare mode/.test(text)) return "traps";
   if (/war|battle|roman|norman|tudor|stuart|victoria|magna carta|boudicca|athelstan|alfred|domesday|hastings|reformation|beveridge|nhs|wilberforce|chartist|peterloo|suffragette|general strike|union of crowns|james i|charles i|waterloo|world war/.test(text)) return "history";
   if (/prime minister|monarch|commons|lords|parliament|speaker|democracy|vote|ballot|constituenc|jury|magistrate|law|equality act|rule of law|innocent|community|volunteer|bank of england|10 downing street|government|human rights/.test(text)) return "civics";
   if (/england|scotland|wales|northern ireland|belfast|cardiff|edinburgh|london|saint|shamrock|daffodil|thistle|rose|senedd|holyrood|stormont|union jack|capital city|loch|snowdonia|river|wall|castle|palace|museum|stonehenge|tower of london|windsor|buckingham|cenotaph|welsh|gaelic|jersey|guernsey|isle of man/.test(text)) return "nations";
@@ -100,17 +100,22 @@ const classifyMockSubgroup = (question) => {
   return "culture-people";
 };
 
-const takeFixedQuestions = (items, count, startIndex, used) => {
-  if (!items.length) return [];
+const pickLeastUsedMockQuestions = (items, count, usageMap, usedQuestions, seed) => {
+  if (!items.length || count <= 0) return [];
+  const candidates = seededShuffle(items, seed)
+    .sort((left, right) => {
+      const leftUsage = usageMap.get(left.q) || 0;
+      const rightUsage = usageMap.get(right.q) || 0;
+      if (leftUsage !== rightUsage) return leftUsage - rightUsage;
+      return left.q.localeCompare(right.q);
+    });
   const picked = [];
-  let offset = 0;
-  while (picked.length < count && offset < items.length * 2) {
-    const item = items[(startIndex + offset) % items.length];
-    if (!used.has(item.q)) {
-      picked.push(item);
-      used.add(item.q);
-    }
-    offset += 1;
+  for (const item of candidates) {
+    if (picked.length >= count) break;
+    if (usedQuestions.has(item.q)) continue;
+    picked.push(item);
+    usedQuestions.add(item.q);
+    usageMap.set(item.q, (usageMap.get(item.q) || 0) + 1);
   }
   return picked;
 };
@@ -154,43 +159,65 @@ const takeFixedQuestions = (items, count, startIndex, used) => {
     return bucketed;
   };
 
-  const buildFixedMockPaper = (paperNumber) => {
+  const buildAllFixedMockPapers = () => {
     const buckets = buildMockBuckets();
-    const used = new Set();
-    const questions = [];
+    const usageMap = new Map();
 
-    MOCK_SUBGROUP_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
-      const items = buckets[id];
-      const startIndex = ((paperNumber - 1) * (count + bucketIndex + 2)) % items.length;
-      questions.push(...takeFixedQuestions(items, count, startIndex, used));
+    return Array.from({ length: MOCK_PAPER_COUNT }, (_, index) => {
+      const paperNumber = index + 1;
+      const usedQuestions = new Set();
+      const questions = [];
+
+      MOCK_SUBGROUP_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
+        questions.push(
+          ...pickLeastUsedMockQuestions(
+            buckets[id],
+            count,
+            usageMap,
+            usedQuestions,
+            4000 + paperNumber * 97 + bucketIndex * 17,
+          ),
+        );
+      });
+
+      if (questions.length < MOCK_TOTAL) {
+        MOCK_DISTRIBUTION.forEach(({ id }, bucketIndex) => {
+          if (questions.length >= MOCK_TOTAL) return;
+          questions.push(
+            ...pickLeastUsedMockQuestions(
+              buckets[id],
+              MOCK_TOTAL - questions.length,
+              usageMap,
+              usedQuestions,
+              7000 + paperNumber * 83 + bucketIndex * 29,
+            ),
+          );
+        });
+      }
+
+      if (questions.length < MOCK_TOTAL) {
+        questions.push(
+          ...pickLeastUsedMockQuestions(
+            [...data.ALL_QUIZ, ...buildConfusionDeck()],
+            MOCK_TOTAL - questions.length,
+            usageMap,
+            usedQuestions,
+            9000 + paperNumber * 101,
+          ),
+        );
+      }
+
+      return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber)
+        .map((question, questionIndex) => prepareQuestionVariant(question, 9000 + paperNumber * 100 + questionIndex));
     });
-
-    if (questions.length < MOCK_TOTAL) {
-      const fallbackGroups = MOCK_DISTRIBUTION.flatMap(({ id }) => seededShuffle(buckets[id], 2000 + paperNumber + id.length));
-      fallbackGroups.forEach((question) => {
-        if (questions.length >= MOCK_TOTAL || used.has(question.q)) return;
-        questions.push(question);
-        used.add(question.q);
-      });
-    }
-
-    if (questions.length < MOCK_TOTAL) {
-      const fallback = seededShuffle([...data.ALL_QUIZ, ...buildConfusionDeck()], 1000 + paperNumber);
-      fallback.forEach((question) => {
-        if (questions.length >= MOCK_TOTAL || used.has(question.q)) return;
-        questions.push(question);
-        used.add(question.q);
-      });
-    }
-
-    return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber)
-      .map((question, index) => prepareQuestionVariant(question, 9000 + paperNumber * 100 + index));
   };
 
   const answerCounts = [0, 0, 0, 0];
+  const seenAcrossSeries = new Set();
+  const papers = buildAllFixedMockPapers();
 
-  for (let paperNumber = 1; paperNumber <= MOCK_PAPER_COUNT; paperNumber += 1) {
-    const questions = buildFixedMockPaper(paperNumber);
+  papers.forEach((questions, index) => {
+    const paperNumber = index + 1;
     assert(questions.length === MOCK_TOTAL, `Mock paper ${paperNumber} does not have ${MOCK_TOTAL} questions`);
     assert(new Set(questions.map((question) => question.q)).size === questions.length, `Mock paper ${paperNumber} has duplicate questions`);
 
@@ -198,12 +225,20 @@ const takeFixedQuestions = (items, count, startIndex, used) => {
     questions.forEach((question) => {
       counts[classifyMockCategory(question)] += 1;
       answerCounts[question.a] += 1;
+      seenAcrossSeries.add(question.q);
     });
 
     MOCK_DISTRIBUTION.forEach(({ id, count }) => {
       assert(counts[id] === count, `Mock paper ${paperNumber} has ${counts[id]} ${id} questions, expected ${count}`);
     });
-  }
+  });
+
+  const allExpectedQuestions = new Set([
+    ...data.ALL_QUIZ.map((question) => question.q),
+    ...buildConfusionDeck().map((question) => question.q),
+  ]);
+  const missingAcrossSeries = [...allExpectedQuestions].filter((question) => !seenAcrossSeries.has(question));
+  assert(missingAcrossSeries.length === 0, `Mock paper series is missing ${missingAcrossSeries.length} questions across the full run`);
 
   const totalAnswers = answerCounts.reduce((sum, count) => sum + count, 0);
   answerCounts.forEach((count, index) => {
@@ -214,5 +249,6 @@ const takeFixedQuestions = (items, count, startIndex, used) => {
   console.log("Mock balance check passed:");
   console.log(`- ${MOCK_PAPER_COUNT} fixed papers validated`);
   console.log(`- ${MOCK_TOTAL} questions per paper with balanced coverage`);
+  console.log(`- all ${allExpectedQuestions.size} quiz and trap questions appear at least once across the series`);
   console.log(`- answer positions distributed across A/B/C/D = ${answerCounts.join("/")}`);
 })();

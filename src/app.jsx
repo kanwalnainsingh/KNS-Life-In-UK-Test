@@ -127,57 +127,55 @@ const COVERAGE_AREAS = [
 
 const STORY_TESTED_POINTS = {
   "britain-begins": [
+    "Lock in the earliest three anchors: 43 AD Romans, 122 AD Hadrian's Wall, 597 AD Augustine.",
     "55 BC vs 43 AD is the first big date trap: Caesar fails, Claudius succeeds.",
-    "597 AD Augustine and 927 Athelstan are strong early-England anchors.",
-    "Hadrian's Wall = Roman, 122 AD, northern England.",
+    "Boudicca = revolt against Rome; Athelstan = first king of a united England in 927.",
   ],
   "conquest-crown-law": [
-    "1066, 1215, 1295, 1534, 1603, and 1707 are core chapter dates.",
-    "Magna Carta = nobody above the law.",
-    "1603 is crowns; 1707 is parliament and Great Britain.",
+    "1066, 1215, 1284, 1295, 1314, and 1415 are the chapter's key medieval dates.",
+    "Magna Carta = nobody above the law; Model Parliament = early Parliament growth.",
+    "William = Hastings, King John = Magna Carta, Edward I = Wales and Parliament, Robert the Bruce = Bannockburn.",
   ],
   "nations-symbols-places": [
-    "UK = GB + Northern Ireland.",
-    "England has no separate parliament.",
-    "Scotland uses Highers; Northern Ireland needs photo ID at polling stations.",
+    "1485 starts the Tudors, 1534 is Henry VIII's break with Rome, 1588 is the Armada.",
+    "Henry VIII is the must-know Tudor: six wives, Church of England, monasteries, Wales laws.",
+    "Henry VII starts the dynasty; Elizabeth I and Drake are the Armada names.",
   ],
   "rights-duties-everyday": [
-    "Speaker = secret ballot, neutral, still an MP.",
-    "18 + FPTP + jury service + rule of law are core civic anchors.",
-    "National Insurance and emergency numbers are easy marks.",
-    "Civil servants are neutral officials; coalition means two parties govern together.",
+    "1603, 1605, 1642, 1649, 1660, 1688, 1689, and 1690 are the Stuart/Civil War sequence to remember.",
+    "Roundheads = Parliament, Cavaliers = king, Jacobites = James II and the Stuart claim.",
+    "1603 is crowns only; 1688-89 turns Britain towards constitutional monarchy.",
   ],
   "faith-community": [
-    "59%, 25%, 4.8% are the census numbers to lock in.",
-    "Christmas, Easter, Diwali, Vaisakhi, Eid al-Fitr, and Hanukkah are the high-yield festivals.",
-    "Good citizenship includes volunteering, participation, and respect.",
+    "1707 creates Great Britain; 1807 abolishes the slave trade; 1833 abolishes slavery.",
+    "Walpole = first PM, Nelson = Trafalgar, Wellington = Waterloo.",
+    "Industrial Revolution = factories, cities, transport, and new industry.",
   ],
   "people-who-shaped-britain": [
-    "William = 1066, John = 1215, Churchill = WWII.",
-    "Pankhurst = votes, Beveridge = welfare, Bevan = NHS.",
-    "Nightingale and Seacole are the Crimean War pair.",
-    "Henry VIII = six wives, 1534, monasteries, and Wales laws.",
+    "1832 Reform Act, 1837 Victoria, and 1851 Great Exhibition are the strongest Victorian anchors.",
+    "Victoria's era mixes industry, empire, protest, and reform.",
+    "Nightingale and Seacole are the Crimean pair; Wilberforce belongs with abolition.",
   ],
   "culture-sport-arts": [
-    "Wimbledon and the FA Cup are the two strongest event anchors.",
-    "Shakespeare, Dickens, Burns, Beatles, and McQueen are broad recognition names.",
-    "Use place clues like Liverpool, Stratford-upon-Avon, and Royal Albert Hall.",
-    "Milton = Paradise Lost and Handel = Messiah are useful extra culture anchors.",
+    "This is the democracy timeline chapter: Peterloo, Chartists, 1903 WSPU, 1918, 1928, 1969.",
+    "Pankhurst = votes for women; 1918 is partial, 1928 is equal voting rights, 1969 lowers the age to 18.",
+    "General Strike 1926 belongs with workers and industrial society, not war history.",
   ],
   "wars-modern-britain": [
-    "Trafalgar = Nelson, Waterloo = Wellington.",
     "WWI = 1914–1918, Armistice = 11 November 1918.",
-    "WWII sequence = 1939 start, 1940 defend, 1944 D-Day, 1945 end.",
+    "WWII sequence = 1939 start, 1940 Battle of Britain/Blitz/Dunkirk, 1944 D-Day, 1945 end.",
+    "Churchill leads in war; Attlee leads after war; 1942 Beveridge and 1948 NHS/Windrush follow.",
   ],
   "citizenship-settlement-basics": [
-    "The test matters for citizenship or settlement applications.",
-    "Knowledge requirement = language + life in the UK.",
-    "Under 18 or 65+ are exempt because of age.",
+    "1960 Wind of Change, 1998 Good Friday Agreement, and 1999 devolution are the chapter's modern anchors.",
+    "UK = Great Britain + Northern Ireland. England has no separate parliament.",
+    "England and Wales share a legal system; Scotland and Northern Ireland have separate systems.",
   ],
   "world-stage": [
     "UN = peace, NATO = defence, Commonwealth = voluntary, Council of Europe = rights.",
-    "Council of Europe and ECHR are not the EU.",
-    "1947 and 1960 matter for decolonisation context.",
+    "Council of Europe and ECHR are not the EU, and the Council of Europe cannot make laws.",
+    "Commons elected, Speaker neutral, 18 + FPTP + rule of law are modern civics anchors.",
+    "999/112, National Insurance, and citizenship/settlement basics are easy practical marks.",
   ],
 };
 
@@ -1476,7 +1474,7 @@ const prepareQuestionVariant = (question, seed = 0) => {
 
 const classifyMockCategory = (question) => {
   const text = `${question.q} ${question.tip}`.toLowerCase();
-  if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote|british isles|republic of ireland|crown dependenc|channel islands|overseas territor/.test(text)) return "traps";
+  if (/compare mode/.test(text)) return "traps";
   if (/war|battle|roman|norman|tudor|stuart|victoria|magna carta|boudicca|athelstan|alfred|domesday|hastings|reformation|beveridge|nhs|wilberforce|chartist|peterloo|suffragette|general strike|union of crowns|james i|charles i|waterloo|world war/.test(text)) return "history";
   if (/prime minister|monarch|commons|lords|parliament|speaker|democracy|vote|ballot|constituenc|jury|magistrate|law|equality act|rule of law|innocent|community|volunteer|bank of england|10 downing street|government|human rights/.test(text)) return "civics";
   if (/england|scotland|wales|northern ireland|belfast|cardiff|edinburgh|london|saint|shamrock|daffodil|thistle|rose|senedd|holyrood|stormont|union jack|capital city|loch|snowdonia|river|wall|castle|palace|museum|stonehenge|tower of london|windsor|buckingham|cenotaph|welsh|gaelic|jersey|guernsey|isle of man/.test(text)) return "nations";
@@ -1540,61 +1538,86 @@ const buildMockBuckets = () => {
   return bucketed;
 };
 
-const takeFixedQuestions = (items, count, startIndex, used) => {
-  if (!items.length) return [];
+const pickLeastUsedMockQuestions = (items, count, usageMap, usedQuestions, seed) => {
+  if (!items.length || count <= 0) return [];
+  const candidates = seededShuffle(items, seed)
+    .sort((left, right) => {
+      const leftUsage = usageMap.get(left.q) || 0;
+      const rightUsage = usageMap.get(right.q) || 0;
+      if (leftUsage !== rightUsage) return leftUsage - rightUsage;
+      return left.q.localeCompare(right.q);
+    });
   const picked = [];
-  let offset = 0;
-  while (picked.length < count && offset < items.length * 2) {
-    const item = items[(startIndex + offset) % items.length];
-    if (!used.has(item.q)) {
-      picked.push(item);
-      used.add(item.q);
-    }
-    offset += 1;
+  for (const item of candidates) {
+    if (picked.length >= count) break;
+    if (usedQuestions.has(item.q)) continue;
+    picked.push(item);
+    usedQuestions.add(item.q);
+    usageMap.set(item.q, (usageMap.get(item.q) || 0) + 1);
   }
   return picked;
 };
 
-const buildFixedMockPaper = (paperNumber) => {
+const buildAllFixedMockPapers = () => {
   const buckets = buildMockBuckets();
-  const used = new Set();
-  const questions = [];
+  const usageMap = new Map();
 
-  MOCK_SUBGROUP_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
-    const items = buckets[id];
-    const startIndex = ((paperNumber - 1) * (count + bucketIndex + 2)) % items.length;
-    questions.push(...takeFixedQuestions(items, count, startIndex, used));
+  return Array.from({ length: MOCK_PAPER_COUNT }, (_, index) => {
+    const paperNumber = index + 1;
+    const usedQuestions = new Set();
+    const questions = [];
+
+    MOCK_SUBGROUP_DISTRIBUTION.forEach(({ id, count }, bucketIndex) => {
+      questions.push(
+        ...pickLeastUsedMockQuestions(
+          buckets[id],
+          count,
+          usageMap,
+          usedQuestions,
+          4000 + paperNumber * 97 + bucketIndex * 17,
+        ),
+      );
+    });
+
+    if (questions.length < MOCK_TOTAL) {
+      MOCK_DISTRIBUTION.forEach(({ id }, bucketIndex) => {
+        if (questions.length >= MOCK_TOTAL) return;
+        questions.push(
+          ...pickLeastUsedMockQuestions(
+            buckets[id],
+            MOCK_TOTAL - questions.length,
+            usageMap,
+            usedQuestions,
+            7000 + paperNumber * 83 + bucketIndex * 29,
+          ),
+        );
+      });
+    }
+
+    if (questions.length < MOCK_TOTAL) {
+      questions.push(
+        ...pickLeastUsedMockQuestions(
+          [...ALL_QUIZ, ...buildConfusionDeck()],
+          MOCK_TOTAL - questions.length,
+          usageMap,
+          usedQuestions,
+          9000 + paperNumber * 101,
+        ),
+      );
+    }
+
+    return {
+      id: paperNumber,
+      title: `Mock Test ${paperNumber}`,
+      note: index < 5 ? "Start with these for broad balanced recall." : index < 10 ? "Good second round once the basics feel steady." : index < 15 ? "More pressure from traps and mixed recall." : "Final stretch papers before the real test.",
+      accent: ["#f97316", "#3b82f6", "#22c55e", "#8b5cf6", "#ef4444"][index % 5],
+      questions: seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber)
+        .map((question, questionIndex) => prepareQuestionVariant(question, 9000 + paperNumber * 100 + questionIndex)),
+    };
   });
-
-  if (questions.length < MOCK_TOTAL) {
-    const fallbackGroups = MOCK_DISTRIBUTION.flatMap(({ id }) => seededShuffle(buckets[id], 2000 + paperNumber + id.length));
-    fallbackGroups.forEach((question) => {
-      if (questions.length >= MOCK_TOTAL || used.has(question.q)) return;
-      questions.push(question);
-      used.add(question.q);
-    });
-  }
-
-  if (questions.length < MOCK_TOTAL) {
-    const fallback = seededShuffle([...ALL_QUIZ, ...buildConfusionDeck()], 1000 + paperNumber);
-    fallback.forEach((question) => {
-      if (questions.length >= MOCK_TOTAL || used.has(question.q)) return;
-      questions.push(question);
-      used.add(question.q);
-    });
-  }
-
-  return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber)
-    .map((question, index) => prepareQuestionVariant(question, 9000 + paperNumber * 100 + index));
 };
 
-const MOCK_PAPERS = Array.from({ length: MOCK_PAPER_COUNT }, (_, index) => ({
-  id: index + 1,
-  title: `Mock Test ${index + 1}`,
-  note: index < 5 ? "Start with these for broad balanced recall." : index < 10 ? "Good second round once the basics feel steady." : index < 15 ? "More pressure from traps and mixed recall." : "Final stretch papers before the real test.",
-  accent: ["#f97316", "#3b82f6", "#22c55e", "#8b5cf6", "#ef4444"][index % 5],
-  questions: buildFixedMockPaper(index + 1),
-}));
+const MOCK_PAPERS = buildAllFixedMockPapers();
 
 const formatCountdown = (seconds) => {
   const minutes = String(Math.floor(seconds / 60)).padStart(2, "0");

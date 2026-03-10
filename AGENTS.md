@@ -43,6 +43,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Simplified mobile navigation by removing the extra mobile primary strip and relying on header menu + bottom nav + quick panel.
 - Added `Quick Revise` short-session card mode.
 - Added stable `Story Mode` chapters sourced from `src/data.js`.
+- Rewrote `Story Mode` into a cleaner chronological history-to-modern-Britain course with stronger date anchors.
 - Added visible app release versioning sourced from `package.json`.
 - Added `↻ Latest` refresh action to help mobile users pull the newest deployed version.
 - Added timeline checkpoint saving so learners can jump back to the point they last remembered.
@@ -58,6 +59,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
   - optionally include memory/context
 - Added recent-history avoidance for quiz/mock/rapid-fire randomness to reduce repeated questions across sessions.
 - Added safe per-question answer shuffling across quiz, mock, rapid-fire, sprint, and mistake-revision flows to avoid repeated `B/C` answer-position bias.
+- Reworked fixed mock generation so the full 40-paper series spreads questions more evenly across the course instead of over-reusing the same subset.
 - Added community/participation facts and questions.
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
 - Expanded `Key People` again with fuller exam-focused facts, especially Henry VIII, plus extra civics/culture coverage like Jacobites, coalition government, civil servants, school governors, Tate galleries, Turner Prize, and rugby origin.

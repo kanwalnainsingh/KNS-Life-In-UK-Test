@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 326 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.14.1`
+Current release: `v1.14.2`
 
 ---
 
@@ -65,7 +65,7 @@ UI stack now uses:
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
 | ↔️ Quick Revise | Session-first quick revision with `5/10/15 min` runs, `Fresh mix`, `Pass core`, `Weak areas`, `Common traps`, `Dates`, and `4 Nations` focuses |
-| 📚 Story Mode | Small handbook-style chapters for quick sequential revision |
+| 📚 Story Mode | Chronological chapter-by-chapter revision for the main history and modern-Britain story |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
 | 📄 Cram Sheet | One-page night-before summary |
@@ -94,6 +94,7 @@ UI stack now uses:
 - UI migration to Tailwind CSS plus shadcn-style reusable primitives for cards, buttons, badges, progress, and sheets
 - Class-based dark mode now initializes before render and respects system preference when no saved choice exists
 - Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
+- Story Mode now reads as a clearer chronological course with stronger date anchors from Roman Britain to devolution and modern civic life
 - More relevant grouped navigation with main actions first and topic subsections underneath
 - `Quick Revise` has been redesigned around short return-friendly sessions:
   - `5 min`, `10 min`, and `15 min` runs
@@ -187,6 +188,12 @@ UI stack now uses:
   - shows `Most tested in this chapter` anchors
   - lets you mark chapters done
   - shows progress across all chapters
+- Reworked the story chapters into a cleaner chronological arc:
+  - Roman Britain and early England
+  - conquest, medieval kings, Magna Carta, and Parliament
+  - Tudors and Reformation
+  - Stuarts, Civil War, Restoration, and Glorious Revolution
+  - union, empire, reform, world wars, devolution, and modern Britain
 - Tightened the `↻ Latest` refresh path:
   - refresh now forces a service-worker update check before unregistering old registrations
   - reload adds stronger cache-busting parameters so phones are more likely to fetch the newest bundle immediately
@@ -198,6 +205,7 @@ UI stack now uses:
   - `1` compare trap
 - Increased fixed papers from `30` to `40`
 - Added a dedicated mock-balance regression test so every paper stays at `24` questions with the intended coverage split
+- Improved mock-paper variety across the full 40-paper series so working through them gives broader whole-course revision instead of reusing the same subset too often
 - Offline cache support after first online load
 - Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 
