@@ -42,6 +42,8 @@ const STORAGE_KEYS = {
   recentQuickRev: "lifeuk-recent-quickrev",
   recentDaily10: "lifeuk-recent-daily10",
   recentSprint: "lifeuk-recent-sprint",
+  quickRevState: "lifeuk-quickrev-state",
+  quickRevRatings: "lifeuk-quickrev-ratings",
   topicTracker: "lifeuk-topic-tracker",
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
   storyChapter: "lifeuk-story-chapter",
@@ -587,7 +589,10 @@ const buildQuickRevisionDeck = () => {
     { front: "🪙 Britannia", back: "Female symbol of Britain with shield and trident.", context: "Britannia appears on coins and works as a short identity/symbol question.", memory: "Britannia = Britain personified.", topic: "Symbols", color: "#3b82f6" },
   );
 
-  return deck;
+  return deck.map((item, index) => ({
+    ...item,
+    id: item.id || `qr-${item.topic}-${index}`,
+  }));
 };
 
 const buildConfusionDeck = () =>
@@ -924,9 +929,9 @@ const pickRandomNoRepeat = (items, count, storageKey, recentLimit = 80) => {
   return picked;
 };
 
-const pickQuickRevisionCards = (items, count) => {
-  const prepared = items.map((item, index) => ({ ...item, q: `${item.topic}|${item.front}|${index}` }));
-  return pickRandomNoRepeat(prepared, count, STORAGE_KEYS.recentQuickRev, 220).map(({ q, ...item }) => item);
+const pickQuickRevisionCards = (items, count, storageKey = STORAGE_KEYS.recentQuickRev, recentLimit = 220) => {
+  const prepared = items.map((item, index) => ({ ...item, q: item.id || `${item.topic}|${item.front}|${index}` }));
+  return pickRandomNoRepeat(prepared, count, storageKey, recentLimit).map(({ q, ...item }) => item);
 };
 
 const isPassCoreCard = (item) => {
@@ -937,6 +942,109 @@ const isPassCoreCard = (item) => {
 const isTrapCard = (item) => {
   const text = `${item.topic} ${item.front} ${item.back} ${item.context} ${item.memory}`.toLowerCase();
   return /comparison|trap|vs |versus|great britain|united kingdom|british isles|crown dependenc|channel islands|overseas territories|big ben|elizabeth tower|church of england|church of scotland|council of europe|eu|commonwealth|nato|thames|severn|highers|a-level|dunkirk|d-day|battle of britain|blitz/.test(text);
+};
+
+const QUICK_REVISION_SESSION_OPTIONS = [
+  { id: "short", label: "5 min", count: 8, detail: "Very short fresh burst." },
+  { id: "medium", label: "10 min", count: 14, detail: "Balanced quick revision." },
+  { id: "long", label: "15 min", count: 20, detail: "Deeper but still phone-friendly." },
+];
+
+const QUICK_REVISION_FOCUS_OPTIONS = [
+  { id: "fresh", label: "Fresh mix", detail: "Balanced coverage across the course with new cards first." },
+  { id: "core", label: "Pass core", detail: "Highest-yield facts to pass quickly." },
+  { id: "weak", label: "Weak areas", detail: "Cards you marked hard or struggle with most." },
+  { id: "traps", label: "Common traps", detail: "Comparison cards and high-confusion facts." },
+  { id: "dates", label: "Dates only", detail: "Timeline, wars, and major year anchors." },
+  { id: "nations", label: "4 Nations", detail: "Capitals, saints, parliaments, symbols, and places." },
+];
+
+const getQuickRevisionBucket = (item) => {
+  if (isTrapCard(item)) return "Traps";
+  if (/history|wars/.test(item.topic.toLowerCase()) || /\b\d{3,4}\b|ad|bc/.test(`${item.front} ${item.back}`.toLowerCase())) return "History";
+  if (/4 nations|geography|landmarks|symbols/.test(item.topic.toLowerCase())) return "Nations";
+  if (/parliament|law|community|government|rights|everyday|elections|coverage/.test(item.topic.toLowerCase())) return "Civics";
+  if (/world orgs|international|inventors/.test(item.topic.toLowerCase())) return "World & Science";
+  return "People & Culture";
+};
+
+const isDateHeavyCard = (item) =>
+  /\b\d{2,4}\b|ad|bc|hastings|magna carta|act of union|church of england|world war|armistice|beveridge|nhs|battle/i
+    .test(`${item.front} ${item.back} ${item.context}`);
+
+const getQuickRevisionFocusPool = (deck, focus, ratings) => {
+  if (focus === "core") return deck.filter(isPassCoreCard);
+  if (focus === "traps") return deck.filter(isTrapCard);
+  if (focus === "dates") return deck.filter(isDateHeavyCard);
+  if (focus === "nations") return deck.filter((item) => ["4 Nations", "Geography", "Landmarks", "Symbols"].includes(item.topic));
+  if (focus === "weak") {
+    const weak = deck
+      .filter((item) => (ratings[item.id]?.hard || 0) > 0 || (ratings[item.id]?.seen || 0) > 0)
+      .sort((a, b) => ((ratings[b.id]?.hard || 0) - (ratings[b.id]?.easy || 0)) - ((ratings[a.id]?.hard || 0) - (ratings[a.id]?.easy || 0)));
+    return weak.length ? weak : deck.filter(isPassCoreCard);
+  }
+  return deck;
+};
+
+const buildQuickRevisionSession = (deck, focus, count, ratings = {}) => {
+  const pool = getQuickRevisionFocusPool(deck, focus, ratings);
+  const recent = readStore(STORAGE_KEYS.recentQuickRev, []);
+  const target = Math.min(count, pool.length || count);
+
+  if (!pool.length) return { cards: [], newCount: 0, reviewCount: 0, buckets: {} };
+
+  let cards = [];
+  if (focus === "fresh" || focus === "core") {
+    const buckets = ["History", "Civics", "Nations", "People & Culture", "World & Science", "Traps"];
+    const grouped = Object.fromEntries(buckets.map((bucket) => [bucket, shuffleList(pool.filter((item) => getQuickRevisionBucket(item) === bucket))]));
+    const used = new Set();
+    let guard = 0;
+    while (cards.length < target && guard < target * 8) {
+      buckets.forEach((bucket) => {
+        if (cards.length >= target) return;
+        const next = grouped[bucket]?.find((item) => !used.has(item.id) && !recent.includes(item.id));
+        if (next) {
+          cards.push(next);
+          used.add(next.id);
+        }
+      });
+      guard += 1;
+      if (cards.length < target && guard > 2) {
+        buckets.forEach((bucket) => {
+          if (cards.length >= target) return;
+          const fallback = grouped[bucket]?.find((item) => !used.has(item.id));
+          if (fallback) {
+            cards.push(fallback);
+            used.add(fallback.id);
+          }
+        });
+      }
+    }
+    if (cards.length < target) {
+      const fallback = shuffleList(pool).filter((item) => !used.has(item.id)).slice(0, target - cards.length);
+      cards = [...cards, ...fallback];
+    }
+  } else if (focus === "weak") {
+    cards = pool.slice(0, target);
+  } else {
+    cards = pickQuickRevisionCards(pool, target);
+  }
+
+  const normalized = cards.map((item) => ({ ...item, bucket: getQuickRevisionBucket(item) }));
+  const updatedRecent = [...normalized.map((item) => item.id), ...recent]
+    .filter((value, index, arr) => arr.indexOf(value) === index)
+    .slice(0, 260);
+  writeStore(STORAGE_KEYS.recentQuickRev, updatedRecent);
+  const buckets = normalized.reduce((acc, item) => {
+    acc[item.bucket] = (acc[item.bucket] || 0) + 1;
+    return acc;
+  }, {});
+  return {
+    cards: normalized,
+    newCount: normalized.filter((item) => !recent.includes(item.id)).length,
+    reviewCount: normalized.filter((item) => recent.includes(item.id) || (ratings[item.id]?.seen || 0) > 0).length,
+    buckets,
+  };
 };
 
 const getMockNextPaper = (progress = {}) => {
@@ -1993,38 +2101,45 @@ const TrueFalseSprintTab = () => {
   );
 };
 
-const QUICK_REVISION_MODES = [
-  { id: "core", label: "Pass Core", detail: "Highest-yield facts for passing quickly." },
-  { id: "traps", label: "Common Traps", detail: "Pairs and mix-ups that lose easy marks." },
-  { id: "full", label: "Full Course", detail: "Everything in the app's revision deck." },
-];
-
 const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
-  const [mode, setMode] = useState("core");
-  const modeDeck = useMemo(() => {
-    if (mode === "traps") return deck.filter(isTrapCard);
-    if (mode === "full") return deck;
-    return deck.filter(isPassCoreCard);
-  }, [deck, mode]);
-  const topics = useMemo(() => ["All", ...Array.from(new Set(modeDeck.map((item) => item.topic)))], [modeDeck]);
-  const [topic, setTopic] = useState("All");
-  const [sessionSize, setSessionSize] = useState(12);
+  const [focus, setFocus] = useState("fresh");
+  const [sessionType, setSessionType] = useState("medium");
   const [session, setSession] = useState([]);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [completed, setCompleted] = useState(0);
-  const [againCount, setAgainCount] = useState(0);
-  const filteredDeck = useMemo(() => topic === "All" ? modeDeck : modeDeck.filter((item) => item.topic === topic), [modeDeck, topic]);
+  const [hardCount, setHardCount] = useState(0);
+  const [sessionMeta, setSessionMeta] = useState({ newCount: 0, reviewCount: 0, buckets: {} });
+  const [ratings, setRatings] = useState(() => readStore(STORAGE_KEYS.quickRevRatings, {}));
   const current = session[index];
 
-  const startSession = () => {
-    const picked = pickQuickRevisionCards(filteredDeck, sessionSize);
-    setSession(picked);
+  const selectedSession = QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === sessionType) || QUICK_REVISION_SESSION_OPTIONS[1];
+  const selectedFocus = QUICK_REVISION_FOCUS_OPTIONS.find((item) => item.id === focus) || QUICK_REVISION_FOCUS_OPTIONS[0];
+  const persistQuickRevisionState = (next) => writeStore(STORAGE_KEYS.quickRevState, next);
+  const clearQuickRevisionState = () => writeStore(STORAGE_KEYS.quickRevState, null);
+
+  const startSession = (overrideFocus = focus, overrideType = sessionType) => {
+    const length = (QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === overrideType) || QUICK_REVISION_SESSION_OPTIONS[1]).count;
+    const built = buildQuickRevisionSession(deck, overrideFocus, length, ratings);
+    setFocus(overrideFocus);
+    setSessionType(overrideType);
+    setSession(built.cards);
     setIndex(0);
     setCompleted(0);
-    setAgainCount(0);
+    setHardCount(0);
     setRevealed(false);
+    setSessionMeta({ newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets });
+    persistQuickRevisionState({
+      focus: overrideFocus,
+      sessionType: overrideType,
+      sessionIds: built.cards.map((item) => item.id),
+      index: 0,
+      completed: 0,
+      hardCount: 0,
+      revealed: false,
+      sessionMeta: { newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets },
+    });
   };
 
   const moveToNext = () => {
@@ -2033,14 +2148,26 @@ const QuickRevisionTab = ({ setActive }) => {
     setRevealed(false);
   };
 
-  const markAgain = () => {
+  const markCard = (result) => {
     if (!current) return;
-    setSession((items) => [...items, current]);
-    setAgainCount((value) => value + 1);
+    const nextRatings = {
+      ...ratings,
+      [current.id]: {
+        seen: (ratings[current.id]?.seen || 0) + 1,
+        hard: (ratings[current.id]?.hard || 0) + (result === "hard" ? 1 : 0),
+        okay: (ratings[current.id]?.okay || 0) + (result === "okay" ? 1 : 0),
+        easy: (ratings[current.id]?.easy || 0) + (result === "easy" ? 1 : 0),
+      },
+    };
+    setRatings(nextRatings);
+    writeStore(STORAGE_KEYS.quickRevRatings, nextRatings);
+    if (result === "hard") {
+      setSession((items) => [...items, current]);
+      setHardCount((value) => value + 1);
+    }
     moveToNext();
   };
 
-  const markGotIt = () => moveToNext();
   const moveCard = (direction) => {
     if (!session.length) return;
     setIndex((value) => {
@@ -2059,66 +2186,107 @@ const QuickRevisionTab = ({ setActive }) => {
   const isFinished = session.length > 0 && index >= session.length;
 
   useEffect(() => {
-    if (topic !== "All" && !topics.includes(topic)) {
-      setTopic("All");
+    const saved = readStore(STORAGE_KEYS.quickRevState, null);
+    if (!saved?.sessionIds?.length) return;
+    const restoredCards = saved.sessionIds
+      .map((id) => deck.find((item) => item.id === id))
+      .filter(Boolean);
+    if (!restoredCards.length) return;
+    setSession(restoredCards);
+    setFocus(saved.focus || "fresh");
+    setSessionType(saved.sessionType || "medium");
+    setIndex(Math.min(saved.index || 0, Math.max(restoredCards.length - 1, 0)));
+    setCompleted(saved.completed || 0);
+    setHardCount(saved.hardCount || 0);
+    setRevealed(Boolean(saved.revealed));
+    setSessionMeta(saved.sessionMeta || { newCount: 0, reviewCount: 0, buckets: {} });
+  }, [deck]);
+
+  useEffect(() => {
+    if (!session.length || isFinished) {
+      clearQuickRevisionState();
       return;
     }
-    startSession();
-  }, [topic, sessionSize, mode]);
+    persistQuickRevisionState({
+      focus,
+      sessionType,
+      sessionIds: session.map((item) => item.id),
+      index,
+      completed,
+      hardCount,
+      revealed,
+      sessionMeta,
+    });
+  }, [focus, sessionType, session, index, completed, hardCount, revealed, sessionMeta, isFinished]);
 
   return (
     <div style={{ padding: 20 }}>
-      <SectionTitle icon="↔️" meta="Short fresh sessions for when you only have a few minutes.">Quick Revision</SectionTitle>
+      <SectionTitle icon="↔️" meta="Short fresh revision sessions that mix the full course over time.">Quick Revision</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
-        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Fresh rapid revision</div>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Small sessions, fresh coverage</div>
         <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
-          Start a small session, get a fresh mix of facts, reveal the answer only when you want it, then choose whether the card should come back again later.
+          Use this when you only have a few minutes. Each session gives a fresh set, spreads coverage across the course, and remembers which cards felt hard so weaker facts can come back later.
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
-          <Badge text={`${filteredDeck.length} in topic pool`} color="#3b82f6" />
-          <Badge text="Fresh mix each session" color="#22c55e" />
-          <Badge text={QUICK_REVISION_MODES.find((item) => item.id === mode)?.label || "Pass Core"} color="#8b5cf6" />
+          <Badge text={selectedFocus.label} color="#8b5cf6" />
+          <Badge text={`${selectedSession.count} cards this session`} color="#3b82f6" />
+          <Badge text="New cards + smart review" color="#22c55e" />
         </div>
       </Card>
       <Card>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Revision mode</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Session length</div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
-          {QUICK_REVISION_MODES.map((item) => (
-            <TabButton key={item.id} active={mode === item.id} onClick={() => setMode(item.id)}>
+          {QUICK_REVISION_SESSION_OPTIONS.map((item) => (
+            <TabButton key={item.id} active={sessionType === item.id} onClick={() => setSessionType(item.id)}>
               {item.label}
             </TabButton>
           ))}
         </div>
         <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
-          {QUICK_REVISION_MODES.find((item) => item.id === mode)?.detail}
+          {selectedSession.detail}
         </div>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Topic filter</div>
-        <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto" }}>
-          {topics.map((item) => <TabButton key={item} active={topic === item} onClick={() => setTopic(item)}>{item}</TabButton>)}
+        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Focus</div>
+        <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 12 }}>
+          {QUICK_REVISION_FOCUS_OPTIONS.map((item) => <TabButton key={item.id} active={focus === item.id} onClick={() => setFocus(item.id)}>{item.label}</TabButton>)}
         </div>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, margin: "12px 0 8px" }}>Session length</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
+          {selectedFocus.detail}
+        </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {[12, 24, 40].map((count) => (
-            <TabButton key={count} active={sessionSize === count} onClick={() => setSessionSize(count)}>
-              {count === 12 ? "Few mins" : count === 24 ? "Medium" : "Deep"}
-            </TabButton>
-          ))}
-          <button className="focus-ring" onClick={startSession} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>
-            New mix
+          <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>
+            Start fresh session
           </button>
         </div>
       </Card>
+      {!session.length && (
+        <Card style={{ border: "1px solid var(--card-border)", textAlign: "center" }}>
+          <div style={{ fontSize: 42, marginBottom: 8 }}>🧠</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>Start a quick revision run</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
+            Pick a short session and a focus, then come back later for a new mix without losing your progress.
+          </div>
+          <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>
+            Start now
+          </button>
+        </Card>
+      )}
       {isFinished ? (
         <Card style={{ textAlign: "center", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
           <div style={{ fontSize: 42, marginBottom: 8 }}>✅</div>
           <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 6 }}>Session complete</div>
           <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
-            You went through {completed} cards. {againCount > 0 ? `${againCount} cards were marked to come back again later.` : "No cards were marked for repeat."}
+            You went through {completed} cards. {hardCount > 0 ? `${hardCount} cards were marked hard and will become easier to revisit later.` : "No cards were marked hard in this session."}
+          </div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
+            <Badge text={`${sessionMeta.newCount} new`} color="#22c55e" />
+            <Badge text={`${sessionMeta.reviewCount} review`} color="#3b82f6" />
+            {Object.entries(sessionMeta.buckets || {}).slice(0, 4).map(([bucket, total]) => <Badge key={bucket} text={`${bucket} ${total}`} color="#64748b" />)}
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={startSession} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>Start new mix</button>
-            <button className="focus-ring" onClick={() => setActive(topic === "All" ? "home" : "quickfacts")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Back to topics</button>
+            <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>New fresh session</button>
+            <button className="focus-ring" onClick={() => startSession("weak", "short")} style={{ background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review hard cards</button>
+            <button className="focus-ring" onClick={() => setActive("home")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Back home</button>
           </div>
         </Card>
       ) : current && (
@@ -2127,15 +2295,16 @@ const QuickRevisionTab = ({ setActive }) => {
         <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
         <Badge text={`${remaining} left`} color="#64748b" />
         <Badge text={`${completed} done`} color="#22c55e" />
-        {againCount > 0 && <Badge text={`${againCount} repeat later`} color="#f59e0b" />}
+        <Badge text={`${sessionMeta.newCount} new in this run`} color="#3b82f6" />
+        {hardCount > 0 && <Badge text={`${hardCount} marked hard`} color="#f59e0b" />}
         <div style={{ marginLeft: "auto" }}>
-          <button className="focus-ring" onClick={startSession} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>New mix</button>
+          <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>New mix</button>
         </div>
       </div>
       <Card className="quick-revision-card" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
           <Badge text={current.topic} color={current.color} />
-          <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{revealed ? "Answer shown" : "Question only"}</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{revealed ? "Answer shown" : "Question only"} · {current.bucket}</div>
         </div>
         <div style={{ display: "grid", gap: 10 }}>
           <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "12px 13px" }}>
@@ -2178,8 +2347,9 @@ const QuickRevisionTab = ({ setActive }) => {
           </div>
           {revealed ? (
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="focus-ring" onClick={markAgain} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Again later</button>
-              <button className="focus-ring" onClick={markGotIt} style={{ flex: 1, minWidth: 180, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#15803d", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Got it</button>
+              <button className="focus-ring" onClick={() => markCard("hard")} style={{ flex: 1, minWidth: 140, background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Hard</button>
+              <button className="focus-ring" onClick={() => markCard("okay")} style={{ flex: 1, minWidth: 140, background: "color-mix(in srgb, #38bdf8 12%, var(--card-bg))", color: "#0369a1", border: "1px solid color-mix(in srgb, #38bdf8 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Okay</button>
+              <button className="focus-ring" onClick={() => markCard("easy")} style={{ flex: 1, minWidth: 140, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#15803d", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Easy</button>
             </div>
           ) : (
             <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>

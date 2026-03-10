@@ -55,6 +55,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added community/participation facts and questions.
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
 - Expanded `Key People` again with fuller exam-focused facts, especially Henry VIII, plus extra civics/culture coverage like Jacobites, coalition government, civil servants, school governors, Tate galleries, Turner Prize, and rugby origin.
+- Redesigned `Quick Revise` into a session-first mode with short runs, focus presets, saved session continuity, and `Hard / Okay / Easy` feedback.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 - Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
 - Added direct `Boxing Day` quiz coverage to close the last festival audit gap.

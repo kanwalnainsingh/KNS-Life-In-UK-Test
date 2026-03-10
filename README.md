@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 323 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.12.1`
+Current release: `v1.13.0`
 
 ---
 
@@ -59,7 +59,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 | Section | What it does |
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
-| ↔️ Quick Revise | Short-session revision cards with `Pass Core`, `Common Traps`, and `Full Course` modes |
+| ↔️ Quick Revise | Session-first quick revision with `5/10/15 min` runs, `Fresh mix`, `Pass core`, `Weak areas`, `Common traps`, `Dates`, and `4 Nations` focuses |
 | 📚 Story Mode | Small handbook-style chapters for quick sequential revision |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
@@ -88,7 +88,11 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 - Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
 - Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
 - More relevant grouped navigation with main actions first and topic subsections underneath
-- `Quick Revise` now has `Pass Core`, `Common Traps`, and `Full Course` session modes
+- `Quick Revise` has been redesigned around short return-friendly sessions:
+  - `5 min`, `10 min`, and `15 min` runs
+  - `Fresh mix`, `Pass core`, `Weak areas`, `Common traps`, `Dates`, and `4 Nations` focuses
+  - session continuity across refreshes
+  - `Hard / Okay / Easy` feedback so weaker facts can come back later
 - `Mock Test` and `Revise Mistakes` modes
 - Answer reveal toggles for quiz and mock flows
 - Mock paper history is now saved per paper with best score, attempts, and last score kept in local storage across app updates

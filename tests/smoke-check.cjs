@@ -45,11 +45,13 @@ const assert = (condition, message) => {
   assert(/TopicTrackerTab/.test(appSource), "Tracker UI missing");
   assert(/MOCK_PAPER_COUNT = 40/.test(appSource), "Expected 40 fixed mock papers");
   assert(/mockProgress/.test(appSource), "Mock progress storage missing");
-  assert(/QUICK_REVISION_MODES/.test(appSource), "Quick revision mode presets missing");
-  assert(/Pass Core/.test(appSource), "Pass Core quick revision mode missing");
+  assert(/QUICK_REVISION_SESSION_OPTIONS/.test(appSource), "Quick revision session presets missing");
+  assert(/QUICK_REVISION_FOCUS_OPTIONS/.test(appSource), "Quick revision focus presets missing");
+  assert(/Fresh mix/.test(appSource), "Fresh mix quick revision focus missing");
+  assert(/Weak areas/.test(appSource), "Weak areas quick revision focus missing");
   assert(/Saved mock paper tracker/.test(appSource), "Mock tracker summary missing");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
-  assert(/Fresh rapid revision/.test(appSource), "Quick revision hero missing");
+  assert(/Small sessions, fresh coverage/.test(appSource), "Quick revision hero missing");
   assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");
   assert(/Show details/.test(appSource), "Quick revision inline details control missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
