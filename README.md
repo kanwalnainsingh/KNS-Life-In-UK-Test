@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.15.0`
+Current release: `v1.15.2`
 
 ---
 
@@ -64,7 +64,7 @@ UI stack now uses:
 | Section | What it does |
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
-| ↔️ Quick Revise | Session-first quick revision with `5/10/15 min` runs, `Fresh mix`, `Pass core`, `Weak areas`, `Saved facts`, `Common traps`, `Dates`, and `4 Nations` focuses |
+| ↔️ Quick Revise | Fast card-by-card revision with `5/10/15 min` timing, topic filters, `Fresh mix`, `Pass core`, `Weak areas`, `Saved facts`, `Common traps`, `Dates`, and `4 Nations` focuses |
 | 📚 Story Mode | Chronological chapter-by-chapter revision for the main history and modern-Britain story |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
@@ -83,7 +83,7 @@ UI stack now uses:
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7 |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
 | 📝 Mock Test | 40 fixed balanced mock papers with saved per-paper scores, attempts, and next-paper guidance |
-| 🔥 Rapid Fire | Timed revision with broader randomisation and fewer repeats |
+| 🔥 Rapid Fire | Timed revision with broader randomisation, fewer repeats, and a reset option when you want a fully fresh run |
 | ♻️ Revise Mistakes | Retry the questions you got wrong |
 
 ---
@@ -101,6 +101,9 @@ UI stack now uses:
   - mock questions
   - mistake-revision questions
 - `Quick Revise` now includes a `Saved facts` focus so bookmarked facts can be reviewed quickly
+- `Quick Revise` now shows answer, context, and memory clue immediately so it works as a true fast-scroll revision mode
+- `Quick Revise` now has a broad topic filter so you can stay inside one subject like `History`, `Wars`, `Law`, `Landmarks`, `Key People`, `World Orgs`, or `Arts`
+- `Quick Revise` keeps your place quietly in the background, while `Show all now` and `Reset progress` give you manual control when needed
 - `Revise Mistakes` now also links into saved questions and weak-fact study
 - Bottom mobile navigation now keeps the main study flow visible:
   - `Home`
@@ -125,6 +128,7 @@ UI stack now uses:
   - correct answer
   - why it matters
   - memory clue
+- `Rapid Fire` now explains its fresh-question behavior more clearly and includes `Reset progress` to clear recent-history avoidance when you want a completely new run
 - `Mock Test` and `Revise Mistakes` modes
 - Mock results now give a better next-step handoff:
   - weakest area

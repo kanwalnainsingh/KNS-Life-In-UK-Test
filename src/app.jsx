@@ -1107,6 +1107,31 @@ const QUICK_REVISION_FOCUS_OPTIONS = [
   { id: "nations", label: "4 Nations", detail: "Capitals, saints, parliaments, symbols, and places." },
 ];
 
+const QUICK_REVISION_TOPIC_ORDER = [
+  "All topics",
+  "History",
+  "Wars",
+  "4 Nations",
+  "Parliament",
+  "Elections",
+  "Law",
+  "Community",
+  "Geography",
+  "Landmarks",
+  "Religion",
+  "Festivals",
+  "World Orgs",
+  "International",
+  "Key People",
+  "Inventors",
+  "Arts",
+  "Sports",
+  "Symbols",
+  "Comparisons",
+  "Memory Clue",
+  "Coverage",
+];
+
 const getQuickRevisionBucket = (item) => {
   if (isTrapCard(item)) return "Traps";
   if (/history|wars/.test(item.topic.toLowerCase()) || /\b\d{3,4}\b|ad|bc/.test(`${item.front} ${item.back}`.toLowerCase())) return "History";
@@ -1139,8 +1164,24 @@ const getQuickRevisionFocusPool = (deck, focus, ratings) => {
   return deck;
 };
 
-const buildQuickRevisionSession = (deck, focus, count, ratings = {}) => {
-  const pool = getQuickRevisionFocusPool(deck, focus, ratings);
+const getQuickRevisionTopics = (deck) => {
+  const seen = new Set(deck.map((item) => item.topic).filter(Boolean));
+  const ordered = QUICK_REVISION_TOPIC_ORDER.filter((topic) => topic === "All topics" || seen.has(topic));
+  const extra = Array.from(seen)
+    .filter((topic) => !QUICK_REVISION_TOPIC_ORDER.includes(topic))
+    .sort((a, b) => a.localeCompare(b));
+  return [...ordered, ...extra];
+};
+
+const filterQuickRevisionPoolByTopic = (pool, topic) => {
+  if (!topic || topic === "All topics") return pool;
+  return pool.filter((item) => item.topic === topic);
+};
+
+const buildQuickRevisionSession = (deck, focus, count, ratings = {}, topic = "All topics") => {
+  const focusPool = getQuickRevisionFocusPool(deck, focus, ratings);
+  const topicPool = filterQuickRevisionPoolByTopic(focusPool, topic);
+  const pool = topicPool.length ? topicPool : focusPool;
   const recent = readStore(STORAGE_KEYS.recentQuickRev, []);
   const target = Math.min(count, pool.length || count);
 
@@ -2483,7 +2524,9 @@ const TrueFalseSprintTab = () => {
 
 const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
+  const availableTopics = useMemo(() => getQuickRevisionTopics(deck), [deck]);
   const [focus, setFocus] = useState("fresh");
+  const [topicFilter, setTopicFilter] = useState("All topics");
   const [sessionType, setSessionType] = useState("medium");
   const [session, setSession] = useState([]);
   const [index, setIndex] = useState(0);
@@ -2497,13 +2540,32 @@ const QuickRevisionTab = ({ setActive }) => {
 
   const selectedSession = QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === sessionType) || QUICK_REVISION_SESSION_OPTIONS[1];
   const selectedFocus = QUICK_REVISION_FOCUS_OPTIONS.find((item) => item.id === focus) || QUICK_REVISION_FOCUS_OPTIONS[0];
+  const selectedTopic = availableTopics.includes(topicFilter) ? topicFilter : "All topics";
   const persistQuickRevisionState = (next) => writeStore(STORAGE_KEYS.quickRevState, next);
   const clearQuickRevisionState = () => writeStore(STORAGE_KEYS.quickRevState, null);
+  const resetQuickRevisionProgress = () => {
+    writeStore(STORAGE_KEYS.quickRevRatings, {});
+    writeStore(STORAGE_KEYS.recentQuickRev, []);
+    clearQuickRevisionState();
+    setRatings({});
+    setSession([]);
+    setIndex(0);
+    setCompleted(0);
+    setHardCount(0);
+    setRevealed(true);
+    setSessionMeta({ newCount: 0, reviewCount: 0, buckets: {} });
+    setFocus("fresh");
+    setTopicFilter("All topics");
+    setSessionType("medium");
+    scrollPageTop();
+  };
 
-  const startSession = (overrideFocus = focus, overrideType = sessionType) => {
+  const startSession = (overrideFocus = focus, overrideType = sessionType, overrideTopic = selectedTopic) => {
     const length = (QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === overrideType) || QUICK_REVISION_SESSION_OPTIONS[1]).count;
-    const built = buildQuickRevisionSession(deck, overrideFocus, length, ratings);
+    const safeTopic = availableTopics.includes(overrideTopic) ? overrideTopic : "All topics";
+    const built = buildQuickRevisionSession(deck, overrideFocus, length, ratings, safeTopic);
     setFocus(overrideFocus);
+    setTopicFilter(safeTopic);
     setSessionType(overrideType);
     setSession(built.cards);
     setIndex(0);
@@ -2514,6 +2576,7 @@ const QuickRevisionTab = ({ setActive }) => {
     scrollPageTop();
     persistQuickRevisionState({
       focus: overrideFocus,
+      topicFilter: safeTopic,
       sessionType: overrideType,
       sessionIds: built.cards.map((item) => item.id),
       index: 0,
@@ -2580,13 +2643,14 @@ const QuickRevisionTab = ({ setActive }) => {
     if (!restoredCards.length) return;
     setSession(restoredCards);
     setFocus(saved.focus || "fresh");
+    setTopicFilter(availableTopics.includes(saved.topicFilter) ? saved.topicFilter : "All topics");
     setSessionType(saved.sessionType || "medium");
     setIndex(Math.min(saved.index || 0, Math.max(restoredCards.length - 1, 0)));
     setCompleted(saved.completed || 0);
     setHardCount(saved.hardCount || 0);
     setRevealed(true);
     setSessionMeta(saved.sessionMeta || { newCount: 0, reviewCount: 0, buckets: {} });
-  }, [deck]);
+  }, [deck, availableTopics]);
 
   useEffect(() => {
     if (!session.length || isFinished) {
@@ -2595,6 +2659,7 @@ const QuickRevisionTab = ({ setActive }) => {
     }
     persistQuickRevisionState({
       focus,
+      topicFilter: selectedTopic,
       sessionType,
       sessionIds: session.map((item) => item.id),
       index,
@@ -2603,15 +2668,15 @@ const QuickRevisionTab = ({ setActive }) => {
       revealed,
       sessionMeta,
     });
-  }, [focus, sessionType, session, index, completed, hardCount, revealed, sessionMeta, isFinished]);
+  }, [focus, selectedTopic, sessionType, session, index, completed, hardCount, revealed, sessionMeta, isFinished]);
 
   return (
     <div className="px-4 py-5 sm:px-5">
-      <SectionTitle icon="↔️" meta="Short fresh revision sessions that mix the full course over time.">Quick Revision</SectionTitle>
+      <SectionTitle icon="↔️" meta="Fast card-by-card revision that remembers your place and brings in fresh facts over time.">Quick Revision</SectionTitle>
       <Card className="setup-card mb-4">
-        <div className="mb-2 text-lg font-extrabold text-foreground">Small sessions, fresh coverage</div>
+        <div className="mb-2 text-lg font-extrabold text-foreground">Quick cards, full-course coverage</div>
         <div className="mb-4 text-sm leading-7 text-muted-foreground">
-          Use this when you only have a few minutes. Each session gives a fresh set, spreads coverage across the course, and remembers which cards felt hard so weaker facts can come back later.
+          Use this when you only have a few minutes. The app remembers what you have already seen, brings in fresh cards when you come back, and still lets hard facts return later so they stick.
         </div>
         <div className="flex flex-wrap gap-2">
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
@@ -2621,7 +2686,7 @@ const QuickRevisionTab = ({ setActive }) => {
         </div>
       </Card>
       <Card className="mb-4">
-        <div className="mb-2 text-xs text-muted-foreground">Session length</div>
+        <div className="mb-2 text-xs text-muted-foreground">Time</div>
         <div className="choice-grid mb-3">
           {QUICK_REVISION_SESSION_OPTIONS.map((item) => (
             <button
@@ -2641,18 +2706,31 @@ const QuickRevisionTab = ({ setActive }) => {
         <div className="mb-3 text-xs leading-6 text-muted-foreground">
           {selectedFocus.detail}
         </div>
+        <div className="mb-2 text-xs text-muted-foreground">Topic filter</div>
+        <div className="noscroll mb-3 flex gap-2 overflow-x-auto">
+          {availableTopics.map((item) => (
+            <TabButton key={item} active={selectedTopic === item} onClick={() => setTopicFilter(item)}>
+              {item}
+            </TabButton>
+          ))}
+        </div>
+        <div className="mb-3 text-xs leading-6 text-muted-foreground">
+          {selectedTopic === "All topics" ? "Use all topics for the broadest revision mix." : `Show only ${selectedTopic} cards inside the chosen session focus.`}
+        </div>
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => startSession("fresh", "medium")}>Start default session</Button>
-          <Button variant="secondary" onClick={() => startSession(focus, sessionType)}>Start custom session</Button>
+          <Button onClick={() => startSession("fresh", "medium")}>Start now</Button>
+          <Button variant="secondary" onClick={() => startSession(focus, sessionType, selectedTopic)}>Use these settings</Button>
+          <Button variant="outline" onClick={() => startSession(focus, sessionType, "All topics")}>Show all now</Button>
           {bookmarks.cards.length > 0 && <Button variant="outline" onClick={() => startSession("saved", "short")}>Open saved facts</Button>}
+          <Button variant="ghost" onClick={resetQuickRevisionProgress}>Reset progress</Button>
         </div>
       </Card>
       {!session.length && (
         <Card className="status-panel text-center">
           <div className="mb-2 text-[42px]">🧠</div>
-          <div className="mb-2 text-[22px] font-extrabold text-foreground">Start a quick revision run</div>
+          <div className="mb-2 text-[22px] font-extrabold text-foreground">Start quick revision</div>
           <div className="mb-4 text-sm leading-7 text-muted-foreground">
-            Pick a short session and a focus, then come back later for a new mix without losing your progress.
+            Pick a time and a focus, then come back later for new cards without losing your place.
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             <Button onClick={() => startSession("fresh", "medium")}>Start now</Button>
@@ -2663,9 +2741,9 @@ const QuickRevisionTab = ({ setActive }) => {
       {isFinished ? (
         <Card style={{ textAlign: "center", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
           <div style={{ fontSize: 42, marginBottom: 8 }}>✅</div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 6 }}>Session complete</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 6 }}>Quick revision complete</div>
           <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
-            You went through {completed} cards. {hardCount > 0 ? `${hardCount} cards were marked hard and will become easier to revisit later.` : "No cards were marked hard in this session."}
+            You went through {completed} cards. {hardCount > 0 ? `${hardCount} cards were marked hard and will become easier to revisit later.` : "No cards were marked hard in this run."}
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
             <Badge text={`${sessionMeta.newCount} new`} color="#22c55e" />
@@ -2673,9 +2751,10 @@ const QuickRevisionTab = ({ setActive }) => {
             {Object.entries(sessionMeta.buckets || {}).slice(0, 4).map(([bucket, total]) => <Badge key={bucket} text={`${bucket} ${total}`} color="#64748b" />)}
           </div>
           <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>New fresh session</button>
-            <button className="focus-ring" onClick={() => startSession("weak", "short")} style={{ background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review hard cards</button>
+            <button className="focus-ring" onClick={() => startSession(focus, sessionType, selectedTopic)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>New cards</button>
+            <button className="focus-ring" onClick={() => startSession("weak", "short", selectedTopic)} style={{ background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review hard cards</button>
             {bookmarks.cards.length > 0 && <button className="focus-ring" onClick={() => startSession("saved", "short")} style={{ background: "color-mix(in srgb, #14b8a6 12%, var(--card-bg))", color: "#0f766e", border: "1px solid color-mix(in srgb, #14b8a6 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review saved facts</button>}
+            <button className="focus-ring" onClick={() => startSession(focus, sessionType, "All topics")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Show all now</button>
             <button className="focus-ring" onClick={() => setActive("home")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Back home</button>
           </div>
         </Card>
@@ -2685,10 +2764,11 @@ const QuickRevisionTab = ({ setActive }) => {
         <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
         <Badge text={`${remaining} left`} color="#64748b" />
         <Badge text={`${completed} done`} color="#22c55e" />
-        <Badge text={`${sessionMeta.newCount} new in this run`} color="#3b82f6" />
+        <Badge text={`${sessionMeta.newCount} new cards`} color="#3b82f6" />
+        {selectedTopic !== "All topics" && <Badge text={selectedTopic} color={current.color} />}
         {hardCount > 0 && <Badge text={`${hardCount} marked hard`} color="#f59e0b" />}
         <div className="ml-auto">
-          <Button variant="secondary" onClick={() => startSession(focus, sessionType)}>New mix</Button>
+          <Button variant="secondary" onClick={() => startSession(focus, sessionType, selectedTopic)}>New mix</Button>
         </div>
       </div>
       <Card className="quick-revision-card overflow-hidden" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
@@ -4836,6 +4916,19 @@ const RapidFireTab = () => {
   const [finished, setFinished] = useState(false);
   const timerRef = useRef(null);
   const advanceRef = useRef(null);
+  const resetRapidHistory = () => {
+    writeStore(STORAGE_KEYS.recentRapid, []);
+    setStarted(false);
+    setFinished(false);
+    setQuestions([]);
+    setCurrent(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setResults([]);
+    setTimeLeft(timePerQuestion);
+    scrollPageTop();
+  };
 
   const startGame = () => {
     clearInterval(timerRef.current);
@@ -4923,12 +5016,12 @@ const RapidFireTab = () => {
   if (!started && !finished) {
     return (
       <div style={{ padding: 20 }}>
-        <SectionTitle icon="🔥" meta="Pressure practice for fast recall.">Rapid Fire</SectionTitle>
+        <SectionTitle icon="🔥" meta="Pressure practice for fast recall with fresh questions each time you come back.">Rapid Fire</SectionTitle>
         <Card style={{ background: "linear-gradient(135deg, rgba(127,29,29,0.18), rgba(15,23,42,0.94))", border: "1px solid #7f1d1d", textAlign: "center" }}>
           <div style={{ fontSize: 56, marginBottom: 12 }}>⏱️</div>
           <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 22, marginBottom: 8 }}>Fast recall with a bigger rotating pool</div>
           <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 6 }}>Pick an answer before time runs out.</div>
-          <div style={{ color: "#f59e0b", fontSize: 13, marginBottom: 18 }}>Uses recent-history avoidance so the same questions do not repeat too often.</div>
+          <div style={{ color: "#f59e0b", fontSize: 13, marginBottom: 18 }}>The app remembers recent questions so you keep seeing new ones. Use reset if you want to clear that and start fully fresh.</div>
           <SettingGroup
             label="How many questions?"
             value={String(total)}
@@ -4976,9 +5069,14 @@ const RapidFireTab = () => {
               { value: "no", label: "Quiz only" },
             ]}
           />
-          <button className="focus-ring" onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 14, padding: "14px 36px", fontSize: 17, fontWeight: 800, cursor: "pointer" }}>
-            Start Rapid Fire
-          </button>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+            <button className="focus-ring" onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 14, padding: "14px 36px", fontSize: 17, fontWeight: 800, cursor: "pointer" }}>
+              Start Rapid Fire
+            </button>
+            <button className="focus-ring" onClick={resetRapidHistory} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 14, padding: "14px 20px", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
+              Reset progress
+            </button>
+          </div>
         </Card>
       </div>
     );
@@ -4996,6 +5094,8 @@ const RapidFireTab = () => {
           <div style={{ fontSize: 36, fontWeight: 800, color: "var(--text-strong)", margin: "8px 0" }}>{score}/{questions.length}</div>
           <div style={{ fontSize: 20, color: pass ? "#4ade80" : "#f87171", marginBottom: 20 }}>{pct}%</div>
           <button className="focus-ring" onClick={startGame} style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 12, padding: "12px 28px", cursor: "pointer", fontWeight: 800, fontSize: 15 }}>Try Again</button>
+          {" "}
+          <button className="focus-ring" onClick={resetRapidHistory} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 20px", cursor: "pointer", marginLeft: 6 }}>Reset progress</button>
           {" "}
           <button className="focus-ring" onClick={() => { setFinished(false); setStarted(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 20px", cursor: "pointer", marginLeft: 6 }}>Back</button>
         </Card>

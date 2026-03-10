@@ -47,13 +47,17 @@ const assert = (condition, message) => {
   assert(/mockProgress/.test(appSource), "Mock progress storage missing");
   assert(/QUICK_REVISION_SESSION_OPTIONS/.test(appSource), "Quick revision session presets missing");
   assert(/QUICK_REVISION_FOCUS_OPTIONS/.test(appSource), "Quick revision focus presets missing");
+  assert(/Topic filter/.test(appSource), "Quick revision topic filter missing");
+  assert(/All topics/.test(appSource), "Quick revision all-topics option missing");
   assert(/Fresh mix/.test(appSource), "Fresh mix quick revision focus missing");
   assert(/Weak areas/.test(appSource), "Weak areas quick revision focus missing");
   assert(/Saved mock paper tracker/.test(appSource), "Mock tracker summary missing");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
-  assert(/Small sessions, fresh coverage/.test(appSource), "Quick revision hero missing");
+  assert(/Quick cards, full-course coverage/.test(appSource), "Quick revision hero missing");
   assert(/Short narrative chapters/.test(appSource), "Story mode chapter hero missing");
   assert(/Quick answer view/.test(appSource), "Quick revision auto-answer view missing");
+  assert(/Show all now/.test(appSource), "Quick revision show-all action missing");
+  assert(/Reset progress/.test(appSource), "Quick revision reset action missing");
   assert(/Review the ones you missed/.test(appSource), "Daily 10 wrong-answer review missing");
   assert(/<span>Menu<\/span>/.test(appSource), "Bottom menu label missing");
   assert(/Start here/.test(appSource), "Pass-focused start guidance missing");
