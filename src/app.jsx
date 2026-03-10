@@ -1466,42 +1466,72 @@ const getHashTab = () => {
 };
 
 const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
-  const quickActions = ["home", "quickrev", "daily10", "quiz", "mock", "story", "rapidfire", "revise"];
+  const quickActions = ["quickrev", "mock", "quiz", "story"];
+  const currentTab = TABS.find((tab) => tab.id === active);
+  const currentGroup = MOBILE_MORE_GROUPS.find((group) => group.ids.includes(active));
   return (
     <Sheet open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <SheetContent side="bottom" hideClose className="mobile-sheet overflow-y-auto p-4">
         <SheetHeader className="mb-3 pr-14">
           <SheetTitle>Study menu</SheetTitle>
-          <SheetDescription>Start a study action or jump straight to a topic.</SheetDescription>
+          <SheetDescription>Open a study mode quickly or jump to a topic when you need it.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-3">
-          <Button
-            variant="secondary"
-            className="h-auto w-full justify-between rounded-2xl px-4 py-3 text-left"
-            onClick={() => { if (canGoBack) onBack(); onClose(); }}
-          >
-            <span>← Back</span>
-            <span className="text-xs text-muted-foreground">{canGoBack ? "Previous screen" : "No history yet"}</span>
-          </Button>
+          <div className="study-menu-hero">
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Current area</div>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-lg font-extrabold text-foreground">{currentTab?.icon} {currentTab?.label || "Study"}</div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {currentGroup ? `${currentGroup.title} section` : "Main study mode"}
+                </div>
+              </div>
+              <Badge text="Open now" color="#3b82f6" />
+            </div>
+          </div>
+
+          <div className="study-menu-utilities">
+            <button
+              className="focus-ring study-menu-utility"
+              onClick={() => { setActive("home"); onClose(); }}
+            >
+              <div className="mb-1 text-xs font-bold text-muted-foreground">Dashboard</div>
+              <div>🏠 Home</div>
+            </button>
+            <button
+              className="focus-ring study-menu-utility"
+              onClick={() => { if (canGoBack) onBack(); onClose(); }}
+            >
+              <div className="mb-1 text-xs font-bold text-muted-foreground">Go back</div>
+              <div>← {canGoBack ? "Previous screen" : "No history yet"}</div>
+            </button>
+          </div>
+
           <div className="study-menu-section">
-            <div className="mb-1 text-xs font-bold text-muted-foreground">Study now</div>
-            <div className="mb-2 text-[11px] text-muted-foreground">Use these when you want to revise, practise, or test yourself straight away.</div>
-            <div className="study-menu-grid">
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Start studying</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">Best actions when you want to learn or test yourself right away.</div>
+            <div className="study-menu-primary-grid">
               {quickActions.map((id) => {
                 const item = TABS.find((tab) => tab.id === id);
                 if (!item) return null;
                 return (
                   <button
                     key={item.id}
-                    className="focus-ring study-menu-card"
+                    className="focus-ring study-menu-primary"
                     data-active={active === item.id ? "true" : "false"}
                     onClick={() => { setActive(item.id); onClose(); }}
                   >
                     <div className="mb-1 flex items-center justify-between gap-2">
                       <span className="text-xl">{item.icon}</span>
-                      {active === item.id && <span className="text-[10px] font-bold uppercase tracking-[0.14em]">Open</span>}
+                      {active === item.id && <span className="text-[10px] font-bold uppercase tracking-[0.14em]">Here</span>}
                     </div>
                     <div className="text-sm font-bold">{item.label}</div>
+                    <div className="mt-1 text-[11px] text-muted-foreground">
+                      {item.id === "quickrev" ? "Fresh facts quickly" :
+                        item.id === "mock" ? "Closest to the real test" :
+                          item.id === "quiz" ? "Flexible practice mode" :
+                            "Learn the course in order"}
+                    </div>
                   </button>
                 );
               })}
@@ -1511,19 +1541,21 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
             <div key={group.title} className="study-menu-section">
               <div className="mb-1 text-xs font-bold text-muted-foreground">{group.title}</div>
               <div className="mb-2 text-[11px] text-muted-foreground">{group.hint}</div>
-              <div className="study-menu-grid">
+              <div className="study-menu-topic-grid">
                 {group.ids.map((id) => {
                   const item = TABS.find((tab) => tab.id === id);
                   if (!item) return null;
                   return (
                     <button
                       key={item.id}
-                      className="focus-ring study-menu-card study-menu-card-compact"
+                      className="focus-ring study-menu-topic"
                       data-active={active === item.id ? "true" : "false"}
                       onClick={() => { setActive(item.id); onClose(); }}
                     >
-                      <div className="mb-1.5 text-xl">{item.icon}</div>
-                      <div className="text-sm font-bold">{item.label}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{item.icon}</span>
+                        <span>{item.label}</span>
+                      </div>
                     </button>
                   );
                 })}

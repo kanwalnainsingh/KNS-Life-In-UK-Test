@@ -252,8 +252,25 @@
     @apply rounded-2xl border border-border bg-secondary/60 p-3;
   }
 
+  .study-menu-hero {
+    @apply rounded-[24px] border border-primary/15 bg-gradient-to-br from-primary/10 via-card to-card p-4 shadow-soft;
+  }
+
+  .study-menu-utilities {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .study-menu-utility {
+    @apply flex-1 rounded-2xl border border-border bg-card px-3 py-3 text-left text-sm font-semibold text-foreground;
+    min-width: 148px;
+  }
+
   .study-menu-grid {
     @apply grid gap-2 sm:grid-cols-2;
+  }
+
+  .study-menu-primary-grid {
+    @apply grid gap-2 grid-cols-2;
   }
 
   .study-menu-card {
@@ -268,8 +285,32 @@
     @apply border-border bg-card text-foreground;
   }
 
+  .study-menu-primary {
+    @apply rounded-[22px] border px-3 py-3 text-left transition-colors;
+  }
+
+  .study-menu-primary[data-active="true"] {
+    @apply border-primary bg-primary/10 text-primary;
+  }
+
+  .study-menu-primary[data-active="false"] {
+    @apply border-border bg-card text-foreground;
+  }
+
   .study-menu-card-compact[data-active="false"] {
     @apply bg-secondary/70;
+  }
+
+  .study-menu-topic-grid {
+    @apply grid gap-2 grid-cols-2;
+  }
+
+  .study-menu-topic {
+    @apply rounded-xl border border-border bg-card/90 px-3 py-2.5 text-left text-sm font-semibold text-foreground transition-colors;
+  }
+
+  .study-menu-topic[data-active="true"] {
+    @apply border-primary bg-primary/10 text-primary;
   }
 
   .mobile-scroll-top,
