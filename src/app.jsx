@@ -563,24 +563,28 @@ const NATION_KEY_POINTS = {
     "Saint = St George, day = 23 April, flower = rose.",
     "Largest nation by population: about 84% of the UK.",
     "Church of England is the established church and the monarch is its head.",
+    "England shares one legal system with Wales.",
   ],
   SCOTLAND: [
     "Capital = Edinburgh, but Glasgow is the largest city.",
     "Scottish Parliament = Holyrood, 129 MSPs, elected by proportional representation.",
     "Saint = St Andrew, day = 30 November, flower = thistle, animal = unicorn.",
     "Church of Scotland is Presbyterian and the monarch is not its head.",
+    "Scotland has a separate legal system with courts like the Court of Session and Sheriff Courts.",
   ],
   WALES: [
     "Capital = Cardiff. Welsh Parliament = Senedd, 60 SMs.",
     "Saint = St David, day = 1 March, symbols = daffodil or leek.",
     "Welsh is widely spoken alongside English, by around a quarter of the population.",
     "Wales is not shown separately in the Union Jack because it was already joined with England.",
+    "Wales has the Senedd, but in handbook-style questions it shares one legal system with England.",
   ],
   "N. IRELAND": [
     "Capital = Belfast. NI Assembly = Stormont, 90 MLAs.",
     "Saint = St Patrick, day = 17 March, symbol = shamrock.",
     "Good Friday Agreement 1998 is key background for the current Assembly.",
     "Giant's Causeway and Belfast are common Northern Ireland exam anchors.",
+    "Northern Ireland has a separate legal system and requires photo ID at polling stations.",
   ],
 };
 
@@ -2363,7 +2367,7 @@ const NationsTab = () => (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
         <div>
           <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>4 Nations quick compare</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Best for capitals, saints, symbols, and parliament differences.</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Best for capitals, saints, symbols, parliaments, and cross-nation rule differences.</div>
         </div>
         <Badge text="High-yield nation facts" color="#22c55e" />
       </div>
@@ -2373,9 +2377,67 @@ const NationsTab = () => (
           "England has no separate parliament. The other 3 nations have devolved bodies.",
           "St George, St Andrew, St David, St Patrick = key nation-day sequence.",
           "Rose, thistle, daffodil, shamrock = nation flowers.",
+          "England and Wales share one legal system. Scotland and Northern Ireland have separate systems.",
+          "Scotland = Highers. England, Wales and Northern Ireland = A-levels.",
+          "Scotland = Church of Scotland. England = Church of England.",
+          "Northern Ireland = photo ID at polling station.",
         ].map((item) => (
           <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
             {item}
+          </div>
+        ))}
+      </div>
+    </Card>
+    <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+        <div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Cross-nation compare pack</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the nation facts people often mix because the names look similar but the systems differ.</div>
+        </div>
+        <Badge text="System differences" color="#3b82f6" />
+      </div>
+      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+        {[
+          {
+            title: "Legal systems",
+            points: [
+              "England and Wales share one legal system.",
+              "Scotland has a separate legal system.",
+              "Northern Ireland also has a separate legal system.",
+            ],
+          },
+          {
+            title: "Courts and justice",
+            points: [
+              "Scotland = Court of Session for highest civil court.",
+              "Scotland = Children's Hearing System instead of Youth Court wording.",
+              "England, Wales and Northern Ireland use Crown Court / High Court wording more often in the handbook.",
+            ],
+          },
+          {
+            title: "Education",
+            points: [
+              "Scotland uses Highers.",
+              "England, Wales and Northern Ireland use A-levels.",
+              "Do not assume one school qualification name fits the whole UK.",
+            ],
+          },
+          {
+            title: "Voting and church",
+            points: [
+              "Northern Ireland requires photo ID at polling stations.",
+              "Monarch is head of Church of England.",
+              "Monarch is not head of Church of Scotland.",
+            ],
+          },
+        ].map((item) => (
+          <div key={item.title} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)" }}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>{item.title}</div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {item.points.map((point) => (
+                <div key={point} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>• {point}</div>
+              ))}
+            </div>
           </div>
         ))}
       </div>
