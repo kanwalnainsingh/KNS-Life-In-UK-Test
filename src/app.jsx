@@ -1278,6 +1278,20 @@ const ScrollTopButton = ({ visible }) => (
   </button>
 );
 
+const ScrollBottomButton = ({ visible }) => (
+  <button
+    className="focus-ring mobile-scroll-bottom"
+    onClick={() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })}
+    style={{
+      opacity: visible ? 1 : 0,
+      pointerEvents: visible ? "auto" : "none",
+      transform: visible ? "translateY(0)" : "translateY(12px)",
+    }}
+  >
+    ↓ Bottom
+  </button>
+);
+
 const getHashTab = () => {
   const hash = window.location.hash.replace(/^#/, "").trim();
   return TABS.some((tab) => tab.id === hash) ? hash : null;
@@ -1738,10 +1752,11 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
 
   return (
     <div className="px-4 py-5 sm:px-5">
-      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card">
+      <Card className="hero-panel">
         <CardHeader className="pb-4">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="max-w-2xl">
+              <div className="eyebrow mb-2">Free study guide for ILR and citizenship</div>
               <CardTitle className="text-2xl font-black text-foreground">Life in the UK test practice for ILR and citizenship</CardTitle>
               <CardDescription className="mt-2 text-sm leading-6">
                 Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.
@@ -1750,75 +1765,91 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
             <div className="flex flex-wrap gap-2">
               <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("mock")}>Mock Test</Button>
               <Button variant="secondary" onClick={() => setActive("daily10")}>Daily 10</Button>
+              <Button variant="outline" onClick={() => setActive("quickrev")}>Quick Revise</Button>
             </div>
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 0 }}>
+        <div className="mb-4 flex flex-wrap gap-2">
           <Badge text="24 questions" color="#3b82f6" />
           <Badge text="45 minutes" color="#10b981" />
           <Badge text="75% to pass" color="#f59e0b" />
           <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
         </div>
+        <div className="feature-grid">
+          <div className="subtle-panel p-4">
+            <div className="eyebrow mb-2">Best starting path</div>
+            <div className="text-base font-extrabold text-foreground">Quick Revise → Traps → Mock</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">Use short sessions first, then compare common mix-ups, then test yourself with full papers.</div>
+          </div>
+          <div className="subtle-panel p-4">
+            <div className="eyebrow mb-2">Best for short breaks</div>
+            <div className="text-base font-extrabold text-foreground">Daily 10 or T/F Sprint</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">Fast revision modes for a few minutes on your phone without losing progress.</div>
+          </div>
+          <div className="subtle-panel p-4">
+            <div className="eyebrow mb-2">Exam confidence</div>
+            <div className="text-base font-extrabold text-foreground">{completedPapers ? `${bestPaperScore}% best mock result` : "No mock yet"}</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">{completedPapers ? `Next suggested paper: ${nextPaper.title}.` : "Start with Mock Test 1 for a balanced first paper."}</div>
+          </div>
+        </div>
         </CardContent>
       </Card>
 
-      <div className="stats-grid" style={{ display: "grid", gap: 10, marginBottom: 14 }}>
+      <div className="metric-grid mb-4">
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
         <StatTile label="Mock attempts saved" value={mockHistory.length} color="#3b82f6" />
         <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
         <StatTile label="Last mock score" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#10b981" />
         <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "0%"} color="#f59e0b" />
       </div>
-      <Card style={{ border: "1px solid color-mix(in srgb, #8b5cf6 35%, var(--card-border))", background: "color-mix(in srgb, #8b5cf6 8%, var(--card-bg))" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+      <Card className="mb-4 border-violet-500/25 bg-violet-500/5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Mock progress saved on this device</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>
+            <div className="text-lg font-extrabold text-foreground">Mock progress saved on this device</div>
+            <div className="text-sm leading-6 text-muted-foreground">
               Your completed papers, best scores, and last results stay in local storage, so they still work after new app releases.
             </div>
           </div>
           <Badge text={`${completedPapers}/${MOCK_PAPERS.length} papers tried`} color="#8b5cf6" />
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+        <div className="mb-3 flex flex-wrap gap-2">
           <Badge text={`Next paper: #${nextPaper.id}`} color={nextPaper.accent} />
           <Badge text={latestMock ? `Last score ${latestMock.score}/24` : "No paper done yet"} color="#10b981" />
         </div>
-        <button className="focus-ring" onClick={() => setActive("mock")} style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 14px", fontWeight: 800, cursor: "pointer" }}>
-          Open Mock Tracker
-        </button>
+        <Button variant="secondary" onClick={() => setActive("mock")}>Open Mock Tracker</Button>
       </Card>
 
-      <Card style={{ border: "1px solid #334155" }}>
-        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>What this app covers for the Life in the UK test</div>
-        <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7 }}>
+      <Card className="mb-4">
+        <div className="mb-2 text-lg font-extrabold text-foreground">What this app covers for the Life in the UK test</div>
+        <div className="text-sm leading-7 text-foreground">
           This free Life in the UK study guide is built for people preparing for the official test as part of British citizenship or ILR applications. It covers British history, the 4 nations, government and Parliament, British values, religion and festivals, landmarks, key historical figures, world organisations, and exam-style practice questions.
         </div>
       </Card>
 
-      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+      <Card className="mb-4 border-cyan-500/25 bg-cyan-500/5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Visual memory clues</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Short codes from the revision pack, now built into the app</div>
+            <div className="text-lg font-extrabold text-foreground">Visual memory clues</div>
+            <div className="text-sm text-muted-foreground">Short codes from the revision pack, now built into the app</div>
           </div>
           <Badge text={`${VISUAL_MNEMONICS.length} memory packs`} color="#06b6d4" />
         </div>
-        <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
+        <div className="feature-grid">
           {VISUAL_MNEMONICS.map((item) => (
-            <div key={item.code} style={{ background: item.color + "14", border: `1px solid ${item.color}30`, borderRadius: 16, padding: 11 }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.icon} {item.title}</div>
+            <div key={item.code} className="rounded-2xl border border-border bg-card/80 p-3">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <div className="font-extrabold text-foreground">{item.icon} {item.title}</div>
                 <Badge text={item.code} color={item.color} />
               </div>
-              <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6, marginBottom: 6 }}>{item.clue}</div>
-              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>{item.visual}</div>
+              <div className="mb-1.5 text-sm leading-6 text-foreground">{item.clue}</div>
+              <div className="text-xs leading-6 text-muted-foreground">{item.visual}</div>
             </div>
           ))}
         </div>
       </Card>
 
-      <Card style={{ border: "1px solid var(--card-border)" }}>
+      <Card className="mb-4" style={{ border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Coverage checklist</div>
@@ -1839,7 +1870,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <div className="study-mode-grid" style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+      <div className="feature-grid mb-5">
         {[
           { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
           { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
@@ -1849,32 +1880,32 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           { id: "tracker", icon: "✅", title: "Topic Tracker", desc: "Mark what feels done and see full-course progress.", color: "#22c55e" },
           { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
         ].map((item) => (
-          <button key={item.id} className="focus-ring" onClick={() => setActive(item.id)} style={{ background: "var(--card-bg)", border: `1px solid ${item.color}30`, borderRadius: 18, padding: 15, textAlign: "left", cursor: "pointer" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-              <div style={{ fontSize: 26 }}>{item.icon}</div>
+          <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+            <div className="mb-3 flex items-center justify-between">
+              <div className="text-[26px]">{item.icon}</div>
               <Badge text="Study mode" color={item.color} />
             </div>
-            <div style={{ color: "var(--text-strong)", fontSize: 16, fontWeight: 800, marginBottom: 5 }}>{item.title}</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{item.desc}</div>
+            <div className="mb-1.5 text-base font-extrabold text-foreground">{item.title}</div>
+            <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
           </button>
         ))}
       </div>
 
-      <Card style={{ background: "var(--success-surface)", border: "1px solid var(--success-border)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+      <Card className="border-emerald-500/25 bg-emerald-500/5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div style={{ fontSize: 16, fontWeight: 800, color: "var(--success-text)" }}>🎯 Top 10 Most-Tested Facts</div>
-            <div style={{ fontSize: 13, color: "var(--success-muted)", marginTop: 4 }}>Refresh for a new mix or move to the next batch.</div>
+            <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">🎯 Top 10 Most-Tested Facts</div>
+            <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Refresh for a new mix or move to the next batch.</div>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={refreshFacts} style={{ background: "#166534", color: "#ecfdf5", border: "1px solid #22c55e", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Refresh facts</button>
-            <button className="focus-ring" onClick={nextFacts} style={{ background: "var(--surface-strong)", color: "var(--success-text)", border: "1px solid var(--success-border)", borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700 }}>Next 10</button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh facts</Button>
+            <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
           </div>
         </div>
         {visibleFacts.map((fact, index) => (
-          <div key={fact} style={{ display: "flex", gap: 10, padding: "8px 0", borderBottom: index < 9 ? "1px solid rgba(74,222,128,0.15)" : "none" }}>
-            <div style={{ color: "#4ade80", fontWeight: 800, minWidth: 22 }}>{index + 1}.</div>
-            <div style={{ color: "var(--success-text)", fontSize: 14, lineHeight: 1.5 }}>{fact}</div>
+          <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
+            <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
+            <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
           </div>
         ))}
       </Card>
@@ -2258,55 +2289,53 @@ const QuickRevisionTab = ({ setActive }) => {
   }, [focus, sessionType, session, index, completed, hardCount, revealed, sessionMeta, isFinished]);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="px-4 py-5 sm:px-5">
       <SectionTitle icon="↔️" meta="Short fresh revision sessions that mix the full course over time.">Quick Revision</SectionTitle>
-      <Card style={{ background: "linear-gradient(135deg, var(--surface-soft), color-mix(in srgb, #0ea5e9 12%, var(--card-bg)))", border: "1px solid color-mix(in srgb, #0ea5e9 45%, var(--card-border))" }}>
-        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18, marginBottom: 8 }}>Small sessions, fresh coverage</div>
-        <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 14 }}>
+      <Card className="setup-card mb-4">
+        <div className="mb-2 text-lg font-extrabold text-foreground">Small sessions, fresh coverage</div>
+        <div className="mb-4 text-sm leading-7 text-muted-foreground">
           Use this when you only have a few minutes. Each session gives a fresh set, spreads coverage across the course, and remembers which cards felt hard so weaker facts can come back later.
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div className="flex flex-wrap gap-2">
           <Badge text={`${deck.length} cards total`} color="#06b6d4" />
-          <Badge text={selectedFocus.label} color="#8b5cf6" />
-          <Badge text={`${selectedSession.count} cards this session`} color="#3b82f6" />
+          <Badge text="Default: 10 min fresh mix" color="#8b5cf6" />
           <Badge text="New cards + smart review" color="#22c55e" />
         </div>
       </Card>
-      <Card>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Session length</div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+      <Card className="mb-4">
+        <div className="mb-2 text-xs text-muted-foreground">Session length</div>
+        <div className="choice-grid mb-3">
           {QUICK_REVISION_SESSION_OPTIONS.map((item) => (
-            <TabButton key={item.id} active={sessionType === item.id} onClick={() => setSessionType(item.id)}>
-              {item.label}
-            </TabButton>
+            <button
+              key={item.id}
+              className={`focus-ring choice-tile ${sessionType === item.id ? "choice-tile-active" : ""}`}
+              onClick={() => setSessionType(item.id)}
+            >
+              <div>{item.label}</div>
+              <div className="mt-1 text-xs font-normal text-muted-foreground">{item.detail}</div>
+            </button>
           ))}
         </div>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
-          {selectedSession.detail}
-        </div>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>Focus</div>
-        <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 12 }}>
+        <div className="mb-2 text-xs text-muted-foreground">Focus</div>
+        <div className="noscroll mb-3 flex gap-2 overflow-x-auto">
           {QUICK_REVISION_FOCUS_OPTIONS.map((item) => <TabButton key={item.id} active={focus === item.id} onClick={() => setFocus(item.id)}>{item.label}</TabButton>)}
         </div>
-        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 12 }}>
+        <div className="mb-3 text-xs leading-6 text-muted-foreground">
           {selectedFocus.detail}
         </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 999, padding: "8px 12px", cursor: "pointer", fontSize: 12, fontWeight: 700 }}>
-            Start fresh session
-          </button>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => startSession("fresh", "medium")}>Start default session</Button>
+          <Button variant="secondary" onClick={() => startSession(focus, sessionType)}>Start custom session</Button>
         </div>
       </Card>
       {!session.length && (
-        <Card style={{ border: "1px solid var(--card-border)", textAlign: "center" }}>
-          <div style={{ fontSize: 42, marginBottom: 8 }}>🧠</div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>Start a quick revision run</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
+        <Card className="status-panel text-center">
+          <div className="mb-2 text-[42px]">🧠</div>
+          <div className="mb-2 text-[22px] font-extrabold text-foreground">Start a quick revision run</div>
+          <div className="mb-4 text-sm leading-7 text-muted-foreground">
             Pick a short session and a focus, then come back later for a new mix without losing your progress.
           </div>
-          <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>
-            Start now
-          </button>
+          <Button onClick={() => startSession("fresh", "medium")}>Start now</Button>
         </Card>
       )}
       {isFinished ? (
@@ -2329,68 +2358,68 @@ const QuickRevisionTab = ({ setActive }) => {
         </Card>
       ) : current && (
       <>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+      <div className="mb-3 flex flex-wrap gap-2">
         <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
         <Badge text={`${remaining} left`} color="#64748b" />
         <Badge text={`${completed} done`} color="#22c55e" />
         <Badge text={`${sessionMeta.newCount} new in this run`} color="#3b82f6" />
         {hardCount > 0 && <Badge text={`${hardCount} marked hard`} color="#f59e0b" />}
-        <div style={{ marginLeft: "auto" }}>
-          <button className="focus-ring" onClick={() => startSession(focus, sessionType)} style={{ border: "1px solid var(--card-border)", background: "var(--chip-bg)", color: "var(--text)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>New mix</button>
+        <div className="ml-auto">
+          <Button variant="secondary" onClick={() => startSession(focus, sessionType)}>New mix</Button>
         </div>
       </div>
-      <Card className="quick-revision-card" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+      <Card className="quick-revision-card overflow-hidden" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}12, var(--surface-soft))`, userSelect: "none" }}>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <Badge text={current.topic} color={current.color} />
-          <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{revealed ? "Answer shown" : "Question only"} · {current.bucket}</div>
+          <div className="text-xs text-muted-foreground">{revealed ? "Answer shown" : "Question only"} · {current.bucket}</div>
         </div>
-        <div style={{ display: "grid", gap: 10 }}>
-          <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "12px 13px" }}>
-            <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 5 }}>PROMPT</div>
-            <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, lineHeight: 1.35 }}>{current.front}</div>
+        <div className="grid gap-3">
+          <div className="rounded-2xl border border-border bg-card/80 p-4">
+            <div className="mb-1 text-[11px] font-bold text-muted-foreground">PROMPT</div>
+            <div className="text-[22px] font-black leading-8 text-foreground">{current.front}</div>
           </div>
           {!revealed && (
-            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, padding: "2px 2px 0" }}>
+            <div className="px-1 pt-1 text-sm leading-7 text-muted-foreground">
               Think of the answer first, then use <strong style={{ color: "var(--text-strong)" }}>Show answer</strong> to check yourself.
             </div>
           )}
           {revealed && (
             <>
-              <div style={{ background: "color-mix(in srgb, var(--accent) 10%, var(--panel-bg))", borderRadius: 14, padding: "12px 13px", border: "1px solid color-mix(in srgb, var(--accent) 22%, var(--card-border))" }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 5 }}>ANSWER</div>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 20, lineHeight: 1.45 }}>{current.back}</div>
+              <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
+                <div className="mb-1 text-[11px] font-bold text-muted-foreground">ANSWER</div>
+                <div className="text-xl font-extrabold leading-8 text-foreground">{current.back}</div>
               </div>
-              <div style={{ background: "var(--panel-bg)", borderRadius: 14, padding: "10px 12px" }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 700, marginBottom: 4 }}>WHY THIS MATTERS</div>
-                <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.65 }}>{current.context}</div>
+              <div className="rounded-2xl border border-border bg-card/80 p-4">
+                <div className="mb-1 text-[11px] font-bold text-muted-foreground">WHY THIS MATTERS</div>
+                <div className="text-sm leading-7 text-foreground">{current.context}</div>
               </div>
               <MemoryHook text={current.memory} />
             </>
           )}
         </div>
-        <div style={{ display: "grid", gap: 8, marginTop: 14 }}>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={() => setRevealed((value) => !value)} style={{ flex: 1, minWidth: 160, border: "1px solid var(--accent)", background: "var(--accent-soft)", color: "var(--accent-text)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 800 }}>
+        <div className="mt-4 grid gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={() => setRevealed((value) => !value)} className="min-w-[160px] flex-1">
               {revealed ? "Hide details" : "Show details"}
-            </button>
-            <button className="focus-ring" onClick={() => moveCard("prev")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 700 }}>
+            </Button>
+            <Button variant="secondary" onClick={() => moveCard("prev")}>
               ← Previous
-            </button>
-            <button className="focus-ring" onClick={jumpRandomCard} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 700 }}>
+            </Button>
+            <Button variant="secondary" onClick={jumpRandomCard}>
               Random
-            </button>
-            <button className="focus-ring" onClick={() => moveCard("next")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "11px 14px", cursor: "pointer", fontWeight: 700 }}>
+            </Button>
+            <Button variant="secondary" onClick={() => moveCard("next")}>
               Next →
-            </button>
+            </Button>
           </div>
           {revealed ? (
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button className="focus-ring" onClick={() => markCard("hard")} style={{ flex: 1, minWidth: 140, background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Hard</button>
-              <button className="focus-ring" onClick={() => markCard("okay")} style={{ flex: 1, minWidth: 140, background: "color-mix(in srgb, #38bdf8 12%, var(--card-bg))", color: "#0369a1", border: "1px solid color-mix(in srgb, #38bdf8 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Okay</button>
-              <button className="focus-ring" onClick={() => markCard("easy")} style={{ flex: 1, minWidth: 140, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#15803d", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", borderRadius: 14, padding: "12px 14px", cursor: "pointer", fontWeight: 800 }}>Easy</button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" className="min-w-[140px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
+              <Button variant="secondary" className="min-w-[140px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
+              <Button variant="secondary" className="min-w-[140px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
             </div>
           ) : (
-            <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
+            <div className="text-sm leading-7 text-muted-foreground">
               Think first, then use <strong style={{ color: "var(--text-strong)" }}>Show details</strong> to reveal the answer, why it matters, and the memory clue.
             </div>
           )}
@@ -3749,15 +3778,15 @@ const QuizTab = () => {
   if (!started) {
     const pool = filterQuestions();
     return (
-      <div style={{ padding: 20 }}>
+      <div className="px-4 py-5 sm:px-5">
         <SectionTitle icon="🧠" meta="Use this for broad recall with instant feedback.">Quiz Me</SectionTitle>
-        <Card style={{ background: "linear-gradient(135deg, rgba(15,23,42,0.92), rgba(29,78,216,0.18))", border: "1px solid #1e3a5f", textAlign: "center" }}>
-              <div style={{ fontSize: 40, marginBottom: 8 }}>🎯</div>
-              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 22, marginBottom: 8 }}>Test your knowledge</div>
-              <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 20 }}>{pool.length} questions available</div>
-              <div style={{ marginBottom: 16 }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 10 }}>Filter by frequency</div>
-                <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap" }}>
+        <Card className="setup-card text-center">
+              <div className="mb-2 text-[40px]">🎯</div>
+              <div className="mb-2 text-[22px] font-extrabold text-foreground">Test your knowledge</div>
+              <div className="mb-5 text-sm text-muted-foreground">{pool.length} questions available</div>
+              <div className="mb-4">
+                <div className="mb-2 text-sm text-muted-foreground">Filter by frequency</div>
+                <div className="flex flex-wrap justify-center gap-2">
                   {filters.map((f) => <TabButton key={f.id} active={filter === f.id} onClick={() => setFilter(f.id)}>{f.icon} {f.label}</TabButton>)}
                 </div>
               </div>
@@ -3779,15 +3808,18 @@ const QuizTab = () => {
                   { value: "no", label: "Answers only" },
                 ]}
               />
-              <div style={{ marginBottom: 20 }}>
-                <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 10 }}>How many questions?</div>
-                <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+              <div className="mb-5">
+                <div className="mb-2 text-sm text-muted-foreground">How many questions?</div>
+                <div className="flex flex-wrap justify-center gap-2">
                   {[10, 24, 50, pool.length].map((n) => <TabButton key={n} active={count === n} onClick={() => setCount(n)}>{n === pool.length ? `All (${n})` : n}</TabButton>)}
                 </div>
               </div>
-              <button className="focus-ring" onClick={startQuiz} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 14, padding: "14px 32px", fontSize: 16, fontWeight: 800, cursor: "pointer" }}>
+              <div className="mb-3 text-xs text-muted-foreground">
+                `Show now` is better for learning. `Show at end` is better if you want a paper-style review.
+              </div>
+              <Button onClick={startQuiz} className="h-12 px-8 text-base font-extrabold">
                 Start Quiz
-              </button>
+              </Button>
         </Card>
       </div>
     );
@@ -3797,16 +3829,16 @@ const QuizTab = () => {
     const pct = Math.round((score / questions.length) * 100);
     const pass = pct >= 75;
     return (
-      <div style={{ padding: 20 }}>
-        <Card style={{ textAlign: "center", border: `2px solid ${pass ? "#22c55e" : "#ef4444"}` }}>
-          <div style={{ fontSize: 56, marginBottom: 8 }}>{pass ? "🎉" : "📚"}</div>
-          <div style={{ fontSize: 24, fontWeight: 900, color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Strong recall" : "Revision needed"}</div>
-          <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)" }}>{score}/{questions.length}</div>
-          <div style={{ fontSize: 20, color: pass ? "#4ade80" : "#f87171", marginBottom: 16 }}>{pct}%</div>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={startQuiz} style={{ background: "#2563eb", color: "#fff", border: "none", borderRadius: 12, padding: "10px 20px", cursor: "pointer", fontWeight: 800 }}>Try Again</button>
-            {wrong.length > 0 && <button className="focus-ring" onClick={() => setReviewMode((v) => !v)} style={{ background: "#ef444422", color: "#f87171", border: "1px solid #ef4444", borderRadius: 12, padding: "10px 20px", cursor: "pointer", fontWeight: 800 }}>{reviewMode ? "Hide review" : `Review ${wrong.length} wrong`}</button>}
-            <button className="focus-ring" onClick={() => setStarted(false)} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 20px", cursor: "pointer" }}>Back</button>
+      <div className="px-4 py-5 sm:px-5">
+        <Card className="status-panel text-center" style={{ borderColor: pass ? "#22c55e55" : "#ef444455" }}>
+          <div className="mb-2 text-[56px]">{pass ? "🎉" : "📚"}</div>
+          <div className="mb-1 text-2xl font-black" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Strong recall" : "Revision needed"}</div>
+          <div className="big-number">{score}/{questions.length}</div>
+          <div className="mb-4 text-lg" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pct}%</div>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button onClick={startQuiz}>Try Again</Button>
+            {wrong.length > 0 && <Button variant="secondary" className="border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300" onClick={() => setReviewMode((v) => !v)}>{reviewMode ? "Hide review" : `Review ${wrong.length} wrong`}</Button>}
+            <Button variant="secondary" onClick={() => setStarted(false)}>Back</Button>
           </div>
         </Card>
         {answerMode === "deferred" && wrong.length === 0 && (
@@ -3828,32 +3860,26 @@ const QuizTab = () => {
 
   const q = questions[current];
   return (
-    <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 12, flexWrap: "wrap" }}>
+    <div className="px-4 py-5 sm:px-5">
+      <div className="mb-3 flex flex-wrap justify-between gap-2">
         <Badge text={`${current + 1} / ${questions.length}`} color="#64748b" />
         <Badge text={`Score: ${score}`} color="#22c55e" />
       </div>
-      <button className="focus-ring" onClick={() => setStarted(false)} style={{ marginBottom: 12, background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>
-        ← Back to quiz setup
-      </button>
-      <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, marginBottom: 16 }}>
-        <div style={{ background: "#3b82f6", height: "100%", borderRadius: 999, width: `${((current + 1) / questions.length) * 100}%`, transition: "width 0.3s" }} />
-      </div>
+      <Button variant="secondary" className="mb-3" onClick={() => setStarted(false)}>← Back to quiz setup</Button>
+      <Progress value={((current + 1) / questions.length) * 100} className="mb-4 h-2.5" />
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {confirmed && answerMode === "instant" && (
         <>
           {showContext && <MemoryHook text={q.tip} />}
-          <button className="focus-ring" onClick={skipToNext}
-            style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "color-mix(in srgb, #22c55e 12%, var(--card-bg))", color: "#16a34a", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+          <Button variant="secondary" className="mt-3 w-full border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" onClick={skipToNext}>
             {current + 1 < questions.length ? "Next" : "See Results"}
-          </button>
+          </Button>
         </>
       )}
       {answerMode === "deferred" && (
-        <button className="focus-ring" onClick={skipToNext}
-          style={{ width: "100%", marginTop: 12, padding: "12px", borderRadius: 14, background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", fontSize: 14, cursor: "pointer", fontWeight: 700 }}>
+        <Button className="mt-3 w-full" onClick={skipToNext}>
           {current + 1 < questions.length ? "Lock answer and continue" : "Finish and review"}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -4091,20 +4117,20 @@ const MockExamTab = () => {
     const passed = score >= 18;
 
     return (
-      <div style={{ padding: 20 }}>
+      <div className="px-4 py-5 sm:px-5">
         <SectionTitle icon="📝" meta="Review your answers, check weak areas, and use the memory clues to lock in corrections.">Mock Results</SectionTitle>
-        <Card style={{ textAlign: "center", border: `2px solid ${passed ? "#22c55e" : "#ef4444"}` }}>
-          <div style={{ fontSize: 54, marginBottom: 8 }}>{passed ? "✅" : "📘"}</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 4 }}>{selectedPaper.title}</div>
-          <div style={{ fontSize: 26, fontWeight: 900, color: passed ? "#22c55e" : "#ef4444" }}>{passed ? "Pass standard reached" : "Below pass mark"}</div>
-          <div style={{ fontSize: 36, fontWeight: 800, color: "var(--text-strong)", marginTop: 8 }}>{score}/24</div>
-          <div style={{ fontSize: 18, color: "var(--text-muted)", marginBottom: 10 }}>{percent}%</div>
-          <div style={{ color: passed ? "#16a34a" : "#dc2626", fontSize: 14, marginBottom: 16 }}>
+        <Card className="status-panel text-center" style={{ borderColor: passed ? "#22c55e55" : "#ef444455" }}>
+          <div className="mb-2 text-[54px]">{passed ? "✅" : "📘"}</div>
+          <div className="mb-1 text-sm text-muted-foreground">{selectedPaper.title}</div>
+          <div className="text-[26px] font-black" style={{ color: passed ? "#22c55e" : "#ef4444" }}>{passed ? "Pass standard reached" : "Below pass mark"}</div>
+          <div className="big-number mt-2">{score}/24</div>
+          <div className="mb-2 text-lg text-muted-foreground">{percent}%</div>
+          <div className="mb-4 text-sm" style={{ color: passed ? "#16a34a" : "#dc2626" }}>
             {passed ? "You cleared the real test threshold of 18 correct answers." : `You need ${18 - score} more correct answers to reach the pass mark.`}
           </div>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={() => startPaper(selectedPaper.id)} style={{ background: "#f97316", color: "#fff", border: "none", borderRadius: 12, padding: "10px 20px", fontWeight: 800, cursor: "pointer" }}>Retake same paper</button>
-            <button className="focus-ring" onClick={() => { setStarted(false); setFinished(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 20px", cursor: "pointer" }}>Back to paper list</button>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => startPaper(selectedPaper.id)}>Retake same paper</Button>
+            <Button variant="secondary" onClick={() => { setStarted(false); setFinished(false); }}>Back to paper list</Button>
           </div>
         </Card>
         <Card>
@@ -4164,9 +4190,9 @@ const MockExamTab = () => {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <div className="px-4 py-5 sm:px-5">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
           <Badge text={selectedPaper.title} color={selectedPaper.accent} />
           <Badge text={`Question ${current + 1} of ${MOCK_TOTAL}`} color="#64748b" />
           <Badge text={`${answeredCount} answered`} color="#22c55e" />
@@ -4174,17 +4200,15 @@ const MockExamTab = () => {
         </div>
         <Badge text={timerMode === "strict" ? formatCountdown(timeLeft) : "Practice mode"} color={timerMode === "strict" ? (timeLeft > 600 ? "#22c55e" : timeLeft > 300 ? "#f59e0b" : "#ef4444") : "#3b82f6"} />
       </div>
-      <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, marginBottom: 14 }}>
-        <div style={{ background: selectedPaper.accent, height: "100%", borderRadius: 999, width: `${(answeredCount / MOCK_TOTAL) * 100}%`, transition: "width 0.2s" }} />
-      </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
-        <button className="focus-ring" onClick={() => { setStarted(false); setFinished(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>← Back to papers</button>
-        <button className="focus-ring" onClick={() => setFlagged((prev) => ({ ...prev, [current]: !prev[current] }))} style={{ background: flagged[current] ? "color-mix(in srgb, #f59e0b 16%, var(--card-bg))" : "var(--chip-bg)", color: flagged[current] ? "#d97706" : "var(--text)", border: `1px solid ${flagged[current] ? "#f59e0b" : "var(--card-border)"}`, borderRadius: 12, padding: "10px 14px", cursor: "pointer" }}>
+      <Progress value={(answeredCount / MOCK_TOTAL) * 100} className="mb-4 h-2.5" />
+      <div className="mb-4 flex flex-wrap gap-2">
+        <Button variant="secondary" onClick={() => { setStarted(false); setFinished(false); }}>← Back to papers</Button>
+        <Button variant="secondary" className={flagged[current] ? "border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300" : ""} onClick={() => setFlagged((prev) => ({ ...prev, [current]: !prev[current] }))}>
           {flagged[current] ? "★ Flagged" : "☆ Flag for review"}
-        </button>
+        </Button>
       </div>
-      <div className="study-mode-grid" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", alignItems: "start" }}>
-        <div>
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.85fr)] xl:items-start">
+        <div className="space-y-3">
           <QuestionCard
             question={currentQuestion}
             selected={answers[current]}
@@ -4195,25 +4219,24 @@ const MockExamTab = () => {
             }}
           />
           {answerMode === "instant" && answers[current] !== undefined && (
-            <Card style={{ marginTop: 12, border: `1px solid ${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color}33`, background: `${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color}12` }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
-                <div style={{ color: answers[current] === currentQuestion.a ? "#16a34a" : "#dc2626", fontWeight: 800 }}>
+            <Card className="border" style={{ borderColor: `${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color}33`, background: `${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color}12` }}>
+              <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                <div style={{ color: answers[current] === currentQuestion.a ? "#16a34a" : "#dc2626" }} className="font-extrabold">
                   {answers[current] === currentQuestion.a ? "Correct" : `Correct answer: ${currentQuestion.opts[currentQuestion.a]}`}
                 </div>
                 <Badge text={`${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].icon} ${MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].label}`} color={MOCK_CATEGORY_META[classifyMockCategory(currentQuestion)].color} />
               </div>
               {showContext && (
                 <>
-                  <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>{buildMockAnswerContext(currentQuestion)}</div>
+                  <div className="text-sm leading-7 text-muted-foreground">{buildMockAnswerContext(currentQuestion)}</div>
                   <MemoryHook text={currentQuestion.tip} />
                 </>
               )}
             </Card>
           )}
-          <div style={{ display: "flex", gap: 8, marginTop: 14, flexWrap: "wrap" }}>
-            <button className="focus-ring" onClick={() => setCurrent((value) => Math.max(0, value - 1))} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 16px", cursor: "pointer" }}>Previous</button>
-            <button
-              className="focus-ring"
+          <div className="flex flex-wrap gap-2">
+            <Button variant="secondary" onClick={() => setCurrent((value) => Math.max(0, value - 1))}>Previous</Button>
+            <Button
               onClick={() => {
                 if (current + 1 >= MOCK_TOTAL) {
                   setFinished(true);
@@ -4221,27 +4244,25 @@ const MockExamTab = () => {
                 }
                 setCurrent((value) => Math.min(MOCK_TOTAL - 1, value + 1));
               }}
-              style={{ background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", borderRadius: 12, padding: "10px 16px", cursor: "pointer", fontWeight: 800 }}
             >
               {current + 1 >= MOCK_TOTAL ? "Finish paper" : "Next"}
-            </button>
+            </Button>
           </div>
-          <Card style={{ marginTop: 12, border: `1px solid ${finishConfirm ? "#ef4444" : "var(--card-border)"}`, background: finishConfirm ? "color-mix(in srgb, #ef4444 10%, var(--card-bg))" : "var(--panel-bg)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <Card className="border" style={{ borderColor: finishConfirm ? "#ef4444" : "var(--card-border)", background: finishConfirm ? "color-mix(in srgb, #ef4444 10%, var(--card-bg))" : "var(--panel-bg)" }}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 4 }}>Finish this paper</div>
-                <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>
+                <div className="mb-1 font-extrabold text-foreground">Finish this paper</div>
+                <div className="text-xs leading-6 text-muted-foreground">
                   {finishConfirm ? "Tap confirm only if you are ready to end the paper and see results." : "End the paper whenever you are ready to see results."}
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <div className="flex flex-wrap gap-2">
                 {finishConfirm && (
-                  <button className="focus-ring" onClick={() => setFinishConfirm(false)} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
-                    Keep going
-                  </button>
+                  <Button variant="secondary" onClick={() => setFinishConfirm(false)}>Keep going</Button>
                 )}
-                <button
-                  className="focus-ring"
+                <Button
+                  variant={finishConfirm ? "destructive" : "secondary"}
+                  className={finishConfirm ? "" : "border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300"}
                   onClick={() => {
                     if (!finishConfirm) {
                       setFinishConfirm(true);
@@ -4249,20 +4270,19 @@ const MockExamTab = () => {
                     }
                     setFinished(true);
                   }}
-                  style={{ background: finishConfirm ? "#ef4444" : "color-mix(in srgb, #ef4444 10%, var(--card-bg))", color: finishConfirm ? "#fff" : "#dc2626", border: `1px solid ${finishConfirm ? "#ef4444" : "color-mix(in srgb, #ef4444 35%, var(--card-border))"}`, borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 800 }}
                 >
                   {finishConfirm ? "Confirm finish" : "Finish paper"}
-                </button>
+                </Button>
               </div>
             </div>
           </Card>
         </div>
-        <Card>
-          <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Paper navigator</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.7, marginBottom: 12 }}>
+        <Card className="status-panel">
+          <div className="mb-2 font-extrabold text-foreground">Paper navigator</div>
+          <div className="mb-3 text-xs leading-6 text-muted-foreground">
             Jump to any question. Green means answered. Amber means flagged for review.
           </div>
-          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+          <div className="grid grid-cols-4 gap-2">
             {questions.map((question, index) => {
               const answered = answers[index] !== undefined;
               const isCurrent = current === index;
@@ -4270,18 +4290,13 @@ const MockExamTab = () => {
               return (
                 <button
                   key={`${question.q}-${index}`}
-                  className="focus-ring"
+                  className="focus-ring navigator-tile"
                   onClick={() => setCurrent(index)}
                   style={{
-                    minHeight: 50,
-                    borderRadius: 14,
                     border: `1px solid ${isCurrent ? selectedPaper.accent : isFlagged ? "#f59e0b" : answered ? "#22c55e" : "var(--card-border)"}`,
                     background: isCurrent ? `${selectedPaper.accent}20` : isFlagged ? "color-mix(in srgb, #f59e0b 12%, var(--card-bg))" : answered ? "color-mix(in srgb, #22c55e 12%, var(--card-bg))" : "var(--panel-bg)",
                     color: isCurrent ? "var(--text-strong)" : isFlagged ? "#d97706" : answered ? "#16a34a" : "var(--text-muted)",
                     cursor: "pointer",
-                    fontWeight: 800,
-                    display: "grid",
-                    placeItems: "center",
                   }}
                 >
                   {index + 1}
@@ -4798,6 +4813,7 @@ const App = () => {
       </div>
       {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
       {isMobile && <ScrollTopButton visible={showScrollTop} />}
+      {isMobile && <ScrollBottomButton visible={showScrollTop} />}
       {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
     </div>
     </div>

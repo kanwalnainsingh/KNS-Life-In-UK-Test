@@ -74,6 +74,8 @@ const assert = (condition, message) => {
   assert(/mobile-bottom-nav/.test(indexSource), "Mobile bottom nav styling missing");
   assert(/BottomNav/.test(appSource), "Bottom navigation component missing");
   assert(/MobileQuickPanel/.test(appSource), "Quick panel component missing");
+  assert(/ScrollBottomButton/.test(appSource), "Scroll-to-bottom helper missing");
+  assert(/mobile-scroll-bottom/.test(indexSource), "Scroll-to-bottom styling missing");
   assert(/desktop-nav-panel/.test(indexSource), "Desktop grouped navigation styling missing");
   assert(/AppFooterBar/.test(appSource), "Footer version bar missing");
   assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");

@@ -25,7 +25,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🇬🇧</text></svg>" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <link rel="stylesheet" href="./assets/styles.bfbdc7b3cf.css" />
+  <link rel="stylesheet" href="./assets/styles.cb5190c055.css" />
   <script>
     (() => {
       const key = "lifeuk-theme";
@@ -217,6 +217,22 @@
       transition: opacity 0.2s ease, transform 0.2s ease;
       box-shadow: 0 10px 22px rgba(29, 78, 216, 0.24);
     }
+    .mobile-scroll-bottom {
+      display: none;
+      position: fixed;
+      left: 14px;
+      bottom: calc(86px + env(safe-area-inset-bottom));
+      z-index: 245;
+      border: 1px solid #0f766e;
+      background: #0f766e;
+      color: #fff;
+      border-radius: 999px;
+      padding: 9px 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 10px 22px rgba(15, 118, 110, 0.24);
+    }
     .mobile-sheet-backdrop {
       position: fixed;
       inset: 0;
@@ -270,7 +286,7 @@
       .app-badge { font-size: 10px !important; padding: 3px 8px !important; }
       .mobile-bottom-nav { display: flex; }
       .desktop-nav-panel { display: none; }
-      .mobile-scroll-top { display: inline-flex; align-items: center; justify-content: center; }
+      .mobile-scroll-top, .mobile-scroll-bottom { display: inline-flex; align-items: center; justify-content: center; }
       .mobile-sheet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       body { background-size: cover; }
     }
@@ -279,7 +295,7 @@
 <body>
   <div id="root"></div>
 
-  <script type="module" src="./assets/app.fc3026de46.js"></script>
+  <script type="module" src="./assets/app.b4cd8cf0b6.js"></script>
   <script>
     window.__APP_VERSION__ = "1.14.0";
     window.__offlineReady = false;
