@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 290 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 295 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.1`
+Current release: `v1.11.2`
 
 ---
 
@@ -125,6 +125,11 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - blood donation timing
   - National Trust as a charity
   - post-war decolonisation / Empire winds down
+- Added the missing official-scope `citizenship / settlement` context with stable GOV.UK-style facts and questions:
+  - why people take the Life in the UK Test
+  - language + life in the UK as the two-part knowledge requirement
+  - English, Welsh, or Scottish Gaelic as accepted languages for that requirement
+  - age-based exemptions and long-term-condition exemptions
 - Offline cache support after first online load
 - Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
 

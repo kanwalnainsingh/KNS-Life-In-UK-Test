@@ -38,6 +38,7 @@ const normalizeQuestion = (text) =>
     "What is the name of the tower that contains Big Ben?",
     "Which language has official status and is spoken by many people in Wales?",
     "Which group can vote in local elections but not UK general elections?",
+    "Why do many people take the Life in the UK Test?",
   ];
 
   for (const expected of mustCover) {

@@ -1,15 +1,15 @@
-const CACHE_VERSION = "lifeuk-static-ec3f01ff10";
+const CACHE_VERSION = "lifeuk-static-f21c36b208";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./assets/app.ec3f01ff10.js",
+  "./assets/app.f21c36b208.js",
   "./robots.txt",
   "./sitemap.xml",
 ];
 const NETWORK_FIRST_PATHS = new Set([
   "/",
   "/index.html",
-  "/assets/app.ec3f01ff10.js",
+  "/assets/app.f21c36b208.js",
 ]);
 
 const CDN_ASSETS = [
