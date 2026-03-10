@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 310 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 323 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.11.8`
+Current release: `v1.12.0`
 
 ---
 
@@ -94,6 +94,7 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 - Mock paper history is now saved per paper with best score, attempts, and last score kept in local storage across app updates
 - Visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`
 - Expanded `Key Historical Figures` with extra tested people, direct memory hooks, and comparison groups
+- Expanded `Key People` again with fuller exam-focused fact sets, especially for `Henry VIII`
 - Improved timeline with extra high-yield history anchors:
   - Boudicca
   - St Augustine
@@ -133,6 +134,8 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
 - Added more compare-heavy exam coverage for underrepresented traps and modern facts:
   - `National Insurance` vs `council tax`
   - `Industrial Revolution` vs `Glorious Revolution`
+  - `Jacobites` vs `Williamites`
+  - `single-party government` vs `coalition government`
   - `Police and Crime Commissioner` vs `local councillor`
   - `Beveridge Report` vs `Butler Act`
   - `criminal courts` vs `civil courts`
@@ -143,6 +146,17 @@ Official test info: https://www.gov.uk/life-in-the-uk-test
   - Scotland and Northern Ireland have separate legal systems
   - Scotland uses `Highers`
   - Northern Ireland requires photo ID at polling stations
+- Added new handbook-style civics and culture questions and revision cues for:
+  - civil servants
+  - coalition government
+  - school governors
+  - local elections in May
+  - offensive-weapon law
+  - John Milton and Handel's `Messiah`
+  - Tate Britain / Tate Modern
+  - Turner Prize
+  - rugby originating in England
+- Fixed the old mock-answer bias by shuffling option order safely across quiz, mock, rapid fire, sprint, and mistake-revision sessions
   - nation-specific court, church, and devolution compare points
 - Expanded `Speaker of the House of Commons` coverage across the app:
   - how the Speaker is chosen

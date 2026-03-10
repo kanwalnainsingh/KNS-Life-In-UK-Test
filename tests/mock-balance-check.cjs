@@ -47,6 +47,20 @@ const seededShuffle = (items, seed) => {
   return copy;
 };
 
+const hashText = (text) =>
+  [...text].reduce((sum, char, index) => ((sum * 31) + char.charCodeAt(0) + index) >>> 0, 0);
+
+const prepareQuestionVariant = (question, seed = 0) => {
+  if (!question?.opts || question.opts.length < 2) return question;
+  const indexed = question.opts.map((opt, index) => ({ opt, index }));
+  const shuffled = seededShuffle(indexed, seed + hashText(question.q));
+  return {
+    ...question,
+    opts: shuffled.map((item) => item.opt),
+    a: shuffled.findIndex((item) => item.index === question.a),
+  };
+};
+
 const classifyMockCategory = (question) => {
   const text = `${question.q} ${question.tip}`.toLowerCase();
   if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote|british isles|republic of ireland|crown dependenc|channel islands|overseas territor/.test(text)) return "traps";
@@ -169,8 +183,11 @@ const takeFixedQuestions = (items, count, startIndex, used) => {
       });
     }
 
-    return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber);
+    return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber)
+      .map((question, index) => prepareQuestionVariant(question, 9000 + paperNumber * 100 + index));
   };
+
+  const answerCounts = [0, 0, 0, 0];
 
   for (let paperNumber = 1; paperNumber <= MOCK_PAPER_COUNT; paperNumber += 1) {
     const questions = buildFixedMockPaper(paperNumber);
@@ -180,6 +197,7 @@ const takeFixedQuestions = (items, count, startIndex, used) => {
     const counts = { history: 0, civics: 0, nations: 0, culture: 0, traps: 0 };
     questions.forEach((question) => {
       counts[classifyMockCategory(question)] += 1;
+      answerCounts[question.a] += 1;
     });
 
     MOCK_DISTRIBUTION.forEach(({ id, count }) => {
@@ -187,7 +205,14 @@ const takeFixedQuestions = (items, count, startIndex, used) => {
     });
   }
 
+  const totalAnswers = answerCounts.reduce((sum, count) => sum + count, 0);
+  answerCounts.forEach((count, index) => {
+    const ratio = count / totalAnswers;
+    assert(ratio >= 0.15 && ratio <= 0.35, `Answer position ${index} is too skewed: ${count}/${totalAnswers}`);
+  });
+
   console.log("Mock balance check passed:");
   console.log(`- ${MOCK_PAPER_COUNT} fixed papers validated`);
   console.log(`- ${MOCK_TOTAL} questions per paper with balanced coverage`);
+  console.log(`- answer positions distributed across A/B/C/D = ${answerCounts.join("/")}`);
 })();

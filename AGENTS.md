@@ -51,8 +51,10 @@ It is designed to help learners revise quickly on mobile and desktop with:
   - show at end
   - optionally include memory/context
 - Added recent-history avoidance for quiz/mock/rapid-fire randomness to reduce repeated questions across sessions.
+- Added safe per-question answer shuffling across quiz, mock, rapid-fire, sprint, and mistake-revision flows to avoid repeated `B/C` answer-position bias.
 - Added community/participation facts and questions.
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
+- Expanded `Key People` again with fuller exam-focused facts, especially Henry VIII, plus extra civics/culture coverage like Jacobites, coalition government, civil servants, school governors, Tate galleries, Turner Prize, and rugby origin.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 - Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
 - Added direct `Boxing Day` quiz coverage to close the last festival audit gap.
@@ -68,6 +70,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - `STORY_CHAPTERS` is the stable source for story-mode content.
 - `KEY_FIGURES`, `EXTRA_KEY_FIGURES`, and `FIGURE_MEMORY` together power the people page.
 - `CONFUSABLES` powers compare/trap views and also seeds some mock/rapid content.
+- `ALL_QUIZ` is protected by regression checks for duplicate questions, and mock balance tests also validate answer-position spread.
 
 ## UX expectations
 - Mobile users should be able to move between modes with minimal scrolling.

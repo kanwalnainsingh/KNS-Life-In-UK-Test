@@ -113,6 +113,7 @@ const STORY_TESTED_POINTS = {
     "Speaker = secret ballot, neutral, still an MP.",
     "18 + FPTP + jury service + rule of law are core civic anchors.",
     "National Insurance and emergency numbers are easy marks.",
+    "Civil servants are neutral officials; coalition means two parties govern together.",
   ],
   "faith-community": [
     "59%, 25%, 4.8% are the census numbers to lock in.",
@@ -123,11 +124,13 @@ const STORY_TESTED_POINTS = {
     "William = 1066, John = 1215, Churchill = WWII.",
     "Pankhurst = votes, Beveridge = welfare, Bevan = NHS.",
     "Nightingale and Seacole are the Crimean War pair.",
+    "Henry VIII = six wives, 1534, monasteries, and Wales laws.",
   ],
   "culture-sport-arts": [
     "Wimbledon and the FA Cup are the two strongest event anchors.",
     "Shakespeare, Dickens, Burns, Beatles, and McQueen are broad recognition names.",
     "Use place clues like Liverpool, Stratford-upon-Avon, and Royal Albert Hall.",
+    "Milton = Paradise Lost and Handel = Messiah are useful extra culture anchors.",
   ],
   "wars-modern-britain": [
     "Trafalgar = Nelson, Waterloo = Wellington.",
@@ -627,6 +630,9 @@ const NATION_KEY_POINTS = {
     "Largest nation by population: about 84% of the UK.",
     "Church of England is the established church and the monarch is its head.",
     "England shares one legal system with Wales.",
+    "1066 Battle of Hastings = William the Conqueror and the Norman Conquest.",
+    "Stonehenge, Tower of London, Buckingham Palace, and Windsor Castle are major England place anchors.",
+    "Shakespeare and Henry VIII are strong England person links for culture and Tudor history.",
   ],
   SCOTLAND: [
     "Capital = Edinburgh, but Glasgow is the largest city.",
@@ -634,6 +640,9 @@ const NATION_KEY_POINTS = {
     "Saint = St Andrew, day = 30 November, flower = thistle, animal = unicorn.",
     "Church of Scotland is Presbyterian and the monarch is not its head.",
     "Scotland has a separate legal system with courts like the Court of Session and Sheriff Courts.",
+    "1314 Bannockburn = Robert the Bruce and Scottish independence in that period.",
+    "Culloden 1746 = final Jacobite defeat and a major Scotland date anchor.",
+    "Edinburgh, Loch Lomond, Loch Ness, and Skara Brae are strong Scotland place clues.",
   ],
   WALES: [
     "Capital = Cardiff. Welsh Parliament = Senedd, 60 SMs.",
@@ -641,6 +650,9 @@ const NATION_KEY_POINTS = {
     "Welsh is widely spoken alongside English, by around a quarter of the population.",
     "Wales is not shown separately in the Union Jack because it was already joined with England.",
     "Wales has the Senedd, but in handbook-style questions it shares one legal system with England.",
+    "Edward I annexed Wales in 1284, and Henry VIII's Acts of Union later linked Wales more fully with England.",
+    "Cardiff, Snowdonia, Bodnant Gardens, and the Millennium Stadium are useful Wales place anchors.",
+    "The Welsh language is one of the strongest Wales-specific clues in the test.",
   ],
   "N. IRELAND": [
     "Capital = Belfast. NI Assembly = Stormont, 90 MLAs.",
@@ -648,6 +660,9 @@ const NATION_KEY_POINTS = {
     "Good Friday Agreement 1998 is key background for the current Assembly.",
     "Giant's Causeway and Belfast are common Northern Ireland exam anchors.",
     "Northern Ireland has a separate legal system and requires photo ID at polling stations.",
+    "1690 Battle of the Boyne is a major Northern Ireland / Stuart-period memory anchor.",
+    "Stormont, Belfast, and Giant's Causeway are the strongest Northern Ireland place links.",
+    "Use St Patrick and the shamrock as the fastest Northern Ireland identity clue.",
   ],
 };
 
@@ -1209,6 +1224,20 @@ const seededShuffle = (items, seed) => {
   return copy;
 };
 
+const hashText = (text) =>
+  [...text].reduce((sum, char, index) => ((sum * 31) + char.charCodeAt(0) + index) >>> 0, 0);
+
+const prepareQuestionVariant = (question, seed = 0) => {
+  if (!question?.opts || question.opts.length < 2) return question;
+  const indexed = question.opts.map((opt, index) => ({ opt, index }));
+  const shuffled = seededShuffle(indexed, seed + hashText(question.q));
+  return {
+    ...question,
+    opts: shuffled.map((item) => item.opt),
+    a: shuffled.findIndex((item) => item.index === question.a),
+  };
+};
+
 const classifyMockCategory = (question) => {
   const text = `${question.q} ${question.tip}`.toLowerCase();
   if (/compare mode|trap|vs |versus|great britain|big ben|elizabeth tower|union of crowns|act of union|church of england|church of scotland|council of europe|river severn|river thames|slave trade|women's vote|british isles|republic of ireland|crown dependenc|channel islands|overseas territor/.test(text)) return "traps";
@@ -1319,7 +1348,8 @@ const buildFixedMockPaper = (paperNumber) => {
     });
   }
 
-  return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber);
+  return seededShuffle(questions.slice(0, MOCK_TOTAL), 5000 + paperNumber)
+    .map((question, index) => prepareQuestionVariant(question, 9000 + paperNumber * 100 + index));
 };
 
 const MOCK_PAPERS = Array.from({ length: MOCK_PAPER_COUNT }, (_, index) => ({
@@ -1667,7 +1697,8 @@ const DailyTenTab = () => {
 
   const buildSession = () => {
     const pool = topic === "All" ? ALL_QUIZ : ALL_QUIZ.filter((item) => inferTopic(item) === topic);
-    const picked = pickRandomNoRepeat(pool, Math.min(10, pool.length), STORAGE_KEYS.recentDaily10, 80);
+    const picked = pickRandomNoRepeat(pool, Math.min(10, pool.length), STORAGE_KEYS.recentDaily10, 80)
+      .map((question, index) => prepareQuestionVariant(question, 12000 + index));
     setSession(picked);
     setIndex(0);
     setSelected(null);
@@ -1826,11 +1857,12 @@ const TopicTrackerTab = ({ setActive }) => {
 
 const TrueFalseSprintTab = () => {
   const buildRound = () => pickRandomNoRepeat(ALL_QUIZ, 18, STORAGE_KEYS.recentSprint, 120).map((question, index) => {
+    const prepared = prepareQuestionVariant(question, 14000 + index);
     const useTrue = index % 2 === 0;
-    const wrongOptions = question.opts.filter((_, optionIndex) => optionIndex !== question.a);
-    const displayed = useTrue ? question.opts[question.a] : wrongOptions[index % wrongOptions.length];
+    const wrongOptions = prepared.opts.filter((_, optionIndex) => optionIndex !== prepared.a);
+    const displayed = useTrue ? prepared.opts[prepared.a] : wrongOptions[index % wrongOptions.length];
     return {
-      ...question,
+      ...prepared,
       statement: `For this question, the correct answer is: ${displayed}`,
       isTrue: useTrue,
       shownAnswer: displayed,
@@ -3395,7 +3427,10 @@ const QuizTab = () => {
 
   const resetFlow = (pool) => {
     const n = Math.min(count, pool.length);
-    setQuestions(pickRandomNoRepeat(pool, n, STORAGE_KEYS.recentQuiz, 120));
+    setQuestions(
+      pickRandomNoRepeat(pool, n, STORAGE_KEYS.recentQuiz, 120)
+        .map((question, index) => prepareQuestionVariant(question, 16000 + index)),
+    );
     setCurrent(0);
     setSelected(null);
     setConfirmed(false);
@@ -4016,7 +4051,10 @@ const ReviseTab = () => {
 
   const startRevision = (questions = bank) => {
     if (!questions.length) return;
-    setSession(pickRandom(questions, Math.min(questions.length, 12)));
+    setSession(
+      pickRandom(questions, Math.min(questions.length, 12))
+        .map((question, index) => prepareQuestionVariant(question, 18000 + index)),
+    );
     setCurrent(0);
     setSelected(null);
     setConfirmed(false);
@@ -4146,7 +4184,10 @@ const RapidFireTab = () => {
     clearInterval(timerRef.current);
     clearTimeout(advanceRef.current);
     const pool = includeCompare === "yes" ? [...ALL_QUIZ, ...buildConfusionDeck()] : ALL_QUIZ;
-    setQuestions(pickRandomNoRepeat(pool, total, STORAGE_KEYS.recentRapid, 180));
+    setQuestions(
+      pickRandomNoRepeat(pool, total, STORAGE_KEYS.recentRapid, 180)
+        .map((question, index) => prepareQuestionVariant(question, 20000 + index)),
+    );
     setCurrent(0);
     setSelected(null);
     setConfirmed(false);
