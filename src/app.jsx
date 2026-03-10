@@ -1997,78 +1997,74 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </CardContent>
       </Card>
 
-      <div className="feature-grid mb-4">
-        <Card className="border-primary/20 bg-primary/5">
-          <div className="mb-2 text-lg font-extrabold text-foreground">Start here</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">Pick the route that matches how close you are to the test and how confident you already feel.</div>
-          <div className="grid gap-3">
-            {START_HERE_PATHS.map((path) => (
-              <div key={path.id} className="rounded-2xl border border-border bg-card/80 p-3">
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <div className="font-extrabold text-foreground">{path.title}</div>
-                  <Badge text="Pass path" color={path.color} />
-                </div>
-                <div className="mb-2 text-xs leading-6 text-muted-foreground">{path.note}</div>
-                <div className="grid gap-2">
-                  {path.steps.map((step) => (
-                    <button key={step.label} className="focus-ring rounded-xl border border-border bg-secondary/70 px-3 py-2 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
+      <Card className="mb-4 border-primary/20 bg-primary/5">
+        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-lg font-extrabold text-foreground">Pass guide</div>
+            <div className="text-sm leading-6 text-muted-foreground">Start in the right place, follow a short plan, then use the next best action instead of guessing what to study.</div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} plan steps done`} color={currentPlan.color} />
+            <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
+          </div>
+        </div>
+        <div className="grid gap-3 lg:grid-cols-[1.1fr_1fr_1fr]">
+          <div className="rounded-2xl border border-border bg-card/80 p-4">
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Start Here</div>
+            <div className="mb-3 grid gap-2">
+              {START_HERE_PATHS.map((path) => (
+                <button key={path.id} className="focus-ring rounded-xl border border-border bg-secondary/70 px-3 py-3 text-left" onClick={() => setActive(path.steps[0].tab)}>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <div className="font-extrabold text-foreground">{path.title}</div>
+                    <Badge text="Pass path" color={path.color} />
+                  </div>
+                  <div className="text-xs leading-6 text-muted-foreground">{path.steps.map((step) => step.label).join(" → ")}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-card/80 p-4">
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {PASS_PLANS.map((plan) => (
+                <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
+              ))}
+            </div>
+            <div className="mb-2 text-xs leading-6 text-muted-foreground">{currentPlan.note}</div>
+            <div className="grid gap-2">
+              {currentPlan.steps.map((step, idx) => {
+                const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
+                return (
+                  <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-secondary/60 px-3 py-2.5">
+                    <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-card text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
+                      {done ? "✓" : idx + 1}
+                    </button>
+                    <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
                       {step.label}
                     </button>
-                  ))}
-                </div>
-              </div>
-            ))}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </Card>
-        <Card className="border-emerald-500/20 bg-emerald-500/5">
-          <div className="mb-2 text-lg font-extrabold text-foreground">Pass plan</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">Use a saved plan so you always know what to do next instead of choosing from every mode each time.</div>
-          <div className="mb-3 flex flex-wrap gap-2">
-            {PASS_PLANS.map((plan) => (
-              <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
-            ))}
-          </div>
-          <div className="mb-3 flex flex-wrap gap-2">
-            <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} done`} color={currentPlan.color} />
-            <Badge text={currentPlan.note} color="#64748b" />
-          </div>
-          <div className="grid gap-2">
-            {currentPlan.steps.map((step, idx) => {
-              const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
-              return (
-                <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-card/80 p-3">
-                  <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-secondary text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
-                    {done ? "✓" : idx + 1}
-                  </button>
-                  <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
-                    {step.label}
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-        <Card className="border-amber-500/20 bg-amber-500/5">
-          <div className="mb-2 text-lg font-extrabold text-foreground">Next best action</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
-          <div className="mb-4">
+          <div className="rounded-2xl border border-border bg-card/80 p-4">
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Next Best Action</div>
             <div className="mb-1 text-base font-extrabold text-foreground">{nextBestAction.title}</div>
-            <Button onClick={() => setActive(nextBestAction.tab)}>Open now</Button>
-          </div>
-          <div className="grid gap-3">
-            <div className="rounded-2xl border border-border bg-card/85 p-3">
-              <div className="eyebrow mb-1">Readiness score</div>
-              <div className="big-number">{readiness}%</div>
-              <div className="mt-1 text-xs leading-6 text-muted-foreground">Built from mock scores, tracker progress, and saved mistakes.</div>
+            <div className="mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
+            <Button className="mb-3 w-full" onClick={() => setActive(nextBestAction.tab)}>Open now</Button>
+            <div className="grid gap-2">
+              <div className="rounded-xl border border-border bg-secondary/60 p-3">
+                <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Weakest area</div>
+                <div className="text-sm font-semibold text-foreground">{weakestTopic}</div>
+              </div>
+              <div className="rounded-xl border border-border bg-secondary/60 p-3">
+                <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Saved for later</div>
+                <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length + bookmarks.questions.length} bookmarked facts/questions</div>
+              </div>
             </div>
-            <div className="rounded-2xl border border-border bg-card/85 p-3">
-              <div className="eyebrow mb-1">Weakest area</div>
-              <div className="text-base font-extrabold text-foreground">{weakestTopic}</div>
-              <div className="mt-1 text-xs leading-6 text-muted-foreground">Use `Revise Mistakes` or `Weak areas` in Quick Revise to tighten this next.</div>
-            </div>
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
 
       <div className="metric-grid mb-4">
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />

@@ -57,7 +57,7 @@ const assert = (condition, message) => {
   assert(/Review the ones you missed/.test(appSource), "Daily 10 wrong-answer review missing");
   assert(/<span>Menu<\/span>/.test(appSource), "Bottom menu label missing");
   assert(/Start here/.test(appSource), "Pass-focused start guidance missing");
-  assert(/Pass plan/.test(appSource), "Saved pass plan UI missing");
+  assert(/Pass guide/.test(appSource) && /Pass Plan/.test(appSource), "Saved pass plan UI missing");
   assert(/Saved facts/.test(appSource), "Saved facts quick revision flow missing");
   assert(/const scrollPageTop =/.test(appSource), "Shared session scroll-top helper missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");

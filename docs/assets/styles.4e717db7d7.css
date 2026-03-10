@@ -1090,9 +1090,6 @@ video {
 .bg-amber-500\/10 {
   background-color: rgb(245 158 11 / 0.1);
 }
-.bg-amber-500\/5 {
-  background-color: rgb(245 158 11 / 0.05);
-}
 .bg-background\/80 {
   background-color: hsl(var(--background) / 0.8);
 }
@@ -1104,9 +1101,6 @@ video {
 }
 .bg-card\/80 {
   background-color: hsl(var(--card) / 0.8);
-}
-.bg-card\/85 {
-  background-color: hsl(var(--card) / 0.85);
 }
 .bg-card\/90 {
   background-color: hsl(var(--card) / 0.9);
@@ -1146,6 +1140,9 @@ video {
 }
 .bg-secondary {
   background-color: hsl(var(--secondary));
+}
+.bg-secondary\/60 {
+  background-color: hsl(var(--secondary) / 0.6);
 }
 .bg-secondary\/70 {
   background-color: hsl(var(--secondary) / 0.7);
@@ -1383,6 +1380,9 @@ video {
 }
 .leading-none {
   line-height: 1;
+}
+.tracking-\[0\.14em\] {
+  letter-spacing: 0.14em;
 }
 .tracking-\[0\.18em\] {
   letter-spacing: 0.18em;
@@ -1643,6 +1643,12 @@ video {
   .sm\:px-5 {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
+  }
+}
+@media (min-width: 1024px) {
+
+  .lg\:grid-cols-\[1\.1fr_1fr_1fr\] {
+    grid-template-columns: 1.1fr 1fr 1fr;
   }
 }
 @media (min-width: 1280px) {
