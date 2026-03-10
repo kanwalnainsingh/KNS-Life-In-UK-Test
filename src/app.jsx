@@ -5129,6 +5129,7 @@ const App = () => {
   const [mockProgress, setMockProgress] = useState(() => loadMockProgress());
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const scrollButtonsTimeoutRef = useRef(null);
   const [quickPanelOpen, setQuickPanelOpen] = useState(false);
   const [tabHistory, setTabHistory] = useState([]);
   const [isOffline, setIsOffline] = useState(() => !navigator.onLine);
@@ -5171,12 +5172,26 @@ const App = () => {
     const onScroll = () => {
       const current = window.scrollY;
       const maxScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 0);
-      setShowScrollTop(maxScroll > 220 && current > 140);
-      setShowScrollBottom(maxScroll > 220 && current < maxScroll - 120);
+      const longPage = maxScroll > 220;
+      if (!longPage) {
+        setShowScrollTop(false);
+        setShowScrollBottom(false);
+        return;
+      }
+      setShowScrollTop(current > 140);
+      setShowScrollBottom(current < maxScroll - 120);
+      if (scrollButtonsTimeoutRef.current) clearTimeout(scrollButtonsTimeoutRef.current);
+      scrollButtonsTimeoutRef.current = window.setTimeout(() => {
+        setShowScrollTop(false);
+        setShowScrollBottom(false);
+      }, 900);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (scrollButtonsTimeoutRef.current) clearTimeout(scrollButtonsTimeoutRef.current);
+    };
   }, []);
 
   useEffect(() => {
