@@ -93,6 +93,9 @@ const assert = (condition, message) => {
   assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");
   assert(/Visual memory clues/.test(appSource), "Mnemonic home panel missing");
   assert(/Coverage checklist/.test(appSource), "Coverage checklist missing");
+  assert(/SectionStudyActions/.test(appSource), "Section follow-up action rows missing");
+  assert(/Use these nation facts right away/.test(appSource), "4 Nations follow-up actions missing");
+  assert(/These are your fast marks/.test(appSource), "Quick Facts follow-up actions missing");
   assert(/focus-ring/.test(indexSource), "Focus-visible styling missing");
   assert(/@media \(max-width: 820px\)/.test(indexSource), "Responsive breakpoint missing");
   assert(/serviceWorker\.register/.test(indexSource), "Service worker registration missing");

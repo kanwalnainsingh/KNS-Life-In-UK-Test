@@ -3004,6 +3004,25 @@ const StoryModeTab = ({ setActive }) => {
   );
 };
 
+const SectionStudyActions = ({ title = "Study this next", note = "When you finish reading, move straight into recall while the facts are still fresh.", actions = [] }) => (
+  <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+      <div>
+        <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>{title}</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{note}</div>
+      </div>
+      <Badge text={`${actions.length} next steps`} color="#3b82f6" />
+    </div>
+    <div className="flex flex-wrap gap-2">
+      {actions.map((action) => (
+        <Button key={action.label} variant={action.primary ? "default" : "secondary"} className={action.primary ? "bg-orange-500 hover:bg-orange-500/90" : ""} onClick={action.onClick}>
+          {action.label}
+        </Button>
+      ))}
+    </div>
+  </Card>
+);
+
 // ── TIMELINE ─────────────────────────────────────────────────
 const TimelineTab = () => {
   const eras = ["All", "Ancient", "Roman", "Medieval", "Tudor", "Stuart", "Georgian", "Victorian", "Modern"];
@@ -3357,7 +3376,7 @@ const WarsTab = () => {
 };
 
 // ── 4 NATIONS ────────────────────────────────────────────────
-const NationsTab = () => (
+const NationsTab = ({ setActive }) => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🏴" meta="Use comparison blocks to separate nation facts quickly.">The 4 Nations</SectionTitle>
     <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #3b82f6 12%, var(--card-bg)), color-mix(in srgb, #ef4444 10%, var(--card-bg)))", border: "1px solid var(--card-border)" }}>
@@ -3486,6 +3505,15 @@ const NationsTab = () => (
         ))}
       </Card>
     ))}
+    <SectionStudyActions
+      title="Use these nation facts right away"
+      note="This page is best followed by compare-heavy or question-heavy revision while the capitals, systems, and saints are still fresh."
+      actions={[
+        { label: "Quick Revise 4 Nations", primary: true, onClick: () => setActive("quickrev") },
+        { label: "Open Traps", onClick: () => setActive("confuse") },
+        { label: "Take a Mock", onClick: () => setActive("mock") },
+      ]}
+    />
   </div>
 );
 
@@ -3686,7 +3714,7 @@ const SportsTab = () => (
 );
 
 // ── KEY FIGURES ──────────────────────────────────────────────
-const FiguresTab = () => {
+const FiguresTab = ({ setActive }) => {
   const figureOrder = [
     "Boudicca",
     "St Augustine",
@@ -3827,6 +3855,15 @@ const FiguresTab = () => {
           {FIGURE_MEMORY[f.name] && <MemoryHook text={FIGURE_MEMORY[f.name]} />}
         </Card>
       ))}
+      <SectionStudyActions
+        title="Turn people into recall"
+        note="After reading figures, move into quick revision or a mock so the names stay attached to the right dates and events."
+        actions={[
+          { label: "Quick Revise Key People", primary: true, onClick: () => setActive("quickrev") },
+          { label: "Open Story Mode", onClick: () => setActive("story") },
+          { label: "Take a Mock", onClick: () => setActive("mock") },
+        ]}
+      />
     </div>
   );
 };
@@ -3937,7 +3974,7 @@ const LandmarksTab = () => (
 );
 
 // ── INTERNATIONAL ────────────────────────────────────────────
-const InternationalTab = () => (
+const InternationalTab = ({ setActive }) => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="🌍" meta="Most questions here are compare traps: voluntary group, military alliance, human-rights body, or UN role.">International Organisations</SectionTitle>
     <TrapAlert text="Council of Europe ≠ EU. Council has 47 members and cannot make laws. EU has 27 and can." />
@@ -3981,11 +4018,20 @@ const InternationalTab = () => (
         </Card>
       ))}
     </div>
+    <SectionStudyActions
+      title="Lock in the organisation labels"
+      note="International questions are mostly about choosing the right label quickly, so use a compare or quiz mode next."
+      actions={[
+        { label: "Open Traps", primary: true, onClick: () => setActive("confuse") },
+        { label: "Start Quiz", onClick: () => setActive("quiz") },
+        { label: "Quick Revise", onClick: () => setActive("quickrev") },
+      ]}
+    />
   </div>
 );
 
 // ── ARTS ─────────────────────────────────────────────────────
-const ArtsTab = () => {
+const ArtsTab = ({ setActive }) => {
   const sections = [
     { key: "literature", label: "📚 Literature", color: "#3b82f6" },
     { key: "music", label: "🎵 Music", color: "#8b5cf6" },
@@ -3994,15 +4040,15 @@ const ArtsTab = () => {
     { key: "fashion", label: "👗 Fashion", color: "#10b981" },
     { key: "film", label: "🎬 Film", color: "#ef4444" },
   ];
-  const [active, setActive] = useState("literature");
-  const sec = sections.find((s) => s.key === active);
-  const activeCore = ARTS_CORE_BY_SECTION[active] || new Set();
-  const orderedItems = [...(ARTS[active] || [])].sort((a, b) => Number(activeCore.has(b.who)) - Number(activeCore.has(a.who)));
+  const [activeSection, setActiveSection] = useState("literature");
+  const sec = sections.find((s) => s.key === activeSection);
+  const activeCore = ARTS_CORE_BY_SECTION[activeSection] || new Set();
+  const orderedItems = [...(ARTS[activeSection] || [])].sort((a, b) => Number(activeCore.has(b.who)) - Number(activeCore.has(a.who)));
   return (
     <div style={{ padding: 20 }}>
       <SectionTitle icon="🎭" meta="This section works best through anchor names: one writer, one composer, one artist, one architect, one fashion name, one film clue.">Arts & Culture</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
-        {sections.map((s) => <TabButton key={s.key} active={active === s.key} onClick={() => setActive(s.key)}>{s.label}</TabButton>)}
+        {sections.map((s) => <TabButton key={s.key} active={activeSection === s.key} onClick={() => setActiveSection(s.key)}>{s.label}</TabButton>)}
       </div>
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Arts memory anchors</div>
@@ -4035,7 +4081,7 @@ const ArtsTab = () => {
           <Badge text={sec ? sec.label : "Arts"} color={sec ? sec.color : "#64748b"} />
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {[...(ARTS[active] || []).filter((item) => activeCore.has(item.who)).map((item) => (
+          {[...(ARTS[activeSection] || []).filter((item) => activeCore.has(item.who)).map((item) => (
             <Badge key={item.who} text={item.who} color="#ef4444" />
           ))]}
         </div>
@@ -4050,6 +4096,15 @@ const ArtsTab = () => {
           <MemoryHook text={item.mem} />
         </Card>
       ))}
+      <SectionStudyActions
+        title="Keep arts revision short"
+        note="Arts works best as a short anchor pass, then a broader revision mode so these names do not crowd out higher-yield history and civics."
+        actions={[
+          { label: "Quick Revise", primary: true, onClick: () => setActive("quickrev") },
+          { label: "Daily 10", onClick: () => setActive("daily10") },
+          { label: "Back to Home", onClick: () => setActive("home") },
+        ]}
+      />
     </div>
   );
 };
@@ -4100,7 +4155,7 @@ const AnthemTab = () => (
 );
 
 // ── QUICK FACTS ──────────────────────────────────────────────
-const QuickFactsTab = () => (
+const QuickFactsTab = ({ setActive }) => (
   <div style={{ padding: 20 }}>
     <SectionTitle icon="⚡" meta="These are the fast marks: government jobs, law basics, voting, school, driving, taxes, and daily-life rules.">Quick Facts</SectionTitle>
     <Card style={{ background: "color-mix(in srgb, #22c55e 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
@@ -4129,6 +4184,15 @@ const QuickFactsTab = () => (
         ))}
       </Card>
     ))}
+    <SectionStudyActions
+      title="These are your fast marks"
+      note="After reading quick facts, go straight into a broad practice mode so government, law, and everyday-life points become automatic."
+      actions={[
+        { label: "Start Quiz", primary: true, onClick: () => setActive("quiz") },
+        { label: "Quick Revise", onClick: () => setActive("quickrev") },
+        { label: "Take a Mock", onClick: () => setActive("mock") },
+      ]}
+    />
   </div>
 );
 
@@ -5298,17 +5362,17 @@ const App = () => {
       case "tracker": return <TopicTrackerTab setActive={navigateTo} />;
       case "timeline": return <TimelineTab />;
       case "wars": return <WarsTab />;
-      case "nations": return <NationsTab />;
+      case "nations": return <NationsTab setActive={navigateTo} />;
       case "confuse": return <ConfuseTab />;
       case "inventors": return <InventorsTab />;
       case "sports": return <SportsTab />;
-      case "figures": return <FiguresTab />;
+      case "figures": return <FiguresTab setActive={navigateTo} />;
       case "religion": return <ReligionTab />;
       case "landmarks": return <LandmarksTab />;
-      case "international": return <InternationalTab />;
-      case "arts": return <ArtsTab />;
+      case "international": return <InternationalTab setActive={navigateTo} />;
+      case "arts": return <ArtsTab setActive={navigateTo} />;
       case "anthem": return <AnthemTab />;
-      case "quickfacts": return <QuickFactsTab />;
+      case "quickfacts": return <QuickFactsTab setActive={navigateTo} />;
       case "quiz": return <QuizTab />;
       case "mock": return <MockExamTab setActive={navigateTo} />;
       case "revise": return <ReviseTab setActive={navigateTo} />;
