@@ -596,6 +596,24 @@ video {
 .dark .surface-card {
     box-shadow: 0 16px 40px rgba(2, 6, 23, 0.28);
   }
+.topic-page > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
+}
+.topic-page {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+@media (min-width: 640px) {
+
+  .topic-page {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
 .hero-panel {
   overflow: hidden;
   border-radius: 28px;
@@ -1621,14 +1639,30 @@ video {
     display: inline-flex;
   }
 
+  .sm\:rounded-2xl {
+    border-radius: 1.25rem;
+  }
+
   .sm\:rounded-l-3xl {
     border-top-left-radius: 1.5rem;
     border-bottom-left-radius: 1.5rem;
   }
 
+  .sm\:p-5 {
+    padding: 1.25rem;
+  }
+
   .sm\:px-5 {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
+  }
+
+  .sm\:pb-3 {
+    padding-bottom: 0.75rem;
+  }
+
+  .sm\:pt-0 {
+    padding-top: 0px;
   }
 }
 @media (min-width: 768px) {

@@ -3377,7 +3377,7 @@ const WarsTab = () => {
 
 // ── 4 NATIONS ────────────────────────────────────────────────
 const NationsTab = ({ setActive }) => (
-  <div style={{ padding: 20 }}>
+  <div className="topic-page">
     <SectionTitle icon="🏴" meta="Use comparison blocks to separate nation facts quickly.">The 4 Nations</SectionTitle>
     <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, #3b82f6 12%, var(--card-bg)), color-mix(in srgb, #ef4444 10%, var(--card-bg)))", border: "1px solid var(--card-border)" }}>
       <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
@@ -3525,7 +3525,7 @@ const ConfuseTab = () => {
   })).filter((entry) => entry.items.length > 0);
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="topic-page">
       <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam traps.">Don't Confuse These</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.14), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
@@ -3609,7 +3609,7 @@ const InventorsTab = () => {
     .sort((a, b) => Number(CORE_INVENTORS.has(b.who)) - Number(CORE_INVENTORS.has(a.who)));
   const coreVisible = filtered.filter((item) => CORE_INVENTORS.has(item.who));
   return (
-    <div style={{ padding: 20 }}>
+    <div className="topic-page">
       <SectionTitle icon="💡" meta="Inventors are easier to remember by category and visual icon.">British Inventors & Scientists</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {cats.map((c) => <TabButton key={c} active={cat === c} onClick={() => setCat(c)}>{c}</TabButton>)}
@@ -3650,7 +3650,7 @@ const InventorsTab = () => {
 
 // ── SPORTS ───────────────────────────────────────────────────
 const SportsTab = () => (
-  <div style={{ padding: 20 }}>
+  <div className="topic-page">
     <SectionTitle icon="🏅" meta="Use event anchors first, then attach the star names and dates to them.">British Sport & Sports Stars</SectionTitle>
     <Card style={{ background: "#0f1f0f", border: "1px solid #166534", marginBottom: 16 }}>
       <div style={{ fontWeight: 800, color: "#4ade80", marginBottom: 8 }}>🏟️ Olympics Key Facts</div>
@@ -3770,7 +3770,7 @@ const FiguresTab = ({ setActive }) => {
   ];
 
   return (
-    <div style={{ padding: 20 }}>
+    <div className="topic-page">
       <SectionTitle icon="👑" meta="High-yield people for the test, ordered for faster revision and comparison.">Key Historical Figures</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, rgba(29,78,216,0.18), rgba(15,23,42,0.96))", border: "1px solid #1d4ed866" }}>
         <div style={{ fontWeight: 800, color: "#bfdbfe", marginBottom: 8, fontSize: 15 }}>Quick figure map</div>
@@ -3870,7 +3870,7 @@ const FiguresTab = ({ setActive }) => {
 
 // ── RELIGION ─────────────────────────────────────────────────
 const ReligionTab = () => (
-  <div style={{ padding: 20 }}>
+  <div className="topic-page">
     <SectionTitle icon="⛪" meta="This section is mostly short factual recall: census proportions, major Christian dates, and key non-Christian festivals.">Religion & Festivals</SectionTitle>
     <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
       <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>📊 2011 Census — Religious Identity</div>
@@ -3975,7 +3975,7 @@ const LandmarksTab = () => (
 
 // ── INTERNATIONAL ────────────────────────────────────────────
 const InternationalTab = ({ setActive }) => (
-  <div style={{ padding: 20 }}>
+  <div className="topic-page">
     <SectionTitle icon="🌍" meta="Most questions here are compare traps: voluntary group, military alliance, human-rights body, or UN role.">International Organisations</SectionTitle>
     <TrapAlert text="Council of Europe ≠ EU. Council has 47 members and cannot make laws. EU has 27 and can." />
     <CompactVisualStrip
@@ -4045,7 +4045,7 @@ const ArtsTab = ({ setActive }) => {
   const activeCore = ARTS_CORE_BY_SECTION[activeSection] || new Set();
   const orderedItems = [...(ARTS[activeSection] || [])].sort((a, b) => Number(activeCore.has(b.who)) - Number(activeCore.has(a.who)));
   return (
-    <div style={{ padding: 20 }}>
+    <div className="topic-page">
       <SectionTitle icon="🎭" meta="This section works best through anchor names: one writer, one composer, one artist, one architect, one fashion name, one film clue.">Arts & Culture</SectionTitle>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {sections.map((s) => <TabButton key={s.key} active={activeSection === s.key} onClick={() => setActiveSection(s.key)}>{s.label}</TabButton>)}
@@ -4111,7 +4111,7 @@ const ArtsTab = ({ setActive }) => {
 
 // ── ANTHEM & SYMBOLS ─────────────────────────────────────────
 const AnthemTab = () => (
-  <div style={{ padding: 20 }}>
+  <div className="topic-page">
     <SectionTitle icon="🎵" meta="Keep this section very compressed: anthem, monarch wording, Union Jack crosses, and why Wales is not shown.">National Anthem & Symbols</SectionTitle>
     <CompactVisualStrip
       title="Symbol memory"
@@ -4156,7 +4156,7 @@ const AnthemTab = () => (
 
 // ── QUICK FACTS ──────────────────────────────────────────────
 const QuickFactsTab = ({ setActive }) => (
-  <div style={{ padding: 20 }}>
+  <div className="topic-page">
     <SectionTitle icon="⚡" meta="These are the fast marks: government jobs, law basics, voting, school, driving, taxes, and daily-life rules.">Quick Facts</SectionTitle>
     <Card style={{ background: "color-mix(in srgb, #22c55e 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
       <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Fast civic recall</div>

@@ -95,6 +95,10 @@
     @apply space-y-4;
   }
 
+  .topic-page {
+    @apply space-y-4 px-4 py-5 sm:px-5;
+  }
+
   .hero-panel {
     @apply overflow-hidden rounded-[28px] border border-primary/15 bg-gradient-to-br from-primary/10 via-card to-card shadow-soft;
   }
