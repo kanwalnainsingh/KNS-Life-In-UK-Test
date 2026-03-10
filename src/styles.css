@@ -207,8 +207,69 @@
   }
 
   .mobile-bottom-nav {
-    @apply fixed inset-x-3 bottom-3 z-[120] flex items-center justify-between rounded-[24px] border border-border bg-background/90 px-3 py-2 shadow-soft backdrop-blur-xl;
+    @apply fixed inset-x-3 bottom-3 z-[120] flex items-center justify-between rounded-[28px] border border-border bg-background/90 px-2.5 py-2 shadow-soft backdrop-blur-xl;
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+
+  .mobile-nav-item {
+    @apply flex min-w-[58px] flex-col items-center justify-center gap-1 rounded-2xl px-2 py-2 text-[11px] font-semibold transition-all;
+  }
+
+  .mobile-nav-item[data-active="true"] {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .mobile-nav-item[data-active="false"] {
+    @apply text-muted-foreground;
+  }
+
+  .mobile-nav-menu {
+    @apply rounded-[22px] border border-primary/20 bg-primary/10 text-primary;
+  }
+
+  .desktop-menu-shell {
+    @apply h-full overflow-y-auto border-r border-border bg-card/95 p-5 shadow-soft;
+    width: min(360px, 88vw);
+  }
+
+  .desktop-menu-section {
+    @apply mb-4 rounded-2xl border border-border bg-secondary/50 p-3;
+  }
+
+  .desktop-menu-link {
+    @apply block w-full rounded-xl px-3 py-3 text-left text-sm font-semibold transition-colors;
+  }
+
+  .desktop-menu-link[data-active="true"] {
+    @apply bg-primary/10 text-primary;
+  }
+
+  .desktop-menu-link[data-active="false"] {
+    @apply text-foreground hover:bg-card;
+  }
+
+  .study-menu-section {
+    @apply rounded-2xl border border-border bg-secondary/60 p-3;
+  }
+
+  .study-menu-grid {
+    @apply grid gap-2 sm:grid-cols-2;
+  }
+
+  .study-menu-card {
+    @apply rounded-2xl border px-3 py-3 text-left transition-colors;
+  }
+
+  .study-menu-card[data-active="true"] {
+    @apply border-primary bg-primary/10 text-primary;
+  }
+
+  .study-menu-card[data-active="false"] {
+    @apply border-border bg-card text-foreground;
+  }
+
+  .study-menu-card-compact[data-active="false"] {
+    @apply bg-secondary/70;
   }
 
   .mobile-scroll-top,

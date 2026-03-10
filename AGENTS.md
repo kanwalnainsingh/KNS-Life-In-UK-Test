@@ -75,6 +75,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Reordered those lighter reference pages to put `must know first` anchors before the longer supporting lists.
 - Added a broader visual polish pass across the shared theme, Home, Quick Revision, Quiz, and Mock screens to reduce clutter and improve mobile-first readability.
 - Extended that visual polish to `Story Mode`, `Timeline`, `4 Nations`, and `Key Historical Figures` so the core study pages now share the calmer card hierarchy and lighter light/dark surfaces.
+- Improved the desktop topics drawer and mobile bottom navigation / study menu so the main learner actions are easier to scan and the grouped topic browsing feels lighter.
 - Added hash-based tab deep links like `#home`, `#timeline`, and `#figures` for easier navigation and screenshot capture.
 - Added fingerprinted build assets for GitHub Pages so releases update more reliably on mobile.
 - Added direct `Boxing Day` quiz coverage to close the last festival audit gap.

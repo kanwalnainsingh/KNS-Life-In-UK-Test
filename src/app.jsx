@@ -1408,25 +1408,20 @@ const BottomNav = ({ active, setActive, openQuickPanel }) => {
       {items.map((item) => (
         <button
           key={item.id}
-          className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1"
+          className="focus-ring mobile-nav-item"
           onClick={() => setActive(item.id)}
-          style={{
-            border: "none",
-            background: "none",
-            color: primaryActive === item.id ? "var(--accent-text)" : "var(--text-muted)",
-            fontSize: 11,
-            fontWeight: primaryActive === item.id ? 800 : 600,
-            cursor: "pointer",
-          }}
+          data-active={primaryActive === item.id ? "true" : "false"}
+          style={{ border: "none", cursor: "pointer" }}
         >
           <span style={{ fontSize: 18 }}>{item.icon}</span>
           <span>{item.label}</span>
         </button>
       ))}
       <button
-        className="focus-ring flex min-w-[54px] flex-col items-center justify-center gap-1 rounded-xl px-2 py-1"
+        className="focus-ring mobile-nav-item mobile-nav-menu"
         onClick={openQuickPanel}
-        style={{ border: "none", background: "none", color: primaryActive === "menu" ? "var(--accent-text)" : "var(--text-muted)", fontSize: 11, fontWeight: primaryActive === "menu" ? 800 : 700, cursor: "pointer" }}
+        data-active={primaryActive === "menu" ? "true" : "false"}
+        style={{ cursor: "pointer" }}
       >
         <span style={{ fontSize: 18 }}>☰</span>
         <span>Menu</span>
@@ -1469,6 +1464,7 @@ const getHashTab = () => {
 };
 
 const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
+  const quickActions = ["home", "quickrev", "daily10", "quiz", "mock", "story", "rapidfire", "revise"];
   return (
     <Sheet open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <SheetContent side="bottom" hideClose className="mobile-sheet overflow-y-auto p-4">
@@ -1485,25 +1481,24 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
             <span>← Back</span>
             <span className="text-xs text-muted-foreground">{canGoBack ? "Previous screen" : "No history yet"}</span>
           </Button>
-          <div className="rounded-2xl border border-border bg-secondary/70 p-3">
+          <div className="study-menu-section">
             <div className="mb-1 text-xs font-bold text-muted-foreground">Study now</div>
-            <div className="mb-2 text-[11px] text-muted-foreground">These are the best places to start if you want to revise or test yourself right now.</div>
-            <div className="mobile-sheet-grid">
-              {["home", "quickrev", "daily10", "quiz", "mock", "story", "rapidfire", "revise"].map((id) => {
+            <div className="mb-2 text-[11px] text-muted-foreground">Use these when you want to revise, practise, or test yourself straight away.</div>
+            <div className="study-menu-grid">
+              {quickActions.map((id) => {
                 const item = TABS.find((tab) => tab.id === id);
                 if (!item) return null;
                 return (
                   <button
                     key={item.id}
-                    className={cn(
-                      "focus-ring rounded-2xl border px-3 py-3 text-left transition-colors",
-                      active === item.id
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border bg-card text-foreground"
-                    )}
+                    className="focus-ring study-menu-card"
+                    data-active={active === item.id ? "true" : "false"}
                     onClick={() => { setActive(item.id); onClose(); }}
                   >
-                    <div className="mb-1.5 text-xl">{item.icon}</div>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <span className="text-xl">{item.icon}</span>
+                      {active === item.id && <span className="text-[10px] font-bold uppercase tracking-[0.14em]">Open</span>}
+                    </div>
                     <div className="text-sm font-bold">{item.label}</div>
                   </button>
                 );
@@ -1511,22 +1506,18 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
             </div>
           </div>
           {MOBILE_MORE_GROUPS.map((group) => (
-            <div key={group.title}>
+            <div key={group.title} className="study-menu-section">
               <div className="mb-1 text-xs font-bold text-muted-foreground">{group.title}</div>
               <div className="mb-2 text-[11px] text-muted-foreground">{group.hint}</div>
-              <div className="mobile-sheet-grid">
+              <div className="study-menu-grid">
                 {group.ids.map((id) => {
                   const item = TABS.find((tab) => tab.id === id);
                   if (!item) return null;
                   return (
                     <button
                       key={item.id}
-                      className={cn(
-                        "focus-ring rounded-2xl border px-3 py-3 text-left transition-colors",
-                        active === item.id
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border bg-secondary/70 text-foreground"
-                      )}
+                      className="focus-ring study-menu-card study-menu-card-compact"
+                      data-active={active === item.id ? "true" : "false"}
                       onClick={() => { setActive(item.id); onClose(); }}
                     >
                       <div className="mb-1.5 text-xl">{item.icon}</div>
@@ -1903,19 +1894,24 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
       </div>
       {!isMobile && menuOpen && (
         <div role="dialog" aria-modal="true" aria-label="Topics menu" style={{ position: "fixed", inset: 0, background: "#020617cc", zIndex: 200 }} onClick={() => setMenuOpen(false)}>
-          <div style={{ background: "var(--card-bg)", width: 340, maxWidth: "86vw", height: "100%", overflowY: "auto", padding: 18, borderRight: "1px solid var(--card-border)" }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ color: "#60a5fa", fontWeight: 800, marginBottom: 6, fontSize: 18 }}>🇬🇧 Study navigation</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 16 }}>Main study flows first, then grouped topic sections.</div>
+          <div className="desktop-menu-shell" onClick={(e) => e.stopPropagation()}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 6, fontSize: 18 }}>🇬🇧 Study navigation</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 16 }}>Main study actions first, then grouped topic sections if you want to browse the course.</div>
             {NAV_GROUPS.map((group) => (
-              <div key={group.title} style={{ marginBottom: 14 }}>
+              <div key={group.title} className="desktop-menu-section">
                 <div style={{ color: "var(--text-muted)", fontSize: 12, fontWeight: 700, marginBottom: 4 }}>{group.title}</div>
                 <div style={{ color: "var(--text-muted)", fontSize: 11, marginBottom: 8 }}>{group.hint}</div>
                 {group.ids.map((id) => {
                   const t = TABS.find((tab) => tab.id === id);
                   if (!t) return null;
                   return (
-                    <button key={t.id} className="focus-ring" onClick={() => { setActive(t.id); setMenuOpen(false); }}
-                      style={{ display: "block", width: "100%", padding: "12px 16px", background: active === t.id ? "#1e3a5f" : "none", border: "none", cursor: "pointer", textAlign: "left", color: active === t.id ? "#bfdbfe" : "var(--text)", borderRadius: 12, marginBottom: 4, fontSize: 15 }}>
+                    <button
+                      key={t.id}
+                      className="focus-ring desktop-menu-link"
+                      data-active={active === t.id ? "true" : "false"}
+                      onClick={() => { setActive(t.id); setMenuOpen(false); }}
+                      style={{ border: "none", cursor: "pointer", marginBottom: 4 }}
+                    >
                       {t.icon} {t.label}
                     </button>
                   );

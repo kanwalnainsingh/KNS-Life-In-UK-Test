@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.16.0`
+Current release: `v1.16.1`
 
 ---
 
@@ -19,6 +19,7 @@ UI stack now uses:
 - shadcn-style open-source UI primitives
 - class-based dark mode with persisted preference
 - calmer shared visual system across Home, Quick Revision, Quiz, Mock, Story, Timeline, 4 Nations, and Figures
+- cleaner learner-first side menu and bottom navigation for mobile and desktop
 
 ---
 
