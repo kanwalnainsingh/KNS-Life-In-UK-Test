@@ -3366,6 +3366,26 @@ const WARS_COMPARE_ROWS = [
   { label: "1939-45", left: "WWII", right: "Churchill in war, Attlee after war", why: "Second world war anchor." },
 ];
 
+const WARS_CORE_STRIP = [
+  "1066 = Hastings = William the Conqueror",
+  "1588 = Spanish Armada = Elizabeth I / Francis Drake",
+  "1805 = Trafalgar = Nelson",
+  "1815 = Waterloo = Wellington",
+  "1914-18 = WWI = Armistice 11 November 1918",
+  "1939-45 = WWII = Churchill in war, Attlee after war",
+];
+
+const WAR_PERSON_DRILL = [
+  { prompt: "Battle of Hastings", answer: "William the Conqueror", clue: "1066 and the Norman Conquest always go with William." },
+  { prompt: "Spanish Armada", answer: "Elizabeth I / Francis Drake", clue: "Think Tudor England defending itself in 1588." },
+  { prompt: "Battle of Bannockburn", answer: "Robert the Bruce", clue: "Scotland and 1314 go with Robert the Bruce." },
+  { prompt: "Battle of Culloden", answer: "Bonnie Prince Charlie", clue: "1746 = final Jacobite defeat." },
+  { prompt: "Battle of Trafalgar", answer: "Nelson", clue: "Sea battle, not land battle." },
+  { prompt: "Battle of Waterloo", answer: "Wellington", clue: "Land battle ending Napoleon's wars." },
+  { prompt: "WWII wartime leader", answer: "Winston Churchill", clue: "Churchill in war, Attlee after war." },
+  { prompt: "Post-war Labour leader", answer: "Clement Attlee", clue: "1945 election after WWII." },
+];
+
 const WARS_TEST_OPTIONS = [
   { id: "mixed", label: "Mixed war test", match: /battle|war|armistice|churchill|attlee|trafalgar|waterloo|dunkirk|blitz|d-day|bannockburn|hastings|armada|boyne|culloden|boudicca|napoleon|nelson|wellington/i },
   { id: "dates", label: "Dates & people", match: /1066|1588|1805|1815|1914|1918|1939|1940|1944|1945|william the conqueror|drake|nelson|wellington|churchill|attlee|robert the bruce|bonnie prince charlie/i },
@@ -3470,6 +3490,21 @@ const WarsTab = ({ setActive }) => {
       <Card className="support-card-strong">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Most tested first</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>If you only have a few minutes, lock these six war anchors in this order.</div>
+          </div>
+          <Badge text="Pass-first list" color="#ef4444" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {WARS_CORE_STRIP.map((item) => (
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item}</div>
+          ))}
+        </div>
+        <MemoryHook text="First learn the six anchors, then expand into Bannockburn, Culloden, Boyne, Dunkirk, Battle of Britain, Blitz, and D-Day." />
+      </Card>
+      <Card className="support-card-strong">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>One-glance war compare table</div>
             <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use this to tie the big dates directly to the battle, person, or war outcome most likely to be tested.</div>
           </div>
@@ -3498,6 +3533,26 @@ const WarsTab = ({ setActive }) => {
           </table>
         </div>
         <MemoryHook text="Lock the pair first: Hastings-William, Armada-Elizabeth/Drake, Trafalgar-Nelson, Waterloo-Wellington, WWI-1918 Armistice, WWII-Churchill then Attlee." />
+      </Card>
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>War to person drill</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use this for the named-person links that the test likes to attach to wars and battles.</div>
+          </div>
+          <Badge text="Battle -> person" color="#8b5cf6" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {WAR_PERSON_DRILL.map((item) => (
+            <div key={item.prompt} className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Prompt</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 6 }}>{item.prompt}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Answer</div>
+              <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6, marginBottom: 8 }}>{item.answer}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.55 }}>{item.clue}</div>
+            </div>
+          ))}
+        </div>
       </Card>
       <Card style={{ background: "color-mix(in srgb, #ef4444 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>WWII quick anchors</div>

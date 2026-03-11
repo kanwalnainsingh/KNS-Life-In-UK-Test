@@ -143,6 +143,7 @@ const clickByText = async (page, text) => {
 
     await page.goto(`${url}/#wars`, { waitUntil: "networkidle0" });
     await waitForText(page, "Wars & Battles");
+    await waitForText(page, "Most tested first");
     await waitForText(page, "One-glance war compare table");
     await clickByText(page, "Start test");
     await waitForText(page, "Question 1 of");

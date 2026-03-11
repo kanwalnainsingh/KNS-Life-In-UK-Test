@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.18.2`
+Current release: `v1.18.3`
 
 ---
 
@@ -116,6 +116,7 @@ UI stack now uses:
   - embedded nation-only mini tests for capitals, saints/symbols, and common traps
 - `Wars & Battles` now works more like a real study section too:
   - one-glance war compare table for battle/date/person anchors
+  - `Most tested first` war strip plus a `war to person` drill
   - war-only mini tests for dates, world wars, and battle traps
   - direct handoff into Story Mode, Timeline, and war-focused quick revision
 - `Revise Mistakes` now also links into saved questions and weak-fact study

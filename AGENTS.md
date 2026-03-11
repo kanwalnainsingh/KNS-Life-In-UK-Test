@@ -72,6 +72,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Redesigned `Quick Facts` into `Quick Facts Course` with grouped blocks, per-group checks, and saved completion state so it can act as the fast-track civics/law/everyday-life mode beside `Story Mode`.
 - Reworked `4 Nations` into a fuller study section with a one-glance compare table, per-nation link blocks, and a built-in nation mini-test for capitals, saints/symbols, and UK identity traps.
 - Reworked `Wars & Battles` into a fuller study section with a one-glance war compare table, war-only mini tests, and cleaner handoff into `Story Mode`, `Timeline`, and war-focused quick revision.
+- Added a `Most tested first` war strip and a `war to person` drill so the main battle/person/date pairings are easier to revise quickly.
 - Mock results now point learners to the weakest area and the most useful next revision step.
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.
 - Added focused follow-up actions on the heavier topic pages so `Story Mode`, `Religion`, `Landmarks`, `Inventors`, and `Sports` can jump straight into topic-specific quick revision.
