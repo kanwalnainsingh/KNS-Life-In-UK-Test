@@ -2840,6 +2840,7 @@ const TrueFalseSprintTab = () => {
 const ExamTopicsModeTab = ({ setActive }) => {
   const [completed, setCompleted] = useState(() => readStore(STORAGE_KEYS.examTopicsMode, []));
   const [topicMockHistory, setTopicMockHistory] = useState(() => readStore(STORAGE_KEYS.examTopicMocks, []));
+  const topicMockAreaRefs = useRef({});
   const [topicMock, setTopicMock] = useState({
     groupId: null,
     questions: [],
@@ -2902,7 +2903,11 @@ const ExamTopicsModeTab = ({ setActive }) => {
       wrong: [],
       finished: false,
     });
-    scrollPageTop();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        topicMockAreaRefs.current[group.id]?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
   };
 
   const answerTopicMockQuestion = (optionIndex) => {
@@ -3062,7 +3067,13 @@ const ExamTopicsModeTab = ({ setActive }) => {
             </div>
           </div>
 
-          <div className="subtle-panel" style={{ padding: 12, marginBottom: 12, border: `1px solid color-mix(in srgb, ${group.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${group.color} 6%, var(--card-bg))` }}>
+          <div
+            className="subtle-panel"
+            ref={(node) => {
+              if (node) topicMockAreaRefs.current[group.id] = node;
+            }}
+            style={{ padding: 12, marginBottom: 12, border: `1px solid color-mix(in srgb, ${group.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${group.color} 6%, var(--card-bg))` }}
+          >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
               <div>
                 <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Start a topic mock from here</div>
