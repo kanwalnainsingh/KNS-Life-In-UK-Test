@@ -3357,9 +3357,33 @@ const TimelineTab = () => {
 };
 
 // ── WARS ─────────────────────────────────────────────────────
-const WarsTab = () => {
+const WARS_COMPARE_ROWS = [
+  { label: "1066", left: "Hastings", right: "William the Conqueror", why: "Norman Conquest and last successful invasion of England." },
+  { label: "1588", left: "Spanish Armada", right: "Elizabeth I / Francis Drake", why: "Tudor defence anchor." },
+  { label: "1805", left: "Trafalgar", right: "Nelson", why: "Sea battle; Nelson wins and dies." },
+  { label: "1815", left: "Waterloo", right: "Wellington", why: "Land battle; Napoleon defeated." },
+  { label: "1914-18", left: "WWI", right: "Armistice = 11 November 1918", why: "First world war anchor." },
+  { label: "1939-45", left: "WWII", right: "Churchill in war, Attlee after war", why: "Second world war anchor." },
+];
+
+const WARS_TEST_OPTIONS = [
+  { id: "mixed", label: "Mixed war test", match: /battle|war|armistice|churchill|attlee|trafalgar|waterloo|dunkirk|blitz|d-day|bannockburn|hastings|armada|boyne|culloden|boudicca|napoleon|nelson|wellington/i },
+  { id: "dates", label: "Dates & people", match: /1066|1588|1805|1815|1914|1918|1939|1940|1944|1945|william the conqueror|drake|nelson|wellington|churchill|attlee|robert the bruce|bonnie prince charlie/i },
+  { id: "worldwars", label: "WWI & WWII", match: /world war|armistice|battle of britain|blitz|dunkirk|d-day|poland|churchill|attlee/i },
+  { id: "traps", label: "Battle traps", match: /trafalgar|waterloo|battle of britain|blitz|dunkirk|d-day|boyne|culloden|armada/i },
+];
+
+const WarsTab = ({ setActive }) => {
   const battleCards = BATTLES_AND_WARS.filter((item) => /battle|revolt|armada|dunkirk|blitz|d-day/i.test(item.name));
   const widerWarCards = BATTLES_AND_WARS.filter((item) => !battleCards.includes(item));
+  const [testType, setTestType] = useState("mixed");
+  const [testQuestions, setTestQuestions] = useState([]);
+  const [testCurrent, setTestCurrent] = useState(0);
+  const [testSelected, setTestSelected] = useState(null);
+  const [testConfirmed, setTestConfirmed] = useState(false);
+  const [testScore, setTestScore] = useState(0);
+  const [testWrong, setTestWrong] = useState([]);
+  const [testFinished, setTestFinished] = useState(false);
   const warComparisons = [
     {
       title: "Trafalgar vs Waterloo",
@@ -3387,8 +3411,49 @@ const WarsTab = () => {
     },
   ];
 
+  const warTestPool = useMemo(() => {
+    const matcher = WARS_TEST_OPTIONS.find((option) => option.id === testType)?.match || WARS_TEST_OPTIONS[0].match;
+    return ALL_QUIZ.filter((question) => matcher.test(`${question.q} ${question.tip}`));
+  }, [testType]);
+
+  const startWarTest = (selectedType = testType) => {
+    const matcher = WARS_TEST_OPTIONS.find((option) => option.id === selectedType)?.match || WARS_TEST_OPTIONS[0].match;
+    const pool = ALL_QUIZ.filter((question) => matcher.test(`${question.q} ${question.tip}`));
+    const total = Math.min(6, pool.length);
+    setTestType(selectedType);
+    setTestQuestions(pickRandomNoRepeat(pool, total, `lifeuk-recent-wars-${selectedType}`, 40).map((question, index) => prepareQuestionVariant(question, 28000 + index)));
+    setTestCurrent(0);
+    setTestSelected(null);
+    setTestConfirmed(false);
+    setTestScore(0);
+    setTestWrong([]);
+    setTestFinished(false);
+    scrollPageTop();
+  };
+
+  const answerWarQuestion = (optionIndex) => {
+    if (testConfirmed || testFinished) return;
+    const question = testQuestions[testCurrent];
+    const isCorrect = optionIndex === question.a;
+    setTestSelected(optionIndex);
+    setTestConfirmed(true);
+    if (isCorrect) setTestScore((value) => value + 1);
+    else setTestWrong((items) => [...items, { ...question, chosen: optionIndex }]);
+  };
+
+  const nextWarQuestion = () => {
+    if (testCurrent + 1 >= testQuestions.length) {
+      setTestFinished(true);
+      if (testWrong.length) saveWrongQuestions(testWrong);
+      return;
+    }
+    setTestCurrent((value) => value + 1);
+    setTestSelected(null);
+    setTestConfirmed(false);
+  };
+
   return (
-    <div style={{ padding: 20 }}>
+    <div className="topic-page">
       <SectionTitle icon="⚔️" meta="Use war anchors as a separate memory spine: battle name, year, person, and why it mattered.">Wars & Battles</SectionTitle>
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>War memory spine</div>
@@ -3401,6 +3466,38 @@ const WarsTab = () => {
           • `1939–45` = WWII = Churchill in war, Attlee after war
         </div>
         <MemoryHook text="When a war question appears, first lock the date, then attach the person: Hastings-William, Trafalgar-Nelson, Waterloo-Wellington." />
+      </Card>
+      <Card className="support-card-strong">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>One-glance war compare table</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use this to tie the big dates directly to the battle, person, or war outcome most likely to be tested.</div>
+          </div>
+          <Badge text="High-yield anchors" color="#22c55e" />
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, minWidth: 680 }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted)", fontSize: 12 }}>Date / period</th>
+                <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted)", fontSize: 12 }}>Battle / war</th>
+                <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted)", fontSize: 12 }}>Person / clue</th>
+                <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted)", fontSize: 12 }}>Why remember it</th>
+              </tr>
+            </thead>
+            <tbody>
+              {WARS_COMPARE_ROWS.map((row) => (
+                <tr key={row.label}>
+                  <td style={{ padding: "10px 12px", borderTop: "1px solid var(--card-border)", color: "var(--text-strong)", fontWeight: 700, fontSize: 13 }}>{row.label}</td>
+                  <td style={{ padding: "10px 12px", borderTop: "1px solid var(--card-border)", color: "var(--text)", fontSize: 13 }}>{row.left}</td>
+                  <td style={{ padding: "10px 12px", borderTop: "1px solid var(--card-border)", color: "var(--text)", fontSize: 13 }}>{row.right}</td>
+                  <td style={{ padding: "10px 12px", borderTop: "1px solid var(--card-border)", color: "var(--text-muted)", fontSize: 13, lineHeight: 1.5 }}>{row.why}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <MemoryHook text="Lock the pair first: Hastings-William, Armada-Elizabeth/Drake, Trafalgar-Nelson, Waterloo-Wellington, WWI-1918 Armistice, WWII-Churchill then Attlee." />
       </Card>
       <Card style={{ background: "color-mix(in srgb, #ef4444 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))" }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>WWII quick anchors</div>
@@ -3496,6 +3593,78 @@ const WarsTab = () => {
           <MemoryHook text={item.memory} />
         </Card>
       ))}
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Test this section</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Check dates, battle names, and people while the war spine is still fresh.</div>
+          </div>
+          <Badge text={`${warTestPool.length} questions available`} color="#3b82f6" />
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+          {WARS_TEST_OPTIONS.map((option) => (
+            <Button key={option.id} variant={testType === option.id ? "default" : "secondary"} onClick={() => setTestType(option.id)}>{option.label}</Button>
+          ))}
+          <Button variant="outline" onClick={() => startWarTest(testType)}>Start test</Button>
+        </div>
+
+        {testQuestions.length > 0 && (
+          !testFinished ? (
+            <>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 10 }}>Question {testCurrent + 1} of {testQuestions.length}</div>
+              <QuestionCard
+                question={testQuestions[testCurrent]}
+                selected={testSelected}
+                confirmed={testConfirmed}
+                onSelect={answerWarQuestion}
+              />
+              {testConfirmed && (
+                <div style={{ marginTop: 14 }}>
+                  <MemoryHook text={testQuestions[testCurrent].tip.replace(/^[⭐📌💡]\s*/, "")} />
+                  <Button className="mt-3 w-full" onClick={nextWarQuestion}>
+                    {testCurrent + 1 >= testQuestions.length ? "Finish war test" : "Next question"}
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div style={{ fontWeight: 900, fontSize: 24, color: "var(--text-strong)", marginBottom: 6 }}>War score: {testScore}/{testQuestions.length}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>The main goal here is automatic recall of date, battle, person, and why it mattered. Wrong answers are saved to revision.</div>
+              {testWrong.length > 0 && (
+                <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+                  {testWrong.map((question, index) => (
+                    <Card key={`${question.q}-${index}`} style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+                      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 6 }}>{question.q}</div>
+                      <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>
+                        <div>Your answer: <strong>{question.opts[question.chosen] || "No answer"}</strong></div>
+                        <div>Correct answer: <strong>{question.opts[question.a]}</strong></div>
+                      </div>
+                      <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                <Button onClick={() => startWarTest(testType)}>Retake this test</Button>
+                <Button variant="secondary" onClick={() => launchQuickRevision(setActive, { focus: "dates", topic: "Wars", sessionType: "short" })}>Quick revise wars</Button>
+                <Button variant="outline" onClick={() => setActive("timeline")}>Open timeline</Button>
+              </div>
+            </>
+          )
+        )}
+      </Card>
+      <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
+        title="Use wars as a history memory spine"
+        note="Best route: use Story Mode for the broader history, Wars & Battles for dates and named conflicts, then take a mock or dates-focused quick revision run."
+        actions={[
+          { label: "Quick Revise wars", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "dates", topic: "Wars", sessionType: "short" }) },
+          { label: "Open Story Mode", onClick: () => setActive("story") },
+          { label: "Take a Mock", onClick: () => setActive("mock") },
+        ]}
+      />
     </div>
   );
 };
@@ -5664,7 +5833,7 @@ const App = () => {
       case "cram": return <CramSheetTab />;
       case "tracker": return <TopicTrackerTab setActive={navigateTo} />;
       case "timeline": return <TimelineTab />;
-      case "wars": return <WarsTab />;
+      case "wars": return <WarsTab setActive={navigateTo} />;
       case "nations": return <NationsTab setActive={navigateTo} />;
       case "confuse": return <ConfuseTab />;
       case "inventors": return (

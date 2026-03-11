@@ -141,6 +141,12 @@ const clickByText = async (page, text) => {
     await clickByText(page, "Mock Test 1");
     await waitForText(page, "Question 1 of 24");
 
+    await page.goto(`${url}/#wars`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Wars & Battles");
+    await waitForText(page, "One-glance war compare table");
+    await clickByText(page, "Start test");
+    await waitForText(page, "Question 1 of");
+
     await page.goto(`${url}/#rapidfire`, { waitUntil: "networkidle0" });
     await waitForText(page, "Rapid Fire");
     await waitForText(page, "Reset progress");
@@ -157,6 +163,7 @@ const clickByText = async (page, text) => {
     console.log("- story mode chapter handoff to quick revision works");
     console.log("- quick facts course group check renders");
     console.log("- mock paper flow starts in the browser");
+    console.log("- wars section compare table and mini test render");
     console.log("- rapid fire reset control renders");
     console.log("- topic-page follow-up actions render");
   } finally {
