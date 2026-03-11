@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.16.1`
+Current release: `v1.17.0`
 
 ---
 
@@ -127,6 +127,15 @@ UI stack now uses:
 - Added a browser smoke test using `puppeteer-core` and Chrome to validate Home, Quick Revision, Story Mode handoff, Mock start, Rapid Fire, and follow-up actions after each build
 - `Religion`, `Sports`, `Landmarks`, and `Inventors` are now more pass-first: each starts with `must know first` anchors before the longer reference list
 - Lower-priority reference tabs were extracted into a dedicated module so future UI changes are safer and `src/app.jsx` is less overloaded
+- `Key Historical Figures` now works more like a one-stop pass sheet:
+  - stronger exam hooks
+  - fuller coverage for figures like `Henry VIII`, `Elizabeth I`, `Churchill`, `Attlee`, `Victoria`, `Walpole`, and `Wilberforce`
+  - cleaner “likely question” and “dates to lock in” summaries above the full cards
+- `Religion`, `Sports`, `Landmarks`, and `Inventors` now have a second pass of exam-first polish with clearer `likely questions here` panels
+- Home has stronger personalization guidance:
+  - readiness now includes a clearer confidence explanation
+  - direct weak-area and compare-trap shortcuts are surfaced more clearly
+- The figures page was extracted into its own component to keep the app structure safer as content keeps growing
 - The visual system is now cleaner and calmer in both light and dark mode, with softer surfaces, lighter mobile chrome, and stronger contrast discipline
 - `Home`, `Quick Revision`, `Quiz`, and `Mock Test` now have a clearer hierarchy and less visual noise on both mobile and desktop
 - More relevant grouped navigation with main actions first and topic subsections underneath

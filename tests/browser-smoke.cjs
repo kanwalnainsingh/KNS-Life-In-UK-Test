@@ -44,6 +44,15 @@ const getChromePath = () => {
   return found;
 };
 
+const captureScreenshot = async (page, baseUrl) => {
+  const targetPath = process.env.SCREENSHOT_PATH;
+  if (!targetPath) return;
+  const targetHash = process.env.SCREENSHOT_HASH || "#figures";
+  await page.setViewport({ width: 430, height: 932, deviceScaleFactor: 2 });
+  await page.goto(`${baseUrl}/${targetHash}`, { waitUntil: "networkidle0" });
+  await page.screenshot({ path: targetPath, fullPage: true });
+};
+
 const startServer = () => {
   const server = http.createServer((req, res) => {
     const requestPath = decodeURIComponent((req.url || "/").split("?")[0]).replace(/^\/+/, "");
@@ -133,6 +142,8 @@ const clickByText = async (page, text) => {
 
     await page.goto(`${url}/#landmarks`, { waitUntil: "networkidle0" });
     await waitForText(page, "Turn places into quick recall");
+
+    await captureScreenshot(page, url);
 
     console.log("Browser smoke test passed:");
     console.log("- home loads with pass-guide shortcuts");

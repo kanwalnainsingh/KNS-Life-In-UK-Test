@@ -14,6 +14,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Local bundled React app with `esbuild`
 - Tailwind CSS with a custom PostCSS build step into `docs/assets`
 - shadcn-style open-source UI primitives under `src/components/ui`
+- topic-specific tab components now also live under `src/components/` such as `reference-tabs.jsx` and `figures-tab.jsx`
 - `src/data.js` for all facts, mnemonics, tabs, and question bank
 - `src/app.jsx` for UI and state
 - `src/main.jsx` as bundle entry
@@ -62,6 +63,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Reworked fixed mock generation so the full 40-paper series spreads questions more evenly across the course instead of over-reusing the same subset.
 - Added community/participation facts and questions.
 - Expanded `Key Historical Figures` with more tested names, memory hooks, and grouped revision cues.
+- Extracted the figures page into `src/components/figures-tab.jsx` and strengthened it as a one-stop revision page with direct exam hooks and date anchors.
 - Expanded `Key People` again with fuller exam-focused facts, especially Henry VIII, plus extra civics/culture coverage like Jacobites, coalition government, civil servants, school governors, Tate galleries, Turner Prize, and rugby origin.
 - Redesigned `Quick Revise` into a session-first mode with short runs, focus presets, saved session continuity, and `Hard / Okay / Easy` feedback.
 - Simplified the visible `Quick Revise` UI so the card answer, context, and memory clue show immediately while recent-history tracking stays in the background.

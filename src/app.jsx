@@ -30,6 +30,7 @@ import {
   SectionStudyActions,
   SportsTab,
 } from "./components/reference-tabs.jsx";
+import { FiguresTabSection } from "./components/figures-tab.jsx";
 import { cn } from "./lib/utils.js";
 import {
   ALL_QUIZ,
@@ -924,19 +925,6 @@ const QUICK_FACT_CATEGORY_PRIORITY = {
   "Population & Geography": { order: 9, label: "Good to know", color: "#64748b" },
   "History Extras": { order: 10, label: "Good to know", color: "#64748b" },
 };
-
-const CORE_FIGURES = new Set([
-  "William the Conqueror",
-  "King John",
-  "Henry VIII",
-  "Elizabeth I",
-  "Emmeline Pankhurst",
-  "Winston Churchill",
-  "William Beveridge",
-  "Aneurin (Nye) Bevan",
-  "Clement Attlee",
-  "Margaret Thatcher",
-]);
 
 const CORE_INVENTORS = new Set([
   "Alexander Fleming",
@@ -1994,6 +1982,11 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const [planProgress, setPlanProgress] = useState(() => readStore(STORAGE_KEYS.passPlan, { planId: "7day", done: {} }));
   const readiness = Math.max(0, Math.min(100, Math.round((bestPaperScore * 0.55) + (trackerCompleted / TRACKER_SECTIONS.length) * 30 + (wrongQuestions.length ? Math.max(0, 20 - Math.min(20, wrongQuestions.length)) : 15))));
   const weakestTopic = wrongQuestions.length ? buildRevisionBuckets(wrongQuestions)[0]?.topic || "General review" : "No weak area saved yet";
+  const readinessNote = readiness >= 80
+    ? "You are in a strong range now. Keep traps and mocks active so you do not lose easy marks."
+    : readiness >= 60
+      ? "You are close, but still need targeted revision before relying on full mocks alone."
+      : "Use pass-core revision and weak-area cleanup first, then come back to more mocks.";
   const currentPlan = PASS_PLANS.find((plan) => plan.id === selectedPlan) || PASS_PLANS[0];
   const completedPlanSteps = currentPlan.steps.filter((step) => planProgress.done?.[`${currentPlan.id}:${step.id}`]).length;
   const nextStoryChapter = STORY_CHAPTERS[Math.min(storyChapterIndex, STORY_CHAPTERS.length - 1)];
@@ -2148,6 +2141,21 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
                   </div>
                 );
               })}
+            </div>
+          </div>
+          <div className="dashboard-card">
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Confidence Guide</div>
+            <div className="mb-1 text-base font-extrabold text-foreground">{readiness}% readiness</div>
+            <div className="mb-3 text-sm leading-6 text-muted-foreground">{readinessNote}</div>
+            <div className="grid gap-2">
+              <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
+                <div className="text-sm font-semibold text-foreground">Run Weak Areas now</div>
+                <div className="mt-1 text-xs leading-5 text-muted-foreground">Best if your score is not stable yet or you keep missing the same facts.</div>
+              </button>
+              <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive("confuse")}>
+                <div className="text-sm font-semibold text-foreground">Open compare traps</div>
+                <div className="mt-1 text-xs leading-5 text-muted-foreground">Fastest way to stop losing marks on UK vs GB, dates, Parliament, and law mix-ups.</div>
+              </button>
             </div>
           </div>
         </div>
@@ -3668,161 +3676,19 @@ const ConfuseTab = () => {
 };
 
 // ── KEY FIGURES ──────────────────────────────────────────────
-const FiguresTab = ({ setActive }) => {
-  const figureOrder = [
-    "Boudicca",
-    "St Augustine",
-    "Alfred the Great",
-    "Athelstan",
-    "William the Conqueror",
-    "King John",
-    "Edward I",
-    "Robert the Bruce",
-    "Henry VII",
-    "Henry VIII",
-    "Elizabeth I",
-    "Sir Francis Drake",
-    "James VI and I",
-    "Charles II",
-    "Oliver Cromwell",
-    "Isaac Newton",
-    "Alexander Fleming",
-    "Sir Tim Berners-Lee",
-    "Sir Edmund Halley",
-    "Robert Walpole",
-    "Lord Nelson",
-    "Duke of Wellington",
-    "William Wilberforce",
-    "Sake Dean Mahomet",
-    "Florence Nightingale",
-    "Mary Seacole",
-    "Queen Victoria",
-    "Emmeline Pankhurst",
-    "Winston Churchill",
-    "William Beveridge",
-    "Clement Attlee",
-    "Aneurin (Nye) Bevan",
-    "Dr Ludwig Guttmann",
-    "Margaret Thatcher",
-    "Queen Elizabeth II",
-    "James Cook",
-    "Stephen Hawking",
-  ];
-  const orderMap = Object.fromEntries(figureOrder.map((name, index) => [name, index]));
-  const figures = [...KEY_FIGURES, ...EXTRA_KEY_FIGURES]
-    .filter((figure, index, arr) => arr.findIndex((item) => item.name === figure.name) === index)
-    .sort((a, b) => {
-      const coreDiff = Number(CORE_FIGURES.has(b.name)) - Number(CORE_FIGURES.has(a.name));
-      if (coreDiff) return coreDiff;
-      return (orderMap[a.name] ?? 999) - (orderMap[b.name] ?? 999);
-    });
-  const figureGroups = [
-    { title: "Kings, queens & union", color: "#3b82f6", items: ["Alfred", "Athelstan", "William", "Henry VII", "Henry VIII", "Elizabeth I", "James VI and I", "Charles II"] },
-    { title: "Rights, reform & welfare", color: "#10b981", items: ["King John", "Wilberforce", "Pankhurst", "Beveridge", "Bevan", "Attlee"] },
-    { title: "War & defence", color: "#f97316", items: ["Boudicca", "Robert the Bruce", "Drake", "Nelson", "Wellington", "Churchill"] },
-    { title: "Science & modern Britain", color: "#a855f7", items: ["Newton", "Fleming", "Berners-Lee", "Halley", "Hawking", "Guttmann"] },
-  ];
-
-  return (
-    <div className="topic-page">
-      <SectionTitle icon="👑" meta="High-yield people for the test, ordered for faster revision and comparison.">Key Historical Figures</SectionTitle>
-      <Card className="setup-card" style={{ border: "1px solid color-mix(in srgb, #1d4ed8 24%, var(--card-border))" }}>
-        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8, fontSize: 15 }}>Quick figure map</div>
-        <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-          Use the groups below to remember who belongs to monarchy, reform, war, welfare, and science. These links reduce mix-ups in mocks.
-        </div>
-        <div className="compare-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
-          {figureGroups.map((group) => (
-            <div key={group.title} className="subtle-panel" style={{ border: `1px solid ${group.color}33`, padding: 12 }}>
-              <div style={{ color: group.color, fontWeight: 800, fontSize: 12, marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>{group.title}</div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {group.items.map((item) => <Badge key={item} text={item} color={group.color} />)}
-              </div>
-            </div>
-          ))}
-        </div>
-      </Card>
-      <Card className="support-card-strong">
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-          <div>
-            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Most tested figures first</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Learn the high-frequency names first, then use the rest as supporting context.</div>
-          </div>
-          <Badge text="Exam core" color="#ef4444" />
-        </div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {figures.filter((item) => CORE_FIGURES.has(item.name)).map((item) => <Badge key={item.name} text={item.name} color="#ef4444" />)}
-        </div>
-      </Card>
-      <Card className="support-card">
-        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Figure date anchors</div>
-        <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-          • `1066` William the Conqueror<br />
-          • `1215` King John and Magna Carta<br />
-          • `1485` Henry VII and Tudor dynasty begins<br />
-          • `1534` Henry VIII and Church of England<br />
-          • `1588` Elizabeth I and the Armada<br />
-          • `1660` Charles II and the Restoration<br />
-          • `1918 / 1928` Emmeline Pankhurst and votes for women<br />
-          • `1942 / 1948` Beveridge and Bevan
-        </div>
-        <MemoryHook text="Link people to dates, not just names: 1066 William, 1215 John, 1485 Henry VII, 1534 Henry VIII, 1588 Elizabeth I, 1948 Bevan." />
-      </Card>
-      <Card className="support-card">
-        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>High-yield person pairs</div>
-        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
-          {[
-            "Henry VII starts the Tudors. Henry VIII breaks with Rome.",
-            "Elizabeth I = Armada. James VI and I = Union of Crowns.",
-            "Cromwell = republic. Charles II = monarchy restored.",
-            "Nightingale and Seacole = Crimean War care.",
-            "Beveridge = welfare blueprint. Bevan = NHS.",
-            "Newton = gravity. Fleming = penicillin. Berners-Lee = web.",
-          ].map((item) => (
-            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
-              {item}
-            </div>
-          ))}
-        </div>
-      </Card>
-      {figures.map((f) => (
-        <Card key={f.name} className="quick-revision-card" style={{ border: `1px solid ${f.color}33` }}>
-          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
-            <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 4 }}>
-                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
-                <Badge text={CORE_FIGURES.has(f.name) ? "Exam core" : "More detail"} color={CORE_FIGURES.has(f.name) ? "#ef4444" : "#64748b"} />
-              </div>
-              <div style={{ color: f.color, fontSize: 12, fontWeight: 700 }}>{f.role}</div>
-            </div>
-          </div>
-          <div style={{ marginBottom: 10, borderRadius: 12, padding: "10px 12px", background: `${f.color}12`, border: `1px solid ${f.color}33` }}>
-            <div style={{ color: f.color, fontSize: 11, fontWeight: 800, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.4 }}>Remember first</div>
-            <div style={{ color: "var(--text-strong)", fontSize: 13, lineHeight: 1.55 }}>{f.facts[0]}</div>
-          </div>
-          <div style={{ display: "grid", gap: 6 }}>
-            {f.facts.map((fact, fi) => (
-              <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "6px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid var(--card-border)" : "none", lineHeight: 1.6 }}>• {fact}</div>
-            ))}
-          </div>
-          {FIGURE_MEMORY[f.name] && <MemoryHook text={FIGURE_MEMORY[f.name]} />}
-        </Card>
-      ))}
-      <SectionStudyActions
-        Card={Card}
-        Badge={Badge}
-        title="Turn people into recall"
-        note="After reading figures, move into quick revision or a mock so the names stay attached to the right dates and events."
-        actions={[
-          { label: "Quick Revise Key People", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Key People", sessionType: "short" }) },
-          { label: "Open Story Mode", onClick: () => setActive("story") },
-          { label: "Take a Mock", onClick: () => setActive("mock") },
-        ]}
-      />
-    </div>
-  );
-};
+const FiguresTab = ({ setActive }) => (
+  <FiguresTabSection
+    setActive={setActive}
+    SectionTitle={SectionTitle}
+    Card={Card}
+    Badge={Badge}
+    MemoryHook={MemoryHook}
+    launchQuickRevision={launchQuickRevision}
+    KEY_FIGURES={KEY_FIGURES}
+    EXTRA_KEY_FIGURES={EXTRA_KEY_FIGURES}
+    FIGURE_MEMORY={FIGURE_MEMORY}
+  />
+);
 
 // ── INTERNATIONAL ────────────────────────────────────────────
 const InternationalTab = ({ setActive }) => (

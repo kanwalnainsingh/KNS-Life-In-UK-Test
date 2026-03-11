@@ -5,6 +5,25 @@ const CORE_SPORT_EVENT_NAMES = new Set(["Wimbledon", "FA Cup", "Grand National",
 const CORE_SPORT_STAR_NAMES = new Set(["Mo Farah", "Jessica Ennis-Hill", "Andy Murray", "Bradley Wiggins", "Jayne Torvill and Christopher Dean"]);
 const CORE_FESTIVAL_NAMES = new Set(["Christmas", "Easter", "Boxing Day", "Diwali", "Eid al-Fitr", "Vaisakhi", "Hanukkah"]);
 
+const ExamFocusPanel = ({ Card, Badge, title, note, items, color = "#3b82f6" }) => (
+  <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+      <div>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{title}</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{note}</div>
+      </div>
+      <Badge text={`${items.length} exam cues`} color={color} />
+    </div>
+    <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+      {items.map((item) => (
+        <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
+          {item}
+        </div>
+      ))}
+    </div>
+  </Card>
+);
+
 export const SectionStudyActions = ({
   title = "Study this next",
   note = "When you finish reading, move straight into recall while the facts are still fresh.",
@@ -75,6 +94,19 @@ export const InventorsTab = ({
         </div>
         <MemoryHook text="Inventor questions are easiest if you remember person + invention as a fixed pair: Fleming-penicillin, Baird-TV, Berners-Lee-world wide web." />
       </Card>
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Likely questions here"
+        note="Most inventor questions are direct person-to-discovery matches."
+        color="#0ea5e9"
+        items={[
+          "Who discovered penicillin? Alexander Fleming.",
+          "Who invented the World Wide Web? Tim Berners-Lee.",
+          "Who invented television? John Logie Baird.",
+          "Think person + invention first, science field second.",
+        ]}
+      />
       {filtered.map((inv) => (
         <Card key={inv.who}>
           <div style={{ display: "flex", gap: 12 }}>
@@ -155,6 +187,19 @@ export const SportsTab = ({
         </div>
         <MemoryHook text="Three Olympic years is the main numbers clue: 1908, 1948, 2012." />
       </Card>
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Likely questions here"
+        note="Sports questions are usually event anchors, not deep sports trivia."
+        color="#f59e0b"
+        items={[
+          "Wimbledon = tennis. FA Cup = football. Grand National = horse racing.",
+          "Boat Race = Oxford vs Cambridge.",
+          "Rugby originated in England.",
+          "Torvill and Dean = gold medal ice skating pair.",
+        ]}
+      />
       {SPORTS_FACTS.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", gap: 12 }}>
@@ -238,6 +283,19 @@ export const ReligionTab = ({
         </div>
         <MemoryHook text="Identify the faith first, then the clue: Diwali-lights, Vaisakhi-Sikh New Year, Hanukkah-lights, Eid al-Fitr-end of Ramadan." />
       </Card>
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Likely questions here"
+        note="Religion questions are often short faith-to-festival matches."
+        color="#d97706"
+        items={[
+          "Christianity was the largest religion in the 2011 census.",
+          "Christmas and Easter = Christian festivals.",
+          "Diwali = Hindu lights festival. Vaisakhi = Sikh New Year.",
+          "Eid al-Fitr ends Ramadan.",
+        ]}
+      />
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>2011 Census — religious identity</div>
         {RELIGIONS.map((item) => (
@@ -329,6 +387,19 @@ export const LandmarksTab = ({
         </div>
         <MemoryHook text="Landmark questions are usually won by one clue: bell not tower, London home, outside London, longest river, Roman wall." />
       </Card>
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Likely questions here"
+        note="These place questions usually depend on one memorable clue."
+        color="#0ea5e9"
+        items={[
+          "Big Ben = bell, not the tower.",
+          "Buckingham Palace = monarch's official London home.",
+          "Windsor Castle = oldest occupied royal castle, outside central London.",
+          "River Severn = longest in the UK. Thames = longest in England.",
+        ]}
+      />
       {orderedLandmarks.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
