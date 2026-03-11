@@ -2,7 +2,7 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 324 quiz questions · 💡 Memory clues · ⚠️ Common Mix-Ups · 📅 Full timeline · 📝 Mock tests with saved progress
 
 Current release: `v1.20.0`
 
@@ -34,15 +34,15 @@ UI stack now uses:
 ## 📸 Screenshots
 
 <p align="center">
-  <img src="screenshots/mobile-nav.png" width="22%" alt="Mobile home and revision hub" />
+  <img src="screenshots/exam-topics.png" width="22%" alt="Exam topics course on mobile" />
   &nbsp;
-  <img src="screenshots/timeline.png" width="22%" alt="Timeline revision on mobile" />
+  <img src="screenshots/quick-facts-course.png" width="22%" alt="Quick Facts Course on mobile" />
   &nbsp;
-  <img src="screenshots/figures.png" width="22%" alt="Key historical figures on mobile" />
+  <img src="screenshots/common-mixups.png" width="22%" alt="Common Mix-Ups on mobile" />
   &nbsp;
-  <img src="screenshots/mock-progress.png" width="22%" alt="Mock paper tracker with saved scores" />
+  <img src="screenshots/inventors.png" width="22%" alt="Inventors page with page-specific mock on mobile" />
 </p>
-<p align="center"><strong>Current mobile views</strong> — revision hub, history timeline, key figures, and the saved mock-paper tracker.</p>
+<p align="center"><strong>Current mobile views</strong> — exam-topic course, quick facts course, common mix-ups, and a page-specific section mock.</p>
 
 ---
 
@@ -50,14 +50,17 @@ UI stack now uses:
 
 1. Open the app at the live link above.
 2. Use the top menu on desktop or the bottom navigation / quick panel on mobile.
-3. Start with `Quick Revise` for fast facts and memory clues.
-4. Use `Quiz` if you want normal practice with answer options:
+3. Start with `Exam Topics` if you want to complete the course by official-style exam area.
+4. Use `Quick Facts Course` for government, law, everyday life, and identity facts.
+5. Use `Quick Revise` for fast facts and memory clues.
+6. Use `Quiz` if you want normal practice with answer options:
    - show answers instantly
    - show answers at the end
    - include context and memory tips
-5. Use `Mock Test` for a more exam-style run.
-6. Use `Rapid Fire` for faster timed recall.
-7. Use `Revise Mistakes` to retry weak questions.
+7. Use `Mock Test` for a more exam-style run.
+8. Use page-specific mocks/tests inside sections like `Timeline`, `Key People`, `Inventors`, `Sports`, `Landmarks`, and `Common Mix-Ups` when you want to finish one topic properly.
+9. Use `Rapid Fire` for faster timed recall.
+10. Use `Revise Mistakes` to retry weak questions.
 
 ---
 
