@@ -67,6 +67,7 @@ const STORAGE_KEYS = {
   recentMock: "lifeuk-recent-mock",
   recentRapid: "lifeuk-recent-rapid",
   recentQuickRev: "lifeuk-recent-quickrev",
+  recentDates: "lifeuk-recent-dates",
   recentDaily10: "lifeuk-recent-daily10",
   recentSprint: "lifeuk-recent-sprint",
   quickRevState: "lifeuk-quickrev-state",
@@ -98,6 +99,7 @@ const SEO_COPY = {
   examtopics: { title: "Exam Topics Course | Life in the UK Test Practice" },
   quickrev: { title: "Quick Revision Cards | Life in the UK Test Practice" },
   story: { title: "Story Mode Revision | Life in the UK Test Practice" },
+  datesdrill: { title: "Dates Drill | Life in the UK Test Practice" },
   daily10: { title: "Daily 10 Revision | Life in the UK Test Practice" },
   sprint: { title: "True or False Sprint | Life in the UK Test Practice" },
   cram: { title: "One Page Cram Sheet | Life in the UK Test Practice" },
@@ -120,13 +122,13 @@ const NAV_GROUPS = [
   { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "story", "quiz", "mock"] },
   { title: "Core Course", hint: "Main pass-first sections and high-yield comparisons", ids: ["quickfacts", "nations", "timeline", "wars", "confuse", "figures"] },
   { title: "Culture & Reference", hint: "Religion, places, inventors, sport, arts, symbols, world organisations", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
-  { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
+  { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
 ];
 const MOBILE_MORE_GROUPS = [
   { title: "Study Now", hint: "Best next actions", ids: ["examtopics", "quickrev", "story", "confuse"] },
   { title: "Core Course", hint: "Finish the course in strong exam order", ids: ["quickfacts", "nations", "timeline", "wars", "figures"] },
   { title: "Culture & Reference", hint: "Browse the lower-priority fact sections", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
-  { title: "Review", hint: "Short drills and mistake work", ids: ["daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
+  { title: "Review", hint: "Short drills and mistake work", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
 ];
 const COVERAGE_AREAS = [
   { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
@@ -881,6 +883,55 @@ const buildConfusionDeck = () =>
       tip: `⭐ Compare mode — ${pair.memory}`,
     }];
   });
+
+const buildDatesDrillPool = () => {
+  const timelinePool = TIMELINE
+    .filter((item) => item.priority !== "detail")
+    .filter((item) => /\d/.test(String(item.year)))
+    .map((item) => ({
+      type: "timeline",
+      year: String(item.year),
+      label: item.event,
+      tip: item.memory,
+      context: `${item.era} history anchor`,
+    }));
+
+  const warPool = BATTLES_AND_WARS.map((item) => ({
+    type: "war",
+    year: String(item.years),
+    label: item.name,
+    tip: item.memory,
+    context: item.type,
+  }));
+
+  const combined = [...timelinePool, ...warPool];
+
+  return combined.flatMap((entry, index, pool) => {
+    const sameKind = pool.filter((item) => item.type === entry.type && item.label !== entry.label);
+    const otherYears = pool.filter((item) => item.year !== entry.year);
+
+    const eventDistractors = seededShuffle(sameKind, hashText(entry.label)).slice(0, 3).map((item) => item.label);
+    const yearDistractors = seededShuffle(otherYears, hashText(entry.year)).slice(0, 3).map((item) => item.year);
+
+    return [
+      {
+        q: `What happened in ${entry.year}?`,
+        opts: seededShuffle([entry.label, ...eventDistractors], 50000 + index),
+        a: 0,
+        tip: `📅 ${entry.context} — ${entry.tip}`,
+      },
+      {
+        q: `When was ${entry.label}?`,
+        opts: seededShuffle([entry.year, ...yearDistractors], 60000 + index),
+        a: 0,
+        tip: `📅 ${entry.context} — ${entry.tip}`,
+      },
+    ].map((question) => ({
+      ...question,
+      a: question.opts.findIndex((option) => option === (question.q.startsWith("When was") ? entry.year : entry.label)),
+    }));
+  });
+};
 
 const shuffleList = (items) => [...items].sort(() => Math.random() - 0.5);
 
@@ -2540,6 +2591,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         {[
           { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
           { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
+          { id: "datesdrill", icon: "🗓️", title: "Dates Drill", desc: "Lock in history years, events, and battle anchors quickly.", color: "#8b5cf6" },
           { id: "sprint", icon: "⚡", title: "True/False Sprint", desc: "Fast mobile revision with simple true/false calls.", color: "#0ea5e9" },
           { id: "confuse", icon: "⚖️", title: "Common Mix-Ups", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
           { id: "cram", icon: "📄", title: "One-Page Cram", desc: "Night-before summary of the highest-yield facts.", color: "#f59e0b" },
@@ -2575,6 +2627,138 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           </div>
         ))}
       </Card>
+    </div>
+  );
+};
+
+const DatesDrillTab = () => {
+  const [mode, setMode] = useState("mixed");
+  const [total, setTotal] = useState(12);
+  const [questions, setQuestions] = useState([]);
+  const [current, setCurrent] = useState(0);
+  const [selected, setSelected] = useState(null);
+  const [confirmed, setConfirmed] = useState(false);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const pool = useMemo(() => buildDatesDrillPool(), []);
+
+  const startDrill = () => {
+    const filtered = mode === "mixed"
+      ? pool
+      : pool.filter((item) => mode === "year" ? item.q.startsWith("What happened in") : item.q.startsWith("When was"));
+    const next = pickRandomNoRepeat(filtered, Math.min(total, filtered.length), STORAGE_KEYS.recentDates, 160)
+      .map((question, index) => prepareQuestionVariant(question, 32000 + index));
+    setQuestions(next);
+    setCurrent(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setFinished(false);
+    scrollPageTop();
+  };
+
+  const resetProgress = () => {
+    writeStore(STORAGE_KEYS.recentDates, []);
+    setQuestions([]);
+    setCurrent(0);
+    setSelected(null);
+    setConfirmed(false);
+    setScore(0);
+    setFinished(false);
+    scrollPageTop();
+  };
+
+  useEffect(() => {
+    startDrill();
+  }, [mode, total]);
+
+  if (!questions.length) return null;
+
+  const q = questions[current];
+
+  const nextQuestion = () => {
+    if (current + 1 >= questions.length) {
+      setFinished(true);
+      return;
+    }
+    setCurrent((value) => value + 1);
+    setSelected(null);
+    setConfirmed(false);
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <SectionTitle icon="🗓️" meta="Fix the highest-yield years, battles, reforms, and voting dates in short history drills.">Dates Drill</SectionTitle>
+      {!finished ? (
+        <>
+          <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>Date-first revision for history and wars</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Focus on year → event, event → year, or mix both. The app avoids recent repeats so you keep seeing fresh anchors.</div>
+              </div>
+              <Badge text={`${score}/${questions.length}`} color="#8b5cf6" />
+            </div>
+            <SettingGroup
+              label="Question style"
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: "mixed", label: "Mixed" },
+                { value: "year", label: "Year → event" },
+                { value: "event", label: "Event → year" },
+              ]}
+            />
+            <SettingGroup
+              label="How many questions?"
+              value={String(total)}
+              onChange={(value) => setTotal(Number(value))}
+              options={[
+                { value: "12", label: "12" },
+                { value: "24", label: "24" },
+                { value: "36", label: "36" },
+              ]}
+            />
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <button className="focus-ring" onClick={startDrill} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+                New set
+              </button>
+              <button className="focus-ring" onClick={resetProgress} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px", cursor: "pointer", fontWeight: 700 }}>
+                Reset progress
+              </button>
+            </div>
+          </Card>
+          <Badge text={`${current + 1} of ${questions.length}`} color="#64748b" />
+          <div style={{ height: 10 }} />
+          <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={(choice) => {
+            if (confirmed) return;
+            setSelected(choice);
+            setConfirmed(true);
+            if (choice === q.a) setScore((value) => value + 1);
+          }} />
+          {confirmed && (
+            <>
+              <MemoryHook text={q.tip} />
+              <button className="focus-ring" onClick={nextQuestion} style={{ width: "100%", marginTop: 12, padding: "12px 14px", borderRadius: 14, background: "var(--accent-soft)", color: "var(--accent-text)", border: "1px solid var(--accent)", fontWeight: 800, cursor: "pointer" }}>
+                {current + 1 >= questions.length ? "See dates results" : "Next date"}
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <Card style={{ textAlign: "center", border: `2px solid ${score >= Math.ceil(questions.length * 0.75) ? "#22c55e" : "#8b5cf6"}` }}>
+          <div style={{ fontSize: 48, marginBottom: 8 }}>{score >= Math.ceil(questions.length * 0.75) ? "📅" : "🛡️"}</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 8 }}>Dates Drill complete</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 12 }}>
+            {mode === "mixed" ? "Mixed year and event practice" : mode === "year" ? "Year to event practice" : "Event to year practice"}
+          </div>
+          <div style={{ fontSize: 34, fontWeight: 800, color: "var(--text-strong)", marginBottom: 16 }}>{score}/{questions.length}</div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="focus-ring" onClick={startDrill} style={{ background: "#8b5cf6", color: "#fff", border: "none", borderRadius: 12, padding: "10px 18px", fontWeight: 800, cursor: "pointer" }}>New dates set</button>
+            <button className="focus-ring" onClick={resetProgress} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 18px", cursor: "pointer" }}>Reset progress</button>
+          </div>
+        </Card>
+      )}
     </div>
   );
 };
@@ -6590,6 +6774,7 @@ const App = () => {
       case "examtopics": return <ExamTopicsModeTab setActive={navigateTo} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
       case "story": return <StoryModeTab setActive={navigateTo} />;
+      case "datesdrill": return <DatesDrillTab />;
       case "daily10": return <DailyTenTab />;
       case "sprint": return <TrueFalseSprintTab />;
       case "cram": return <CramSheetTab />;

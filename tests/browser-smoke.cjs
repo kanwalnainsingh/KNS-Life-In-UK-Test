@@ -151,6 +151,12 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "PROMPT");
     await waitForText(page, "ANSWER");
 
+    await page.goto(`${url}/#datesdrill`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Dates Drill");
+    await waitForText(page, "Year → event");
+    await clickFirstAnswerOption(page);
+    await waitForText(page, "Next date");
+
     await page.goto(`${url}/#quickfacts`, { waitUntil: "networkidle0" });
     await waitForText(page, "Quick Facts Course");
     await waitForText(page, "Complete course");

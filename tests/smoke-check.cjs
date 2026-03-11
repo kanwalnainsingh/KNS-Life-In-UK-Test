@@ -29,6 +29,7 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
   assert(data.TABS.some((tab) => tab.id === "examtopics"), "Exam topics tab missing");
   assert(data.TABS.some((tab) => tab.id === "story"), "Story mode tab missing");
+  assert(data.TABS.some((tab) => tab.id === "datesdrill"), "Dates drill tab missing");
   assert(data.TABS.some((tab) => tab.id === "wars"), "Wars tab missing");
   assert(data.TABS.some((tab) => tab.id === "daily10"), "Daily 10 tab missing");
   assert(data.TABS.some((tab) => tab.id === "sprint"), "Sprint tab missing");
@@ -39,6 +40,7 @@ const assert = (condition, message) => {
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
   assert(/ExamTopicsModeTab/.test(appSource), "Exam topics UI missing");
   assert(/StoryModeTab/.test(appSource), "Story mode UI missing");
+  assert(/DatesDrillTab/.test(appSource), "Dates drill UI missing");
   assert(/STORY_CHAPTERS/.test(appSource), "Story mode should use stable chapter data");
   assert(/WarsTab/.test(appSource), "Wars revision UI missing");
   assert(/DailyTenTab/.test(appSource), "Daily 10 UI missing");
@@ -58,6 +60,8 @@ const assert = (condition, message) => {
   assert(/Quick cards, full-course coverage/.test(appSource), "Quick revision hero missing");
   assert(/Date-first memory flow/.test(appSource), "Story mode chapter hero missing");
   assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
+  assert(/Dates Drill/.test(appSource), "Dates drill heading missing");
+  assert(/Year → event|Event → year/.test(appSource), "Dates drill mode options missing");
   assert(/Quick answer view/.test(appSource), "Quick revision auto-answer view missing");
   assert(/Show all now/.test(appSource), "Quick revision show-all action missing");
   assert(/Reset progress/.test(appSource), "Quick revision reset action missing");

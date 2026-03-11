@@ -1350,6 +1350,7 @@ const TABS = [
   { id:"examtopics",    label:"Exam Topics",  icon:"🧭" },
   { id:"quickrev",      label:"Quick Revise", icon:"↔️" },
   { id:"story",         label:"Story Mode",   icon:"📚" },
+  { id:"datesdrill",    label:"Dates Drill",  icon:"🗓️" },
   { id:"daily10",       label:"Daily 10",     icon:"🔟" },
   { id:"sprint",        label:"T/F Sprint",   icon:"⚡" },
   { id:"cram",          label:"Cram Sheet",   icon:"📄" },
