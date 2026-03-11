@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.18.3`
+Current release: `v1.19.0`
 
 ---
 
@@ -66,6 +66,7 @@ UI stack now uses:
 | Section | What it does |
 |---|---|
 | 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
+| 🧭 Exam Topics | Learn the course by exam-style topic areas: values, history, government, society, everyday life, and important people/events |
 | ↔️ Quick Revise | Fast card-by-card revision with topic filters, `Fresh mix`, `Pass core`, `Weak areas`, `Saved facts`, `Common traps`, `Dates`, and `4 Nations` focuses |
 | 📚 Story Mode | Chronological chapter-by-chapter revision with explicit dates, names, and pass-first memory anchors for the main history and modern-Britain story |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
@@ -119,6 +120,14 @@ UI stack now uses:
   - `Most tested first` war strip plus a `war to person` drill
   - war-only mini tests for dates, world wars, and battle traps
   - direct handoff into Story Mode, Timeline, and war-focused quick revision
+- New `Exam Topics` mode groups the course by likely exam area:
+  - British Values, Principles & Traditions
+  - UK History
+  - Government & Law
+  - Modern UK Society
+  - Everyday Life in the UK
+  - Important People & Events
+  - each topic has key facts, key names, and direct links into the best revision section
 - `Revise Mistakes` now also links into saved questions and weak-fact study
 - Bottom mobile navigation now keeps the main study flow visible:
   - `Home`

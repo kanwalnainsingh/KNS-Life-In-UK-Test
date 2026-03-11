@@ -27,6 +27,7 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "mock"), "Mock tab missing");
   assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
   assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
+  assert(data.TABS.some((tab) => tab.id === "examtopics"), "Exam topics tab missing");
   assert(data.TABS.some((tab) => tab.id === "story"), "Story mode tab missing");
   assert(data.TABS.some((tab) => tab.id === "wars"), "Wars tab missing");
   assert(data.TABS.some((tab) => tab.id === "daily10"), "Daily 10 tab missing");
@@ -36,6 +37,7 @@ const assert = (condition, message) => {
   assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
+  assert(/ExamTopicsModeTab/.test(appSource), "Exam topics UI missing");
   assert(/StoryModeTab/.test(appSource), "Story mode UI missing");
   assert(/STORY_CHAPTERS/.test(appSource), "Story mode should use stable chapter data");
   assert(/WarsTab/.test(appSource), "Wars revision UI missing");
@@ -63,6 +65,7 @@ const assert = (condition, message) => {
   assert(/<span>Menu<\/span>/.test(appSource), "Bottom menu label missing");
   assert(/Start here/.test(appSource), "Pass-focused start guidance missing");
   assert(/Pass guide/.test(appSource) && /Pass Plan/.test(appSource), "Saved pass plan UI missing");
+  assert(/Exam Topics Course/.test(appSource), "Exam topics course heading missing");
   assert(/Saved facts/.test(appSource), "Saved facts quick revision flow missing");
   assert(/const scrollPageTop =/.test(appSource), "Shared session scroll-top helper missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");

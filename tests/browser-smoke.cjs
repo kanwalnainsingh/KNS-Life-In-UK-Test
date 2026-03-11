@@ -115,6 +115,11 @@ const clickByText = async (page, text) => {
     await waitForText(page, "Check Update");
     await waitForText(page, "Continue your revision");
 
+    await page.goto(`${url}/#examtopics`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Exam Topics Course");
+    await waitForText(page, "British Values, Principles & Traditions");
+    await waitForText(page, "Important People & Events");
+
     await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0" });
     await waitForText(page, "Quick Revision");
     await waitForText(page, "Topic filter");
@@ -160,6 +165,7 @@ const clickByText = async (page, text) => {
 
     console.log("Browser smoke test passed:");
     console.log("- home loads with pass-guide shortcuts");
+    console.log("- exam topics course renders");
     console.log("- quick revision topic filter and card flow render");
     console.log("- story mode chapter handoff to quick revision works");
     console.log("- quick facts course group check renders");

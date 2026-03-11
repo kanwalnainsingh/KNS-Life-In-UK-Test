@@ -1352,6 +1352,7 @@ const ALL_QUIZ = [
 // ── TABS ─────────────────────────────────────────────────────
 const TABS = [
   { id:"home",          label:"Home",         icon:"🏠" },
+  { id:"examtopics",    label:"Exam Topics",  icon:"🧭" },
   { id:"quickrev",      label:"Quick Revise", icon:"↔️" },
   { id:"story",         label:"Story Mode",   icon:"📚" },
   { id:"daily10",       label:"Daily 10",     icon:"🔟" },

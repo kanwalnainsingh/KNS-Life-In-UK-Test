@@ -78,6 +78,7 @@ const STORAGE_KEYS = {
   storyChapter: "lifeuk-story-chapter",
   storyCompleted: "lifeuk-story-completed",
   quickFactsCourse: "lifeuk-quickfacts-course",
+  examTopicsMode: "lifeuk-examtopics-mode",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -93,6 +94,7 @@ const SEO_COPY = {
     title: "Life in the UK Test Practice for ILR and Citizenship",
     description: "Free Life in the UK test revision app with mock tests, practice questions, memory clues, history timeline, and UK citizenship study topics.",
   },
+  examtopics: { title: "Exam Topics Course | Life in the UK Test Practice" },
   quickrev: { title: "Quick Revision Cards | Life in the UK Test Practice" },
   story: { title: "Story Mode Revision | Life in the UK Test Practice" },
   daily10: { title: "Daily 10 Revision | Life in the UK Test Practice" },
@@ -112,9 +114,9 @@ const SEO_COPY = {
   figures: { title: "Key Historical Figures | Life in the UK Test Practice" },
 };
 
-const PRIMARY_DESKTOP_TABS = ["home", "quickrev", "story", "quiz", "mock", "timeline"];
+const PRIMARY_DESKTOP_TABS = ["home", "examtopics", "quickrev", "story", "quiz", "mock"];
 const NAV_GROUPS = [
-  { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "quickrev", "story", "daily10", "sprint", "mock", "cram", "tracker", "quiz", "rapidfire", "revise"] },
+  { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "story", "daily10", "sprint", "mock", "cram", "tracker", "quiz", "rapidfire", "revise"] },
   { title: "History & Society", hint: "Timeline, wars, nations, law, traps, landmarks", ids: ["timeline", "wars", "nations", "quickfacts", "confuse", "landmarks", "international"] },
   { title: "People & Culture", hint: "Figures, religion, inventors, sports, arts", ids: ["figures", "religion", "inventors", "sports", "arts", "anthem"] },
 ];
@@ -211,6 +213,111 @@ const PASS_PLANS = [
       { id: "mock", label: "One mock paper or Daily 10", tab: "mock" },
     ],
     color: "#10b981",
+  },
+];
+
+const EXAM_TOPIC_MODE_GROUPS = [
+  {
+    id: "values",
+    title: "British Values, Principles & Traditions",
+    approx: "3-5 questions",
+    covers: "Democracy, rule of law, individual liberty, tolerance, rights, responsibilities, national symbols, and major national days.",
+    keyFacts: [
+      "DRIM = Democracy, Rule of law, Individual liberty, Mutual respect and tolerance.",
+      "Rights include freedom of speech, religion, association, and a fair trial.",
+      "Responsibilities include obeying the law, paying taxes, jury service, and respecting others.",
+      "Church of England is the established church in England and the monarch is its head.",
+      "Union Flag and the four patron saints are classic identity facts.",
+    ],
+    people: ["Emmeline Pankhurst", "Elizabeth II"],
+    primaryTab: "quickfacts",
+    secondaryTab: "anthem",
+    quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
+  },
+  {
+    id: "history",
+    title: "UK History",
+    approx: "7-10 questions",
+    covers: "Romans, Anglo-Saxons, Vikings, Normans, Tudors, Stuarts, Industrial Revolution, reform, world wars, and welfare-state change.",
+    keyFacts: [
+      "Use a history spine: 43, 1066, 1215, 1534, 1588, 1707, 1805, 1815, 1914-18, 1939-45, 1948.",
+      "Caesar fails in 55 BC; Claudius succeeds in 43 AD.",
+      "1066 = Hastings and 1215 = Magna Carta are must-know anchors.",
+      "1534 = Henry VIII breaks with Rome; 1588 = Spanish Armada defeated.",
+      "1948 = NHS founded by Nye Bevan after WWII and the Beveridge plan.",
+    ],
+    people: ["William the Conqueror", "Henry VIII", "Elizabeth I", "Victoria", "Winston Churchill", "Clement Attlee"],
+    primaryTab: "story",
+    secondaryTab: "timeline",
+    quickFocus: { focus: "dates", topic: "History", sessionType: "short" },
+  },
+  {
+    id: "government",
+    title: "Government & Law",
+    approx: "3-5 questions",
+    covers: "Parliament, elections, the constitution, devolved governments, police, courts, legal principles, and jury service.",
+    keyFacts: [
+      "UK = constitutional monarchy and parliamentary democracy.",
+      "Parliament = Monarch + House of Commons + House of Lords.",
+      "650 MPs sit in the House of Commons.",
+      "Voting age = 18 and general elections happen at least every 5 years.",
+      "Supreme Court = highest court. Crown Court jury usually = 12 people.",
+    ],
+    people: ["Robert Walpole", "Speaker of the House of Commons"],
+    primaryTab: "quickfacts",
+    secondaryTab: "confuse",
+    quickFocus: { focus: "core", topic: "Law", sessionType: "short" },
+  },
+  {
+    id: "society",
+    title: "Modern UK Society",
+    approx: "2-4 questions",
+    covers: "Population, the 4 nations, religion, culture, sport, media, and modern British public life.",
+    keyFacts: [
+      "UK = England, Scotland, Wales, Northern Ireland.",
+      "Population in the handbook-era facts = just over 66 million in 2017.",
+      "Religious freedom matters, and many people have no religion.",
+      "BBC is the main public-service broadcaster funded mainly by the TV licence fee.",
+      "Know major sports and events like Wimbledon, Grand National, and the Boat Race.",
+    ],
+    people: ["The Beatles", "William Shakespeare", "J. K. Rowling"],
+    primaryTab: "religion",
+    secondaryTab: "sports",
+    quickFocus: { focus: "fresh", topic: "All topics", sessionType: "short" },
+  },
+  {
+    id: "everyday",
+    title: "Everyday Life in the UK",
+    approx: "2-4 questions",
+    covers: "Education, NHS, work, volunteering, community life, driving, taxes, and practical civic rules.",
+    keyFacts: [
+      "Compulsory school age is 5-16, but young people must stay in education or training until 18.",
+      "GCSEs are taken around 16; Scotland uses Highers instead of A-levels.",
+      "NHS is funded by taxes and free at the point of use.",
+      "National Insurance helps fund NHS, state pension, and benefits; council tax funds local services.",
+      "People drive on the left. 999 and 112 are emergency numbers; 101 is non-emergency police.",
+    ],
+    people: ["Aneurin Bevan", "School governors", "Civil servants"],
+    primaryTab: "quickfacts",
+    secondaryTab: "tracker",
+    quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
+  },
+  {
+    id: "people",
+    title: "Important People & Events",
+    approx: "2-3 questions",
+    covers: "Frequently tested rulers, reformers, scientists, writers, and a short list of named events that often come up directly.",
+    keyFacts: [
+      "Top names to lock in first: William the Conqueror, Henry VIII, Elizabeth I, Churchill, Pankhurst, Newton, Darwin, Fleming, Berners-Lee, Shakespeare.",
+      "Top events to lock in first: 1066 Hastings, 1605 Gunpowder Plot, 1666 Great Fire of London, WWI, WWII.",
+      "Henry VIII, Elizabeth I, Churchill, and Attlee link directly to major history anchors.",
+      "Newton, Darwin, Fleming, and Berners-Lee are the science names most worth learning first.",
+      "Shakespeare, Jane Austen, J. K. Rowling, and the Beatles cover a lot of culture questions quickly.",
+    ],
+    people: ["William the Conqueror", "Henry VIII", "Elizabeth I", "Winston Churchill", "Emmeline Pankhurst", "Isaac Newton"],
+    primaryTab: "figures",
+    secondaryTab: "wars",
+    quickFocus: { focus: "fresh", topic: "Key People", sessionType: "short" },
   },
 ];
 
@@ -1505,7 +1612,7 @@ const getHashTab = () => {
 };
 
 const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
-  const quickActions = ["quickrev", "mock", "quiz", "story"];
+  const quickActions = ["examtopics", "quickrev", "mock", "quiz", "story"];
   const currentTab = TABS.find((tab) => tab.id === active);
   const currentGroup = MOBILE_MORE_GROUPS.find((group) => group.ids.includes(active));
   return (
@@ -1567,6 +1674,7 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
                     <div className="text-sm font-bold">{item.label}</div>
                     <div className="mt-1 text-[11px] text-muted-foreground">
                       {item.id === "quickrev" ? "Fresh facts quickly" :
+                        item.id === "examtopics" ? "Learn by exam category" :
                         item.id === "mock" ? "Closest to the real test" :
                           item.id === "quiz" ? "Flexible practice mode" :
                             "Learn the course in order"}
@@ -2642,6 +2750,105 @@ const TrueFalseSprintTab = () => {
           </button>
         </Card>
       )}
+    </div>
+  );
+};
+
+const ExamTopicsModeTab = ({ setActive }) => {
+  const [completed, setCompleted] = useState(() => readStore(STORAGE_KEYS.examTopicsMode, []));
+  const completedSet = new Set(completed);
+  const doneCount = completedSet.size;
+  const progress = Math.round((doneCount / EXAM_TOPIC_MODE_GROUPS.length) * 100);
+
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.examTopicsMode, completed);
+  }, [completed]);
+
+  const toggleCompleted = (id) => {
+    setCompleted((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return [...next];
+    });
+  };
+
+  return (
+    <div className="topic-page">
+      <SectionTitle icon="🧭" meta="Use this mode when you want to complete the course by official-style exam topic rather than by section names.">Exam Topics Course</SectionTitle>
+      <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--card-bg)) 0%, color-mix(in srgb, #22c55e 8%, var(--card-bg)) 100%)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)", marginBottom: 6 }}>Complete the course by exam question area</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, maxWidth: 760 }}>
+              This mode groups the course the way learners often think about the test: values, history, government, society, everyday life, and important people/events.
+            </div>
+          </div>
+          <Badge text={`${doneCount}/${EXAM_TOPIC_MODE_GROUPS.length} topics done`} color="#22c55e" />
+        </div>
+        <Progress value={progress} className="h-2.5" />
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", marginTop: 16 }}>
+          <Button onClick={() => setActive("story")}>Start with history</Button>
+          <Button variant="secondary" onClick={() => setActive("quickfacts")}>Open civics facts</Button>
+          <Button variant="outline" onClick={() => setCompleted([])}>Reset topic progress</Button>
+        </div>
+      </Card>
+
+      {EXAM_TOPIC_MODE_GROUPS.map((group) => (
+        <Card key={group.id} style={{ border: `1px solid ${completedSet.has(group.id) ? "#22c55e55" : "var(--card-border)"}` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+            <div>
+              <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)" }}>{group.title}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{group.approx} • {group.covers}</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Badge text={group.approx} color="#3b82f6" />
+              <Badge text={completedSet.has(group.id) ? "Completed" : "Study next"} color={completedSet.has(group.id) ? "#22c55e" : "#64748b"} />
+            </div>
+          </div>
+
+          <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+            <div className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 800, marginBottom: 8 }}>Most worth remembering</div>
+              <div style={{ display: "grid", gap: 6 }}>
+                {group.keyFacts.map((fact) => (
+                  <div key={fact} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>• {fact}</div>
+                ))}
+              </div>
+            </div>
+            <div className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 12, color: "#8b5cf6", fontWeight: 800, marginBottom: 8 }}>Key people / names</div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
+                {group.people.map((person) => (
+                  <Badge key={person} text={person} color="#8b5cf6" />
+                ))}
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>
+                Learn the names above first. They cover most direct people questions from this exam area.
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Button onClick={() => setActive(group.primaryTab)}>Open main section</Button>
+            <Button variant="secondary" onClick={() => setActive(group.secondaryTab)}>Open related section</Button>
+            <Button variant="outline" onClick={() => launchQuickRevision(setActive, group.quickFocus)}>Quick revise this area</Button>
+            <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
+          </div>
+        </Card>
+      ))}
+
+      <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
+        title="Use this as your course map"
+        note="Best route: work through these six exam-topic blocks, then use Traps, Mock Test, and Revise Mistakes to turn the knowledge into pass-level recall."
+        actions={[
+          { label: "Open Traps", primary: true, onClick: () => setActive("confuse") },
+          { label: "Take a Mock", onClick: () => setActive("mock") },
+          { label: "Revise Mistakes", onClick: () => setActive("revise") },
+        ]}
+      />
     </div>
   );
 };
@@ -5881,6 +6088,7 @@ const App = () => {
   const renderTab = () => {
     switch (active) {
       case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
+      case "examtopics": return <ExamTopicsModeTab setActive={navigateTo} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
       case "story": return <StoryModeTab setActive={navigateTo} />;
       case "daily10": return <DailyTenTab />;
