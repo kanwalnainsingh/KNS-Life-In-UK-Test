@@ -75,6 +75,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added a `Most tested first` war strip and a `war to person` drill so the main battle/person/date pairings are easier to revise quickly.
 - Added `Exam Topics` mode, which groups the course by likely exam question areas and links each topic area into the most relevant study sections and quick revision flow.
 - Polished `Exam Topics` visually with topic-weight bars, restrained per-topic accents, stronger completed states, and clearer learner-first action hierarchy.
+- Added topic-specific mini mocks inside `Exam Topics`, built from the existing question bank with saved attempt history and wrong-answer review for each official-style topic block.
 - Added a `Continue learning` strip on Home and softened the bottom nav, quick panel, and floating scroll controls so the app feels cleaner and more guided on mobile.
 - Mock results now point learners to the weakest area and the most useful next revision step.
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.

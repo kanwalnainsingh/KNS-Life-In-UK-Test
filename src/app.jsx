@@ -79,6 +79,7 @@ const STORAGE_KEYS = {
   storyCompleted: "lifeuk-story-completed",
   quickFactsCourse: "lifeuk-quickfacts-course",
   examTopicsMode: "lifeuk-examtopics-mode",
+  examTopicMocks: "lifeuk-examtopic-mocks",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -236,6 +237,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     primaryTab: "quickfacts",
     secondaryTab: "anthem",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
+    mockCount: 8,
+    match: /democracy|rule of law|individual liberty|mutual respect|tolerance|rights|responsibilit|freedom of speech|freedom of religion|human rights|church of england|union flag|union jack|st george|st andrew|st david|st patrick|bonfire night|remembrance day|paying taxes|jury service/i,
   },
   {
     id: "history",
@@ -256,6 +259,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     primaryTab: "story",
     secondaryTab: "timeline",
     quickFocus: { focus: "dates", topic: "History", sessionType: "short" },
+    mockCount: 12,
+    match: /roman|caesar|claudius|boudicca|hadrian|anglo-saxon|viking|athelstan|hastings|1066|domesday|magna carta|model parliament|bannockburn|bosworth|tudor|stuart|reformation|armada|civil war|glorious revolution|industrial revolution|reform act|chartist|victoria|peterloo|world war|battle of britain|blitz|d-day|beveridge|nhs|devolution/i,
   },
   {
     id: "government",
@@ -276,6 +281,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     primaryTab: "quickfacts",
     secondaryTab: "confuse",
     quickFocus: { focus: "core", topic: "Law", sessionType: "short" },
+    mockCount: 10,
+    match: /constitutional monarchy|parliamentary democracy|house of commons|house of lords|monarch|prime minister|cabinet|speaker|650 mp|mps|general election|voting age|first-past-the-post|electoral register|secret ballot|senedd|holyrood|stormont|supreme court|jury|magistrate|crown court|court of session|children's hearing|police|crime commissioner|civil servant|innocent until proven guilty|fair trial/i,
   },
   {
     id: "society",
@@ -296,6 +303,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     primaryTab: "religion",
     secondaryTab: "sports",
     quickFocus: { focus: "fresh", topic: "All topics", sessionType: "short" },
+    mockCount: 8,
+    match: /population|religion|church of england|church of scotland|bbc|tv licence|football|rugby|cricket|tennis|wimbledon|grand national|boat race|marathon|festival|christmas|easter|diwali|eid|vaisakhi|burns night|hogmanay|mothering sunday|beatles|shakespeare|jane austen|j\. k\. rowling|arts|sport/i,
   },
   {
     id: "everyday",
@@ -316,6 +325,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     primaryTab: "quickfacts",
     secondaryTab: "tracker",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
+    mockCount: 8,
+    match: /education|training until 18|gcse|highers|a-level|nhs|gp|national insurance|council tax|minimum wage|equality act|volunteer|charity|school governor|blood donation|driv|999|112|101|seat belt|lottery|census|settlement|citizenship|language requirement/i,
   },
   {
     id: "people",
@@ -336,6 +347,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     primaryTab: "figures",
     secondaryTab: "wars",
     quickFocus: { focus: "fresh", topic: "Key People", sessionType: "short" },
+    mockCount: 8,
+    match: /william the conqueror|henry viii|elizabeth i|victoria|churchill|attlee|robert walpole|emmeline pankhurst|nightingale|mary seacole|isaac newton|charles darwin|alexander fleming|tim berners-lee|shakespeare|jane austen|j\. k\. rowling|beatles|gunpowder plot|great fire of london|battle of hastings/i,
   },
 ];
 
@@ -2001,6 +2014,31 @@ const buildMockCategoryBreakdown = (questions, answers) =>
     })
     .filter((row) => row.total > 0);
 
+const buildExamTopicQuestionPool = (group) =>
+  ALL_QUIZ.filter((question) => group.match.test(`${question.q} ${question.tip}`));
+
+const buildExamTopicMockProgress = (history) =>
+  history.reduce((acc, item) => {
+    const prev = acc[item.groupId] || {
+      attempts: 0,
+      bestPercent: 0,
+      lastPercent: 0,
+      lastScore: 0,
+      total: item.total,
+      lastAt: item.at,
+    };
+    const percent = Math.round((item.score / item.total) * 100);
+    acc[item.groupId] = {
+      attempts: prev.attempts + 1,
+      bestPercent: Math.max(prev.bestPercent, percent),
+      lastPercent: percent,
+      lastScore: item.score,
+      total: item.total,
+      lastAt: item.at,
+    };
+    return acc;
+  }, {});
+
 // ── TAB BAR ──────────────────────────────────────────────────
 const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel, isMobile }) => {
   useEffect(() => {
@@ -2801,14 +2839,43 @@ const TrueFalseSprintTab = () => {
 
 const ExamTopicsModeTab = ({ setActive }) => {
   const [completed, setCompleted] = useState(() => readStore(STORAGE_KEYS.examTopicsMode, []));
+  const [topicMockHistory, setTopicMockHistory] = useState(() => readStore(STORAGE_KEYS.examTopicMocks, []));
+  const [topicMock, setTopicMock] = useState({
+    groupId: null,
+    questions: [],
+    current: 0,
+    selected: null,
+    confirmed: false,
+    score: 0,
+    wrong: [],
+    finished: false,
+  });
   const completedSet = new Set(completed);
   const doneCount = completedSet.size;
   const progress = Math.round((doneCount / EXAM_TOPIC_MODE_GROUPS.length) * 100);
   const examWeightTotal = EXAM_TOPIC_MODE_GROUPS.reduce((sum, group) => sum + group.weight, 0);
+  const topicMockProgress = useMemo(() => buildExamTopicMockProgress(topicMockHistory), [topicMockHistory]);
+  const groupedTopics = useMemo(() => EXAM_TOPIC_MODE_GROUPS.map((group) => ({
+    ...group,
+    questionPool: buildExamTopicQuestionPool(group),
+  })), []);
+  const totalCoveredQuestions = useMemo(() => {
+    const seen = new Set();
+    groupedTopics.forEach((group) => group.questionPool.forEach((question) => seen.add(question.q)));
+    return seen.size;
+  }, [groupedTopics]);
 
   useEffect(() => {
     writeStore(STORAGE_KEYS.examTopicsMode, completed);
   }, [completed]);
+
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.examTopicMocks, topicMockHistory);
+  }, [topicMockHistory]);
+
+  useEffect(() => {
+    if (topicMock.finished && topicMock.wrong.length) saveWrongQuestions(topicMock.wrong);
+  }, [topicMock.finished, topicMock.wrong]);
 
   const toggleCompleted = (id) => {
     setCompleted((prev) => {
@@ -2819,6 +2886,64 @@ const ExamTopicsModeTab = ({ setActive }) => {
     });
   };
 
+  const startTopicMock = (groupId) => {
+    const group = groupedTopics.find((item) => item.id === groupId) || groupedTopics[0];
+    const count = Math.min(group.mockCount, group.questionPool.length);
+    if (!count) return;
+    const questions = pickRandomNoRepeat(group.questionPool, count, `lifeuk-recent-examtopic-${group.id}`, 60)
+      .map((question, index) => prepareQuestionVariant(question, 28000 + index + hashText(group.id)));
+    setTopicMock({
+      groupId: group.id,
+      questions,
+      current: 0,
+      selected: null,
+      confirmed: false,
+      score: 0,
+      wrong: [],
+      finished: false,
+    });
+    scrollPageTop();
+  };
+
+  const answerTopicMockQuestion = (optionIndex) => {
+    if (topicMock.confirmed || topicMock.finished) return;
+    const question = topicMock.questions[topicMock.current];
+    const isCorrect = optionIndex === question.a;
+    setTopicMock((prev) => ({
+      ...prev,
+      selected: optionIndex,
+      confirmed: true,
+      score: prev.score + (isCorrect ? 1 : 0),
+      wrong: isCorrect ? prev.wrong : [...prev.wrong, { ...question, chosen: optionIndex }],
+    }));
+  };
+
+  const finishTopicMock = () => {
+    setTopicMock((prev) => ({ ...prev, finished: true }));
+    setTopicMockHistory((prev) => ([
+      ...prev,
+      {
+        groupId: topicMock.groupId,
+        score: topicMock.score,
+        total: topicMock.questions.length,
+        at: new Date().toISOString(),
+      },
+    ]));
+  };
+
+  const nextTopicMockQuestion = () => {
+    if (topicMock.current + 1 >= topicMock.questions.length) {
+      finishTopicMock();
+      return;
+    }
+    setTopicMock((prev) => ({
+      ...prev,
+      current: prev.current + 1,
+      selected: null,
+      confirmed: false,
+    }));
+  };
+
   return (
     <div className="topic-page">
       <SectionTitle icon="🧭" meta="Use this mode when you want to complete the course by official-style exam topic rather than by section names.">Exam Topics Course</SectionTitle>
@@ -2827,7 +2952,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
           <div>
             <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)", marginBottom: 6 }}>Complete the course by exam question area</div>
             <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, maxWidth: 760 }}>
-              This mode groups the course the way learners often think about the test: values, history, government, society, everyday life, and important people/events.
+              This mode groups the course the way learners often think about the test: values, history, government, society, everyday life, and important people/events. Each topic now also has its own mini mock from the existing question bank.
             </div>
           </div>
           <Badge text={`${doneCount}/${EXAM_TOPIC_MODE_GROUPS.length} topics done`} color="#22c55e" />
@@ -2837,6 +2962,18 @@ const ExamTopicsModeTab = ({ setActive }) => {
           <Button onClick={() => setActive("story")}>Start with history</Button>
           <Button variant="secondary" onClick={() => setActive("quickfacts")}>Open civics facts</Button>
           <Button variant="outline" onClick={() => setCompleted([])}>Reset topic progress</Button>
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginTop: 14 }}>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "var(--accent)", fontWeight: 800, marginBottom: 4 }}>Question coverage</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{totalCoveredQuestions} bank questions</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>Across these six topic blocks, the section now covers the main handbook-style course through the current question bank.</div>
+          </div>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "#f97316", fontWeight: 800, marginBottom: 4 }}>Topic mocks</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{Object.keys(topicMockProgress).length}/{groupedTopics.length} attempted</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>Use the mini mock in each topic card to turn reading into recall before full 24-question papers.</div>
+          </div>
         </div>
       </Card>
 
@@ -2849,7 +2986,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
           <Badge text="Learn biggest topics first" color="#f97316" />
         </div>
         <div style={{ display: "grid", gap: 10 }}>
-          {EXAM_TOPIC_MODE_GROUPS.map((group) => (
+          {groupedTopics.map((group) => (
             <div key={group.id} style={{ display: "grid", gap: 8 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -2869,7 +3006,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
         </div>
       </Card>
 
-      {EXAM_TOPIC_MODE_GROUPS.map((group) => (
+      {groupedTopics.map((group) => (
         <Card key={group.id} style={{ border: `1px solid ${completedSet.has(group.id) ? "#22c55e55" : `${group.color}2f`}`, background: completedSet.has(group.id) ? "color-mix(in srgb, #22c55e 5%, var(--card-bg))" : `color-mix(in srgb, ${group.color} 4%, var(--card-bg))` }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "flex-start", marginBottom: 12 }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -2924,9 +3061,95 @@ const ExamTopicsModeTab = ({ setActive }) => {
             </div>
           </div>
 
+          <Card style={{ border: `1px solid color-mix(in srgb, ${group.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${group.color} 6%, var(--card-bg))`, marginBottom: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>Topic mock</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
+                  {group.questionPool.length} questions available in the bank for this topic. Use a short {Math.min(group.mockCount, group.questionPool.length)}-question mock to lock the area in.
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <Badge text={`${group.questionPool.length} questions`} color={group.color} />
+                {topicMockProgress[group.id] && <Badge text={`Best ${topicMockProgress[group.id].bestPercent}%`} color="#22c55e" />}
+              </div>
+            </div>
+            {topicMockProgress[group.id] && (
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
+                Attempts: {topicMockProgress[group.id].attempts} • Last score: {topicMockProgress[group.id].lastScore}/{topicMockProgress[group.id].total}
+              </div>
+            )}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <Button variant="outline" onClick={() => startTopicMock(group.id)}>{topicMock.groupId === group.id && !topicMock.finished ? "Restart topic mock" : "Start topic mock"}</Button>
+            </div>
+
+            {topicMock.groupId === group.id && topicMock.questions.length > 0 && (
+              <div style={{ marginTop: 14 }}>
+                {!topicMock.finished ? (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+                      <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Question {topicMock.current + 1} of {topicMock.questions.length}</div>
+                      <Badge text={`${topicMock.score}/${topicMock.questions.length}`} color={group.color} />
+                    </div>
+                    <QuestionCard
+                      question={topicMock.questions[topicMock.current]}
+                      selected={topicMock.selected}
+                      confirmed={topicMock.confirmed}
+                      onSelect={answerTopicMockQuestion}
+                    />
+                    {topicMock.confirmed && (
+                      <div style={{ marginTop: 12 }}>
+                        <div className="subtle-panel" style={{ padding: 12, marginBottom: 10 }}>
+                          <div style={{ fontSize: 12, color: group.color, fontWeight: 800, marginBottom: 4 }}>Why this question matters</div>
+                          <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{buildMockAnswerContext(topicMock.questions[topicMock.current])}</div>
+                        </div>
+                        <MemoryHook text={topicMock.questions[topicMock.current].tip.replace(/^[⭐📌💡]\s*/, "")} />
+                        <Button className="mt-3 w-full" onClick={nextTopicMockQuestion}>
+                          {topicMock.current + 1 >= topicMock.questions.length ? "Finish topic mock" : "Next question"}
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div style={{ fontWeight: 900, fontSize: 22, color: "var(--text-strong)", marginBottom: 6 }}>
+                      Topic mock score: {topicMock.score}/{topicMock.questions.length}
+                    </div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
+                      Use this result to decide whether this topic is ready for full mocks or needs one more pass through the facts and traps.
+                    </div>
+                    {topicMock.wrong.length > 0 && (
+                      <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+                        {topicMock.wrong.map((question, index) => (
+                          <Card key={`${question.q}-${index}`} style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+                            <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 6 }}>{question.q}</div>
+                            <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>
+                              <div>Your answer: <strong>{question.opts[question.chosen] || "No answer"}</strong></div>
+                              <div>Correct answer: <strong>{question.opts[question.a]}</strong></div>
+                            </div>
+                            <div className="subtle-panel" style={{ padding: 12, marginTop: 10, marginBottom: 10 }}>
+                              <div style={{ fontSize: 12, color: group.color, fontWeight: 800, marginBottom: 4 }}>Why this matters</div>
+                              <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{buildMockAnswerContext(question)}</div>
+                            </div>
+                            <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                          </Card>
+                        ))}
+                      </div>
+                    )}
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                      <Button onClick={() => startTopicMock(group.id)}>Retake topic mock</Button>
+                      <Button variant="secondary" onClick={() => launchQuickRevision(setActive, group.quickFocus)}>Quick revise this topic</Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </Card>
+
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Button onClick={() => setActive(group.primaryTab)} className="min-w-[156px]">{`Study ${group.title.split(" ")[0]}`}</Button>
             <Button variant="secondary" onClick={() => launchQuickRevision(setActive, group.quickFocus)} className="min-w-[156px]">Quick revise</Button>
+            <Button variant="outline" onClick={() => startTopicMock(group.id)}>Topic mock</Button>
             <Button variant="outline" onClick={() => setActive(group.secondaryTab)}>Open related</Button>
             <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
           </div>

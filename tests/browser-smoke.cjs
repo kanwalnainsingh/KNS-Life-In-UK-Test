@@ -119,6 +119,9 @@ const clickByText = async (page, text) => {
     await waitForText(page, "Exam Topics Course");
     await waitForText(page, "British Values, Principles & Traditions");
     await waitForText(page, "Important People & Events");
+    await waitForText(page, "Question coverage");
+    await clickByText(page, "Start topic mock");
+    await waitForText(page, "Question 1 of");
 
     await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0" });
     await waitForText(page, "Quick Revision");
