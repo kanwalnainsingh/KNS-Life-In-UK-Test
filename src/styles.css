@@ -207,8 +207,9 @@
   }
 
   .mobile-bottom-nav {
-    @apply fixed inset-x-3 bottom-3 z-[120] flex items-center justify-between rounded-[28px] border border-border bg-background/90 px-2.5 py-2 shadow-soft backdrop-blur-xl;
+    @apply fixed inset-x-3 bottom-3 z-[120] flex items-center justify-between rounded-[28px] border border-border bg-background/80 px-2.5 py-2 shadow-soft backdrop-blur-xl;
     padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
   }
 
   .mobile-nav-item {
@@ -220,11 +221,12 @@
   }
 
   .mobile-nav-item[data-active="false"] {
-    @apply text-muted-foreground;
+    @apply text-muted-foreground opacity-90;
   }
 
   .mobile-nav-menu {
     @apply rounded-[22px] border border-primary/20 bg-primary/10 text-primary;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.12);
   }
 
   .desktop-menu-shell {
@@ -286,15 +288,16 @@
   }
 
   .study-menu-primary {
-    @apply rounded-[22px] border px-3 py-3 text-left transition-colors;
+    @apply rounded-[22px] border px-3 py-3 text-left transition-all;
   }
 
   .study-menu-primary[data-active="true"] {
     @apply border-primary bg-primary/10 text-primary;
+    box-shadow: 0 8px 18px rgba(59, 130, 246, 0.12);
   }
 
   .study-menu-primary[data-active="false"] {
-    @apply border-border bg-card text-foreground;
+    @apply border-border bg-card/90 text-foreground;
   }
 
   .study-menu-card-compact[data-active="false"] {
@@ -315,7 +318,7 @@
 
   .mobile-scroll-top,
   .mobile-scroll-bottom {
-    @apply fixed right-4 z-[121] flex items-center gap-1.5 rounded-full border border-primary/20 bg-background/95 px-3 py-2 text-xs font-extrabold text-foreground shadow-soft backdrop-blur transition-all;
+    @apply fixed right-4 z-[121] flex items-center gap-1.5 rounded-full border border-primary/20 bg-background/80 px-2.5 py-1.5 text-[11px] font-extrabold text-foreground shadow-soft backdrop-blur transition-all;
   }
 
   .mobile-scroll-top {
@@ -360,5 +363,17 @@
 
   .result-shell {
     @apply rounded-[24px] border p-5 shadow-soft;
+  }
+
+  .continue-learning-grid {
+    @apply grid gap-3 md:grid-cols-3;
+  }
+
+  .continue-learning-card {
+    @apply rounded-2xl border border-border bg-card/90 p-4 text-left shadow-soft transition-all;
+  }
+
+  .continue-learning-card:hover {
+    transform: translateY(-1px);
   }
 }

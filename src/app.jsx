@@ -2153,6 +2153,8 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const bookmarks = useMemo(() => loadBookmarks(), []);
   const trackerProgress = useMemo(() => readStore(STORAGE_KEYS.topicTracker, {}), []);
   const storyChapterIndex = useMemo(() => readStore(STORAGE_KEYS.storyChapter, 0), []);
+  const examTopicsProgress = useMemo(() => readStore(STORAGE_KEYS.examTopicsMode, []), []);
+  const lastActiveTabId = useMemo(() => readStore(STORAGE_KEYS.activeTab, "home"), []);
   const trackerCompleted = TRACKER_SECTIONS.filter((item) => trackerProgress[item.id]).length;
   const quickRevRatings = useMemo(() => readStore(STORAGE_KEYS.quickRevRatings, {}), []);
   const hardCardCount = Object.values(quickRevRatings).filter((item) => (item?.hard || 0) > (item?.easy || 0)).length;
@@ -2168,6 +2170,8 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const currentPlan = PASS_PLANS.find((plan) => plan.id === selectedPlan) || PASS_PLANS[0];
   const completedPlanSteps = currentPlan.steps.filter((step) => planProgress.done?.[`${currentPlan.id}:${step.id}`]).length;
   const nextStoryChapter = STORY_CHAPTERS[Math.min(storyChapterIndex, STORY_CHAPTERS.length - 1)];
+  const lastActiveTab = TABS.find((tab) => tab.id === lastActiveTabId && tab.id !== "home");
+  const nextExamTopic = EXAM_TOPIC_MODE_GROUPS.find((group) => !examTopicsProgress.includes(group.id)) || EXAM_TOPIC_MODE_GROUPS[0];
   const nextBestAction = wrongQuestions.length > 6
     ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
     : bestPaperScore < 75
@@ -2263,6 +2267,29 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
             <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} plan steps done`} color={currentPlan.color} />
             <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
           </div>
+        </div>
+        <div className="continue-learning-grid mb-4">
+          <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Continue learning</div>
+            <div className="mb-1 text-base font-extrabold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} ${lastActiveTab.label}` : "↔️ Quick Revise"}</div>
+            <div className="text-sm leading-6 text-muted-foreground">
+              {lastActiveTab ? "Jump back into the last section you used." : "Start with the fastest study mode for quick recall."}
+            </div>
+          </button>
+          <button className="focus-ring continue-learning-card" onClick={() => setActive("examtopics")}>
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Next unfinished topic</div>
+            <div className="mb-1 text-base font-extrabold text-foreground">🧭 {nextExamTopic.title}</div>
+            <div className="text-sm leading-6 text-muted-foreground">
+              {examTopicsProgress.length}/{EXAM_TOPIC_MODE_GROUPS.length} exam-topic areas done. Use this to keep course coverage moving.
+            </div>
+          </button>
+          <button className="focus-ring continue-learning-card" onClick={() => setActive("mock")}>
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Latest test pressure</div>
+            <div className="mb-1 text-base font-extrabold text-foreground">{latestMock ? `📝 ${latestMock.paperTitle}` : "📝 Mock Test"}</div>
+            <div className="text-sm leading-6 text-muted-foreground">
+              {latestMock ? `Last result ${latestMock.score}/24. ${nextPaper.title} is the next paper to keep moving.` : "No paper done yet. Start a balanced mock when you want exam-format practice."}
+            </div>
+          </button>
         </div>
         <div className="dashboard-grid">
           <div className="card-stack">
