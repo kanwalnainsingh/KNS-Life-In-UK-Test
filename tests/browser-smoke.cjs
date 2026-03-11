@@ -92,6 +92,15 @@ const clickByText = async (page, text) => {
   });
 };
 
+const clickFirstAnswerOption = async (page) => {
+  const handles = await page.$x(`//button[contains(@class, "option-button")]`);
+  assert(handles.length > 0, "Could not find any quiz option buttons");
+  await handles[0].evaluate((element) => {
+    element.scrollIntoView({ block: "center", inline: "center" });
+    element.click();
+  });
+};
+
 (async () => {
   assert(fs.existsSync(path.join(DOCS_DIR, "index.html")), "Built docs/ output is required. Run npm run build first.");
 
@@ -122,6 +131,10 @@ const clickByText = async (page, text) => {
     await waitForText(page, "Question coverage");
     await clickByText(page, "Start topic mock");
     await waitForText(page, "Question 1 of");
+    await clickFirstAnswerOption(page);
+    await waitForText(page, "Why this question matters");
+    await clickByText(page, "Next question");
+    await waitForText(page, "Question 2 of");
 
     await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0" });
     await waitForText(page, "Quick Revision");
