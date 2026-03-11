@@ -108,7 +108,7 @@ const SEO_COPY = {
   timeline: { title: "History Timeline | Life in the UK Test Practice" },
   wars: { title: "Wars and Battles Revision | Life in the UK Test Practice" },
   nations: { title: "4 Nations Revision | Life in the UK Test Practice" },
-  confuse: { title: "Confusing Topics and Comparisons | Life in the UK Test Practice" },
+  confuse: { title: "Common Mix-Ups | Life in the UK Test Practice" },
   quickfacts: { title: "Quick Facts | Life in the UK Test Practice" },
   landmarks: { title: "Landmarks and Places | Life in the UK Test Practice" },
   religion: { title: "Religion and Festivals | Life in the UK Test Practice" },
@@ -117,15 +117,16 @@ const SEO_COPY = {
 
 const PRIMARY_DESKTOP_TABS = ["home", "examtopics", "quickrev", "story", "quiz", "mock"];
 const NAV_GROUPS = [
-  { title: "Study Modes", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "story", "daily10", "sprint", "mock", "cram", "tracker", "quiz", "rapidfire", "revise"] },
-  { title: "History & Society", hint: "Timeline, wars, nations, law, traps, landmarks", ids: ["timeline", "wars", "nations", "quickfacts", "confuse", "landmarks", "international"] },
-  { title: "People & Culture", hint: "Figures, religion, inventors, sports, arts", ids: ["figures", "religion", "inventors", "sports", "arts", "anthem"] },
+  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "story", "quiz", "mock"] },
+  { title: "Core Course", hint: "Main pass-first sections and high-yield comparisons", ids: ["quickfacts", "nations", "timeline", "wars", "confuse", "figures"] },
+  { title: "Culture & Reference", hint: "Religion, places, inventors, sport, arts, symbols, world organisations", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
+  { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
 ];
 const MOBILE_MORE_GROUPS = [
-  { title: "History", hint: "Main history sections and people", ids: ["timeline", "wars", "figures"] },
-  { title: "Nations & Society", hint: "4 nations, civics, religion, landmarks", ids: ["nations", "quickfacts", "religion", "landmarks"] },
-  { title: "Culture & Knowledge", hint: "Arts, sport, inventors, symbols, world organisations", ids: ["arts", "sports", "inventors", "anthem", "international"] },
-  { title: "High-Yield", hint: "Best sections for fast marks and traps", ids: ["confuse", "cram", "tracker", "revise"] },
+  { title: "Study Now", hint: "Best next actions", ids: ["examtopics", "quickrev", "story", "confuse"] },
+  { title: "Core Course", hint: "Finish the course in strong exam order", ids: ["quickfacts", "nations", "timeline", "wars", "figures"] },
+  { title: "Culture & Reference", hint: "Browse the lower-priority fact sections", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
+  { title: "Review", hint: "Short drills and mistake work", ids: ["daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
 ];
 const COVERAGE_AREAS = [
   { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
@@ -148,7 +149,7 @@ const START_HERE_PATHS = [
     steps: [
       { label: "Start with Story Mode", tab: "story" },
       { label: "Then do Quick Revise Pass Core", tab: "quickrev" },
-      { label: "Use Traps before your first mock", tab: "confuse" },
+      { label: "Use Common Mix-Ups before your first mock", tab: "confuse" },
     ],
     color: "#3b82f6",
   },
@@ -170,7 +171,7 @@ const START_HERE_PATHS = [
     steps: [
       { label: "Start with Mock Test 1", tab: "mock" },
       { label: "Use Revise Mistakes after each paper", tab: "revise" },
-      { label: "Use Traps for repeat confusions", tab: "confuse" },
+      { label: "Use Common Mix-Ups for repeat confusions", tab: "confuse" },
     ],
     color: "#22c55e",
   },
@@ -188,7 +189,7 @@ const PASS_PLANS = [
       { id: "people", label: "Key People + Wars & Battles", tab: "figures" },
       { id: "core", label: "Quick Revise Pass Core", tab: "quickrev" },
       { id: "mock1", label: "Mock Test + Revise Mistakes", tab: "mock" },
-      { id: "final", label: "Cram Sheet + Traps + final mock", tab: "cram" },
+      { id: "final", label: "Cram Sheet + Mix-Ups + final mock", tab: "cram" },
     ],
     color: "#3b82f6",
   },
@@ -197,7 +198,7 @@ const PASS_PLANS = [
     title: "3-day push",
     note: "Best if the test is close and you need only the highest-yield sequence.",
     steps: [
-      { id: "day1", label: "Story Mode + 4 Nations + Traps", tab: "story" },
+      { id: "day1", label: "Story Mode + 4 Nations + Mix-Ups", tab: "story" },
       { id: "day2", label: "Quick Revise Pass Core + Daily 10", tab: "quickrev" },
       { id: "day3", label: "Mock Test + Revise Mistakes + Cram Sheet", tab: "mock" },
     ],
@@ -210,7 +211,7 @@ const PASS_PLANS = [
     steps: [
       { id: "cram", label: "One-Page Cram Sheet", tab: "cram" },
       { id: "core", label: "Quick Revise Pass Core", tab: "quickrev" },
-      { id: "traps", label: "Traps + 4 Nations quick pass", tab: "confuse" },
+      { id: "traps", label: "Mix-Ups + 4 Nations quick pass", tab: "confuse" },
       { id: "mock", label: "One mock paper or Daily 10", tab: "mock" },
     ],
     color: "#10b981",
@@ -1786,7 +1787,7 @@ const MOCK_CATEGORY_META = {
   civics: { label: "Government & Law", icon: "⚖️", color: "#22c55e", hint: "Parliament, voting, values, rights, duties, courts, and citizenship." },
   nations: { label: "4 Nations & Places", icon: "🗺️", color: "#0ea5e9", hint: "Capitals, saints, parliaments, symbols, and geography." },
   culture: { label: "People & Culture", icon: "🎭", color: "#8b5cf6", hint: "Religion, festivals, inventors, arts, sport, landmarks, and famous people." },
-  traps: { label: "Compare Traps", icon: "⚠️", color: "#ef4444", hint: "Common mix-ups that often cost easy marks under pressure." },
+  traps: { label: "Common Mix-Ups", icon: "⚠️", color: "#ef4444", hint: "Side-by-side differences that often cost easy marks under pressure." },
 };
 
 const MOCK_DISTRIBUTION = [
@@ -2225,7 +2226,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
       ? { title: `Take ${nextPaper.title}`, detail: "You need repeated exam-format practice to reach a safe pass score.", tab: "mock" }
       : hardCardCount > 0
         ? { title: "Run a Weak Areas quick session", detail: `${hardCardCount} quick-revision cards are still marked hard.`, tab: "quickrev" }
-        : { title: "Use Traps for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
+        : { title: "Use Common Mix-Ups for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const visibleFacts = useMemo(() => {
@@ -2292,7 +2293,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <div className="hero-summary-grid">
           <div className="support-card-strong">
             <div className="eyebrow mb-2">Best starting path</div>
-            <div className="text-base font-extrabold text-foreground">Quick Revise → Traps → Mock</div>
+            <div className="text-base font-extrabold text-foreground">Quick Revise → Mix-Ups → Mock</div>
             <div className="mt-2 text-sm leading-6 text-muted-foreground">Use short revision first, lock in the main mix-ups, then move into balanced full papers.</div>
           </div>
           <div className="support-card">
@@ -2511,7 +2512,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
           { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
           { id: "sprint", icon: "⚡", title: "True/False Sprint", desc: "Fast mobile revision with simple true/false calls.", color: "#0ea5e9" },
-          { id: "confuse", icon: "⚖️", title: "Compare Confusions", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
+          { id: "confuse", icon: "⚖️", title: "Common Mix-Ups", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
           { id: "cram", icon: "📄", title: "One-Page Cram", desc: "Night-before summary of the highest-yield facts.", color: "#f59e0b" },
           { id: "tracker", icon: "✅", title: "Topic Tracker", desc: "Mark what feels done and see full-course progress.", color: "#22c55e" },
           { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
@@ -3214,9 +3215,9 @@ const ExamTopicsModeTab = ({ setActive }) => {
         Card={Card}
         Badge={Badge}
         title="Use this as your course map"
-        note="Best route: work through these six exam-topic blocks, then use Traps, Mock Test, and Revise Mistakes to turn the knowledge into pass-level recall."
+        note="Best route: work through these six exam-topic blocks, then use Common Mix-Ups, Mock Test, and Revise Mistakes to turn the knowledge into pass-level recall."
         actions={[
-          { label: "Open Traps", primary: true, onClick: () => setActive("confuse") },
+          { label: "Open Common Mix-Ups", primary: true, onClick: () => setActive("confuse") },
           { label: "Take a Mock", onClick: () => setActive("mock") },
           { label: "Revise Mistakes", onClick: () => setActive("revise") },
         ]}
@@ -4409,7 +4410,7 @@ const NationsTab = ({ setActive }) => {
 
   return (
     <div className="topic-page">
-      <SectionTitle icon="🏴" meta="Use this section to finish capitals, saints, symbols, legal systems, devolved institutions, and UK identity traps in one place.">The 4 Nations</SectionTitle>
+      <SectionTitle icon="🏴" meta="Use this section to finish capitals, saints, symbols, legal systems, devolved institutions, and UK identity mix-ups in one place.">The 4 Nations</SectionTitle>
       <Card className="setup-card">
         <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
           <div className="subtle-panel" style={{ background: "color-mix(in srgb, #3b82f6 12%, var(--card-bg))", padding: 12 }}>
@@ -4599,7 +4600,7 @@ const NationsTab = ({ setActive }) => {
         note="This section now works best as a full nation course: compare table first, country links next, then a short nation-only test before moving into traps or mocks."
         actions={[
           { label: "Quick Revise 4 Nations", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "nations", topic: "4 Nations", sessionType: "short" }) },
-          { label: "Open Traps", onClick: () => setActive("confuse") },
+          { label: "Open Common Mix-Ups", onClick: () => setActive("confuse") },
           { label: "Take a Mock", onClick: () => setActive("mock") },
         ]}
       />
@@ -4616,7 +4617,7 @@ const ConfuseTab = () => {
 
   return (
     <div className="topic-page">
-      <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam traps.">Don't Confuse These</SectionTitle>
+      <SectionTitle icon="⚠️" meta="These side-by-side cards are the fastest way to stop mixing common exam facts.">Common Mix-Ups</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.14), rgba(15,23,42,0.9))", border: "1px solid #334155" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
@@ -4756,7 +4757,7 @@ const InternationalTab = ({ setActive }) => (
       title="Lock in the organisation labels"
       note="International questions are mostly about choosing the right label quickly, so use a compare or quiz mode next."
       actions={[
-        { label: "Open Traps", primary: true, onClick: () => setActive("confuse") },
+        { label: "Open Common Mix-Ups", primary: true, onClick: () => setActive("confuse") },
         { label: "Start Quiz", onClick: () => setActive("quiz") },
         { label: "Quick Revise", onClick: () => setActive("quickrev") },
       ]}
@@ -5059,14 +5060,14 @@ const QuickFactsTab = ({ setActive }) => {
 
   return (
     <div className="topic-page">
-      <SectionTitle icon="⚡" meta="Use this like the fast-track course for civics, law, everyday-life rules, citizenship context, and UK identity traps.">Quick Facts Course</SectionTitle>
+      <SectionTitle icon="⚡" meta="Use this like the fast-track course for civics, law, everyday-life rules, citizenship context, and UK identity facts.">Quick Facts Course</SectionTitle>
 
       <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--card-bg)) 0%, color-mix(in srgb, #22c55e 8%, var(--card-bg)) 100%)", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
           <div>
             <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)", marginBottom: 6 }}>Finish the non-history part of the course fast</div>
             <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, maxWidth: 760 }}>
-              Story Mode covers the history story. This course covers government, law, everyday Britain, community, settlement facts, and identity traps that are often tested directly.
+              Story Mode covers the history story. This course covers government, law, everyday Britain, community, settlement facts, and identity facts that are often tested directly.
             </div>
           </div>
           <Badge text={`${completedCount}/${groupedFacts.length} groups done`} color="#22c55e" />
@@ -5264,11 +5265,11 @@ const QuickFactsTab = ({ setActive }) => {
         Card={Card}
         Badge={Badge}
         title="Use Quick Facts as a course mode"
-        note="The fastest path is Story Mode for history, then Quick Facts Course for civics, law, everyday life, and identity traps. After that, move into 4 Nations, Traps, and Mock Test."
+        note="The fastest path is Story Mode for history, then Quick Facts Course for civics, law, everyday life, and identity facts. After that, move into 4 Nations, Common Mix-Ups, and Mock Test."
         actions={[
           { label: "Quick Revise", primary: true, onClick: () => setActive("quickrev") },
           { label: "Take a Mock", onClick: () => setActive("mock") },
-          { label: "Open Traps", onClick: () => setActive("confuse") },
+          { label: "Open Common Mix-Ups", onClick: () => setActive("confuse") },
         ]}
       />
     </div>

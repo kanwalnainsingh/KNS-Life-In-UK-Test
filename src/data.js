@@ -1364,7 +1364,7 @@ const TABS = [
   { id:"timeline",      label:"Timeline",     icon:"📅" },
   { id:"wars",          label:"Wars",         icon:"⚔️" },
   { id:"nations",       label:"4 Nations",    icon:"🏴" },
-  { id:"confuse",       label:"Traps",        icon:"⚠️" },
+  { id:"confuse",       label:"Common Mix-Ups", icon:"⚠️" },
   { id:"inventors",     label:"Inventors",    icon:"💡" },
   { id:"sports",        label:"Sports",       icon:"🏅" },
   { id:"figures",       label:"Key People",   icon:"👑" },

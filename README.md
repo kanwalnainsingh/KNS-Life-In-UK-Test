@@ -75,7 +75,7 @@ UI stack now uses:
 | ✅ Tracker | Full-course completion tracker stored on device |
 | 📅 Timeline | Full history timeline with search, era filters, and anchor dates |
 | 🏴 4 Nations | Capitals, saints, symbols, languages, parliaments, and common traps |
-| ⚠️ Confusing Topics | Side-by-side comparisons for the facts people mix up most |
+| ⚠️ Common Mix-Ups | Side-by-side comparisons for the facts people mix up most |
 | ⚡ Quick Facts Course | A guided civics/law/everyday-life course with grouped facts, per-group checks, and completion tracking |
 | 🏛️ Landmarks | Important places with memory clues and exam traps |
 | ⛪ Religion | Faith groups and major festivals |
