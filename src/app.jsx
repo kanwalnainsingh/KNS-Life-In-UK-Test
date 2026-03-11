@@ -2889,7 +2889,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
 
   const startTopicMock = (groupId) => {
     const group = groupedTopics.find((item) => item.id === groupId) || groupedTopics[0];
-    const count = Math.min(group.mockCount, group.questionPool.length);
+    const count = group.questionPool.length;
     if (!count) return;
     const questions = pickRandomNoRepeat(group.questionPool, count, `lifeuk-recent-examtopic-${group.id}`, 60)
       .map((question, index) => prepareQuestionVariant(question, 28000 + index + hashText(group.id)));
@@ -3076,9 +3076,9 @@ const ExamTopicsModeTab = ({ setActive }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
               <div>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Start a topic mock from here</div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Start a full topic mock</div>
                 <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
-                  {Math.min(group.mockCount, group.questionPool.length)} questions from this topic · {group.questionPool.length} available in the bank
+                  All {group.questionPool.length} questions for this topic from the current bank
                 </div>
               </div>
               {topicMockProgress[group.id] && (
@@ -3094,8 +3094,6 @@ const ExamTopicsModeTab = ({ setActive }) => {
               <Button onClick={() => startTopicMock(group.id)} className="min-w-[170px]">
                 {topicMock.groupId === group.id && !topicMock.finished ? "Restart topic mock" : "Start topic mock"}
               </Button>
-              <Button variant="secondary" onClick={() => setActive(group.primaryTab)}>{`Study ${group.title.split(" ")[0]}`}</Button>
-              <Button variant="outline" onClick={() => launchQuickRevision(setActive, group.quickFocus)}>Quick revise</Button>
             </div>
 
             {topicMock.groupId === group.id && topicMock.questions.length > 0 && (
@@ -3153,7 +3151,6 @@ const ExamTopicsModeTab = ({ setActive }) => {
                     )}
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
                       <Button onClick={() => startTopicMock(group.id)}>Retake topic mock</Button>
-                      <Button variant="secondary" onClick={() => launchQuickRevision(setActive, group.quickFocus)}>Quick revise this topic</Button>
                     </div>
                   </>
                 )}
@@ -3162,7 +3159,6 @@ const ExamTopicsModeTab = ({ setActive }) => {
           </div>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Button variant="outline" onClick={() => setActive(group.secondaryTab)}>Open related</Button>
             <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
           </div>
         </Card>
