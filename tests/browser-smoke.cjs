@@ -118,6 +118,10 @@ const clickFirstAnswerOption = async (page) => {
   try {
     const page = await browser.newPage();
     page.setDefaultTimeout(15000);
+    page.on("pageerror", (error) => console.error("Page error:", error.message));
+    page.on("console", (msg) => {
+      if (msg.type() === "error") console.error("Console error:", msg.text());
+    });
 
     await page.goto(url, { waitUntil: "networkidle0" });
     await waitForText(page, "Pass guide");
@@ -183,6 +187,13 @@ const clickFirstAnswerOption = async (page) => {
     await page.goto(`${url}/#landmarks`, { waitUntil: "networkidle0" });
     await waitForText(page, "Turn places into quick recall");
 
+    await page.goto(`${url}/#inventors`, { waitUntil: "networkidle0" });
+    await waitForText(page, "British Inventors & Scientists");
+    await clickByText(page, "Start inventors mock");
+    await waitForText(page, "Question 1 of");
+    await clickFirstAnswerOption(page);
+    await waitForText(page, "Correct answer:");
+
     await captureScreenshot(page, url);
 
     console.log("Browser smoke test passed:");
@@ -195,6 +206,7 @@ const clickFirstAnswerOption = async (page) => {
     console.log("- wars section compare table and mini test render");
     console.log("- rapid fire reset control renders");
     console.log("- topic-page follow-up actions render");
+    console.log("- section-specific page mocks render and review answers");
   } finally {
     await browser.close();
     await new Promise((resolve) => server.close(resolve));

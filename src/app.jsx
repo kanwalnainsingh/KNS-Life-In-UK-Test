@@ -81,6 +81,7 @@ const STORAGE_KEYS = {
   quickFactsCourse: "lifeuk-quickfacts-course",
   examTopicsMode: "lifeuk-examtopics-mode",
   examTopicMocks: "lifeuk-examtopic-mocks",
+  sectionMocks: "lifeuk-section-mocks",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -1170,9 +1171,11 @@ const CORE_INVENTORS = new Set([
   "Tim Berners-Lee",
   "John Logie Baird",
   "Frank Whittle",
+  "Sir Robert Watson-Watt",
   "Alan Turing",
   "James Watt",
   "Isaac Newton",
+  "Charles Darwin",
   "Edward Jenner",
 ]);
 
@@ -1930,6 +1933,316 @@ const classifyMockSubgroup = (question) => {
   return "culture-people";
 };
 
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const textMatches = (text, regexes) => regexes.some((regex) => regex.test(text));
+
+const FIGURE_NAME_PATTERNS = [
+  ...new Set([...KEY_FIGURES, ...EXTRA_KEY_FIGURES].map((item) => item.name)),
+].map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i"));
+
+const INVENTOR_PATTERNS = [
+  ...INVENTORS
+    .map((item) => item?.who)
+    .filter(Boolean)
+    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
+  /penicillin|world wide web|television|jet engine|radar|turing machine|steam engine|gravity|evolution|vaccine|dna|ivf|dolly the sheep|cash machine|telephone|jodrell bank/i,
+];
+
+const SPORTS_PATTERNS = [
+  ...SPORTS_STARS
+    .map((item) => item?.name)
+    .filter(Boolean)
+    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
+  ...SPORTS_FACTS
+    .map((item) => item?.name)
+    .filter(Boolean)
+    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
+  /world cup|olympic|paralympic|rugby originated|tour de france/i,
+];
+
+const ARTS_NAME_PATTERNS = Object.values(ARTS)
+  .flat()
+  .map((item) => item?.who)
+  .filter(Boolean)
+  .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i"));
+
+const RELIGION_PATTERNS = [
+  ...RELIGIONS
+    .map((item) => item?.name || item?.faith)
+    .filter(Boolean)
+    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
+  ...FESTIVALS
+    .map((item) => item?.name)
+    .filter(Boolean)
+    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
+  /church of england|church of scotland|religion|christian|muslim|hindu|sikh|jew|buddh|diwali|eid|vaisakhi|hanukkah|easter|christmas|boxing day/i,
+];
+
+const LANDMARK_PATTERNS = [
+  /big ben|elizabeth tower|buckingham palace|windsor castle|tower of london|stonehenge|hadrian'?s wall|river severn|river thames|loch ness|cenotaph|jodrell bank|british museum|maiden castle|bodnant gardens|millennium stadium|giant'?s causeway/i,
+];
+
+const INTERNATIONAL_PATTERNS = [
+  /commonwealth|united nations|nato|council of europe|european convention on human rights|echr/i,
+];
+
+const SYMBOL_PATTERNS = [
+  /god save the (king|queen)|union jack|union flag|britannia|patron saint|st george|st andrew|st david|st patrick/i,
+];
+
+const TIMELINE_PATTERNS = [
+  /roman|claudius|julius caesar|boudicca|hadrian'?s wall|augustine|alfred|athelstan|norman|hastings|domesday|magna carta|model parliament|henry viii|church of england|armada|james i|union of crowns|bill of rights|reform act|chartist|wspu|suffragette|world war|beveridge|nhs|good friday agreement|devolution|supreme court|equality act/i,
+];
+
+const SECTION_TEST_CONFIG = {
+  timeline: { title: "Timeline mock", startLabel: "Start timeline mock", kind: "mock", accent: "#3b82f6", note: "Use all history-timeline questions for a full chronology pass.", match: (text) => textMatches(text, TIMELINE_PATTERNS) },
+  figures: { title: "People mock", startLabel: "Start people mock", kind: "mock", accent: "#8b5cf6", note: "Covers the key historical figures, reformers, scientists, and leaders on this page.", match: (text) => textMatches(text, FIGURE_NAME_PATTERNS) },
+  confuse: { title: "Mix-Ups mock", startLabel: "Start mix-ups mock", kind: "mock", accent: "#f59e0b", note: "Use the full comparison bank to stop losing marks on the classic confusion pairs.", confusionOnly: true },
+  inventors: { title: "Inventors mock", startLabel: "Start inventors mock", kind: "mock", accent: "#06b6d4", note: "Runs every inventor and science question linked to this page.", match: (text) => textMatches(text, INVENTOR_PATTERNS) },
+  sports: { title: "Sports mini test", startLabel: "Start sports test", kind: "test", accent: "#f97316", note: "Covers sports stars, major sporting events, and the short handbook-style sports facts.", match: (text) => textMatches(text, SPORTS_PATTERNS) },
+  arts: { title: "Arts mini test", startLabel: "Start arts test", kind: "test", accent: "#ec4899", note: "Covers writers, music, art, architecture, fashion, film, and stage anchors from this page.", match: (text) => textMatches(text, ARTS_NAME_PATTERNS) || /bafta|turner prize|tate britain|tate modern|royal albert hall|proms|the mousetrap|edinburgh festival fringe/i.test(text) },
+  religion: { title: "Religion mini test", startLabel: "Start religion test", kind: "test", accent: "#22c55e", note: "Covers religions, census facts, and festivals shown on this page.", match: (text) => textMatches(text, RELIGION_PATTERNS) },
+  landmarks: { title: "Landmarks mini test", startLabel: "Start landmarks test", kind: "test", accent: "#6366f1", note: "Covers places, rivers, walls, palaces, memorials, and landmark facts from this page.", match: (text) => textMatches(text, LANDMARK_PATTERNS) },
+  international: { title: "World Orgs mini test", startLabel: "Start world orgs test", kind: "test", accent: "#0ea5e9", note: "Covers the organisations and labels shown on this page.", match: (text) => textMatches(text, INTERNATIONAL_PATTERNS) },
+  anthem: { title: "Symbols mini test", startLabel: "Start symbols test", kind: "test", accent: "#3b82f6", note: "Covers anthem, Union Jack, patron saints, and identity-symbol questions.", match: (text) => textMatches(text, SYMBOL_PATTERNS) },
+};
+
+const buildSectionQuestionPool = (sectionId) => {
+  const config = SECTION_TEST_CONFIG[sectionId];
+  if (!config) return [];
+  if (config.confusionOnly) return buildConfusionDeck();
+  return ALL_QUIZ.filter((question) => config.match(`${question.q} ${question.tip}`));
+};
+
+const SectionMockPanel = ({ sectionId }) => {
+  const config = SECTION_TEST_CONFIG[sectionId];
+  const questionPool = useMemo(() => buildSectionQuestionPool(sectionId), [sectionId]);
+  const [history, setHistory] = useState(() => readStore(STORAGE_KEYS.sectionMocks, []));
+  const [state, setState] = useState({
+    questions: [],
+    current: 0,
+    selected: null,
+    confirmed: false,
+    score: 0,
+    wrong: [],
+    results: [],
+    finished: false,
+  });
+
+  const progress = useMemo(() => buildSectionMockProgress(history)[sectionId], [history, sectionId]);
+
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.sectionMocks, history);
+  }, [history]);
+
+  useEffect(() => {
+    if (state.finished && state.wrong.length) saveWrongQuestions(state.wrong);
+  }, [state.finished, state.wrong]);
+
+  if (!config || !questionPool.length) return null;
+
+  const startTest = () => {
+    const questions = pickRandomNoRepeat(
+      questionPool,
+      questionPool.length,
+      `lifeuk-recent-section-${sectionId}`,
+      Math.max(60, questionPool.length + 20),
+    ).map((question, index) => prepareQuestionVariant(question, 32000 + index + hashText(sectionId)));
+    setState({
+      questions,
+      current: 0,
+      selected: null,
+      confirmed: false,
+      score: 0,
+      wrong: [],
+      results: [],
+      finished: false,
+    });
+  };
+
+  const answerQuestion = (optionIndex) => {
+    if (state.confirmed || state.finished) return;
+    const question = state.questions[state.current];
+    const isCorrect = optionIndex === question.a;
+    setState((prev) => ({
+      ...prev,
+      selected: optionIndex,
+      confirmed: true,
+      score: prev.score + (isCorrect ? 1 : 0),
+      wrong: isCorrect ? prev.wrong : [...prev.wrong, { ...question, chosen: optionIndex }],
+      results: [...prev.results, { ...question, chosen: optionIndex, correct: isCorrect }],
+    }));
+  };
+
+  const finishTest = () => {
+    setState((prev) => ({ ...prev, finished: true }));
+    setHistory((prev) => ([
+      ...prev,
+      {
+        sectionId,
+        score: state.score,
+        total: state.questions.length,
+        at: new Date().toISOString(),
+      },
+    ]));
+  };
+
+  const nextQuestion = () => {
+    if (state.current + 1 >= state.questions.length) {
+      finishTest();
+      return;
+    }
+    setState((prev) => ({
+      ...prev,
+      current: prev.current + 1,
+      selected: null,
+      confirmed: false,
+    }));
+  };
+
+  const currentQuestion = state.questions[state.current];
+
+  return (
+    <Card className="support-card-strong" style={{ border: `1px solid ${config.accent}33` }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+        <div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>{config.title}</div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{config.note}</div>
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <Badge text={`${questionPool.length} page questions`} color={config.accent} />
+          {progress && <Badge text={`Best ${progress.bestPercent}%`} color="#22c55e" />}
+        </div>
+      </div>
+
+      {!state.questions.length || state.finished ? (
+        <>
+          <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+            <div className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 12, color: config.accent, fontWeight: 800, marginBottom: 4 }}>Coverage</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{questionPool.length} questions</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                This pulls every current question that belongs to this page so you can finish the whole section in one run.
+              </div>
+            </div>
+            <div className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Progress</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>
+                {progress ? `${progress.attempts} attempts` : "No attempts yet"}
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                {progress ? `Last ${progress.lastScore}/${progress.total} · Best ${progress.bestPercent}%` : "Start this page test when you want to check if the facts have stuck."}
+              </div>
+            </div>
+          </div>
+
+          {state.finished && (
+            <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+              <Card style={{ border: `1px solid ${state.score >= Math.ceil(state.questions.length * 0.75) ? "#22c55e" : "#f59e0b"}` }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+                  <div>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>Section summary</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use this to fix the facts you nearly know before another full mock.</div>
+                  </div>
+                  <Badge text={`${state.score}/${state.questions.length}`} color={state.score >= Math.ceil(state.questions.length * 0.75) ? "#22c55e" : "#f59e0b"} />
+                </div>
+                <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+                  <div className="subtle-panel" style={{ padding: 12 }}>
+                    <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Correct</div>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{state.results.filter((item) => item.correct).length}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
+                      {state.results.filter((item) => item.correct).length ? "Facts that already feel steady." : "No correct answers in this run yet."}
+                    </div>
+                  </div>
+                  <div className="subtle-panel" style={{ padding: 12 }}>
+                    <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 800, marginBottom: 4 }}>Wrong</div>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{state.wrong.length}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
+                      {state.wrong.length ? "Review these before you leave this page." : "Perfect run. Nothing to clean up."}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+              {!!state.results.filter((item) => item.correct).length && (
+                <Card style={{ border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", background: "color-mix(in srgb, #22c55e 6%, var(--card-bg))" }}>
+                  <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 8 }}>What you got right</div>
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {state.results.filter((item) => item.correct).slice(0, 6).map((question) => (
+                      <div key={question.q} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
+                        • {question.q}
+                      </div>
+                    ))}
+                    {state.results.filter((item) => item.correct).length > 6 && (
+                      <div style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                        + {state.results.filter((item) => item.correct).length - 6} more correct answers in this page test
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )}
+              {!!state.wrong.length && (
+                <div style={{ display: "grid", gap: 10 }}>
+                  {state.wrong.map((question, index) => (
+                    <Card key={`${question.q}-${index}`} style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+                      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 6 }}>{question.q}</div>
+                      <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>
+                        <div>Your answer: <strong>{question.opts[question.chosen] || "No answer"}</strong></div>
+                        <div>Correct answer: <strong>{question.opts[question.a]}</strong></div>
+                      </div>
+                      <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 8 }}>
+                        {buildMockAnswerContext(question)}
+                      </div>
+                      <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <Button onClick={startTest} className="min-w-[180px]">
+            {state.finished ? `Restart ${config.startLabel.replace(/^Start /, "").toLowerCase()}` : config.startLabel}
+          </Button>
+        </>
+      ) : (
+        <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>
+              Question {state.current + 1} of {state.questions.length}
+            </div>
+            <Badge text={`${state.score}/${state.questions.length}`} color={config.accent} />
+          </div>
+          <QuestionCard
+            question={currentQuestion}
+            selected={state.selected}
+            confirmed={state.confirmed}
+            onSelect={answerQuestion}
+          />
+          {state.confirmed && (
+            <Card style={{ border: `1px solid ${state.selected === currentQuestion.a ? "#22c55e" : "#ef4444"}` }}>
+              <div style={{ color: state.selected === currentQuestion.a ? "#16a34a" : "#dc2626", fontWeight: 800, marginBottom: 6 }}>
+                {state.selected === currentQuestion.a ? "Correct" : "Incorrect"}
+              </div>
+              <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.7 }}>
+                Correct answer: <strong>{currentQuestion.opts[currentQuestion.a]}</strong>
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 8 }}>
+                {buildMockAnswerContext(currentQuestion)}
+              </div>
+              <MemoryHook text={currentQuestion.tip.replace(/^[⭐📌💡]\s*/, "")} />
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 12 }}>
+                <Button onClick={nextQuestion}>
+                  {state.current + 1 >= state.questions.length ? `Finish ${config.kind}` : "Next question"}
+                </Button>
+              </div>
+            </Card>
+          )}
+        </div>
+      )}
+    </Card>
+  );
+};
+
 const buildMockBuckets = () => {
   const bucketed = {
     history: [],
@@ -2119,6 +2432,28 @@ const buildExamTopicMockProgress = (history) =>
     };
     const percent = Math.round((item.score / item.total) * 100);
     acc[item.groupId] = {
+      attempts: prev.attempts + 1,
+      bestPercent: Math.max(prev.bestPercent, percent),
+      lastPercent: percent,
+      lastScore: item.score,
+      total: item.total,
+      lastAt: item.at,
+    };
+    return acc;
+  }, {});
+
+const buildSectionMockProgress = (history = []) =>
+  history.reduce((acc, item) => {
+    const prev = acc[item.sectionId] || {
+      attempts: 0,
+      bestPercent: 0,
+      lastPercent: 0,
+      lastScore: 0,
+      total: item.total,
+      lastAt: item.at,
+    };
+    const percent = Math.round((item.score / item.total) * 100);
+    acc[item.sectionId] = {
       attempts: prev.attempts + 1,
       bestPercent: Math.max(prev.bestPercent, percent),
       lastPercent: percent,
@@ -4242,6 +4577,7 @@ const TimelineTab = () => {
           )})}
         </>
       )}
+      <SectionMockPanel sectionId="timeline" />
     </div>
   );
 };
@@ -4997,6 +5333,7 @@ const ConfuseTab = () => {
           })}
         </div>
       ))}
+      <SectionMockPanel sectionId="confuse" />
     </div>
   );
 };
@@ -5009,6 +5346,7 @@ const FiguresTab = ({ setActive }) => (
     Card={Card}
     Badge={Badge}
     MemoryHook={MemoryHook}
+    SectionMockPanel={SectionMockPanel}
     launchQuickRevision={launchQuickRevision}
     KEY_FIGURES={KEY_FIGURES}
     EXTRA_KEY_FIGURES={EXTRA_KEY_FIGURES}
@@ -5072,6 +5410,7 @@ const InternationalTab = ({ setActive }) => (
         { label: "Quick Revise", onClick: () => setActive("quickrev") },
       ]}
     />
+    <SectionMockPanel sectionId="international" />
   </div>
 );
 
@@ -5225,6 +5564,7 @@ const ArtsTab = ({ setActive }) => {
           ))}
         </div>
       </Card>
+      <SectionMockPanel sectionId="arts" />
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
@@ -5306,6 +5646,7 @@ const AnthemTab = () => (
       </div>
       <TrapAlert text="Wales has no representation in the Union Jack." />
     </Card>
+    <SectionMockPanel sectionId="anthem" />
   </div>
 );
 
@@ -6899,6 +7240,7 @@ const App = () => {
           Badge={Badge}
           MemoryHook={MemoryHook}
           TabButton={TabButton}
+          SectionMockPanel={SectionMockPanel}
           launchQuickRevision={launchQuickRevision}
           INVENTORS={INVENTORS}
           CORE_INVENTORS={CORE_INVENTORS}
@@ -6911,6 +7253,7 @@ const App = () => {
           Card={Card}
           Badge={Badge}
           MemoryHook={MemoryHook}
+          SectionMockPanel={SectionMockPanel}
           launchQuickRevision={launchQuickRevision}
           SPORTS_FACTS={SPORTS_FACTS}
           SPORTS_STARS={SPORTS_STARS}
@@ -6924,6 +7267,7 @@ const App = () => {
           Card={Card}
           Badge={Badge}
           MemoryHook={MemoryHook}
+          SectionMockPanel={SectionMockPanel}
           launchQuickRevision={launchQuickRevision}
           RELIGIONS={RELIGIONS}
           FESTIVALS={FESTIVALS}
@@ -6938,6 +7282,7 @@ const App = () => {
           MemoryHook={MemoryHook}
           TrapAlert={TrapAlert}
           CompactVisualStrip={CompactVisualStrip}
+          SectionMockPanel={SectionMockPanel}
           launchQuickRevision={launchQuickRevision}
           LANDMARKS={LANDMARKS}
           CORE_LANDMARK_NAMES={CORE_LANDMARK_NAMES}

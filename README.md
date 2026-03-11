@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.19.6`
+Current release: `v1.20.0`
 
 ---
 
@@ -73,17 +73,17 @@ UI stack now uses:
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
 | 📄 Cram Sheet | One-page night-before summary |
 | ✅ Tracker | Full-course completion tracker stored on device |
-| 📅 Timeline | Full history timeline with search, era filters, and anchor dates |
+| 📅 Timeline | Full history timeline with search, era filters, anchor dates, and a full timeline mock |
 | 🏴 4 Nations | Capitals, saints, symbols, languages, parliaments, and common traps |
-| ⚠️ Common Mix-Ups | Side-by-side comparisons for the facts people mix up most |
+| ⚠️ Common Mix-Ups | Side-by-side comparisons for the facts people mix up most, plus a comparison-only mock |
 | ⚡ Quick Facts Course | A guided civics/law/everyday-life course with grouped facts, per-group checks, and completion tracking |
-| 🏛️ Landmarks | Important places with memory clues and exam traps |
+| 🏛️ Landmarks | Important places with memory clues, exam traps, and a page-specific section test |
 | ⛪ Religion | Faith groups and major festivals |
-| 💡 Inventors | British inventors and key discoveries |
-| 🏅 Sports | Sports stars and high-yield exam facts |
-| 👑 Key People | Historic figures, grouped memory links, and revision cues |
+| 💡 Inventors | British inventors and key discoveries, plus a full inventor-only mock |
+| 🏅 Sports | Sports stars and high-yield exam facts, plus a sports-only section test |
+| 👑 Key People | Historic figures, grouped memory links, revision cues, and a full people mock |
 | 🎭 Arts | Literature, music, art, architecture, fashion, and film |
-| 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7 |
+| 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7, plus a world-orgs section test |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
 | 📝 Mock Test | 40 fixed balanced mock papers with saved per-paper scores, attempts, and next-paper guidance |
 | 🔥 Rapid Fire | Timed revision with broader randomisation, fewer repeats, and a reset option when you want a fully fresh run |
@@ -159,6 +159,18 @@ UI stack now uses:
   - fuller coverage for figures like `Henry VIII`, `Elizabeth I`, `Churchill`, `Attlee`, `Victoria`, `Walpole`, and `Wilberforce`
   - cleaner “likely question” and “dates to lock in” summaries above the full cards
 - `Religion`, `Sports`, `Landmarks`, and `Inventors` now have a second pass of exam-first polish with clearer `likely questions here` panels
+- The remaining topic pages now have page-specific section mocks/tests built from the existing question bank:
+  - `Timeline`
+  - `Key People`
+  - `Common Mix-Ups`
+  - `Inventors`
+  - `Sports`
+  - `Arts`
+  - `Religion`
+  - `Landmarks`
+  - `World Orgs`
+  - `Symbols`
+  - each one uses the questions that actually belong to that page and now gives a full right/wrong summary with memory-clue review
 - Home has stronger personalization guidance:
   - readiness now includes a clearer confidence explanation
   - direct weak-area and compare-trap shortcuts are surfaced more clearly

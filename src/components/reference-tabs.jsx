@@ -64,6 +64,7 @@ export const InventorsTab = ({
   Badge,
   MemoryHook,
   TabButton,
+  SectionMockPanel,
   launchQuickRevision,
   INVENTORS,
   CORE_INVENTORS,
@@ -75,6 +76,78 @@ export const InventorsTab = ({
     .sort((a, b) => Number(CORE_INVENTORS.has(b.who)) - Number(CORE_INVENTORS.has(a.who)));
   const coreVisible = filtered.filter((item) => CORE_INVENTORS.has(item.who));
   const coreLinks = coreVisible.slice(0, 6).map((item) => `${item.who} = ${item.what}`);
+  const likelyQuestions = {
+    All: [
+      "Who discovered penicillin? Alexander Fleming.",
+      "Who invented the World Wide Web? Tim Berners-Lee.",
+      "Who invented television? John Logie Baird.",
+      "Who developed the theory of evolution? Charles Darwin.",
+      "Who is linked with radar? Robert Watson-Watt.",
+      "Think person + invention first, science field second.",
+    ],
+    Medicine: [
+      "Fleming = penicillin.",
+      "Jenner = first vaccine (smallpox).",
+      "Macleod = insulin.",
+      "Edwards and Steptoe = IVF.",
+    ],
+    Computing: [
+      "Tim Berners-Lee = World Wide Web.",
+      "Alan Turing = modern computing / Enigma / Turing Machine.",
+      "James Goodfellow = ATM cash machine.",
+    ],
+    Engineering: [
+      "James Watt = improved steam engine.",
+      "Stephenson = Rocket / railway age.",
+      "Whittle = jet engine.",
+      "Brunel = bridges, railways, SS Great Britain.",
+    ],
+    Electronics: [
+      "John Logie Baird = television.",
+      "Robert Watson-Watt = radar.",
+      "Alexander Graham Bell = telephone.",
+    ],
+    Physics: [
+      "Isaac Newton = gravity and laws of motion.",
+      "Bernard Lovell = Jodrell Bank radio telescope.",
+    ],
+    Biology: [
+      "Charles Darwin = evolution.",
+      "Crick and Watson = DNA double helix.",
+      "Dolly the sheep = Wilmut and Campbell.",
+    ],
+  };
+  const inventorMixUps = {
+    All: [
+      "Baird = television. Berners-Lee = World Wide Web.",
+      "Fleming = penicillin. Jenner = vaccine.",
+      "Newton = gravity. Darwin = evolution.",
+      "Watt = steam engine. Stephenson = Rocket railway.",
+      "Watson-Watt = radar. Bell = telephone.",
+    ],
+    Medicine: [
+      "Fleming = penicillin. Jenner = vaccine.",
+      "Macleod = insulin. Edwards and Steptoe = IVF.",
+    ],
+    Computing: [
+      "Berners-Lee = WWW, not the whole internet.",
+      "Turing = computing theory / Enigma, not the web.",
+    ],
+    Engineering: [
+      "Watt = steam engine. Whittle = jet engine.",
+      "Stephenson = railway Rocket. Brunel = engineering projects.",
+    ],
+    Electronics: [
+      "Baird = television. Bell = telephone. Watson-Watt = radar.",
+    ],
+    Physics: [
+      "Newton = laws of motion and gravity. Lovell = radio telescope.",
+    ],
+    Biology: [
+      "Darwin = evolution. Crick and Watson = DNA.",
+      "Wilmut and Campbell = Dolly the sheep cloning.",
+    ],
+  };
 
   return (
     <div className="topic-page">
@@ -106,15 +179,19 @@ export const InventorsTab = ({
         Card={Card}
         Badge={Badge}
         title="Likely questions here"
-        note="Most inventor questions are direct person-to-discovery matches."
+        note="Most inventor questions are direct person-to-discovery matches with one strong memory pair."
         color="#0ea5e9"
-        items={[
-          "Who discovered penicillin? Alexander Fleming.",
-          "Who invented the World Wide Web? Tim Berners-Lee.",
-          "Who invented television? John Logie Baird.",
-          "Think person + invention first, science field second.",
-        ]}
+        items={likelyQuestions[cat]}
       />
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Common mix-ups"
+        note="These are the person-to-invention pairs most likely to get swapped under time pressure."
+        color="#f59e0b"
+        items={inventorMixUps[cat]}
+      />
+      <SectionMockPanel sectionId="inventors" />
       {filtered.map((inv) => (
         <Card key={inv.who}>
           <div style={{ display: "flex", gap: 12 }}>
@@ -137,7 +214,7 @@ export const InventorsTab = ({
         Card={Card}
         Badge={Badge}
         title="Turn inventors into quick recall"
-        note="Inventors are easiest to keep if you follow them with a short topic-focused run instead of trying to memorise the full list in one go."
+        note="Inventors are easiest to keep if you lock in the core pairs first, then use the lower cards as support instead of trying to memorise the whole list in one go."
         actions={[
           { label: "Quick Revise Inventors", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Inventors", sessionType: "short" }) },
           { label: "Daily 10", onClick: () => setActive("daily10") },
@@ -154,6 +231,7 @@ export const SportsTab = ({
   Card,
   Badge,
   MemoryHook,
+  SectionMockPanel,
   launchQuickRevision,
   SPORTS_FACTS,
   SPORTS_STARS,
@@ -239,6 +317,7 @@ export const SportsTab = ({
           "Torvill and Dean = 1984 Olympic gold medal pair.",
         ]}
       />
+      <SectionMockPanel sectionId="sports" />
       {SPORTS_FACTS.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", gap: 12 }}>
@@ -300,6 +379,7 @@ export const ReligionTab = ({
   Card,
   Badge,
   MemoryHook,
+  SectionMockPanel,
   launchQuickRevision,
   RELIGIONS,
   FESTIVALS,
@@ -343,6 +423,7 @@ export const ReligionTab = ({
           "Eid al-Fitr ends Ramadan.",
         ]}
       />
+      <SectionMockPanel sectionId="religion" />
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ fontWeight: 800, color: "#60a5fa", marginBottom: 12 }}>2011 Census — religious identity</div>
         {RELIGIONS.map((item) => (
@@ -394,6 +475,7 @@ export const LandmarksTab = ({
   MemoryHook,
   TrapAlert,
   CompactVisualStrip,
+  SectionMockPanel,
   launchQuickRevision,
   LANDMARKS,
   CORE_LANDMARK_NAMES,
@@ -447,6 +529,7 @@ export const LandmarksTab = ({
           "River Severn = longest in the UK. Thames = longest in England.",
         ]}
       />
+      <SectionMockPanel sectionId="landmarks" />
       {orderedLandmarks.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>

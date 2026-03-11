@@ -39,6 +39,9 @@ const assert = (condition, message) => {
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
   assert(/ExamTopicsModeTab/.test(appSource), "Exam topics UI missing");
+  assert(/SectionMockPanel/.test(appSource), "Reusable section test UI missing");
+  assert(/sectionMocks/.test(appSource), "Section test progress storage missing");
+  assert(/SECTION_TEST_CONFIG/.test(appSource), "Section test config missing");
   assert(/StoryModeTab/.test(appSource), "Story mode UI missing");
   assert(/DatesDrillTab/.test(appSource), "Dates drill UI missing");
   assert(/STORY_CHAPTERS/.test(appSource), "Story mode should use stable chapter data");
@@ -72,6 +75,11 @@ const assert = (condition, message) => {
   assert(/Exam Topics Course/.test(appSource), "Exam topics course heading missing");
   assert(/lifeuk-examtopic-mocks/.test(appSource), "Exam topic mock storage missing");
   assert(/Topic mock/.test(appSource), "Exam topic mock UI missing");
+  assert(/Start inventors mock/.test(appSource), "Inventors page mock action missing");
+  assert(/Start sports test/.test(appSource), "Sports page test action missing");
+  assert(/Start religion test/.test(appSource), "Religion page test action missing");
+  assert(/Start landmarks test/.test(appSource), "Landmarks page test action missing");
+  assert(/Start world orgs test|Start world orgs/.test(appSource), "World orgs page test action missing");
   assert(/Question coverage/.test(appSource), "Exam topic question coverage summary missing");
   assert(/mockCount: 8|mockCount: 10|mockCount: 12/.test(appSource), "Exam topic mock counts missing");
   assert(/buildExamTopicQuestionPool/.test(appSource), "Exam topic question pool helper missing");

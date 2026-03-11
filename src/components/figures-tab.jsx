@@ -75,6 +75,7 @@ export const FiguresTabSection = ({
   Card,
   Badge,
   MemoryHook,
+  SectionMockPanel,
   launchQuickRevision,
   KEY_FIGURES,
   EXTRA_KEY_FIGURES,
@@ -199,6 +200,8 @@ export const FiguresTabSection = ({
           ))}
         </div>
       </Card>
+
+      <SectionMockPanel sectionId="figures" />
 
       {figures.map((f) => (
         <Card key={f.name} className="quick-revision-card" style={{ border: `1px solid ${f.color}33` }}>

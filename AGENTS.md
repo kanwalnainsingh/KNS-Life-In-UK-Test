@@ -83,6 +83,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Added a browser smoke test with `puppeteer-core` to validate core flows after build.
 - Extracted the lighter reference tabs into `src/components/reference-tabs.jsx` so `Religion`, `Sports`, `Landmarks`, and `Inventors` can evolve without making `src/app.jsx` even larger.
 - Reordered those lighter reference pages to put `must know first` anchors before the longer supporting lists.
+- Added reusable page-specific section mocks/tests so `Timeline`, `Key People`, `Common Mix-Ups`, `Inventors`, `Sports`, `Arts`, `Religion`, `Landmarks`, `World Orgs`, and `Symbols` can test the questions that actually belong to that page.
 - Added a broader visual polish pass across the shared theme, Home, Quick Revision, Quiz, and Mock screens to reduce clutter and improve mobile-first readability.
 - Extended that visual polish to `Story Mode`, `Timeline`, `4 Nations`, and `Key Historical Figures` so the core study pages now share the calmer card hierarchy and lighter light/dark surfaces.
 - Improved the desktop topics drawer and mobile bottom navigation / study menu so the main learner actions are easier to scan and the grouped topic browsing feels lighter.
