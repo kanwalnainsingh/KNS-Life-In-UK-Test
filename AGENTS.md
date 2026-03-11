@@ -69,6 +69,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Simplified the visible `Quick Revise` UI so the card answer, context, and memory clue show immediately while recent-history tracking stays in the background.
 - Added a pass-focused learner layer on `Home` with start routes, saved pass plans, readiness cues, and next-best-action guidance.
 - Added bookmarks for quick-revision cards and question flows, plus a `Saved facts` quick-revision focus.
+- Redesigned `Quick Facts` into `Quick Facts Course` with grouped blocks, per-group checks, and saved completion state so it can act as the fast-track civics/law/everyday-life mode beside `Story Mode`.
 - Mock results now point learners to the weakest area and the most useful next revision step.
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.
 - Added focused follow-up actions on the heavier topic pages so `Story Mode`, `Religion`, `Landmarks`, `Inventors`, and `Sports` can jump straight into topic-specific quick revision.

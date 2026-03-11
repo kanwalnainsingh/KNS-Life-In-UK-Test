@@ -130,6 +130,12 @@ const clickByText = async (page, text) => {
     await waitForText(page, "PROMPT");
     await waitForText(page, "ANSWER");
 
+    await page.goto(`${url}/#quickfacts`, { waitUntil: "networkidle0" });
+    await waitForText(page, "Quick Facts Course");
+    await waitForText(page, "Complete course");
+    await clickByText(page, "Test this group");
+    await waitForText(page, "Question 1 of");
+
     await page.goto(`${url}/#mock`, { waitUntil: "networkidle0" });
     await waitForText(page, "Mock Test");
     await clickByText(page, "Mock Test 1");
@@ -149,6 +155,7 @@ const clickByText = async (page, text) => {
     console.log("- home loads with pass-guide shortcuts");
     console.log("- quick revision topic filter and card flow render");
     console.log("- story mode chapter handoff to quick revision works");
+    console.log("- quick facts course group check renders");
     console.log("- mock paper flow starts in the browser");
     console.log("- rapid fire reset control renders");
     console.log("- topic-page follow-up actions render");

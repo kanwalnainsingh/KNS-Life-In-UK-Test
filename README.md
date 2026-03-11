@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.17.0`
+Current release: `v1.18.0`
 
 ---
 
@@ -75,7 +75,7 @@ UI stack now uses:
 | 📅 Timeline | Full history timeline with search, era filters, and anchor dates |
 | 🏴 4 Nations | Capitals, saints, symbols, languages, parliaments, and common traps |
 | ⚠️ Confusing Topics | Side-by-side comparisons for the facts people mix up most |
-| ⚡ Quick Facts | Government, law, values, daily life, citizenship basics |
+| ⚡ Quick Facts Course | A guided civics/law/everyday-life course with grouped facts, per-group checks, and completion tracking |
 | 🏛️ Landmarks | Important places with memory clues and exam traps |
 | ⛪ Religion | Faith groups and major festivals |
 | 💡 Inventors | British inventors and key discoveries |
@@ -106,6 +106,10 @@ UI stack now uses:
 - `Quick Revise` now shows answer, context, and memory clue immediately so it works as a true fast-scroll revision mode
 - `Quick Revise` now has a broad topic filter so you can stay inside one subject like `History`, `Wars`, `Law`, `Landmarks`, `Key People`, `World Orgs`, or `Arts`
 - `Quick Revise` keeps your place quietly in the background, while `Show all now` and `Reset progress` give you manual control when needed
+- `Quick Facts` has been redesigned into `Quick Facts Course`:
+  - grouped into Government, Law, Everyday Britain, Community, Citizenship, and Identity
+  - `Learn`, `Check me`, and `Complete course` flows
+  - saved completion state so learners can finish the civics/law side of the course in chunks
 - `Revise Mistakes` now also links into saved questions and weak-fact study
 - Bottom mobile navigation now keeps the main study flow visible:
   - `Home`
@@ -234,7 +238,7 @@ UI stack now uses:
   - political neutrality
   - the fact that the Speaker still remains an MP
 - Reordered weaker reference-heavy sections so the most important facts appear first:
-  - `Quick Facts` now labels sections like `Must know first`, `Easy marks`, and `Good to know`
+  - `Quick Facts Course` now works as a grouped fast-track course instead of one flat fact wall
   - `Key People`, `Inventors`, `Arts`, `Landmarks`, and `World Orgs` now surface exam-core names and facts before the fuller reference list
   - broader facts are still included, but moved lower with clearer labels instead of competing with the highest-yield material
 - Improved `Story Mode` as a guided revision flow:

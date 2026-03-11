@@ -95,7 +95,10 @@ const assert = (condition, message) => {
   assert(/Coverage checklist/.test(appSource), "Coverage checklist missing");
   assert(/SectionStudyActions/.test(appSource), "Section follow-up action rows missing");
   assert(/Use these nation facts right away/.test(appSource), "4 Nations follow-up actions missing");
-  assert(/These are your fast marks/.test(appSource), "Quick Facts follow-up actions missing");
+  assert(/Quick Facts Course/.test(appSource), "Quick Facts course heading missing");
+  assert(/Use Quick Facts as a course mode/.test(appSource), "Quick Facts course follow-up actions missing");
+  assert(/Complete course/.test(appSource), "Quick Facts complete-course mode missing");
+  assert(/Test this group/.test(appSource), "Quick Facts group check action missing");
   assert(/focus-ring/.test(indexSource), "Focus-visible styling missing");
   assert(/@media \(max-width: 820px\)/.test(indexSource), "Responsive breakpoint missing");
   assert(/serviceWorker\.register/.test(indexSource), "Service worker registration missing");

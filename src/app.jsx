@@ -77,6 +77,7 @@ const STORAGE_KEYS = {
   timelineCheckpoint: "lifeuk-timeline-checkpoint",
   storyChapter: "lifeuk-story-chapter",
   storyCompleted: "lifeuk-story-completed",
+  quickFactsCourse: "lifeuk-quickfacts-course",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -925,6 +926,57 @@ const QUICK_FACT_CATEGORY_PRIORITY = {
   "Population & Geography": { order: 9, label: "Good to know", color: "#64748b" },
   "History Extras": { order: 10, label: "Good to know", color: "#64748b" },
 };
+
+const QUICK_FACTS_COURSE_GROUPS = [
+  {
+    id: "government",
+    title: "Government & Parliament",
+    summary: "Parliament, elections, ministers, the Speaker, and devolved institutions.",
+    color: "#3b82f6",
+    cats: ["Government & Parliament"],
+    match: /parliament|commons|lords|speaker|secret ballot|cabinet|prime minister|pmq|hansard|model parliament|senedd|holyrood|stormont|msp|mla|chancellor|home secretary|foreign secretary/i,
+  },
+  {
+    id: "law",
+    title: "Law, Rights & Courts",
+    summary: "Rule of law, courts, juries, magistrates, equality, and legal-system differences.",
+    color: "#10b981",
+    cats: ["Law & Courts"],
+    match: /rule of law|innocent until proven|jury|magistrate|court|crown court|civil|criminal|youth court|children's hearing|supreme court|habeas corpus|equality act|weapon|forced marriage/i,
+  },
+  {
+    id: "everyday",
+    title: "Everyday Britain",
+    summary: "Driving, school, emergency numbers, National Insurance, council tax, and easy practical marks.",
+    color: "#f59e0b",
+    cats: ["Rights & Everyday Life", "Currency & Finance"],
+    match: /999|112|101|drive|left|driving|moped|school|education|training until 18|national insurance|council tax|lottery|blood donation|mot|gcse|a-level|highers|pound|coins|notes|income tax/i,
+  },
+  {
+    id: "community",
+    title: "Community & Participation",
+    summary: "Volunteering, charities, councillors, civil servants, school governors, and public duties.",
+    color: "#8b5cf6",
+    cats: ["Community & Participation"],
+    match: /volunteer|community|charity|civil servant|governor|local election|councillor|magistrate|jury service|coalition|pcc|police and crime commissioner/i,
+  },
+  {
+    id: "citizenship",
+    title: "Citizenship & Settlement",
+    summary: "Why people take the test, the official knowledge requirement, and exemptions.",
+    color: "#2563eb",
+    cats: ["Citizenship & Settlement"],
+    match: /life in the uk test|citizenship|settlement|knowledge requirement|language and life in the uk|gaelic|welsh|exempt/i,
+  },
+  {
+    id: "identity",
+    title: "Boundary & Identity Facts",
+    summary: "UK vs Great Britain, Republic of Ireland, Crown Dependencies, territories, and nation-system traps.",
+    color: "#14b8a6",
+    cats: ["Britain Beyond the UK", "Population & Geography"],
+    match: /great britain|united kingdom|british isles|republic of ireland|crown dependenc|channel islands|overseas territor|gibraltar|falkland|england has no separate parliament|legal system|ben nevis|snowdon|severn|thames/i,
+  },
+];
 
 const CORE_INVENTORS = new Set([
   "Alexander Fleming",
@@ -3876,48 +3928,389 @@ const AnthemTab = () => (
 );
 
 // ── QUICK FACTS ──────────────────────────────────────────────
-const QuickFactsTab = ({ setActive }) => (
-  <div className="topic-page">
-    <SectionTitle icon="⚡" meta="These are the fast marks: government jobs, law basics, voting, school, driving, taxes, and daily-life rules.">Quick Facts</SectionTitle>
-    <Card style={{ background: "color-mix(in srgb, #22c55e 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
-      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Fast civic recall</div>
-      <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
-        • `Hansard` = official written record of Parliament<br />
-        • `PMQs` = Wednesday when Parliament is sitting<br />
-        • `National Insurance` = NHS, state pension, benefits<br />
-        • `Council tax` = local services<br />
-        • `999 / 112` = emergency, `101` = non-emergency police
+const QuickFactsTab = ({ setActive }) => {
+  const [courseState, setCourseState] = useState(() => readStore(STORAGE_KEYS.quickFactsCourse, {
+    mode: "learn",
+    currentGroupId: QUICK_FACTS_COURSE_GROUPS[0].id,
+    completed: [],
+  }));
+  const [checkState, setCheckState] = useState({
+    groupId: null,
+    questions: [],
+    current: 0,
+    selected: null,
+    confirmed: false,
+    score: 0,
+    wrong: [],
+    finished: false,
+  });
+
+  const groupedFacts = useMemo(() => QUICK_FACTS_COURSE_GROUPS.map((group) => {
+    const sections = QUICK_FACTS
+      .filter((section) => group.cats.includes(section.cat))
+      .sort((a, b) => (QUICK_FACT_CATEGORY_PRIORITY[a.cat]?.order ?? 99) - (QUICK_FACT_CATEGORY_PRIORITY[b.cat]?.order ?? 99));
+    const allFacts = sections.flatMap((section) => section.facts.map((text) => ({
+      text,
+      cat: section.cat,
+      icon: section.icon,
+      color: section.color,
+    })));
+    const memory = allFacts.find((fact) => /^Memory clue:/i.test(fact.text))?.text?.replace(/^Memory clue:\s*/i, "");
+    const normalFacts = allFacts.filter((fact) => !/^Memory clue:/i.test(fact.text));
+    const mustKnow = normalFacts.slice(0, Math.min(5, normalFacts.length));
+    const mustKnowTexts = new Set(mustKnow.map((fact) => fact.text));
+    const mixups = normalFacts.filter((fact) => (
+      !mustKnowTexts.has(fact.text)
+      && /(NOT|not part|separate|share one legal system|different|photo ID|secret ballot|British Isles|United Kingdom|Council tax|National Insurance|local but not general|self-governing)/i.test(fact.text)
+    ));
+    const mixupTexts = new Set(mixups.map((fact) => fact.text));
+    const moreDetail = normalFacts.filter((fact) => !mustKnowTexts.has(fact.text) && !mixupTexts.has(fact.text));
+    const questionPool = ALL_QUIZ.filter((question) => group.match.test(`${question.q} ${question.tip}`));
+
+    return {
+      ...group,
+      sections,
+      questionPool,
+      questionCount: questionPool.length,
+      factCount: normalFacts.length,
+      mustKnow,
+      mixups,
+      moreDetail,
+      memory,
+    };
+  }), []);
+
+  const currentGroup = groupedFacts.find((group) => group.id === courseState.currentGroupId) || groupedFacts[0];
+  const completedSet = new Set(courseState.completed || []);
+  const completedCount = completedSet.size;
+  const completionPercent = Math.round((completedCount / groupedFacts.length) * 100);
+  const nextGroup = groupedFacts.find((group) => !completedSet.has(group.id)) || groupedFacts[0];
+
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.quickFactsCourse, courseState);
+  }, [courseState]);
+
+  useEffect(() => {
+    if (checkState.finished && checkState.wrong.length) saveWrongQuestions(checkState.wrong);
+  }, [checkState.finished, checkState.wrong]);
+
+  const updateCourseState = (patch) => setCourseState((prev) => ({ ...prev, ...patch }));
+
+  const selectGroup = (groupId, mode = courseState.mode) => {
+    updateCourseState({ currentGroupId: groupId, mode });
+    scrollPageTop();
+  };
+
+  const toggleCompleted = (groupId) => {
+    setCourseState((prev) => {
+      const completed = new Set(prev.completed || []);
+      if (completed.has(groupId)) completed.delete(groupId);
+      else completed.add(groupId);
+      return { ...prev, completed: [...completed] };
+    });
+  };
+
+  const resetCourse = () => {
+    setCourseState({
+      mode: "learn",
+      currentGroupId: groupedFacts[0].id,
+      completed: [],
+    });
+    setCheckState({
+      groupId: null,
+      questions: [],
+      current: 0,
+      selected: null,
+      confirmed: false,
+      score: 0,
+      wrong: [],
+      finished: false,
+    });
+    scrollPageTop();
+  };
+
+  const startGroupCheck = (groupId) => {
+    const group = groupedFacts.find((item) => item.id === groupId) || groupedFacts[0];
+    const count = Math.min(6, group.questionPool.length);
+    if (!count) {
+      updateCourseState({ currentGroupId: group.id, mode: "learn" });
+      return;
+    }
+    const questions = pickRandomNoRepeat(group.questionPool, count, `lifeuk-recent-quickfacts-${group.id}`, 50)
+      .map((question, index) => prepareQuestionVariant(question, 24000 + index));
+    setCheckState({
+      groupId: group.id,
+      questions,
+      current: 0,
+      selected: null,
+      confirmed: false,
+      score: 0,
+      wrong: [],
+      finished: false,
+    });
+    updateCourseState({ currentGroupId: group.id, mode: "check" });
+    scrollPageTop();
+  };
+
+  const answerCheckQuestion = (optionIndex) => {
+    if (checkState.confirmed || checkState.finished) return;
+    const question = checkState.questions[checkState.current];
+    const isCorrect = optionIndex === question.a;
+    setCheckState((prev) => ({
+      ...prev,
+      selected: optionIndex,
+      confirmed: true,
+      score: prev.score + (isCorrect ? 1 : 0),
+      wrong: isCorrect ? prev.wrong : [...prev.wrong, { ...question, chosen: optionIndex }],
+    }));
+  };
+
+  const nextCheckQuestion = () => {
+    setCheckState((prev) => {
+      if (prev.current + 1 >= prev.questions.length) {
+        return { ...prev, finished: true };
+      }
+      return {
+        ...prev,
+        current: prev.current + 1,
+        selected: null,
+        confirmed: false,
+      };
+    });
+  };
+
+  const renderFactList = (title, tone, items, emptyText) => (
+    <Card style={{ border: `1px solid color-mix(in srgb, ${tone} 35%, var(--card-border))`, background: `color-mix(in srgb, ${tone} 7%, var(--card-bg))` }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>{title}</div>
+        <Badge text={`${items.length} facts`} color={tone} />
       </div>
-      <MemoryHook text="Use one keyword per fact: Hansard-record, PMQs-Wednesday, NI-benefits, council tax-local, 999-emergency." />
-    </Card>
-    {[...QUICK_FACTS]
-      .sort((a, b) => (QUICK_FACT_CATEGORY_PRIORITY[a.cat]?.order ?? 99) - (QUICK_FACT_CATEGORY_PRIORITY[b.cat]?.order ?? 99))
-      .map((section, si) => (
-      <Card key={si} style={{ border: `1px solid ${section.color}33` }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-          <div style={{ fontWeight: 800, color: section.color, fontSize: 15 }}>{section.icon} {section.cat}</div>
-          <Badge text={QUICK_FACT_CATEGORY_PRIORITY[section.cat]?.label || "Reference"} color={QUICK_FACT_CATEGORY_PRIORITY[section.cat]?.color || "#64748b"} />
+      {items.length ? items.map((fact, index) => (
+        <div key={`${title}-${index}`} style={{ fontSize: 13, color: "var(--text)", padding: "8px 0", borderTop: index ? "1px solid var(--card-border)" : "none", lineHeight: 1.6 }}>
+          <span style={{ color: fact.color, marginRight: 6 }}>{fact.icon}</span>
+          {fact.text}
         </div>
-        {section.facts.map((f, fi) => (
-          <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: fi < section.facts.length - 1 ? "1px solid #1f2937" : "none", lineHeight: 1.6 }}>
-            <span style={{ color: section.color, marginRight: 6 }}>▸</span>{f}
+      )) : <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>{emptyText}</div>}
+    </Card>
+  );
+
+  return (
+    <div className="topic-page">
+      <SectionTitle icon="⚡" meta="Use this like the fast-track course for civics, law, everyday-life rules, citizenship context, and UK identity traps.">Quick Facts Course</SectionTitle>
+
+      <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--card-bg)) 0%, color-mix(in srgb, #22c55e 8%, var(--card-bg)) 100%)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <div>
+            <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)", marginBottom: 6 }}>Finish the non-history part of the course fast</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, maxWidth: 760 }}>
+              Story Mode covers the history story. This course covers government, law, everyday Britain, community, settlement facts, and identity traps that are often tested directly.
+            </div>
           </div>
-        ))}
+          <Badge text={`${completedCount}/${groupedFacts.length} groups done`} color="#22c55e" />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <Progress value={completionPercent} className="h-2.5" />
+        </div>
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", marginTop: 16 }}>
+          <Button onClick={() => selectGroup(nextGroup.id, "complete")} className="bg-orange-500 hover:bg-orange-500/90">{completedCount ? "Continue course" : "Start from beginning"}</Button>
+          <Button variant="secondary" onClick={() => startGroupCheck(currentGroup.id)}>Check this group</Button>
+          <Button variant="outline" onClick={resetCourse}>Reset course</Button>
+        </div>
       </Card>
-    ))}
-    <SectionStudyActions
-      Card={Card}
-      Badge={Badge}
-      title="These are your fast marks"
-      note="After reading quick facts, go straight into a broad practice mode so government, law, and everyday-life points become automatic."
-      actions={[
-        { label: "Start Quiz", primary: true, onClick: () => setActive("quiz") },
-        { label: "Quick Revise", onClick: () => setActive("quickrev") },
-        { label: "Take a Mock", onClick: () => setActive("mock") },
-      ]}
-    />
-  </div>
-);
+
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 4 }}>Choose how to use this section</div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Learn the groups, test a single group, or complete the whole civics/law/everyday-life side of the course.</div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Button variant={courseState.mode === "learn" ? "default" : "secondary"} onClick={() => updateCourseState({ mode: "learn" })}>Learn</Button>
+            <Button variant={courseState.mode === "check" ? "default" : "secondary"} onClick={() => startGroupCheck(currentGroup.id)}>Check me</Button>
+            <Button variant={courseState.mode === "complete" ? "default" : "secondary"} onClick={() => updateCourseState({ mode: "complete" })}>Complete course</Button>
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}>
+          {groupedFacts.map((group) => {
+            const active = currentGroup.id === group.id;
+            const done = completedSet.has(group.id);
+            return (
+              <button
+                key={group.id}
+                className="focus-ring"
+                onClick={() => selectGroup(group.id)}
+                style={{
+                  border: active ? `2px solid ${group.color}` : "1px solid var(--card-border)",
+                  background: active ? `color-mix(in srgb, ${group.color} 8%, var(--card-bg))` : "var(--card-bg)",
+                  borderRadius: 18,
+                  padding: 16,
+                  textAlign: "left",
+                  cursor: "pointer",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
+                  <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>{group.title}</div>
+                  <Badge text={done ? "Completed" : "In course"} color={done ? "#22c55e" : group.color} />
+                </div>
+                <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 10 }}>{group.summary}</div>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", fontSize: 12, color: "var(--text-muted)" }}>
+                  <span>{group.factCount} facts</span>
+                  <span>•</span>
+                  <span>{group.questionCount} questions</span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
+
+      {courseState.mode === "check" && checkState.questions.length ? (
+        <Card style={{ border: `1px solid color-mix(in srgb, ${currentGroup.color} 35%, var(--card-border))` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>{currentGroup.title} check</div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)" }}>
+                Question {Math.min(checkState.current + 1, checkState.questions.length)} of {checkState.questions.length}
+              </div>
+            </div>
+            <Badge text={`${checkState.score}/${checkState.questions.length}`} color={currentGroup.color} />
+          </div>
+
+          {!checkState.finished ? (
+            (() => {
+              const question = checkState.questions[checkState.current];
+              return (
+                <>
+                  <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18, lineHeight: 1.45, marginBottom: 14 }}>{question.q}</div>
+                  <div style={{ display: "grid", gap: 10 }}>
+                    {question.opts.map((option, optionIndex) => {
+                      const isCorrect = optionIndex === question.a;
+                      const isChosen = checkState.selected === optionIndex;
+                      const show = checkState.confirmed;
+                      let background = "var(--card-bg)";
+                      let border = "1px solid var(--card-border)";
+                      let color = "var(--text)";
+                      if (show && isCorrect) {
+                        background = "color-mix(in srgb, #22c55e 10%, var(--card-bg))";
+                        border = "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))";
+                        color = "var(--text-strong)";
+                      } else if (show && isChosen && !isCorrect) {
+                        background = "color-mix(in srgb, #ef4444 10%, var(--card-bg))";
+                        border = "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))";
+                        color = "var(--text-strong)";
+                      } else if (isChosen) {
+                        background = "color-mix(in srgb, var(--accent) 8%, var(--card-bg))";
+                        border = "1px solid color-mix(in srgb, var(--accent) 35%, var(--card-border))";
+                      }
+                      return (
+                        <button
+                          key={optionIndex}
+                          className="focus-ring"
+                          disabled={checkState.confirmed}
+                          onClick={() => answerCheckQuestion(optionIndex)}
+                          style={{ border, background, color, borderRadius: 16, padding: "14px 16px", textAlign: "left", cursor: checkState.confirmed ? "default" : "pointer", fontSize: 14, fontWeight: 600 }}
+                        >
+                          {String.fromCharCode(65 + optionIndex)}. {option}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {checkState.confirmed && (
+                    <div style={{ marginTop: 14 }}>
+                      <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                      <Button className="mt-3 w-full" onClick={nextCheckQuestion}>
+                        {checkState.current + 1 >= checkState.questions.length ? "Finish group check" : "Next question"}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              );
+            })()
+          ) : (
+            <>
+              <div style={{ fontWeight: 900, fontSize: 24, color: "var(--text-strong)", marginBottom: 6 }}>
+                Group score: {checkState.score}/{checkState.questions.length}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>
+                Use this to lock in the high-yield facts before you move to a full quiz or mock. Wrong answers are saved to revision.
+              </div>
+              {checkState.wrong.length > 0 && (
+                <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
+                  {checkState.wrong.map((question, index) => (
+                    <Card key={`${question.q}-${index}`} style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+                      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 6 }}>{question.q}</div>
+                      <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>
+                        <div>Your answer: <strong>{question.opts[question.chosen] || "No answer"}</strong></div>
+                        <div>Correct answer: <strong>{question.opts[question.a]}</strong></div>
+                      </div>
+                      <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+                <Button onClick={() => startGroupCheck(currentGroup.id)}>Retake this group</Button>
+                <Button variant="secondary" onClick={() => updateCourseState({ mode: "learn" })}>Back to learn view</Button>
+                <Button variant="outline" onClick={() => setActive("mock")}>Take a mock</Button>
+              </div>
+            </>
+          )}
+        </Card>
+      ) : (
+        <>
+          <Card style={{ border: `1px solid color-mix(in srgb, ${currentGroup.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${currentGroup.color} 5%, var(--card-bg))` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+              <div>
+                <div style={{ fontWeight: 900, fontSize: 22, color: "var(--text-strong)", marginBottom: 4 }}>{currentGroup.title}</div>
+                <div style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.7, maxWidth: 760 }}>{currentGroup.summary}</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <Badge text={`${currentGroup.factCount} facts`} color={currentGroup.color} />
+                <Badge text={`${currentGroup.questionCount} questions`} color="#64748b" />
+              </div>
+            </div>
+            <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }}>
+              <Button onClick={() => startGroupCheck(currentGroup.id)}>Test this group</Button>
+              <Button variant="secondary" onClick={() => toggleCompleted(currentGroup.id)}>{completedSet.has(currentGroup.id) ? "Mark as not done" : "Mark group done"}</Button>
+              <Button variant="outline" onClick={() => launchQuickRevision(setActive, { focus: currentGroup.id === "identity" ? "nations" : "core", topic: currentGroup.id === "identity" ? "4 Nations" : "All topics", sessionType: "short" })}>Quick revise next</Button>
+            </div>
+          </Card>
+
+          {renderFactList("Must know first", "#ef4444", currentGroup.mustKnow, "This group is already very compact.")}
+          {renderFactList("Common mix-ups", "#f59e0b", currentGroup.mixups, "No big trap wording here. Focus on the main must-know facts.")}
+          {renderFactList("More detail", "#64748b", currentGroup.moreDetail, "No extra detail beyond the core facts in this group.")}
+
+          {currentGroup.memory && <MemoryHook text={currentGroup.memory} />}
+
+          <Card style={{ border: "1px solid var(--card-border)" }}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Source groups in this course block</div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+              {currentGroup.sections.map((section) => (
+                <Badge key={section.cat} text={section.cat} color={section.color} />
+              ))}
+            </div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>
+              Use this block to finish the course in chunks instead of reading one giant civic-facts page. Read one group, test it, then move to the next block.
+            </div>
+          </Card>
+        </>
+      )}
+
+      <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
+        title="Use Quick Facts as a course mode"
+        note="The fastest path is Story Mode for history, then Quick Facts Course for civics, law, everyday life, and identity traps. After that, move into 4 Nations, Traps, and Mock Test."
+        actions={[
+          { label: "Quick Revise", primary: true, onClick: () => setActive("quickrev") },
+          { label: "Take a Mock", onClick: () => setActive("mock") },
+          { label: "Open Traps", onClick: () => setActive("confuse") },
+        ]}
+      />
+    </div>
+  );
+};
 
 // ── QUIZ ─────────────────────────────────────────────────────
 const QuizTab = () => {
