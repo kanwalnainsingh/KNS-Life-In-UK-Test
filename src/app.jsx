@@ -926,17 +926,14 @@ const TIMELINE_KEY_POINTS = {
   "1942": ["Beveridge Report identifies major social problems.", "Blueprint for post-war welfare reforms.", "Leads into NHS and welfare-state questions."],
   "1944": ["D-Day landings in Normandy.", "Turning point in liberation of Europe.", "Important WW2 anchor after Battle of Britain."],
   "1945": ["WW2 ends.", "Labour wins election and Attlee becomes PM.", "Leads into welfare state and NHS reforms."],
-  "1948": ["NHS is founded by Aneurin Bevan.", "Windrush arrives in the same year.", "London also hosts the Olympic Games."],
-  "1953": ["Elizabeth II is crowned.", "First coronation shown on television.", "Useful modern monarchy anchor."],
+  "1948": ["NHS is founded by Aneurin Bevan.", "Free healthcare at the point of use becomes a key welfare-state fact.", "Windrush arrives in the same year."],
   "1969": ["Voting age falls from 21 to 18.", "The Troubles begin in Northern Ireland.", "Important double-date for politics and NI history."],
-  "1973": ["UK joins the EEC.", "EEC is forerunner of the EU.", "Compare with Brexit and 2020 exit."],
   "1998": ["Good Friday Agreement is the NI peace deal.", "Creates the NI Assembly at Stormont.", "Often tested modern politics date."],
   "1999": ["Scottish Parliament and Welsh devolved institutions open.", "Hereditary peers lose automatic right to sit in Lords.", "Key devolution date."],
   "2009": ["Supreme Court replaces the Law Lords.", "Highest court in the UK.", "Modern law-and-courts anchor."],
   "2010": ["Conservative-Lib Dem coalition government formed.", "Equality Act 2010 protects 9 characteristics.", "Useful modern politics and law date."],
   "2012": ["London hosts Olympics for the third time.", "Held in Stratford, East London.", "UK finishes third in medal table."],
-  "2016": ["Brexit referendum votes to leave the EU.", "Referendum date is not the same as formal exit date.", "Compare with 2020."],
-  "2020": ["UK formally leaves the European Union.", "Brexit becomes legally complete.", "Keep separate from the 2016 referendum."],
+  "1990": ["Tim Berners-Lee invents the World Wide Web.", "Use this as a British innovation anchor rather than a politics date.", "Best paired with inventors and modern Britain questions."],
 };
 
 const buildTimelineDetails = (ev) => {
@@ -3772,8 +3769,14 @@ const TimelineTab = () => {
     { year: "43 AD", clue: "Claudius succeeds", color: "#b45309" },
     { year: "1066", clue: "Norman Conquest", color: "#dc2626" },
     { year: "1215", clue: "Magna Carta", color: "#d97706" },
+    { year: "1295", clue: "Model Parliament", color: "#d97706" },
+    { year: "1534", clue: "Church of England", color: "#c2410c" },
+    { year: "1588", clue: "Armada defeated", color: "#0f766e" },
     { year: "1603 / 1707", clue: "Crowns vs Union", color: "#065f46" },
+    { year: "1807 / 1833", clue: "Trade vs slavery", color: "#7c3aed" },
     { year: "1918 / 1928 / 1969", clue: "Votes timeline", color: "#be185d" },
+    { year: "1942 / 1948", clue: "Welfare to NHS", color: "#0284c7" },
+    { year: "1998 / 1999", clue: "Peace and devolution", color: "#6d28d9" },
   ];
   const revisionByEra = {
     All: [
@@ -3817,14 +3820,16 @@ const TimelineTab = () => {
     ],
     Modern: [
       "Votes timeline: 1918, 1928, 1969",
-      "WW2 anchors: 1939, 1940, 1944, 1945, then Beveridge/NHS/Windrush",
-      "Modern politics anchors: 1973 EEC, 1998 Good Friday, 1999 devolution, 2020 Brexit",
+      "WW2 anchors: 1939, 1940, 1944, 1945, then Beveridge / NHS / Windrush",
+      "Modern politics anchors: 1998 Good Friday, 1999 devolution, 2009 Supreme Court, 2010 Equality Act",
     ],
   };
   const filtered = TIMELINE.filter((e) =>
     (era === "All" || e.era === era) &&
     (!search || e.event.toLowerCase().includes(search.toLowerCase()) || e.year.toString().includes(search))
   );
+  const primaryTimeline = filtered.filter((e) => e.priority !== "detail");
+  const secondaryTimeline = filtered.filter((e) => e.priority === "detail");
 
   useEffect(() => {
     if (!pendingJumpId) return;
@@ -3880,7 +3885,7 @@ const TimelineTab = () => {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginBottom: 10 }}>
           <div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>History anchors to memorise first</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These dates unlock a lot of common compare questions in the test.</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These dates unlock the biggest history, law, union, and voting questions in the official test.</div>
           </div>
           <Badge text={`${TIMELINE.length} timeline facts`} color="#38bdf8" />
         </div>
@@ -3892,7 +3897,33 @@ const TimelineTab = () => {
             </div>
           ))}
         </div>
-        <MemoryHook text="Work in pairs: 55 BC vs 43 AD, 1603 vs 1707, and 1918 vs 1928 vs 1969 are classic exam traps." />
+        <MemoryHook text="Work in pairs: 55 BC vs 43 AD, 1215 vs 1295, 1603 vs 1707, 1807 vs 1833, and 1918 vs 1928 vs 1969 are classic exam traps." />
+      </Card>
+      <Card className="support-card-strong" style={{ border: "1px solid color-mix(in srgb, #22c55e 26%, var(--card-border))" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>Most tested dates first</div>
+          <Badge text="Pass-first order" color="#22c55e" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {[
+            "43 AD = Claudius and Roman rule",
+            "1066 = Hastings and William",
+            "1215 = Magna Carta and the law",
+            "1295 = Model Parliament",
+            "1534 = Henry VIII and Church of England",
+            "1588 = Armada under Elizabeth I",
+            "1603 = crowns join only",
+            "1707 = Great Britain created",
+            "1807 / 1833 = trade banned, then slavery abolished",
+            "1918 / 1928 / 1969 = voting reform timeline",
+            "1942 / 1948 = Beveridge to NHS",
+            "1998 / 1999 = Good Friday and devolution",
+          ].map((item) => (
+            <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 13.5, lineHeight: 1.55 }}>
+              {item}
+            </div>
+          ))}
+        </div>
       </Card>
       <CompactVisualStrip
         title="Date spine"
@@ -3903,6 +3934,7 @@ const TimelineTab = () => {
           { icon: "🏰", label: "1066", text: "Normans" },
           { icon: "📜", label: "1215", text: "Carta" },
           { icon: "👑", label: "1603", text: "Crowns" },
+          { icon: "🗳️", label: "1918", text: "Votes begin to widen" },
           { icon: "🏥", label: "1948", text: "NHS" },
         ]}
       />
@@ -3927,7 +3959,18 @@ const TimelineTab = () => {
         </div>
       </Card>
       <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 12 }}>{filtered.length} events</div>
-      {filtered.map((ev, i) => {
+      {primaryTimeline.length > 0 && (
+        <Card className="support-card">
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>Core history timeline</div>
+            <Badge text={`${primaryTimeline.length} high-yield events`} color="#f59e0b" />
+          </div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 6 }}>
+            Start here for the official test. Use the Wars page for extra battle detail and keep the compare-date pairs in mind.
+          </div>
+        </Card>
+      )}
+      {primaryTimeline.map((ev, i) => {
         const timelineId = `timeline-${TIMELINE.indexOf(ev)}`;
         const isCheckpoint = checkpoint?.id === timelineId;
         return (
@@ -3964,6 +4007,57 @@ const TimelineTab = () => {
           </Card>
         </div>
       )})}
+      {secondaryTimeline.length > 0 && (
+        <>
+          <Card className="support-card">
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>More detail</div>
+              <Badge text={`${secondaryTimeline.length} lower-priority events`} color="#64748b" />
+            </div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 6 }}>
+              These are useful for context, but they are less important than the core date anchors above if your main goal is to pass quickly.
+            </div>
+          </Card>
+          {secondaryTimeline.map((ev, i) => {
+            const timelineId = `timeline-${TIMELINE.indexOf(ev)}`;
+            const isCheckpoint = checkpoint?.id === timelineId;
+            return (
+            <div id={timelineId} key={`${ev.year}-${i}-detail`} className="timeline-item" style={{ display: "grid", gridTemplateColumns: "90px 26px 1fr", gap: 12, marginBottom: 14, alignItems: "flex-start", scrollMarginTop: 90 }}>
+              <div className="timeline-year" style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: ev.color }}>{ev.year}</div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 3 }}>{ev.era}</div>
+              </div>
+              <div style={{ width: 24, display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: ev.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, flexShrink: 0 }}>{ev.icon}</div>
+                <div style={{ width: 2, flexGrow: 1, background: "var(--surface-muted)", marginTop: 2, minHeight: 38 }} />
+              </div>
+              <Card className="quick-revision-card" style={{ marginBottom: 0, background: "color-mix(in srgb, var(--card-bg) 92%, white)", border: `1px solid ${isCheckpoint ? "#3b82f6" : "var(--card-border)"}` }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+                  <Badge text={ev.era} color={ev.color} />
+                  <Badge text={ev.year} color="#64748b" />
+                  <Badge text="More detail" color="#64748b" />
+                  {isCheckpoint && <Badge text="Your checkpoint" color="#3b82f6" />}
+                </div>
+                <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 14, lineHeight: 1.6 }}>{ev.event}</div>
+                <div style={{ marginTop: 10, display: "grid", gap: 6 }}>
+                  {buildTimelineDetails(ev).map((point) => (
+                    <div key={point} style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>
+                      <span style={{ color: ev.color, fontWeight: 800 }}>•</span>
+                      <span>{point}</span>
+                    </div>
+                  ))}
+                </div>
+                <MemoryHook text={ev.memory} />
+                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 10 }}>
+                  <button className="focus-ring" onClick={() => saveCheckpoint(ev)} style={{ background: isCheckpoint ? "#1d4ed8" : "var(--chip-bg)", color: isCheckpoint ? "#fff" : "var(--text)", border: `1px solid ${isCheckpoint ? "#3b82f6" : "var(--card-border)"}`, borderRadius: 12, padding: "9px 12px", cursor: "pointer", fontWeight: 700, fontSize: 12 }}>
+                    {isCheckpoint ? "Checkpoint saved" : "Set checkpoint here"}
+                  </button>
+                </div>
+              </Card>
+            </div>
+          )})}
+        </>
+      )}
     </div>
   );
 };
