@@ -2015,8 +2015,40 @@ const buildMockCategoryBreakdown = (questions, answers) =>
     })
     .filter((row) => row.total > 0);
 
+const classifyExamTopicGroup = (question) => {
+  const questionText = question.q.toLowerCase();
+  const tipText = question.tip.toLowerCase();
+  const text = `${questionText} ${tipText}`;
+
+  if (/(roman|caesar|claudius|boudicca|hadrian|augustine|alfred|athelstan|hastings|domesday|magna carta|model parliament|bannockburn|bosworth|armada|gunpowder plot|civil war|roundheads|cavaliers|restoration|glorious revolution|bill of rights 1689|boyne|culloden|industrial revolution|reform act|chartists|peterloo|suffragette|wspu|general strike|world war|dunkirk|blitz|d-day|beveridge|wind of change|great exhibition|black death|battle of|slave trade|slavery|union of crowns|act of union|battle of britain|butler act|statute of rhuddlan|great fire of london|oliver cromwell|henry vii|charles i|charles ii|james ii|harold macmillan|agincourt|ireland split|ireland in 1801|over 30 first get the vote|equal voting rights|1603|1707)/.test(questionText)) {
+    return "history";
+  }
+
+  if (
+    (/^who\b|^which party did\b|^what was .* known for\b|^what was .* invention\b|^who wrote\b|^who invented\b|^who developed\b|^who created\b|^who rebuilt\b|^who campaigned\b|^who founded\b|^who improved\b|^who co-discovered\b|^who cloned\b|^who opened\b|^who won\b|^who captained\b|^what did\b/.test(questionText)
+      || /novelist|playwright|music group|scientist|inventor|known as/.test(tipText))
+    && !/(parliament|house of commons|house of lords|speaker|cabinet|vote|voting|electoral|jury|magistrate|court|crime commissioner|human rights|equality act|nhs|school|education|council tax|national insurance|citizenship|settlement)/.test(questionText)
+  ) {
+    return "people";
+  }
+
+  if (/(parliament|house of commons|house of lords|speaker|cabinet|prime minister|monarch|constitutional monarchy|parliamentary democracy|general election|electoral|constituenc|secret ballot|senedd|holyrood|stormont|supreme court|court of session|jury|juror|magistrate|children's hearing|crime commissioner|habeas corpus|criminal|civil court|rule of law|innocent until proven guilty|equality act|human rights|civil servant|coalition government|devolved government|police service|mps|mps\b|minimum age to stand as an mp|how many mps|voting age reduced to 18|good friday agreement|first-past-the-post)/.test(questionText)) {
+    return "government";
+  }
+
+  if (/(nhs|gp|school|education|training until 18|training\b|gcse|a-level|highers|minimum wage|council tax|national insurance|blood donation|drive on the left|driving|moped|mot test|999|112|101|lottery|volunteer|community|school governor|charity|citizenship|settlement|language requirement|alcohol|tobacco|currency|bank of england|give blood|state pension|benefits)/.test(questionText)) {
+    return "everyday";
+  }
+
+  if (/(democracy|individual liberty|mutual respect|tolerance|responsibilit|freedom of speech|freedom of religion|freedom of association|fair trial|church of england|union flag|union jack|st george|st andrew|st david|st patrick|bonfire night|guy fawkes night|remembrance day|patron saint|cenotaph|british values)/.test(questionText)) {
+    return "values";
+  }
+
+  return "society";
+};
+
 const buildExamTopicQuestionPool = (group) =>
-  ALL_QUIZ.filter((question) => group.match.test(`${question.q} ${question.tip}`));
+  ALL_QUIZ.filter((question) => classifyExamTopicGroup(question) === group.id);
 
 const getExamTopicMockLabel = (groupId) => ({
   values: "Values mock",
