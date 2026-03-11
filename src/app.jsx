@@ -3020,7 +3020,8 @@ const ExamTopicsModeTab = ({ setActive }) => {
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
               <Badge text={group.approx} color={group.color} />
-              <Badge text={completedSet.has(group.id) ? "Completed" : "Study next"} color={completedSet.has(group.id) ? "#22c55e" : "#64748b"} />
+              {topicMockProgress[group.id] && <Badge text={`Best ${topicMockProgress[group.id].bestPercent}%`} color="#22c55e" />}
+              {completedSet.has(group.id) && <Badge text="Completed" color="#22c55e" />}
             </div>
           </div>
 
@@ -3061,26 +3062,29 @@ const ExamTopicsModeTab = ({ setActive }) => {
             </div>
           </div>
 
-          <Card style={{ border: `1px solid color-mix(in srgb, ${group.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${group.color} 6%, var(--card-bg))`, marginBottom: 12 }}>
+          <div className="subtle-panel" style={{ padding: 12, marginBottom: 12, border: `1px solid color-mix(in srgb, ${group.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${group.color} 6%, var(--card-bg))` }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
               <div>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>Topic mock</div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Start a topic mock from here</div>
                 <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
-                  {group.questionPool.length} questions available in the bank for this topic. Use a short {Math.min(group.mockCount, group.questionPool.length)}-question mock to lock the area in.
+                  {Math.min(group.mockCount, group.questionPool.length)} questions from this topic · {group.questionPool.length} available in the bank
                 </div>
               </div>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <Badge text={`${group.questionPool.length} questions`} color={group.color} />
-                {topicMockProgress[group.id] && <Badge text={`Best ${topicMockProgress[group.id].bestPercent}%`} color="#22c55e" />}
-              </div>
+              {topicMockProgress[group.id] && (
+                <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, textAlign: "right" }}>
+                  Attempts {topicMockProgress[group.id].attempts}
+                  <br />
+                  Last {topicMockProgress[group.id].lastScore}/{topicMockProgress[group.id].total}
+                </div>
+              )}
             </div>
-            {topicMockProgress[group.id] && (
-              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginBottom: 10 }}>
-                Attempts: {topicMockProgress[group.id].attempts} • Last score: {topicMockProgress[group.id].lastScore}/{topicMockProgress[group.id].total}
-              </div>
-            )}
+
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <Button variant="outline" onClick={() => startTopicMock(group.id)}>{topicMock.groupId === group.id && !topicMock.finished ? "Restart topic mock" : "Start topic mock"}</Button>
+              <Button onClick={() => startTopicMock(group.id)} className="min-w-[170px]">
+                {topicMock.groupId === group.id && !topicMock.finished ? "Restart topic mock" : "Start topic mock"}
+              </Button>
+              <Button variant="secondary" onClick={() => setActive(group.primaryTab)}>{`Study ${group.title.split(" ")[0]}`}</Button>
+              <Button variant="outline" onClick={() => launchQuickRevision(setActive, group.quickFocus)}>Quick revise</Button>
             </div>
 
             {topicMock.groupId === group.id && topicMock.questions.length > 0 && (
@@ -3144,12 +3148,9 @@ const ExamTopicsModeTab = ({ setActive }) => {
                 )}
               </div>
             )}
-          </Card>
+          </div>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Button onClick={() => setActive(group.primaryTab)} className="min-w-[156px]">{`Study ${group.title.split(" ")[0]}`}</Button>
-            <Button variant="secondary" onClick={() => launchQuickRevision(setActive, group.quickFocus)} className="min-w-[156px]">Quick revise</Button>
-            <Button variant="outline" onClick={() => startTopicMock(group.id)}>Topic mock</Button>
             <Button variant="outline" onClick={() => setActive(group.secondaryTab)}>Open related</Button>
             <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
           </div>
