@@ -219,6 +219,9 @@ const PASS_PLANS = [
 const EXAM_TOPIC_MODE_GROUPS = [
   {
     id: "values",
+    icon: "⚖️",
+    color: "#4f46e5",
+    weight: 4,
     title: "British Values, Principles & Traditions",
     approx: "3-5 questions",
     covers: "Democracy, rule of law, individual liberty, tolerance, rights, responsibilities, national symbols, and major national days.",
@@ -236,6 +239,9 @@ const EXAM_TOPIC_MODE_GROUPS = [
   },
   {
     id: "history",
+    icon: "📜",
+    color: "#d97706",
+    weight: 9,
     title: "UK History",
     approx: "7-10 questions",
     covers: "Romans, Anglo-Saxons, Vikings, Normans, Tudors, Stuarts, Industrial Revolution, reform, world wars, and welfare-state change.",
@@ -253,6 +259,9 @@ const EXAM_TOPIC_MODE_GROUPS = [
   },
   {
     id: "government",
+    icon: "🏛️",
+    color: "#2563eb",
+    weight: 4,
     title: "Government & Law",
     approx: "3-5 questions",
     covers: "Parliament, elections, the constitution, devolved governments, police, courts, legal principles, and jury service.",
@@ -270,6 +279,9 @@ const EXAM_TOPIC_MODE_GROUPS = [
   },
   {
     id: "society",
+    icon: "🌍",
+    color: "#0f766e",
+    weight: 3,
     title: "Modern UK Society",
     approx: "2-4 questions",
     covers: "Population, the 4 nations, religion, culture, sport, media, and modern British public life.",
@@ -287,6 +299,9 @@ const EXAM_TOPIC_MODE_GROUPS = [
   },
   {
     id: "everyday",
+    icon: "🏥",
+    color: "#16a34a",
+    weight: 3,
     title: "Everyday Life in the UK",
     approx: "2-4 questions",
     covers: "Education, NHS, work, volunteering, community life, driving, taxes, and practical civic rules.",
@@ -304,6 +319,9 @@ const EXAM_TOPIC_MODE_GROUPS = [
   },
   {
     id: "people",
+    icon: "👑",
+    color: "#7c3aed",
+    weight: 2,
     title: "Important People & Events",
     approx: "2-3 questions",
     covers: "Frequently tested rulers, reformers, scientists, writers, and a short list of named events that often come up directly.",
@@ -2759,6 +2777,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
   const completedSet = new Set(completed);
   const doneCount = completedSet.size;
   const progress = Math.round((doneCount / EXAM_TOPIC_MODE_GROUPS.length) * 100);
+  const examWeightTotal = EXAM_TOPIC_MODE_GROUPS.reduce((sum, group) => sum + group.weight, 0);
 
   useEffect(() => {
     writeStore(STORAGE_KEYS.examTopicsMode, completed);
@@ -2794,24 +2813,70 @@ const ExamTopicsModeTab = ({ setActive }) => {
         </div>
       </Card>
 
-      {EXAM_TOPIC_MODE_GROUPS.map((group) => (
-        <Card key={group.id} style={{ border: `1px solid ${completedSet.has(group.id) ? "#22c55e55" : "var(--card-border)"}` }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-            <div>
-              <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)" }}>{group.title}</div>
-              <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{group.approx} • {group.covers}</div>
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Exam weight and study order</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>History is the biggest block, then values/government, then society, everyday life, and important people/events.</div>
+          </div>
+          <Badge text="Learn biggest topics first" color="#f97316" />
+        </div>
+        <div style={{ display: "grid", gap: 10 }}>
+          {EXAM_TOPIC_MODE_GROUPS.map((group) => (
+            <div key={group.id} style={{ display: "grid", gap: 8 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 34, height: 34, borderRadius: 12, background: `color-mix(in srgb, ${group.color} 14%, var(--card-bg))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>{group.icon}</div>
+                  <div>
+                    <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 14 }}>{group.title}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{group.approx}</div>
+                  </div>
+                </div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12 }}>{group.weight}/{examWeightTotal} weight</div>
+              </div>
+              <div style={{ background: "var(--surface-muted)", borderRadius: 999, height: 8, overflow: "hidden" }}>
+                <div style={{ width: `${(group.weight / examWeightTotal) * 100}%`, height: "100%", borderRadius: 999, background: group.color }} />
+              </div>
             </div>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <Badge text={group.approx} color="#3b82f6" />
+          ))}
+        </div>
+      </Card>
+
+      {EXAM_TOPIC_MODE_GROUPS.map((group) => (
+        <Card key={group.id} style={{ border: `1px solid ${completedSet.has(group.id) ? "#22c55e55" : `${group.color}2f`}`, background: completedSet.has(group.id) ? "color-mix(in srgb, #22c55e 5%, var(--card-bg))" : `color-mix(in srgb, ${group.color} 4%, var(--card-bg))` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "flex-start", marginBottom: 12 }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <div style={{ width: 42, height: 42, borderRadius: 14, background: `color-mix(in srgb, ${group.color} 14%, var(--card-bg))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
+                {group.icon}
+              </div>
+              <div>
+                <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)" }}>{group.title}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4, lineHeight: 1.6 }}>{group.covers}</div>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
+              <Badge text={group.approx} color={group.color} />
               <Badge text={completedSet.has(group.id) ? "Completed" : "Study next"} color={completedSet.has(group.id) ? "#22c55e" : "#64748b"} />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: 12, borderRadius: 16, padding: 12, border: `1px solid color-mix(in srgb, ${group.color} 35%, var(--card-border))`, background: `color-mix(in srgb, ${group.color} 8%, var(--card-bg))` }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
+              <div style={{ fontSize: 12, color: group.color, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em" }}>Most tested first</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Learn these before anything else in this topic</div>
+            </div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {group.keyFacts.slice(0, 2).map((fact) => (
+                <div key={fact} style={{ color: "var(--text-strong)", fontSize: 13, lineHeight: 1.55, fontWeight: 600 }}>• {fact}</div>
+              ))}
             </div>
           </div>
 
           <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
             <div className="subtle-panel" style={{ padding: 12 }}>
-              <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 800, marginBottom: 8 }}>Most worth remembering</div>
+              <div style={{ fontSize: 12, color: group.color, fontWeight: 800, marginBottom: 8 }}>Key facts to revise</div>
               <div style={{ display: "grid", gap: 6 }}>
-                {group.keyFacts.map((fact) => (
+                {group.keyFacts.slice(2).map((fact) => (
                   <div key={fact} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>• {fact}</div>
                 ))}
               </div>
@@ -2820,7 +2885,10 @@ const ExamTopicsModeTab = ({ setActive }) => {
               <div style={{ fontSize: 12, color: "#8b5cf6", fontWeight: 800, marginBottom: 8 }}>Key people / names</div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
                 {group.people.map((person) => (
-                  <Badge key={person} text={person} color="#8b5cf6" />
+                  <div key={person} style={{ display: "inline-flex", alignItems: "center", gap: 6, borderRadius: 999, padding: "7px 10px", background: "color-mix(in srgb, #8b5cf6 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #8b5cf6 35%, var(--card-border))", color: "var(--text)", fontSize: 12, fontWeight: 700 }}>
+                    <span style={{ color: "#8b5cf6" }}>•</span>
+                    <span>{person}</span>
+                  </div>
                 ))}
               </div>
               <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>
@@ -2830,9 +2898,9 @@ const ExamTopicsModeTab = ({ setActive }) => {
           </div>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Button onClick={() => setActive(group.primaryTab)}>Open main section</Button>
-            <Button variant="secondary" onClick={() => setActive(group.secondaryTab)}>Open related section</Button>
-            <Button variant="outline" onClick={() => launchQuickRevision(setActive, group.quickFocus)}>Quick revise this area</Button>
+            <Button onClick={() => setActive(group.primaryTab)} className="min-w-[156px]">{`Study ${group.title.split(" ")[0]}`}</Button>
+            <Button variant="secondary" onClick={() => launchQuickRevision(setActive, group.quickFocus)} className="min-w-[156px]">Quick revise</Button>
+            <Button variant="outline" onClick={() => setActive(group.secondaryTab)}>Open related</Button>
             <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
           </div>
         </Card>

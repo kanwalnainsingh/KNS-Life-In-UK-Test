@@ -74,6 +74,7 @@ It is designed to help learners revise quickly on mobile and desktop with:
 - Reworked `Wars & Battles` into a fuller study section with a one-glance war compare table, war-only mini tests, and cleaner handoff into `Story Mode`, `Timeline`, and war-focused quick revision.
 - Added a `Most tested first` war strip and a `war to person` drill so the main battle/person/date pairings are easier to revise quickly.
 - Added `Exam Topics` mode, which groups the course by likely exam question areas and links each topic area into the most relevant study sections and quick revision flow.
+- Polished `Exam Topics` visually with topic-weight bars, restrained per-topic accents, stronger completed states, and clearer learner-first action hierarchy.
 - Mock results now point learners to the weakest area and the most useful next revision step.
 - `Daily 10` now keeps wrong answers for end-of-session review with correct answer, context, and memory tip.
 - Added focused follow-up actions on the heavier topic pages so `Story Mode`, `Religion`, `Landmarks`, `Inventors`, and `Sports` can jump straight into topic-specific quick revision.

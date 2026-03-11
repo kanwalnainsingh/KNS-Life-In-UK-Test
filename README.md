@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 324 quiz questions · 💡 Memory clues · ⚠️ Confusing topics together · 📅 Full timeline · 📝 Mock tests with saved progress
 
-Current release: `v1.19.0`
+Current release: `v1.19.1`
 
 ---
 
@@ -128,6 +128,7 @@ UI stack now uses:
   - Everyday Life in the UK
   - Important People & Events
   - each topic has key facts, key names, and direct links into the best revision section
+  - visual topic weighting and clearer completed-state styling now make it easier to scan on mobile and desktop
 - `Revise Mistakes` now also links into saved questions and weak-fact study
 - Bottom mobile navigation now keeps the main study flow visible:
   - `Home`
