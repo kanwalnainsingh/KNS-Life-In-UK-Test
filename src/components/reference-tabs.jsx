@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import { Button } from "./ui/button.jsx";
 
 const CORE_SPORT_EVENT_NAMES = new Set(["Wimbledon", "FA Cup", "Grand National", "Boat Race", "London Marathon"]);
-const CORE_SPORT_STAR_NAMES = new Set(["Mo Farah", "Jessica Ennis-Hill", "Andy Murray", "Bradley Wiggins", "Jayne Torvill and Christopher Dean"]);
+const CORE_SPORT_STAR_NAMES = new Set([
+  "Sir Roger Bannister",
+  "Bobby Moore",
+  "Jayne Torvill & Christopher Dean",
+  "Sir Chris Hoy",
+  "Andy Murray",
+  "Mo Farah",
+  "Jessica Ennis-Hill",
+]);
 const CORE_FESTIVAL_NAMES = new Set(["Christmas", "Easter", "Boxing Day", "Diwali", "Eid al-Fitr", "Vaisakhi", "Hanukkah"]);
 
 const ExamFocusPanel = ({ Card, Badge, title, note, items, color = "#3b82f6" }) => (
@@ -152,6 +160,27 @@ export const SportsTab = ({
 }) => {
   const coreEvents = SPORTS_FACTS.filter((item) => CORE_SPORT_EVENT_NAMES.has(item.name));
   const coreStars = SPORTS_STARS.filter((item) => CORE_SPORT_STAR_NAMES.has(item.name));
+  const starGroups = [
+    {
+      title: "Most tested sports names",
+      items: [
+        "Roger Bannister = first sub-4-minute mile",
+        "Bobby Moore = 1966 World Cup captain",
+        "Torvill and Dean = 1984 Olympic gold",
+        "Chris Hoy = six Olympic cycling golds",
+        "Andy Murray = Wimbledon 2013",
+      ],
+    },
+    {
+      title: "Modern medal anchors",
+      items: [
+        "Mo Farah = 2012 double long-distance gold",
+        "Jessica Ennis-Hill = 2012 heptathlon gold",
+        "2012 London Olympics = UK finished 3rd in medal table",
+        "UK hosted Olympics in 1908, 1948, and 2012",
+      ],
+    },
+  ];
 
   return (
     <div className="topic-page">
@@ -177,6 +206,14 @@ export const SportsTab = ({
         </div>
         <MemoryHook text="Think event first: Wimbledon, FA Cup, Grand National, Boat Race. Then attach the names: Farah, Ennis-Hill, Murray, Wiggins, Torvill and Dean." />
       </Card>
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Most tested sports names"
+        note="These are the shortest sports facts most worth locking in for handbook-style questions."
+        color="#ef4444"
+        items={starGroups[0].items}
+      />
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Olympics and major event anchors</div>
         <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
@@ -195,9 +232,11 @@ export const SportsTab = ({
         color="#f59e0b"
         items={[
           "Wimbledon = tennis. FA Cup = football. Grand National = horse racing.",
-          "Boat Race = Oxford vs Cambridge.",
+          "Boat Race = Oxford vs Cambridge on the Thames.",
           "Rugby originated in England.",
-          "Torvill and Dean = gold medal ice skating pair.",
+          "Bobby Moore = England's 1966 World Cup captain.",
+          "Roger Bannister = first person to run a mile in under 4 minutes.",
+          "Torvill and Dean = 1984 Olympic gold medal pair.",
         ]}
       />
       {SPORTS_FACTS.map((item) => (
@@ -232,11 +271,19 @@ export const SportsTab = ({
           </div>
         </Card>
       ))}
+      <ExamFocusPanel
+        Card={Card}
+        Badge={Badge}
+        title="Modern medal anchors"
+        note="Use these as support after the classic event and name facts are secure."
+        color="#8b5cf6"
+        items={starGroups[1].items}
+      />
       <SectionStudyActions
         Card={Card}
         Badge={Badge}
         title="Keep sports revision short"
-        note="Sports is best revised as event anchors plus a few names, then tested quickly before the details fade."
+        note="Sports is best revised as event anchors plus a short list of names. Treat the extra stars below as support, not your first priority."
         actions={[
           { label: "Quick Revise Sports", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "fresh", topic: "Sports", sessionType: "short" }) },
           { label: "Daily 10", onClick: () => setActive("daily10") },

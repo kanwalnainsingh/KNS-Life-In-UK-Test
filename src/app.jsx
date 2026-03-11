@@ -1196,12 +1196,12 @@ const CORE_INT_ORGS = new Set([
 ]);
 
 const ARTS_CORE_BY_SECTION = {
-  literature: new Set(["William Shakespeare", "Charles Dickens", "Robert Burns", "Agatha Christie"]),
+  literature: new Set(["William Shakespeare", "Jane Austen", "Charles Dickens", "Robert Burns", "Agatha Christie"]),
   music: new Set(["George Frideric Handel", "Sir Edward Elgar", "The Beatles", "BBC Proms"]),
-  art: new Set(["Joseph Turner", "John Constable", "Henry Moore", "David Hockney"]),
+  art: new Set(["Joseph Turner", "Tate Britain & Tate Modern", "Turner Prize", "John Constable", "Henry Moore"]),
   architecture: new Set(["Sir Christopher Wren", "Sir Edwin Lutyens", "Gothic Revival (19th century)"]),
   fashion: new Set(["Mary Quant", "Alexander McQueen", "Vivienne Westwood"]),
-  film: new Set(["Charlie Chaplin", "Sir Laurence Olivier", "Sir Alfred Hitchcock"]),
+  film: new Set(["Sir Laurence Olivier", "Sir Alfred Hitchcock", "BAFTA", "Edinburgh Festival Fringe"]),
 };
 
 const pickRandom = (items, count) => [...items].sort(() => Math.random() - 0.5).slice(0, count);
@@ -5083,15 +5083,101 @@ const ArtsTab = ({ setActive }) => {
     { key: "art", label: "🎨 Art", color: "#ec4899" },
     { key: "architecture", label: "🏛️ Architecture", color: "#f59e0b" },
     { key: "fashion", label: "👗 Fashion", color: "#10b981" },
-    { key: "film", label: "🎬 Film", color: "#ef4444" },
+    { key: "film", label: "🎬 Film & Stage", color: "#ef4444" },
   ];
   const [activeSection, setActiveSection] = useState("literature");
   const sec = sections.find((s) => s.key === activeSection);
   const activeCore = ARTS_CORE_BY_SECTION[activeSection] || new Set();
   const orderedItems = [...(ARTS[activeSection] || [])].sort((a, b) => Number(activeCore.has(b.who)) - Number(activeCore.has(a.who)));
+  const artsCoreStrip = [
+    "Shakespeare = plays + Stratford-upon-Avon",
+    "Dickens = Victorian poverty",
+    "Burns = Scotland + Burns Night",
+    "Beatles = Liverpool",
+    "Handel = Messiah",
+    "Turner = landscapes and light",
+    "Wren = St Paul's after 1666",
+    "Mary Quant = miniskirt",
+    "Laurence Olivier = major British stage and film figure",
+  ];
+  const artsLikelyQuestions = {
+    literature: [
+      "Who wrote plays such as Hamlet and Macbeth? William Shakespeare.",
+      "Which novelist is linked with Victorian poverty? Charles Dickens.",
+      "Who is linked with Burns Night and Auld Lang Syne? Robert Burns.",
+      "Which author wrote Pride and Prejudice? Jane Austen.",
+    ],
+    music: [
+      "Who wrote Messiah? George Frideric Handel.",
+      "Which band is linked with Liverpool? The Beatles.",
+      "What major classical festival is held at the Royal Albert Hall? BBC Proms.",
+      "Which composer is linked with Land of Hope and Glory? Edward Elgar.",
+    ],
+    art: [
+      "Which painter is famous for landscapes, light, and the sea? J. M. W. Turner.",
+      "What is the difference between Tate Britain and Tate Modern?",
+      "What is the Turner Prize?",
+      "Who painted The Haywain? John Constable.",
+    ],
+    architecture: [
+      "Who rebuilt St Paul's Cathedral after the Great Fire of London? Christopher Wren.",
+      "Which war memorial in Whitehall is linked with Edwin Lutyens? The Cenotaph.",
+      "What style is linked with the Houses of Parliament and St Pancras? Gothic Revival.",
+    ],
+    fashion: [
+      "Who is linked with the miniskirt? Mary Quant.",
+      "Which British designer is linked with punk fashion? Vivienne Westwood.",
+      "Which dramatic British designer is Alexander McQueen?",
+    ],
+    film: [
+      "Which actor-director is a major British Shakespeare name? Laurence Olivier.",
+      "Who was known as the Master of Suspense? Alfred Hitchcock.",
+      "What do the initials BAFTA stand for?",
+      "What is the largest arts festival in the world? Edinburgh Festival Fringe.",
+    ],
+  };
+  const artsMixUps = {
+    literature: [
+      "Shakespeare = plays. Burns = Scotland and poetry.",
+      "Dickens = Victorian social novels. Austen = social observation and romance.",
+    ],
+    music: [
+      "Handel = Messiah. Elgar = Land of Hope and Glory.",
+      "Beatles = popular music. Proms = classical festival.",
+    ],
+    art: [
+      "Tate Britain = British art. Tate Modern = modern and contemporary art.",
+      "Turner = painter. Turner Prize = art prize named after him.",
+    ],
+    architecture: [
+      "Wren = St Paul's after 1666. Lutyens = Cenotaph.",
+      "Gothic Revival = style, not one person.",
+    ],
+    fashion: [
+      "Mary Quant = miniskirt. Westwood = punk fashion.",
+    ],
+    film: [
+      "BAFTA = awards body. Turner Prize = art prize.",
+      "Olivier = acting / stage and screen. Hitchcock = directing.",
+    ],
+  };
   return (
     <div className="topic-page">
-      <SectionTitle icon="🎭" meta="This section works best through anchor names: one writer, one composer, one artist, one architect, one fashion name, one film clue.">Arts & Culture</SectionTitle>
+      <SectionTitle icon="🎭" meta="Keep arts revision compressed: one writer, one composer, one artist, one architect, one fashion name, and one film or theatre clue.">Arts & Culture</SectionTitle>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Core arts names first</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the shortest arts anchors most worth remembering for the test before the wider culture list.</div>
+          </div>
+          <Badge text="Exam core" color="#ef4444" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {artsCoreStrip.map((item) => (
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item}</div>
+          ))}
+        </div>
+      </Card>
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {sections.map((s) => <TabButton key={s.key} active={activeSection === s.key} onClick={() => setActiveSection(s.key)}>{s.label}</TabButton>)}
       </div>
@@ -5107,6 +5193,20 @@ const ArtsTab = ({ setActive }) => {
         <MemoryHook text="If you forget an arts fact, first place it under literature, music, art, architecture, fashion, or film." />
       </Card>
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Likely questions in {sec ? sec.label : "Arts"}</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the short handbook-style cues most worth locking in for this subsection.</div>
+          </div>
+          <Badge text={`${artsLikelyQuestions[activeSection].length} question cues`} color={sec ? sec.color : "#64748b"} />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {artsLikelyQuestions[activeSection].map((item) => (
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item}</div>
+          ))}
+        </div>
+      </Card>
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 8 }}>Arts places and event anchors</div>
         <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.8 }}>
           • `Stratford-upon-Avon` = Shakespeare<br />
@@ -5117,11 +5217,19 @@ const ArtsTab = ({ setActive }) => {
         </div>
         <MemoryHook text="A lot of arts questions become easy if you remember the place or event attached to the person." />
       </Card>
+      <Card style={{ background: "color-mix(in srgb, #f59e0b 8%, var(--card-bg))", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))" }}>
+        <div style={{ fontWeight: 800, color: "#f59e0b", marginBottom: 8 }}>Common mix-ups in {sec ? sec.label : "Arts"}</div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {artsMixUps[activeSection].map((item) => (
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item}</div>
+          ))}
+        </div>
+      </Card>
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
             <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>Most important names first</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Start with the big recognition names in this category, then use the rest as extra support.</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Start with the big recognition names in this category, then use the rest as extra support once those are secure.</div>
           </div>
           <Badge text={sec ? sec.label : "Arts"} color={sec ? sec.color : "#64748b"} />
         </div>
@@ -5145,7 +5253,7 @@ const ArtsTab = ({ setActive }) => {
         Card={Card}
         Badge={Badge}
         title="Keep arts revision short"
-        note="Arts works best as a short anchor pass, then a broader revision mode so these names do not crowd out higher-yield history and civics."
+        note="Arts works best as a short anchor pass with names, places, and one or two compare traps. Keep the lower cards as support, not your first priority."
         actions={[
           { label: "Quick Revise", primary: true, onClick: () => setActive("quickrev") },
           { label: "Daily 10", onClick: () => setActive("daily10") },
