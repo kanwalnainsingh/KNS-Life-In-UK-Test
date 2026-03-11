@@ -2017,6 +2017,15 @@ const buildMockCategoryBreakdown = (questions, answers) =>
 const buildExamTopicQuestionPool = (group) =>
   ALL_QUIZ.filter((question) => group.match.test(`${question.q} ${question.tip}`));
 
+const getExamTopicMockLabel = (groupId) => ({
+  values: "Values mock",
+  history: "History mock",
+  government: "Gov & law mock",
+  society: "Society mock",
+  everyday: "Everyday mock",
+  people: "People mock",
+}[groupId] || "Topic mock");
+
 const buildExamTopicMockProgress = (history) =>
   history.reduce((acc, item) => {
     const prev = acc[item.groupId] || {
@@ -3076,7 +3085,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
           >
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
               <div>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Start a full topic mock</div>
+                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Full topic mock</div>
                 <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
                   All {group.questionPool.length} questions for this topic from the current bank
                 </div>
@@ -3090,10 +3099,11 @@ const ExamTopicsModeTab = ({ setActive }) => {
               )}
             </div>
 
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "space-between", alignItems: "center" }}>
               <Button onClick={() => startTopicMock(group.id)} className="min-w-[170px]">
-                {topicMock.groupId === group.id && !topicMock.finished ? "Restart topic mock" : "Start topic mock"}
+                {topicMock.groupId === group.id && !topicMock.finished ? `Restart ${getExamTopicMockLabel(group.id).toLowerCase()}` : getExamTopicMockLabel(group.id)}
               </Button>
+              <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
             </div>
 
             {topicMock.groupId === group.id && topicMock.questions.length > 0 && (
@@ -3150,16 +3160,12 @@ const ExamTopicsModeTab = ({ setActive }) => {
                       </div>
                     )}
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                      <Button onClick={() => startTopicMock(group.id)}>Retake topic mock</Button>
+                      <Button onClick={() => startTopicMock(group.id)}>{`Retake ${getExamTopicMockLabel(group.id).toLowerCase()}`}</Button>
                     </div>
                   </>
                 )}
               </div>
             )}
-          </div>
-
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
           </div>
         </Card>
       ))}

@@ -129,7 +129,7 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "British Values, Principles & Traditions");
     await waitForText(page, "Important People & Events");
     await waitForText(page, "Question coverage");
-    await clickByText(page, "Start topic mock");
+    await clickByText(page, "Values mock");
     await waitForText(page, "Question 1 of");
     await clickFirstAnswerOption(page);
     await waitForText(page, "Why this question matters");
