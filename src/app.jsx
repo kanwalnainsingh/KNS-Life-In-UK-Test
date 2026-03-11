@@ -2858,6 +2858,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
     confirmed: false,
     score: 0,
     wrong: [],
+    results: [],
     finished: false,
   });
   const completedSet = new Set(completed);
@@ -2910,6 +2911,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
       confirmed: false,
       score: 0,
       wrong: [],
+      results: [],
       finished: false,
     });
     requestAnimationFrame(() => {
@@ -2929,6 +2931,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
       confirmed: true,
       score: prev.score + (isCorrect ? 1 : 0),
       wrong: isCorrect ? prev.wrong : [...prev.wrong, { ...question, chosen: optionIndex }],
+      results: [...prev.results, { ...question, chosen: optionIndex, correct: isCorrect }],
     }));
   };
 
@@ -3135,12 +3138,49 @@ const ExamTopicsModeTab = ({ setActive }) => {
                   </>
                 ) : (
                   <>
+                    <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 14 }}>
+                      <div className="subtle-panel" style={{ padding: 12 }}>
+                        <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Correct</div>
+                        <div style={{ color: "var(--text-strong)", fontSize: 22, fontWeight: 900 }}>
+                          {topicMock.score}
+                        </div>
+                        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                          Questions you answered correctly in this topic mock.
+                        </div>
+                      </div>
+                      <div className="subtle-panel" style={{ padding: 12 }}>
+                        <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 800, marginBottom: 4 }}>Wrong</div>
+                        <div style={{ color: "var(--text-strong)", fontSize: 22, fontWeight: 900 }}>
+                          {topicMock.questions.length - topicMock.score}
+                        </div>
+                        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                          Review these now so you do not repeat the same mistakes.
+                        </div>
+                      </div>
+                    </div>
                     <div style={{ fontWeight: 900, fontSize: 22, color: "var(--text-strong)", marginBottom: 6 }}>
                       Topic mock score: {topicMock.score}/{topicMock.questions.length}
                     </div>
                     <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
                       Use this result to decide whether this topic is ready for full mocks or needs one more pass through the facts and traps.
                     </div>
+                    {topicMock.results.some((item) => item.correct) && (
+                      <Card style={{ border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", background: "color-mix(in srgb, #22c55e 7%, var(--card-bg))", marginTop: 14 }}>
+                        <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 8 }}>What you got right</div>
+                        <div style={{ display: "grid", gap: 6 }}>
+                          {topicMock.results.filter((item) => item.correct).slice(0, 6).map((question, index) => (
+                            <div key={`${question.q}-right-${index}`} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>
+                              • {question.q}
+                            </div>
+                          ))}
+                        </div>
+                        {topicMock.results.filter((item) => item.correct).length > 6 && (
+                          <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 8 }}>
+                            + {topicMock.results.filter((item) => item.correct).length - 6} more correct answers in this topic mock
+                          </div>
+                        )}
+                      </Card>
+                    )}
                     {topicMock.wrong.length > 0 && (
                       <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
                         {topicMock.wrong.map((question, index) => (
