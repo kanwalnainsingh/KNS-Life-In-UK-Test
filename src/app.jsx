@@ -3501,148 +3501,308 @@ const WarsTab = () => {
 };
 
 // ── 4 NATIONS ────────────────────────────────────────────────
-const NationsTab = ({ setActive }) => (
-  <div className="topic-page">
-    <SectionTitle icon="🏴" meta="Use comparison blocks to separate nation facts quickly.">The 4 Nations</SectionTitle>
-    <Card className="setup-card">
-      <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
-        <div className="subtle-panel" style={{ background: "color-mix(in srgb, #3b82f6 12%, var(--card-bg))", padding: 12 }}>
-          <div style={{ fontWeight: 800, color: "#2563eb", marginBottom: 6 }}>Great Britain</div>
-          <div style={{ color: "var(--text)", fontSize: 14 }}>England + Scotland + Wales = 3 nations</div>
-        </div>
-        <div className="subtle-panel" style={{ background: "color-mix(in srgb, #ef4444 12%, var(--card-bg))", padding: 12 }}>
-          <div style={{ fontWeight: 800, color: "#dc2626", marginBottom: 6 }}>United Kingdom</div>
-          <div style={{ color: "var(--text)", fontSize: 14 }}>Great Britain + Northern Ireland = 4 nations</div>
-        </div>
-      </div>
-      <MemoryHook text="UK = GB + Northern Ireland. One extra nation." />
-    </Card>
-    <Card className="support-card-strong">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        <div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>4 Nations quick compare</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Best for capitals, saints, symbols, parliaments, and cross-nation rule differences.</div>
-        </div>
-        <Badge text="High-yield nation facts" color="#22c55e" />
-      </div>
-      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
-        {[
-          "LECB = London, Edinburgh, Cardiff, Belfast.",
-          "England has no separate parliament. The other 3 nations have devolved bodies.",
-          "St George, St Andrew, St David, St Patrick = key nation-day sequence.",
-          "Rose, thistle, daffodil, shamrock = nation flowers.",
-          "England and Wales share one legal system. Scotland and Northern Ireland have separate systems.",
-          "Scotland = Highers. England, Wales and Northern Ireland = A-levels.",
-          "Scotland = Church of Scotland. England = Church of England.",
-          "Northern Ireland = photo ID at polling station.",
-        ].map((item) => (
-          <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
-            {item}
+const NATION_COMPARE_ROWS = [
+  { label: "Capital", values: { ENGLAND: "London", SCOTLAND: "Edinburgh", WALES: "Cardiff", "N. IRELAND": "Belfast" } },
+  { label: "Saint", values: { ENGLAND: "St George", SCOTLAND: "St Andrew", WALES: "St David", "N. IRELAND": "St Patrick" } },
+  { label: "Saint's day", values: { ENGLAND: "23 April", SCOTLAND: "30 November", WALES: "1 March", "N. IRELAND": "17 March" } },
+  { label: "Flower / symbol", values: { ENGLAND: "Rose", SCOTLAND: "Thistle", WALES: "Daffodil / Leek", "N. IRELAND": "Shamrock" } },
+  { label: "Parliament / assembly", values: { ENGLAND: "No separate parliament", SCOTLAND: "Holyrood", WALES: "Senedd", "N. IRELAND": "Stormont" } },
+  { label: "Legal system", values: { ENGLAND: "Shared with Wales", SCOTLAND: "Separate", WALES: "Shared with England", "N. IRELAND": "Separate" } },
+  { label: "Language clue", values: { ENGLAND: "English", SCOTLAND: "English + Scottish Gaelic", WALES: "English + Welsh", "N. IRELAND": "English + Irish" } },
+];
+
+const NATION_DETAIL_GROUPS = {
+  ENGLAND: {
+    people: ["William the Conqueror", "Henry VIII", "William Shakespeare"],
+    places: ["London", "Stonehenge", "Tower of London", "Buckingham Palace", "Windsor Castle"],
+    events: ["1066 Battle of Hastings", "Church of England and monarchy", "No separate parliament"],
+    trap: "England is part of the UK but does not have its own separate parliament.",
+  },
+  SCOTLAND: {
+    people: ["Robert the Bruce", "Bonnie Prince Charlie", "John Logie Baird"],
+    places: ["Edinburgh", "Loch Ness", "Loch Lomond", "Skara Brae", "Holyrood"],
+    events: ["1314 Bannockburn", "1746 Culloden", "Highers, not A-levels"],
+    trap: "Church of Scotland is not led by the monarch, and Scotland has its own legal system.",
+  },
+  WALES: {
+    people: ["St David", "Henry VIII", "Nye Bevan"],
+    places: ["Cardiff", "Snowdonia", "Cardiff Bay", "Bodnant Gardens", "Millennium Stadium"],
+    events: ["1284 Edward I annexes Wales", "1536-1543 Acts of Union", "Welsh language as the strongest clue"],
+    trap: "Wales is not shown separately in the Union Jack because it was already joined to England.",
+  },
+  "N. IRELAND": {
+    people: ["St Patrick", "William III", "James II"],
+    places: ["Belfast", "Stormont", "Giant's Causeway"],
+    events: ["1690 Battle of the Boyne", "1998 Good Friday Agreement", "Photo ID at polling stations"],
+    trap: "Northern Ireland is part of the UK, but the Republic of Ireland is not.",
+  },
+};
+
+const NATION_SECTION_TRAPS = [
+  "England has no separate parliament. Scotland, Wales and Northern Ireland have devolved bodies.",
+  "England and Wales share one legal system. Scotland and Northern Ireland have separate systems.",
+  "Scotland uses Highers. England, Wales and Northern Ireland use A-levels.",
+  "Monarch is head of the Church of England, but not head of the Church of Scotland.",
+  "Northern Ireland requires photo ID to vote. The other nations do not use that rule in the same way.",
+];
+
+const NATIONS_TEST_OPTIONS = [
+  { id: "mixed", label: "Mixed nation test", match: /england|scotland|wales|northern ireland|great britain|united kingdom|british isles|capital|saint|flower|senedd|holyrood|stormont|highers|a-level|photo id|crown dependenc|channel islands|overseas territor|republic of ireland/i },
+  { id: "capitals", label: "Capitals only", match: /capital city|capital of/i },
+  { id: "saints", label: "Saints & symbols", match: /st george|st andrew|st david|st patrick|saint|shamrock|thistle|daffodil|rose|leek/i },
+  { id: "traps", label: "Nation traps", match: /great britain|united kingdom|british isles|crown dependenc|channel islands|overseas territor|republic of ireland|legal system|highers|a-level|photo id/i },
+];
+
+const NationsTab = ({ setActive }) => {
+  const [testType, setTestType] = useState("mixed");
+  const [testQuestions, setTestQuestions] = useState([]);
+  const [testCurrent, setTestCurrent] = useState(0);
+  const [testSelected, setTestSelected] = useState(null);
+  const [testConfirmed, setTestConfirmed] = useState(false);
+  const [testScore, setTestScore] = useState(0);
+  const [testWrong, setTestWrong] = useState([]);
+  const [testFinished, setTestFinished] = useState(false);
+
+  const nationTestPool = useMemo(() => {
+    const matcher = NATIONS_TEST_OPTIONS.find((option) => option.id === testType)?.match || NATIONS_TEST_OPTIONS[0].match;
+    return ALL_QUIZ.filter((question) => matcher.test(`${question.q} ${question.tip}`));
+  }, [testType]);
+
+  const startNationTest = (selectedType = testType) => {
+    const matcher = NATIONS_TEST_OPTIONS.find((option) => option.id === selectedType)?.match || NATIONS_TEST_OPTIONS[0].match;
+    const pool = ALL_QUIZ.filter((question) => matcher.test(`${question.q} ${question.tip}`));
+    const total = Math.min(6, pool.length);
+    setTestType(selectedType);
+    setTestQuestions(pickRandomNoRepeat(pool, total, `lifeuk-recent-nations-${selectedType}`, 40).map((question, index) => prepareQuestionVariant(question, 26000 + index)));
+    setTestCurrent(0);
+    setTestSelected(null);
+    setTestConfirmed(false);
+    setTestScore(0);
+    setTestWrong([]);
+    setTestFinished(false);
+    scrollPageTop();
+  };
+
+  const answerNationQuestion = (optionIndex) => {
+    if (testConfirmed || testFinished) return;
+    const question = testQuestions[testCurrent];
+    const isCorrect = optionIndex === question.a;
+    setTestSelected(optionIndex);
+    setTestConfirmed(true);
+    if (isCorrect) setTestScore((value) => value + 1);
+    else setTestWrong((items) => [...items, { ...question, chosen: optionIndex }]);
+  };
+
+  const nextNationQuestion = () => {
+    if (testCurrent + 1 >= testQuestions.length) {
+      setTestFinished(true);
+      if (testWrong.length) saveWrongQuestions(testWrong);
+      return;
+    }
+    setTestCurrent((value) => value + 1);
+    setTestSelected(null);
+    setTestConfirmed(false);
+  };
+
+  return (
+    <div className="topic-page">
+      <SectionTitle icon="🏴" meta="Use this section to finish capitals, saints, symbols, legal systems, devolved institutions, and UK identity traps in one place.">The 4 Nations</SectionTitle>
+      <Card className="setup-card">
+        <div className="compare-grid" style={{ display: "grid", gap: 10 }}>
+          <div className="subtle-panel" style={{ background: "color-mix(in srgb, #3b82f6 12%, var(--card-bg))", padding: 12 }}>
+            <div style={{ fontWeight: 800, color: "#2563eb", marginBottom: 6 }}>Great Britain</div>
+            <div style={{ color: "var(--text)", fontSize: 14 }}>England + Scotland + Wales = 3 nations</div>
           </div>
-        ))}
-      </div>
-    </Card>
-    <Card className="support-card">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-        <div>
-          <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Cross-nation compare pack</div>
-          <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the nation facts people often mix because the names look similar but the systems differ.</div>
+          <div className="subtle-panel" style={{ background: "color-mix(in srgb, #ef4444 12%, var(--card-bg))", padding: 12 }}>
+            <div style={{ fontWeight: 800, color: "#dc2626", marginBottom: 6 }}>United Kingdom</div>
+            <div style={{ color: "var(--text)", fontSize: 14 }}>Great Britain + Northern Ireland = 4 nations</div>
+          </div>
         </div>
-        <Badge text="System differences" color="#3b82f6" />
-      </div>
-      <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
-        {[
-          {
-            title: "Legal systems",
-            points: [
-              "England and Wales share one legal system.",
-              "Scotland has a separate legal system.",
-              "Northern Ireland also has a separate legal system.",
-            ],
-          },
-          {
-            title: "Courts and justice",
-            points: [
-              "Scotland = Court of Session for highest civil court.",
-              "Scotland = Children's Hearing System instead of Youth Court wording.",
-              "England, Wales and Northern Ireland use Crown Court / High Court wording more often in the handbook.",
-            ],
-          },
-          {
-            title: "Education",
-            points: [
-              "Scotland uses Highers.",
-              "England, Wales and Northern Ireland use A-levels.",
-              "Do not assume one school qualification name fits the whole UK.",
-            ],
-          },
-          {
-            title: "Voting and church",
-            points: [
-              "Northern Ireland requires photo ID at polling stations.",
-              "Monarch is head of Church of England.",
-              "Monarch is not head of Church of Scotland.",
-            ],
-          },
-        ].map((item) => (
-          <div key={item.title} className="subtle-panel" style={{ padding: 12 }}>
-            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 8 }}>{item.title}</div>
-            <div style={{ display: "grid", gap: 6 }}>
-              {item.points.map((point) => (
-                <div key={point} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>• {point}</div>
+        <MemoryHook text="UK = GB + Northern Ireland. One extra nation." />
+      </Card>
+
+      <Card className="support-card-strong">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>One-glance nation compare table</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>This is the fastest way to lock in capitals, saints, symbols, parliaments, and legal-system differences.</div>
+          </div>
+          <Badge text="Exam favourites first" color="#22c55e" />
+        </div>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: 0, minWidth: 720 }}>
+            <thead>
+              <tr>
+                <th style={{ textAlign: "left", padding: "10px 12px", color: "var(--text-muted)", fontSize: 12 }}>Topic</th>
+                {NATIONS.map((nation) => (
+                  <th key={nation.name} style={{ textAlign: "left", padding: "10px 12px", color: nation.color, fontSize: 12, fontWeight: 800 }}>{nation.name}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {NATION_COMPARE_ROWS.map((row) => (
+                <tr key={row.label}>
+                  <td style={{ padding: "10px 12px", color: "var(--text-strong)", fontSize: 13, fontWeight: 700, borderTop: "1px solid var(--card-border)" }}>{row.label}</td>
+                  {NATIONS.map((nation) => (
+                    <td key={`${row.label}-${nation.name}`} style={{ padding: "10px 12px", color: "var(--text)", fontSize: 13, lineHeight: 1.5, borderTop: "1px solid var(--card-border)" }}>
+                      {row.values[nation.name]}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <MemoryHook text="LECB for capitals. Then learn saint, day, flower, parliament, legal system for each nation." />
+      </Card>
+
+      <Card className="support-card">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Nation traps and identity links</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These are the system and identity differences most likely to be mixed in the test.</div>
+          </div>
+          <Badge text="Common mix-ups" color="#f59e0b" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+          {NATION_SECTION_TRAPS.map((item) => (
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item}</div>
+          ))}
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          {[
+            "British Isles = geography, not the same thing as the UK.",
+            "Republic of Ireland is not part of the UK.",
+            "Crown Dependencies = Jersey, Guernsey, Isle of Man. Not part of the UK.",
+            "British Overseas Territories are also not part of the UK. Gibraltar is the classic example.",
+          ].map((item) => (
+            <div key={item} className="subtle-panel" style={{ padding: 12, color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{item}</div>
+          ))}
+        </div>
+      </Card>
+
+      {NATIONS.map((nation) => {
+        const details = NATION_DETAIL_GROUPS[nation.name];
+        return (
+          <Card key={nation.name} className="quick-revision-card" style={{ border: `1px solid ${nation.color}33` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
+              <span style={{ fontSize: 36 }}>{nation.flag}</span>
+              <div>
+                <h3 style={{ color: nation.color, fontWeight: 800, fontSize: 22 }}>{nation.name}</h3>
+                <div style={{ color: "var(--text-muted)", fontSize: 13 }}>{nation.pop} of UK population</div>
+              </div>
+            </div>
+
+            <div className="fact-grid-two" style={{ display: "grid", gap: 8, marginBottom: 10 }}>
+              {[["Capital", nation.capital], ["Saint", nation.saint], ["Saint's day", nation.day], ["Flower / symbol", nation.flower], ["Language", nation.lang], ["Parliament / assembly", nation.parliament]].map(([label, value]) => (
+                <div key={label} className="subtle-panel" style={{ padding: "10px 12px" }}>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>{label}</div>
+                  <div style={{ fontSize: 13, color: "var(--text-strong)", fontWeight: 600 }}>{value}</div>
+                </div>
               ))}
             </div>
-          </div>
-        ))}
-      </div>
-    </Card>
-    {NATIONS.map((n) => (
-      <Card key={n.name} className="quick-revision-card" style={{ border: `1px solid ${n.color}33` }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-          <span style={{ fontSize: 36 }}>{n.flag}</span>
+
+            <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
+              {[
+                { title: "Must know first", items: NATION_KEY_POINTS[nation.name].slice(0, 4), color: "#ef4444" },
+                { title: "People to link", items: details.people, color: "#8b5cf6" },
+                { title: "Places to link", items: details.places, color: "#0ea5e9" },
+                { title: "Battles / events", items: details.events, color: "#f59e0b" },
+              ].map((group) => (
+                <div key={group.title} className="subtle-panel" style={{ padding: 12 }}>
+                  <div style={{ color: group.color, fontWeight: 800, marginBottom: 8, fontSize: 12 }}>{group.title}</div>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    {group.items.map((item) => (
+                      <div key={item} style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.55 }}>• {item}</div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Card style={{ border: `1px solid ${nation.color}33`, background: `color-mix(in srgb, ${nation.color} 7%, var(--card-bg))` }}>
+              <div style={{ fontSize: 12, color: nation.color, fontWeight: 800, marginBottom: 4 }}>Common trap</div>
+              <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{details.trap}</div>
+            </Card>
+          </Card>
+        );
+      })}
+
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
           <div>
-            <h3 style={{ color: n.color, fontWeight: 800, fontSize: 22 }}>{n.name}</h3>
-            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>{n.pop} of UK population</div>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Test this section</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use a short nation-only test while the capitals, saints, systems, and UK-boundary facts are still fresh.</div>
           </div>
+          <Badge text={`${nationTestPool.length} questions available`} color="#3b82f6" />
         </div>
-        <div className="fact-grid-two" style={{ display: "grid", gap: 8, marginBottom: 10 }}>
-          {[["🙏 Saint", n.saint], ["📅 Day", n.day], ["🌸 Flower", n.flower], ["🏙️ Capital", n.capital], ["🗣️ Language", n.lang], ["🍽️ Food", n.food]].map(([label, val]) => (
-            <div key={label} className="subtle-panel" style={{ padding: "10px 12px" }}>
-              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 2 }}>{label}</div>
-              <div style={{ fontSize: 13, color: "var(--text-strong)", fontWeight: 600 }}>{val}</div>
-            </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+          {NATIONS_TEST_OPTIONS.map((option) => (
+            <Button key={option.id} variant={testType === option.id ? "default" : "secondary"} onClick={() => setTestType(option.id)}>{option.label}</Button>
           ))}
+          <Button variant="outline" onClick={() => startNationTest(testType)}>Start test</Button>
         </div>
-        <div className="subtle-panel" style={{ padding: 10, marginBottom: 8, background: "color-mix(in srgb, var(--accent) 18%, var(--card-bg))" }}>
-          <div style={{ fontSize: 12, color: "#4f46e5", fontWeight: 800, marginBottom: 4 }}>🏛️ Parliament</div>
-          <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{n.parliament}</div>
-        </div>
-        <div style={{ display: "grid", gap: 6, marginBottom: 10 }}>
-          {NATION_KEY_POINTS[n.name].map((point) => (
-            <div key={point} className="subtle-panel" style={{ display: "flex", gap: 8, alignItems: "flex-start", color: "var(--text)", fontSize: 13, lineHeight: 1.55, padding: "10px 12px" }}>
-              <span style={{ color: n.color, fontWeight: 800 }}>•</span>
-              <span>{point}</span>
-            </div>
-          ))}
-        </div>
-        {n.tricks.map((t, i) => (
-          <div key={i} style={{ fontSize: 13, color: "var(--text)", padding: "6px 0", borderBottom: i < n.tricks.length - 1 ? "1px solid var(--card-border)" : "none" }}>⚡ {t}</div>
-        ))}
+
+        {testQuestions.length > 0 && (
+          !testFinished ? (
+            <>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 10 }}>Question {testCurrent + 1} of {testQuestions.length}</div>
+              <QuestionCard
+                question={testQuestions[testCurrent]}
+                selected={testSelected}
+                confirmed={testConfirmed}
+                onSelect={answerNationQuestion}
+              />
+              {testConfirmed && (
+                <div style={{ marginTop: 14 }}>
+                  <MemoryHook text={testQuestions[testCurrent].tip.replace(/^[⭐📌💡]\s*/, "")} />
+                  <Button className="mt-3 w-full" onClick={nextNationQuestion}>
+                    {testCurrent + 1 >= testQuestions.length ? "Finish nation test" : "Next question"}
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <div style={{ fontWeight: 900, fontSize: 24, color: "var(--text-strong)", marginBottom: 6 }}>Nation score: {testScore}/{testQuestions.length}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>This section should feel automatic before a mock: capitals, saints, parliaments, legal systems, and UK identity boundaries.</div>
+              {testWrong.length > 0 && (
+                <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+                  {testWrong.map((question, index) => (
+                    <Card key={`${question.q}-${index}`} style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+                      <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 6 }}>{question.q}</div>
+                      <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>
+                        <div>Your answer: <strong>{question.opts[question.chosen] || "No answer"}</strong></div>
+                        <div>Correct answer: <strong>{question.opts[question.a]}</strong></div>
+                      </div>
+                      <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                    </Card>
+                  ))}
+                </div>
+              )}
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                <Button onClick={() => startNationTest(testType)}>Retake this test</Button>
+                <Button variant="secondary" onClick={() => launchQuickRevision(setActive, { focus: "nations", topic: "4 Nations", sessionType: "short" })}>Quick revise 4 Nations</Button>
+              </div>
+            </>
+          )
+        )}
       </Card>
-    ))}
-    <SectionStudyActions
-      Card={Card}
-      Badge={Badge}
-      title="Use these nation facts right away"
-      note="This page is best followed by compare-heavy or question-heavy revision while the capitals, systems, and saints are still fresh."
-      actions={[
-        { label: "Quick Revise 4 Nations", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "nations", topic: "4 Nations", sessionType: "short" }) },
-        { label: "Open Traps", onClick: () => setActive("confuse") },
-        { label: "Take a Mock", onClick: () => setActive("mock") },
-      ]}
-    />
-  </div>
-);
+
+      <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
+        title="Use these nation facts right away"
+        note="This section now works best as a full nation course: compare table first, country links next, then a short nation-only test before moving into traps or mocks."
+        actions={[
+          { label: "Quick Revise 4 Nations", primary: true, onClick: () => launchQuickRevision(setActive, { focus: "nations", topic: "4 Nations", sessionType: "short" }) },
+          { label: "Open Traps", onClick: () => setActive("confuse") },
+          { label: "Take a Mock", onClick: () => setActive("mock") },
+        ]}
+      />
+    </div>
+  );
+};
 
 // ── CONFUSABLES ──────────────────────────────────────────────
 const ConfuseTab = () => {
