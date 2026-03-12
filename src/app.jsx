@@ -229,8 +229,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     color: "#4f46e5",
     weight: 4,
     title: "British Values, Principles & Traditions",
-    approx: "3-5 questions",
-    covers: "Democracy, rule of law, individual liberty, tolerance, rights, responsibilities, national symbols, and major national days.",
+    approx: "Study guide estimate: 3-5 questions",
+    covers: "Democracy, rule of law, liberty, mutual respect and tolerance, rights, responsibilities, plus the most tested national symbols and days.",
     keyFacts: [
       "DRIM = Democracy, Rule of law, Individual liberty, Mutual respect and tolerance.",
       "Rights include freedom of speech, religion, association, and a fair trial.",
@@ -238,7 +238,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
       "Church of England is the established church in England and the monarch is its head.",
       "Union Flag, the four patron saints, Bonfire Night, and Remembrance Day are classic tradition and identity facts.",
     ],
-    people: ["Monarch", "Patron saints"],
+    people: ["Patron saints", "Monarch", "Britannia"],
     primaryTab: "quickfacts",
     secondaryTab: "anthem",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
@@ -251,8 +251,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     color: "#d97706",
     weight: 9,
     title: "UK History",
-    approx: "7-10 questions",
-    covers: "Romans, Anglo-Saxons, Vikings, Normans, Tudors, Stuarts, Industrial Revolution, reform, world wars, and welfare-state change.",
+    approx: "Study guide estimate: 7-10 questions",
+    covers: "Romans, Anglo-Saxons, Vikings, Normans, Tudors, Stuarts, reform, votes, wars, and the welfare-state story.",
     keyFacts: [
       "Use a history spine: 43, 1066, 1215, 1534, 1588, 1707, 1805, 1815, 1914-18, 1939-45, 1948.",
       "Caesar fails in 55 BC; Claudius succeeds in 43 AD.",
@@ -273,8 +273,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     color: "#2563eb",
     weight: 4,
     title: "Government & Law",
-    approx: "3-5 questions",
-    covers: "Parliament, elections, the constitution, devolved governments, police, courts, legal principles, and jury service.",
+    approx: "Study guide estimate: 3-5 questions",
+    covers: "Parliament, elections, devolved governments, courts, legal principles, jury service, and how the UK state works.",
     keyFacts: [
       "UK = constitutional monarchy and parliamentary democracy.",
       "Parliament = Monarch + House of Commons + House of Lords.",
@@ -282,7 +282,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
       "Voting age = 18 and general elections happen at least every 5 years.",
       "Supreme Court = highest court. Crown Court jury usually = 12 people.",
     ],
-    people: ["Robert Walpole", "Speaker of the House of Commons"],
+    people: ["Robert Walpole", "Speaker", "Prime Minister"],
     primaryTab: "quickfacts",
     secondaryTab: "confuse",
     quickFocus: { focus: "core", topic: "Law", sessionType: "short" },
@@ -295,16 +295,16 @@ const EXAM_TOPIC_MODE_GROUPS = [
     color: "#0f766e",
     weight: 3,
     title: "Modern UK Society",
-    approx: "2-4 questions",
-    covers: "Population, the 4 nations, religion, culture, sport, media, and modern British public life.",
+    approx: "Study guide estimate: 2-4 questions",
+    covers: "Population, UK identity, the 4 nations, religion, media, culture, sport, landmarks, and modern British public life.",
     keyFacts: [
       "UK = England, Scotland, Wales, Northern Ireland.",
       "Population in the handbook-era facts = just over 66 million in 2017.",
       "Religious freedom matters, and many people in the UK say they have no religion.",
       "BBC is the main public-service broadcaster funded mainly by the TV licence fee.",
-      "Capitals, landmarks, national parks, and famous events like Wimbledon and the Grand National sit in this bucket.",
+      "This bucket also carries UK identity and place facts like Great Britain, the UK, British Isles, capitals, landmarks, and major public institutions.",
     ],
-    people: ["The Beatles", "William Shakespeare", "Andy Murray"],
+    people: ["The Beatles", "William Shakespeare", "Andy Murray", "BBC"],
     primaryTab: "nations",
     secondaryTab: "religion",
     quickFocus: { focus: "fresh", topic: "All topics", sessionType: "short" },
@@ -317,8 +317,8 @@ const EXAM_TOPIC_MODE_GROUPS = [
     color: "#16a34a",
     weight: 3,
     title: "Everyday Life in the UK",
-    approx: "2-4 questions",
-    covers: "Education, NHS, work, volunteering, community life, driving, taxes, and practical civic rules.",
+    approx: "Study guide estimate: 2-4 questions",
+    covers: "Education, NHS, work, volunteering, taxes, driving, public rules, and the practical citizenship/settlement basics.",
     keyFacts: [
       "Compulsory school age is 5-16, but young people must stay in education or training until 18.",
       "GCSEs are taken around 16; Scotland uses Highers instead of A-levels.",
@@ -326,7 +326,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
       "National Insurance helps fund NHS, state pension, and benefits; council tax funds local services.",
       "People drive on the left. 999 and 112 are emergency numbers; 101 is non-emergency police.",
     ],
-    people: ["Aneurin Bevan", "School governors", "GPs"],
+    people: ["Aneurin Bevan", "GP", "School governors"],
     primaryTab: "quickfacts",
     secondaryTab: "tracker",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
@@ -339,14 +339,14 @@ const EXAM_TOPIC_MODE_GROUPS = [
     color: "#7c3aed",
     weight: 2,
     title: "Important People & Events",
-    approx: "2-3 questions",
-    covers: "Frequently tested rulers, reformers, scientists, writers, and a short list of named events that often come up directly.",
+    approx: "Study guide estimate: 2-3 questions",
+    covers: "Frequently tested rulers, reformers, scientists, writers, inventors, sports stars, and named events that are often asked directly.",
     keyFacts: [
       "Top names to lock in first: William the Conqueror, Henry VIII, Elizabeth I, Churchill, Pankhurst, Newton, Darwin, Fleming, Berners-Lee, Shakespeare.",
       "Top events to lock in first: 1066 Hastings, 1605 Gunpowder Plot, 1666 Great Fire of London, WWI, WWII.",
       "Henry VIII, Elizabeth I, Churchill, and Attlee link directly to major history anchors.",
       "Newton, Darwin, Fleming, and Berners-Lee are the science names most worth learning first.",
-      "Shakespeare, Jane Austen, J. K. Rowling, and the Beatles cover a lot of culture questions quickly.",
+      "Shakespeare, Jane Austen, J. K. Rowling, the Beatles, and a few sports names cover most direct people-and-achievement questions.",
     ],
     people: ["William the Conqueror", "Henry VIII", "Elizabeth I", "Winston Churchill", "Emmeline Pankhurst", "Isaac Newton"],
     primaryTab: "figures",
@@ -3515,13 +3515,13 @@ const ExamTopicsModeTab = ({ setActive }) => {
 
   return (
     <div className="topic-page">
-      <SectionTitle icon="🧭" meta="Use this mode when you want to complete the course by official-style exam topic rather than by section names.">Exam Topics Course</SectionTitle>
+      <SectionTitle icon="🧭" meta="Use this mode after learning the sections. It groups revision by official-style exam area rather than by page names.">Exam Topics Course</SectionTitle>
       <Card style={{ background: "linear-gradient(135deg, color-mix(in srgb, var(--accent) 12%, var(--card-bg)) 0%, color-mix(in srgb, #22c55e 8%, var(--card-bg)) 100%)", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
           <div>
             <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)", marginBottom: 6 }}>Complete the course by exam question area</div>
             <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, maxWidth: 760 }}>
-              This mode groups the course the way learners often think about the test: values, history, government, society, everyday life, and important people/events. Each topic now also has its own mini mock from the existing question bank.
+              This mode groups revision into the six broad exam areas learners usually revise toward: values, history, government, society, everyday life, and important people/events. Each topic also has its own topic mock from the existing question bank.
             </div>
           </div>
           <Badge text={`${doneCount}/${EXAM_TOPIC_MODE_GROUPS.length} topics done`} color="#22c55e" />
@@ -3550,9 +3550,9 @@ const ExamTopicsModeTab = ({ setActive }) => {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
           <div>
             <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 18 }}>Exam weight and study order</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>History is the biggest block, then values/government, then society, everyday life, and important people/events.</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>These weights are study-guide estimates for revision priority, not official published question counts.</div>
           </div>
-          <Badge text="Learn biggest topics first" color="#f97316" />
+          <Badge text="Study estimate" color="#f97316" />
         </div>
         <div style={{ display: "grid", gap: 10 }}>
           {groupedTopics.map((group) => (
@@ -3641,8 +3641,8 @@ const ExamTopicsModeTab = ({ setActive }) => {
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
               <div>
                 <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 15 }}>Full topic mock</div>
-                <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
-                  All {group.questionPool.length} questions for this topic from the current bank
+                      <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
+                  All {group.questionPool.length} questions currently assigned to this exam area in the bank
                 </div>
               </div>
               {topicMockProgress[group.id] && (
