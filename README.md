@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 329 quiz questions · 💡 Memory clues · ⚠️ Common Mix-Ups · 📝 40 balanced mock papers · 📚 Story Mode + Quick Facts Course
 
-Current release: `v1.21.0`
+Current release: `v1.22.0`
 
 ---
 
@@ -74,9 +74,9 @@ UI stack:
 | Section | What it does |
 |---|---|
 | 🏠 Home | Pass guide, continue-learning strip, weakest-area guidance, mock progress |
-| 🧭 Exam Topics | Course completion by official-style exam area with per-topic mocks and learned/tested/reviewed progress |
-| ↔️ Quick Revise | Fast revision cards with topic filters, pass-core focus, weak areas, saved facts, dates, and 4 Nations filters |
-| 📚 Story Mode | Chronological history course with dates, names, and pass-first memory anchors |
+| 🧭 Exam Topics | Course completion by official-style exam area with cleaner topic summaries, per-topic mocks, and learned/tested/reviewed progress |
+| ↔️ Quick Revise | Fast revision cards with weak-facts focus, topic confidence, saved facts, and smarter “study this next” guidance |
+| 📚 Story Mode | Chronological history course with dates, names, pass-first memory anchors, and chapter-end mini quizzes |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
 | 📄 Cram Sheet | One-page night-before summary |
@@ -104,9 +104,12 @@ UI stack:
 - Official-scope cleanup and topic rebalance for the current test
 - Metadata-driven question mapping, so section tests and exam-topic mocks use the right pools
 - `Exam Topics` course with topic mocks and learned / tested / reviewed progress
+- Cleaner `Exam Topics` summaries with metadata-backed question pools and topic-specific coverage notes
 - `Quick Facts Course` for civics, law, identity, and everyday-life revision
+- `Quick Revise` now surfaces weak facts, topic confidence, and a stronger next-step suggestion
+- `Story Mode` now ends chapters with mini quizzes tied to the chapter you just studied
 - `Common Mix-Ups` redesigned for cleaner mobile comparison revision
-- Page-specific tests across the major sections
+- Page-specific tests across the major sections, plus stronger pass-first route panels on Religion, Sports, Landmarks, and Inventors
 - Mock history, saved progress, bookmarks, wrong-answer review, and local persistence across updates
 
 ---

@@ -81,6 +81,34 @@ export const SectionStudyActions = ({
   </Card>
 );
 
+const PagePassPanel = ({
+  Card,
+  Badge,
+  title = "Best route on this page",
+  note,
+  steps,
+  color = "#3b82f6",
+}) => (
+  <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+      <div>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{title}</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{note}</div>
+      </div>
+      <Badge text={`${steps.length} steps`} color={color} />
+    </div>
+    <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+      {steps.map((step, index) => (
+        <div key={step.title} className="subtle-panel" style={{ padding: 12 }}>
+          <div style={{ fontSize: 12, color, fontWeight: 800, marginBottom: 4 }}>STEP {index + 1}</div>
+          <div style={{ color: "var(--text-strong)", fontWeight: 700, marginBottom: 4 }}>{step.title}</div>
+          <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.6 }}>{step.detail}</div>
+        </div>
+      ))}
+    </div>
+  </Card>
+);
+
 export const InventorsTab = ({
   setActive,
   SectionTitle,
@@ -177,6 +205,17 @@ export const InventorsTab = ({
   return (
     <div className="topic-page">
       <SectionTitle icon="💡" meta="Questions here are usually short: match the person to the invention or discovery, then use the field as a backup clue.">British Inventors & Scientists</SectionTitle>
+      <PagePassPanel
+        Card={Card}
+        Badge={Badge}
+        color="#06b6d4"
+        note="Treat this page as fixed person-to-discovery pairs, not as a long science reference list."
+        steps={[
+          { title: "Learn the core names first", detail: "Start with Fleming, Baird, Berners-Lee, Darwin, Newton, Watt, and Watson-Watt." },
+          { title: "Use the section test", detail: "Run the inventors mock after the core names so the person-to-invention pairs become automatic." },
+          { title: "Only then open more detail", detail: "Use the lower list as support after the exam-core pairs are secure." },
+        ]}
+      />
       <div className="noscroll" style={{ display: "flex", gap: 6, overflowX: "auto", marginBottom: 16 }}>
         {cats.map((item) => <TabButton key={item} active={cat === item} onClick={() => setCat(item)}>{item}</TabButton>)}
       </div>
@@ -320,6 +359,17 @@ export const SportsTab = ({
   return (
     <div className="topic-page">
       <SectionTitle icon="🏅" meta="Use event anchors first, then attach the star names and dates to them.">British Sport & Sports Stars</SectionTitle>
+      <PagePassPanel
+        Card={Card}
+        Badge={Badge}
+        color="#f97316"
+        note="Sports revision works best as a short set of event anchors plus a few must-know names."
+        steps={[
+          { title: "Lock in event anchors", detail: "Start with Wimbledon, FA Cup, Grand National, Boat Race, and the London Marathon." },
+          { title: "Add the medal/name pairs", detail: "Then learn Bannister, Bobby Moore, Torvill and Dean, Murray, Hoy, and Farah." },
+          { title: "Use the mini test quickly", detail: "Test this page before opening the extra stars so the core marks are secure first." },
+        ]}
+      />
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", marginBottom: 16 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
@@ -492,6 +542,17 @@ export const ReligionTab = ({
   return (
     <div className="topic-page">
       <SectionTitle icon="⛪" meta="Most religion questions are short recall: biggest faith group, main Christian festivals, and key festival-to-faith matches.">Religion & Festivals</SectionTitle>
+      <PagePassPanel
+        Card={Card}
+        Badge={Badge}
+        color="#22c55e"
+        note="Religion questions are usually quick faith-to-festival matches, so keep this page short and direct."
+        steps={[
+          { title: "Start with census order", detail: "Remember Christianity first, then no religion, then the next largest groups from the 2011 census." },
+          { title: "Match the main festivals", detail: "Lock in Christmas, Easter, Diwali, Vaisakhi, Hanukkah, and the Eids before the wider list." },
+          { title: "Use the page test straight away", detail: "Take the religion mini test while the faith-and-festival links are still fresh." },
+        ]}
+      />
       <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
           <div>
@@ -615,6 +676,17 @@ export const LandmarksTab = ({
   return (
     <div className="topic-page">
       <SectionTitle icon="🏛️" meta="Use location + one distinctive clue for each landmark.">Landmarks & Places</SectionTitle>
+      <PagePassPanel
+        Card={Card}
+        Badge={Badge}
+        color="#0ea5e9"
+        note="Landmark questions are usually won by one clue, so do not try to memorise the whole place list in one pass."
+        steps={[
+          { title: "Learn the exam favourites first", detail: "Start with Big Ben, Buckingham Palace, Windsor Castle, Stonehenge, Hadrian's Wall, and River Severn." },
+          { title: "Use one clue per place", detail: "Think bell, London home, outside London, prehistoric, Roman wall, or longest river." },
+          { title: "Test the page before more places", detail: "Use the landmarks test while the location clues are still easy to separate." },
+        ]}
+      />
       <CompactVisualStrip
         title="Place clues"
         accent="#0ea5e9"

@@ -84,6 +84,7 @@ const STORAGE_KEYS = {
   examTopicMocks: "lifeuk-examtopic-mocks",
   examTopicReviewed: "lifeuk-examtopic-reviewed",
   sectionMocks: "lifeuk-section-mocks",
+  storyQuizzes: "lifeuk-story-quizzes",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -244,6 +245,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
     secondaryTab: "anthem",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
     mockCount: 8,
+    summary: "Best for values, rights, responsibilities, and the short identity/tradition facts that often appear as quick marks.",
     match: /democracy|rule of law|individual liberty|mutual respect|tolerance|rights|responsibilit|freedom of speech|freedom of religion|human rights|church of england|union flag|union jack|st george|st andrew|st david|st patrick|bonfire night|remembrance day|paying taxes|jury service/i,
   },
   {
@@ -266,6 +268,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
     secondaryTab: "timeline",
     quickFocus: { focus: "dates", topic: "History", sessionType: "short" },
     mockCount: 12,
+    summary: "Use this after Story Mode when you want to turn dates, rulers, battles, reform, and wartime anchors into exam-style recall.",
     match: /roman|caesar|claudius|boudicca|hadrian|anglo-saxon|viking|athelstan|hastings|1066|domesday|magna carta|model parliament|bannockburn|bosworth|tudor|stuart|reformation|armada|civil war|glorious revolution|industrial revolution|reform act|chartist|victoria|peterloo|world war|battle of britain|blitz|d-day|beveridge|nhs|devolution/i,
   },
   {
@@ -288,6 +291,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
     secondaryTab: "confuse",
     quickFocus: { focus: "core", topic: "Law", sessionType: "short" },
     mockCount: 10,
+    summary: "Best for Parliament, voting, courts, juries, legal principles, devolution, and how the state works in practice.",
     match: /constitutional monarchy|parliamentary democracy|house of commons|house of lords|monarch|prime minister|cabinet|speaker|650 mp|mps|general election|voting age|first-past-the-post|electoral register|secret ballot|senedd|holyrood|stormont|supreme court|jury|magistrate|crown court|court of session|children's hearing|police|crime commissioner|civil servant|innocent until proven guilty|fair trial/i,
   },
   {
@@ -310,6 +314,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
     secondaryTab: "religion",
     quickFocus: { focus: "fresh", topic: "All topics", sessionType: "short" },
     mockCount: 8,
+    summary: "Use this for population, religion, media, culture, public life, and the modern British society facts that sit outside pure law or history.",
     match: /population|religion|church of england|church of scotland|bbc|tv licence|football|rugby|cricket|tennis|wimbledon|grand national|boat race|marathon|festival|christmas|easter|diwali|eid|vaisakhi|burns night|hogmanay|mothering sunday|beatles|shakespeare|jane austen|j\. k\. rowling|arts|sport/i,
   },
   {
@@ -332,6 +337,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
     secondaryTab: "tracker",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
     mockCount: 8,
+    summary: "Best for education, NHS, work, public duties, taxes, driving, volunteering, and the practical settlement facts that score easy marks.",
     match: /education|training until 18|gcse|highers|a-level|nhs|gp|national insurance|council tax|minimum wage|equality act|volunteer|charity|school governor|blood donation|driv|999|112|101|seat belt|lottery|census|settlement|citizenship|language requirement/i,
   },
   {
@@ -354,9 +360,19 @@ const EXAM_TOPIC_MODE_GROUPS = [
     secondaryTab: "wars",
     quickFocus: { focus: "fresh", topic: "Key People", sessionType: "short" },
     mockCount: 8,
+    summary: "Use this for named rulers, reformers, scientists, writers, and the direct person-or-event questions that come up without much context.",
     match: /william the conqueror|henry viii|elizabeth i|victoria|churchill|attlee|robert walpole|emmeline pankhurst|nightingale|mary seacole|isaac newton|charles darwin|alexander fleming|tim berners-lee|shakespeare|jane austen|j\. k\. rowling|beatles|gunpowder plot|great fire of london|battle of hastings/i,
   },
 ];
+
+const EXAM_TOPIC_PRIMARY_SECTIONS = {
+  values: ["Quick Facts Course", "Common Mix-Ups", "Symbols"],
+  history: ["Story Mode", "Timeline", "Wars & Battles"],
+  government: ["Quick Facts Course", "Common Mix-Ups"],
+  society: ["4 Nations", "Religion", "Arts / Sports"],
+  everyday: ["Quick Facts Course", "Tracker"],
+  people: ["Key Historical Figures", "Wars & Battles", "Inventors / Arts"],
+};
 
 const STORY_TESTED_POINTS = {
   "britain-begins": [
@@ -1417,6 +1433,89 @@ const getQuickRevisionTopics = (deck) => {
     .filter((topic) => !QUICK_REVISION_TOPIC_ORDER.includes(topic))
     .sort((a, b) => a.localeCompare(b));
   return [...ordered, ...extra];
+};
+
+const buildQuickRevisionTopicConfidence = (deck, ratings = {}) => {
+  const grouped = deck.reduce((acc, item) => {
+    if (!item.topic) return acc;
+    if (!acc[item.topic]) acc[item.topic] = { topic: item.topic, total: 0, seen: 0, hard: 0, easy: 0 };
+    acc[item.topic].total += 1;
+    const rating = ratings[item.id] || {};
+    acc[item.topic].seen += rating.seen || 0;
+    acc[item.topic].hard += rating.hard || 0;
+    acc[item.topic].easy += rating.easy || 0;
+    return acc;
+  }, {});
+
+  return Object.values(grouped)
+    .map((item) => {
+      const score = item.seen ? Math.max(0, Math.min(100, Math.round(((item.easy + 1) / (item.hard + item.seen + 1)) * 100))) : 0;
+      const level = score >= 65 ? "Strong" : score >= 35 ? "Okay" : "Needs work";
+      return { ...item, score, level };
+    })
+    .sort((a, b) => a.score - b.score);
+};
+
+const getQuickRevisionNextStep = (confidence, wrongQuestions = []) => {
+  const weakest = confidence[0];
+  if (wrongQuestions.length > 6) {
+    const bucket = buildRevisionBuckets(wrongQuestions)[0];
+    return {
+      title: "Clean up saved mistakes first",
+      detail: bucket ? `${bucket.topic} is your weakest live mistake area. Review that before starting another broad session.` : "You have saved wrong answers. Review them before another broad revision run.",
+      focus: "weak",
+      topic: bucket?.topic || "All topics",
+      button: "Review weak facts",
+    };
+  }
+  if (weakest) {
+    return {
+      title: `Study ${weakest.topic} next`,
+      detail: weakest.seen ? `${weakest.topic} has your lowest confidence based on recent quick-revision ratings.` : `${weakest.topic} has not been revised much yet, so it is the best next area to strengthen.`,
+      focus: weakest.topic === "History" || weakest.topic === "Wars" ? "dates" : weakest.topic === "4 Nations" ? "nations" : "weak",
+      topic: weakest.topic,
+      button: `Revise ${weakest.topic}`,
+    };
+  }
+  return {
+    title: "Keep building fresh coverage",
+    detail: "Use a fresh mixed run to keep moving through the full course and let hard cards return naturally later.",
+    focus: "fresh",
+    topic: "All topics",
+    button: "Start fresh mix",
+  };
+};
+
+const STORY_CHAPTER_QUIZ_CONFIG = {
+  "britain-begins": { title: "Chapter check: Britain begins", sectionIds: ["timeline"], examTopics: ["history"], regex: /roman|caesar|claudius|boudicca|hadrian|stonehenge/i },
+  "conquest-crown-law": { title: "Chapter check: Anglo-Saxons to 1066", sectionIds: ["timeline"], examTopics: ["history"], regex: /augustine|viking|alfred|athelstan|hastings|domesday/i },
+  "nations-symbols-places": { title: "Chapter check: Medieval law and kingdoms", sectionIds: ["timeline", "wars"], examTopics: ["history"], regex: /magna carta|model parliament|bannockburn|black death|agincourt|wars of the roses|bosworth/i },
+  "rights-duties-everyday": { title: "Chapter check: Tudors and Reformation", sectionIds: ["timeline", "figures"], examTopics: ["history", "people"], regex: /henry viii|church of england|armada|francis drake|elizabeth i|wales/i },
+  "faith-community": { title: "Chapter check: Stuarts and constitutional change", sectionIds: ["timeline", "confuse"], examTopics: ["history", "government"], regex: /1603|1605|civil war|charles i|cromwell|glorious revolution|bill of rights|boyne|habeas corpus|free press/i },
+  "people-who-shaped-britain": { title: "Chapter check: Union, empire and Georgian Britain", sectionIds: ["timeline", "wars", "figures"], examTopics: ["history", "people"], regex: /1707|1801|walpole|jacobite|culloden|trafalgar|waterloo|wilberforce|slave trade|slavery|industrial revolution/i },
+  "culture-sport-arts": { title: "Chapter check: Victorian reform and votes", sectionIds: ["timeline", "figures"], examTopics: ["history", "people"], regex: /peterloo|reform act|chartist|victoria|great exhibition|crimean|pankhurst|wspu|1918|1928|1969/i },
+  "wars-modern-britain": { title: "Chapter check: World wars and welfare", sectionIds: ["wars", "timeline", "figures"], examTopics: ["history", "people"], regex: /world war|armistice|churchill|attlee|beveridge|nhs|bevan|blitz|battle of britain|dunkirk|d-day|windrush/i },
+  "citizenship-settlement-basics": { title: "Chapter check: Devolution and modern UK", sectionIds: ["timeline", "nations", "quickfacts"], examTopics: ["history", "government", "everyday"], regex: /wind of change|good friday|devolution|stormont|uk|great britain|british isles|crown dependenc|territories/i },
+  "world-stage": { title: "Chapter check: Today's UK facts", sectionIds: ["quickfacts", "nations", "international", "anthem"], examTopics: ["government", "everyday", "society", "values"], regex: /commons|lords|speaker|first-past-the-post|rule of law|999|112|national insurance|commonwealth|nato|united nations|union jack|patron saint/i },
+};
+
+const buildStoryChapterQuizPool = (chapterId) => {
+  const config = STORY_CHAPTER_QUIZ_CONFIG[chapterId];
+  if (!config) return [];
+  const pool = ALL_QUIZ.filter((question) => {
+    const sectionMatch = Array.isArray(question.sectionIds) && question.sectionIds.some((id) => config.sectionIds.includes(id));
+    const topicMatch = config.examTopics.includes(question.examTopic);
+    const regexMatch = config.regex.test(`${question.q} ${question.tip}`);
+    return sectionMatch && (topicMatch || regexMatch);
+  });
+  const unique = [];
+  const seen = new Set();
+  pool.forEach((question) => {
+    if (seen.has(question.q)) return;
+    seen.add(question.q);
+    unique.push(question);
+  });
+  return unique.slice(0, 12);
 };
 
 const filterQuickRevisionPoolByTopic = (pool, topic) => {
@@ -3652,6 +3751,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
               <div>
                 <div style={{ fontWeight: 900, fontSize: 20, color: "var(--text-strong)" }}>{group.title}</div>
                 <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4, lineHeight: 1.6 }}>{group.covers}</div>
+                <div style={{ color: "var(--text)", fontSize: 13, marginTop: 8, lineHeight: 1.65, fontWeight: 600 }}>{group.summary}</div>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "flex-end" }}>
@@ -3659,6 +3759,25 @@ const ExamTopicsModeTab = ({ setActive }) => {
               {topicMockProgress[group.id] && <Badge text={`Best ${topicMockProgress[group.id].bestPercent}%`} color="#22c55e" />}
               {completedSet.has(group.id) && <Badge text="Completed" color="#22c55e" />}
               {buildTopicWrongCount(group.id) > 0 && <Badge text={`${buildTopicWrongCount(group.id)} mistakes saved`} color="#ef4444" />}
+            </div>
+          </div>
+
+          <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+            <div className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 12, color: group.color, fontWeight: 800, marginBottom: 4 }}>Built from</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{group.questionPool.length} tagged questions</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                Primary sections: {EXAM_TOPIC_PRIMARY_SECTIONS[group.id].join(" · ")}
+              </div>
+            </div>
+            <div className="subtle-panel" style={{ padding: 12 }}>
+              <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Question mix</div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>
+                {group.questionPool.filter((question) => question.priority === "core").length} core · {group.questionPool.filter((question) => question.priority !== "core").length} support
+              </div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                Core questions are the highest-yield handbook anchors. Support questions widen recall without changing the topic.
+              </div>
             </div>
           </div>
 
@@ -3860,6 +3979,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
 const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
   const availableTopics = useMemo(() => getQuickRevisionTopics(deck), [deck]);
+  const wrongQuestions = useMemo(() => readStore(STORAGE_KEYS.wrongQuestions, []), []);
   const [focus, setFocus] = useState("fresh");
   const [topicFilter, setTopicFilter] = useState("All topics");
   const [sessionType, setSessionType] = useState("medium");
@@ -3872,6 +3992,10 @@ const QuickRevisionTab = ({ setActive }) => {
   const [ratings, setRatings] = useState(() => readStore(STORAGE_KEYS.quickRevRatings, {}));
   const [bookmarks, setBookmarks] = useState(() => loadBookmarks());
   const current = session[index];
+  const topicConfidence = useMemo(() => buildQuickRevisionTopicConfidence(deck, ratings), [deck, ratings]);
+  const weakestTopics = topicConfidence.slice(0, 3);
+  const strongestTopics = [...topicConfidence].reverse().slice(0, 2);
+  const nextStep = useMemo(() => getQuickRevisionNextStep(topicConfidence, wrongQuestions), [topicConfidence, wrongQuestions]);
 
   const selectedSession = QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === sessionType) || QUICK_REVISION_SESSION_OPTIONS[1];
   const selectedFocus = QUICK_REVISION_FOCUS_OPTIONS.find((item) => item.id === focus) || QUICK_REVISION_FOCUS_OPTIONS[0];
@@ -4028,6 +4152,44 @@ const QuickRevisionTab = ({ setActive }) => {
           <Badge text={`${bookmarks.cards.length} saved facts`} color="#14b8a6" />
         </div>
       </Card>
+      <Card className="support-card-strong">
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Study this next</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{nextStep.detail}</div>
+          </div>
+          <Badge text={nextStep.title} color="#f97316" />
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 800, marginBottom: 4 }}>Weakest topics</div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {weakestTopics.map((item) => (
+                <div key={item.topic} style={{ display: "flex", justifyContent: "space-between", gap: 8, color: "var(--text)", fontSize: 13 }}>
+                  <span>{item.topic}</span>
+                  <span style={{ color: "var(--text-muted)" }}>{item.level} · {item.score}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Strongest topics</div>
+            <div style={{ display: "grid", gap: 6 }}>
+              {strongestTopics.map((item) => (
+                <div key={item.topic} style={{ display: "flex", justifyContent: "space-between", gap: 8, color: "var(--text)", fontSize: 13 }}>
+                  <span>{item.topic}</span>
+                  <span style={{ color: "var(--text-muted)" }}>{item.level} · {item.score}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => startSession(nextStep.focus, "short", nextStep.topic)}>{nextStep.button}</Button>
+          <Button variant="secondary" onClick={() => startSession("weak", "short", "All topics")}>Weak facts only</Button>
+          {weakestTopics[0] && <Button variant="outline" onClick={() => startSession("weak", "short", weakestTopics[0].topic)}>Focus {weakestTopics[0].topic}</Button>}
+        </div>
+      </Card>
       <Card className="setup-card">
         <div className="mb-2 text-xs text-muted-foreground">Time</div>
         <div className="choice-grid mb-3">
@@ -4065,6 +4227,7 @@ const QuickRevisionTab = ({ setActive }) => {
           <Button variant="secondary" onClick={() => startSession(focus, sessionType, selectedTopic)}>Use these settings</Button>
           <Button variant="outline" onClick={() => startSession(focus, sessionType, "All topics")}>Show all now</Button>
           {bookmarks.cards.length > 0 && <Button variant="outline" onClick={() => startSession("saved", "short")}>Open saved facts</Button>}
+          <Button variant="outline" onClick={() => startSession("weak", "short", selectedTopic)}>Weak facts only</Button>
           <Button variant="ghost" onClick={resetQuickRevisionProgress}>Reset progress</Button>
         </div>
       </Card>
@@ -4179,6 +4342,8 @@ const StoryModeTab = ({ setActive }) => {
   const chapters = useMemo(() => STORY_CHAPTERS, []);
   const [chapterIndex, setChapterIndex] = useState(() => readStore(STORAGE_KEYS.storyChapter, 0));
   const [completedChapters, setCompletedChapters] = useState(() => readStore(STORAGE_KEYS.storyCompleted, {}));
+  const [quizHistory, setQuizHistory] = useState(() => readStore(STORAGE_KEYS.storyQuizzes, {}));
+  const [chapterQuiz, setChapterQuiz] = useState({ chapterId: null, questions: [], current: 0, selected: null, confirmed: false, score: 0, wrong: [], results: [], finished: false });
   const current = chapters[chapterIndex];
 
   useEffect(() => {
@@ -4186,9 +4351,20 @@ const StoryModeTab = ({ setActive }) => {
     scrollPageTop();
   }, [chapterIndex]);
 
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.storyQuizzes, quizHistory);
+  }, [quizHistory]);
+
+  useEffect(() => {
+    if (chapterQuiz.finished && chapterQuiz.wrong.length) saveWrongQuestions(chapterQuiz.wrong);
+  }, [chapterQuiz.finished, chapterQuiz.wrong]);
+
   if (!current) return null;
 
   const testedPoints = STORY_TESTED_POINTS[current.id] || current.recap || [];
+  const chapterQuizConfig = STORY_CHAPTER_QUIZ_CONFIG[current.id];
+  const chapterQuizPool = useMemo(() => buildStoryChapterQuizPool(current.id), [current.id]);
+  const chapterQuizProgress = quizHistory[current.id];
   const rememberDates = current.remember?.dates || [];
   const rememberNames = current.remember?.names || [];
   const passFirst = current.remember?.pass || [];
@@ -4200,6 +4376,53 @@ const StoryModeTab = ({ setActive }) => {
       writeStore(STORAGE_KEYS.storyCompleted, next);
       return next;
     });
+  };
+  const startChapterQuiz = () => {
+    const questions = pickRandomNoRepeat(chapterQuizPool, Math.min(6, chapterQuizPool.length), `lifeuk-story-quiz-${current.id}`, 40)
+      .map((question, index) => prepareQuestionVariant(question, 36000 + index + hashText(current.id)));
+    setChapterQuiz({
+      chapterId: current.id,
+      questions,
+      current: 0,
+      selected: null,
+      confirmed: false,
+      score: 0,
+      wrong: [],
+      results: [],
+      finished: false,
+    });
+  };
+  const answerChapterQuiz = (optionIndex) => {
+    if (chapterQuiz.confirmed || chapterQuiz.finished) return;
+    const question = chapterQuiz.questions[chapterQuiz.current];
+    const isCorrect = optionIndex === question.a;
+    setChapterQuiz((prev) => ({
+      ...prev,
+      selected: optionIndex,
+      confirmed: true,
+      score: prev.score + (isCorrect ? 1 : 0),
+      wrong: isCorrect ? prev.wrong : [...prev.wrong, { ...question, chosen: optionIndex }],
+      results: [...prev.results, { ...question, chosen: optionIndex, correct: isCorrect }],
+    }));
+  };
+  const finishChapterQuiz = () => {
+    setChapterQuiz((prev) => ({ ...prev, finished: true }));
+    setQuizHistory((prev) => ({
+      ...prev,
+      [current.id]: {
+        score: chapterQuiz.score,
+        total: chapterQuiz.questions.length,
+        attempts: (prev[current.id]?.attempts || 0) + 1,
+        at: new Date().toISOString(),
+      },
+    }));
+  };
+  const nextChapterQuizQuestion = () => {
+    if (chapterQuiz.current + 1 >= chapterQuiz.questions.length) {
+      finishChapterQuiz();
+      return;
+    }
+    setChapterQuiz((prev) => ({ ...prev, current: prev.current + 1, selected: null, confirmed: false }));
   };
 
   return (
@@ -4326,6 +4549,87 @@ const StoryModeTab = ({ setActive }) => {
               </div>
             ))}
           </div>
+        </Card>
+      )}
+
+      {chapterQuizPool.length > 0 && (
+        <Card className="support-card-strong" style={{ border: `1px solid ${current.color}33` }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+            <div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 17 }}>{chapterQuizConfig?.title || "Chapter quiz"}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>Use this before leaving the chapter so the dates and names move into active recall.</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Badge text={`${chapterQuizPool.length} matching questions`} color={current.color} />
+              {chapterQuizProgress && <Badge text={`Best ${chapterQuizProgress.score}/${chapterQuizProgress.total}`} color="#22c55e" />}
+            </div>
+          </div>
+          {!chapterQuiz.questions.length || chapterQuiz.finished || chapterQuiz.chapterId !== current.id ? (
+            <>
+              <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+                <div className="subtle-panel" style={{ padding: 12 }}>
+                  <div style={{ fontSize: 12, color: current.color, fontWeight: 800, marginBottom: 4 }}>Why it helps</div>
+                  <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.65 }}>
+                    This chapter check uses the questions that best match the chapter you just read, so you can fix mistakes before they turn into mock-test misses.
+                  </div>
+                </div>
+                <div className="subtle-panel" style={{ padding: 12 }}>
+                  <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Progress</div>
+                  <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>
+                    {chapterQuizProgress ? `${chapterQuizProgress.attempts} attempts` : "No attempts yet"}
+                  </div>
+                  <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                    {chapterQuizProgress ? `Best ${chapterQuizProgress.score}/${chapterQuizProgress.total}` : "Start when you want a quick chapter check."}
+                  </div>
+                </div>
+              </div>
+              {chapterQuiz.finished && chapterQuiz.chapterId === current.id && (
+                <div style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+                  <div className="subtle-panel" style={{ padding: 12 }}>
+                    <div style={{ fontSize: 12, color: chapterQuiz.score >= Math.ceil(chapterQuiz.questions.length * 0.7) ? "#22c55e" : "#f59e0b", fontWeight: 800, marginBottom: 4 }}>Chapter result</div>
+                    <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{chapterQuiz.score}/{chapterQuiz.questions.length}</div>
+                    <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>
+                      {chapterQuiz.wrong.length ? `${chapterQuiz.wrong.length} facts still need another pass.` : "Clean run. This chapter is looking strong."}
+                    </div>
+                  </div>
+                  {!!chapterQuiz.wrong.length && (
+                    <div style={{ display: "grid", gap: 10 }}>
+                      {chapterQuiz.wrong.map((question, wrongIndex) => (
+                        <Card key={`${question.q}-${wrongIndex}`} style={{ marginBottom: 0, border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+                          <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 6 }}>{question.q}</div>
+                          <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>
+                            <div>Your answer: <strong>{question.opts[question.chosen] || "No answer"}</strong></div>
+                            <div>Correct answer: <strong>{question.opts[question.a]}</strong></div>
+                          </div>
+                          <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 8 }}>{buildMockAnswerContext(question)}</div>
+                          <MemoryHook text={question.tip.replace(/^[⭐📌💡]\s*/, "")} />
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              <Button onClick={startChapterQuiz}>{chapterQuiz.finished && chapterQuiz.chapterId === current.id ? "Restart chapter quiz" : "Start chapter quiz"}</Button>
+            </>
+          ) : (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+                <Badge text={`Question ${chapterQuiz.current + 1} / ${chapterQuiz.questions.length}`} color={current.color} />
+                <Badge text={`${chapterQuiz.score} correct`} color="#22c55e" />
+              </div>
+              <QuestionCard
+                question={chapterQuiz.questions[chapterQuiz.current]}
+                selected={chapterQuiz.selected}
+                confirmed={chapterQuiz.confirmed}
+                onSelect={answerChapterQuiz}
+              />
+              {chapterQuiz.confirmed && (
+                <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  <Button onClick={nextChapterQuizQuestion}>{chapterQuiz.current + 1 >= chapterQuiz.questions.length ? "Finish chapter quiz" : "Next question"}</Button>
+                </div>
+              )}
+            </>
+          )}
         </Card>
       )}
 
