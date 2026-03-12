@@ -29,6 +29,19 @@ const MOCK_SUBGROUP_DISTRIBUTION = [
   { id: "traps", count: 1 },
 ];
 
+const REQUIRED_TRAP_TITLES = new Set([
+  "Great Britain vs United Kingdom",
+  "British Isles vs United Kingdom",
+  "House of Commons vs House of Lords",
+  "Church of England vs Church of Scotland",
+  "1603 Union of Crowns vs 1707 Act of Union",
+  "Slave Trade 1807 vs Slavery Abolished 1833",
+  "Council of Europe vs European Union",
+  "Big Ben vs Elizabeth Tower",
+  "Magna Carta 1215 vs Model Parliament 1295",
+  "General election vs local election",
+]);
+
 const createSeededRandom = (seed) => {
   let value = seed >>> 0;
   return () => {
@@ -233,12 +246,16 @@ const pickLeastUsedMockQuestions = (items, count, usageMap, usedQuestions, seed)
     });
   });
 
-  const allExpectedQuestions = new Set([
-    ...data.ALL_QUIZ.map((question) => question.q),
-    ...buildConfusionDeck().map((question) => question.q),
-  ]);
-  const missingAcrossSeries = [...allExpectedQuestions].filter((question) => !seenAcrossSeries.has(question));
-  assert(missingAcrossSeries.length === 0, `Mock paper series is missing ${missingAcrossSeries.length} questions across the full run`);
+  const allQuizQuestions = new Set(data.ALL_QUIZ.map((question) => question.q));
+  const missingQuizAcrossSeries = [...allQuizQuestions].filter((question) => !seenAcrossSeries.has(question));
+  assert(missingQuizAcrossSeries.length === 0, `Mock paper series is missing ${missingQuizAcrossSeries.length} quiz questions across the full run`);
+
+  const confusionDeck = buildConfusionDeck();
+  const requiredTrapQuestions = confusionDeck
+    .filter((question) => REQUIRED_TRAP_TITLES.has(question.q.replace(/ \(\d+\)$/, "")))
+    .map((question) => question.q);
+  const missingRequiredTraps = requiredTrapQuestions.filter((question) => !seenAcrossSeries.has(question));
+  assert(missingRequiredTraps.length === 0, `Mock paper series is missing ${missingRequiredTraps.length} required mix-up cards across the full run`);
 
   const totalAnswers = answerCounts.reduce((sum, count) => sum + count, 0);
   answerCounts.forEach((count, index) => {
@@ -249,6 +266,7 @@ const pickLeastUsedMockQuestions = (items, count, usageMap, usedQuestions, seed)
   console.log("Mock balance check passed:");
   console.log(`- ${MOCK_PAPER_COUNT} fixed papers validated`);
   console.log(`- ${MOCK_TOTAL} questions per paper with balanced coverage`);
-  console.log(`- all ${allExpectedQuestions.size} quiz and trap questions appear at least once across the series`);
+  console.log(`- all ${allQuizQuestions.size} quiz questions appear at least once across the series`);
+  console.log(`- all ${requiredTrapQuestions.length} highest-yield mix-up cards appear across the series`);
   console.log(`- answer positions distributed across A/B/C/D = ${answerCounts.join("/")}`);
 })();

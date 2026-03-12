@@ -1078,18 +1078,20 @@ const TOP_TRAP_TITLES = new Set([
   "Slave Trade 1807 vs Slavery Abolished 1833",
   "Council of Europe vs European Union",
   "Big Ben vs Elizabeth Tower",
+  "Magna Carta 1215 vs Model Parliament 1295",
+  "General election vs local election",
 ]);
 
 const getConfusableGroup = (title) => {
   if (TOP_TRAP_TITLES.has(title)) return "Top Exam Traps";
   if (/great britain|united kingdom|british isles|saints|crown dependencies|highers|a-levels|westminster|devolved|england and wales legal system/i.test(title)) return "Nations and Identity";
-  if (/prime minister|monarch|pcc|councillor|commonwealth & irish voting rights|voting rights|commons|lords|national insurance|council tax/i.test(title)) return "Government, Law and Voting";
+  if (/prime minister|monarch|pcc|councillor|commonwealth & irish voting rights|voting rights|commons|lords|national insurance|council tax|magistrates|jury|crown court|civil courts|criminal courts|general election|local election/i.test(title)) return "Government, Law and Voting";
   return "History, Dates and Places";
 };
 
 const getConfusableLevel = (title) => {
   if (TOP_TRAP_TITLES.has(title)) return { text: "Exam favourite", color: "#ef4444" };
-  if (/criminal courts|civil courts|youth court|children's hearing|highers|a-levels|river severn|river thames|battle of britain|blitz|dunkirk|d-day|trafalgar|waterloo/i.test(title)) {
+  if (/criminal courts|civil courts|youth court|children's hearing|highers|a-levels|river severn|river thames|battle of britain|blitz|dunkirk|d-day|trafalgar|waterloo|magistrates|jury|tate britain|tate modern|handel|messiah|william the conqueror|william of orange|bonfire night|remembrance/i.test(title)) {
     return { text: "Common mix-up", color: "#f59e0b" };
   }
   return { text: "Good to know", color: "#64748b" };
@@ -5277,7 +5279,7 @@ const ConfuseTab = () => {
             "Top Exam Traps = start here if you only have a few minutes.",
             "Nations and Identity = UK/GB, saints, parliaments, systems, and symbols.",
             "Government, Law and Voting = public roles, courts, law, tax, and election traps.",
-            "History, Dates and Places = dates, reforms, battles, and place-based mixes.",
+            "History, Dates and Places = dates, reforms, wars, people, arts, and place-based mixes.",
           ].map((item) => (
             <div key={item} style={{ borderRadius: 14, padding: 12, background: "var(--surface-strong)", border: "1px solid var(--card-border)", color: "var(--text)", fontSize: 14, lineHeight: 1.55 }}>
               {item}
@@ -5297,9 +5299,9 @@ const ConfuseTab = () => {
                     ? "Start here first. These are the comparisons most likely to cost easy marks."
                     : group === "Nations and Identity"
                       ? "Nation names, systems, parliaments, symbols, and location-based confusion points."
-                      : group === "Government, Law and Voting"
+                    : group === "Government, Law and Voting"
                         ? "Public roles, courts, elections, duties, and everyday public-system differences."
-                        : "Dates, reforms, battles, and places that are easy to swap under pressure."}
+                        : "Dates, reforms, wars, people, arts, and places that are easy to swap under pressure."}
                 </div>
               </div>
               <Badge text={`${items.length} cards`} color={group === "Top Exam Traps" ? "#ef4444" : "#3b82f6"} />
