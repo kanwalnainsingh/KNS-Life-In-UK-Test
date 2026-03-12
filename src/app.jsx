@@ -6553,7 +6553,7 @@ const QuizTab = () => {
   const [finished, setFinished] = useState(false);
   const [count, setCount] = useState(24);
   const [questions, setQuestions] = useState([]);
-  const [reviewMode, setReviewMode] = useState(false);
+  const [reviewFilter, setReviewFilter] = useState("wrong");
   const [filter, setFilter] = useState("all");
   const [answerMode, setAnswerMode] = useState("instant");
   const [showContext, setShowContext] = useState(true);
@@ -6585,7 +6585,7 @@ const QuizTab = () => {
     setScore(0);
     setWrong([]);
     setFinished(false);
-    setReviewMode(false);
+    setReviewFilter("wrong");
     setStarted(true);
     scrollPageTop();
   };
@@ -6701,6 +6701,12 @@ const QuizTab = () => {
   if (finished) {
     const pct = Math.round((score / questions.length) * 100);
     const pass = pct >= 75;
+    const reviewItems = questions
+      .map((question, index) => {
+        const wrongEntry = wrong.find((item) => item.q === question.q);
+        return wrongEntry || { ...question, chosen: question.a };
+      })
+      .filter((question) => reviewFilter === "all" || question.chosen !== question.a);
     return (
       <div className="page-stack">
         <Card className="result-shell text-center" style={{ borderColor: pass ? "#22c55e55" : "#ef444455" }}>
@@ -6708,25 +6714,53 @@ const QuizTab = () => {
           <div className="mb-1 text-2xl font-black" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Strong recall" : "Revision needed"}</div>
           <div className="big-number">{score}/{questions.length}</div>
           <div className="mb-4 text-lg" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pct}%</div>
+          <div className="mb-4 grid gap-3 sm:grid-cols-2">
+            <div className="subtle-panel p-3">
+              <div className="mb-1 text-xs font-extrabold uppercase tracking-[0.14em] text-emerald-500">Correct</div>
+              <div className="text-xl font-black text-foreground">{score}</div>
+              <div className="text-xs text-muted-foreground">Facts that already feel steady.</div>
+            </div>
+            <div className="subtle-panel p-3">
+              <div className="mb-1 text-xs font-extrabold uppercase tracking-[0.14em] text-red-500">Wrong</div>
+              <div className="text-xl font-black text-foreground">{wrong.length}</div>
+              <div className="text-xs text-muted-foreground">Review these before the next full run.</div>
+            </div>
+          </div>
           <div className="flex flex-wrap justify-center gap-2">
             <Button onClick={startQuiz}>Try Again</Button>
-            {wrong.length > 0 && <Button variant="secondary" className="border-red-500/30 bg-red-500/10 text-red-700 dark:text-red-300" onClick={() => setReviewMode((v) => !v)}>{reviewMode ? "Hide review" : `Review ${wrong.length} wrong`}</Button>}
             <Button variant="secondary" onClick={() => setStarted(false)}>Back</Button>
           </div>
         </Card>
-        {answerMode === "deferred" && wrong.length === 0 && (
-          <Card className="status-panel" style={{ border: "1px solid color-mix(in srgb, #22c55e 38%, var(--card-border))", background: "color-mix(in srgb, #22c55e 8%, var(--card-bg))" }}>
-            <div style={{ color: "#bbf7d0", fontWeight: 700 }}>All answers were correct. Deferred review is ready when you miss questions.</div>
-          </Card>
-        )}
-        {reviewMode && wrong.map((w, i) => (
-          <Card key={i} className="status-panel" style={{ border: "1px solid color-mix(in srgb, #ef4444 38%, var(--card-border))", background: "color-mix(in srgb, #ef4444 8%, var(--card-bg))" }}>
-            <div style={{ fontWeight: 700, color: "var(--text-strong)", marginBottom: 8 }}>Q: {w.q}</div>
-            <div style={{ color: "#fca5a5", marginBottom: 4 }}>✗ You chose: {w.opts[w.chosen]}</div>
-            <div style={{ color: "#4ade80", marginBottom: 8 }}>✓ Correct: {w.opts[w.a]}</div>
-            {showContext && <MemoryHook text={w.tip} />}
-          </Card>
-        ))}
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>Review this quiz</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Switch between wrong answers only or the full question set to check what has already stuck.</div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <TabButton active={reviewFilter === "wrong"} onClick={() => setReviewFilter("wrong")}>Wrong only</TabButton>
+              <TabButton active={reviewFilter === "all"} onClick={() => setReviewFilter("all")}>All {questions.length}</TabButton>
+            </div>
+          </div>
+          {!reviewItems.length && (
+            <div className="status-panel" style={{ border: "1px solid color-mix(in srgb, #22c55e 38%, var(--card-border))", background: "color-mix(in srgb, #22c55e 8%, var(--card-bg))" }}>
+              <div style={{ color: "#bbf7d0", fontWeight: 700 }}>All answers were correct. Nothing to review in `Wrong only`.</div>
+            </div>
+          )}
+          {reviewItems.map((item, i) => {
+            const correct = item.chosen === item.a;
+            return (
+              <Card key={`${item.q}-${i}`} className="status-panel" style={{ border: `1px solid color-mix(in srgb, ${correct ? "#22c55e" : "#ef4444"} 38%, var(--card-border))`, background: `color-mix(in srgb, ${correct ? "#22c55e" : "#ef4444"} 8%, var(--card-bg))` }}>
+                <div style={{ fontWeight: 700, color: "var(--text-strong)", marginBottom: 8 }}>Q: {item.q}</div>
+                <div style={{ color: correct ? "#4ade80" : "#fca5a5", marginBottom: 4 }}>
+                  {correct ? `✓ Correct: ${item.opts[item.a]}` : `✗ You chose: ${item.opts[item.chosen] || "No answer"}`}
+                </div>
+                {!correct && <div style={{ color: "#4ade80", marginBottom: 8 }}>✓ Correct: {item.opts[item.a]}</div>}
+                {showContext && <MemoryHook text={item.tip} />}
+              </Card>
+            );
+          })}
+        </Card>
       </div>
     );
   }
@@ -7363,6 +7397,7 @@ const RapidFireTab = () => {
   const [timeLeft, setTimeLeft] = useState(timePerQuestion);
   const [score, setScore] = useState(0);
   const [results, setResults] = useState([]);
+  const [reviewFilter, setReviewFilter] = useState("wrong");
   const [finished, setFinished] = useState(false);
   const timerRef = useRef(null);
   const advanceRef = useRef(null);
@@ -7393,6 +7428,7 @@ const RapidFireTab = () => {
     setConfirmed(false);
     setScore(0);
     setResults([]);
+    setReviewFilter("wrong");
     setFinished(false);
     setTimeLeft(timePerQuestion);
     setStarted(true);
@@ -7535,6 +7571,9 @@ const RapidFireTab = () => {
   if (finished) {
     const pct = Math.round((score / questions.length) * 100);
     const pass = pct >= 75;
+    const correctCount = results.filter((item) => item.correct).length;
+    const wrongCount = results.length - correctCount;
+    const reviewItems = results.filter((item) => reviewFilter === "all" || !item.correct);
     return (
       <div style={{ padding: 20 }}>
         <SectionTitle icon="🔥">Rapid Fire Results</SectionTitle>
@@ -7549,17 +7588,34 @@ const RapidFireTab = () => {
           {" "}
           <button className="focus-ring" onClick={() => { setFinished(false); setStarted(false); }} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 20px", cursor: "pointer", marginLeft: 6 }}>Back</button>
         </Card>
-        {results.map((r, i) => (
-          <Card key={i} style={{ border: `1px solid ${r.correct ? "#166534" : "#7f1d1d"}`, background: r.correct ? "#0f1f0f" : "#1a0808" }}>
-            <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Q{i + 1}</div>
-            <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 13, marginBottom: 6 }}>{r.q}</div>
-            <div style={{ fontSize: 13, color: r.correct ? "#4ade80" : "#f87171" }}>
-              {r.correct ? "✓" : "✗"} {r.chosen === -1 ? "Time ran out" : r.opts[r.chosen]}
+        <Card>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>Rapid Fire summary</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12 }}>Use the filter to review only misses or the full run.</div>
             </div>
-            {!r.correct && <div style={{ fontSize: 13, color: "#4ade80", marginTop: 2 }}>✓ {r.opts[r.a]}</div>}
-            {showContext && <MemoryHook text={r.tip} />}
-          </Card>
-        ))}
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Badge text={`${correctCount} correct`} color="#22c55e" />
+              <Badge text={`${wrongCount} wrong`} color="#ef4444" />
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+            <TabButton active={reviewFilter === "wrong"} onClick={() => setReviewFilter("wrong")}>Wrong only</TabButton>
+            <TabButton active={reviewFilter === "all"} onClick={() => setReviewFilter("all")}>All {results.length}</TabButton>
+          </div>
+          {!reviewItems.length && <div style={{ color: "var(--text-muted)", fontSize: 14 }}>No wrong answers to review in this run.</div>}
+          {reviewItems.map((r, i) => (
+            <Card key={`${r.q}-${i}`} style={{ border: `1px solid color-mix(in srgb, ${r.correct ? "#22c55e" : "#ef4444"} 35%, var(--card-border))`, background: `color-mix(in srgb, ${r.correct ? "#22c55e" : "#ef4444"} 8%, var(--card-bg))`, marginBottom: 10 }}>
+              <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 4 }}>Q{r.i + 1 || i + 1}</div>
+              <div style={{ fontWeight: 700, color: "var(--text-strong)", fontSize: 13, marginBottom: 6 }}>{r.q}</div>
+              <div style={{ fontSize: 13, color: r.correct ? "#4ade80" : "#f87171" }}>
+                {r.correct ? "✓" : "✗"} {r.correct ? r.opts[r.a] : (r.chosen === -1 ? "Time ran out" : r.opts[r.chosen])}
+              </div>
+              {!r.correct && <div style={{ fontSize: 13, color: "#4ade80", marginTop: 2 }}>✓ {r.opts[r.a]}</div>}
+              {showContext && <MemoryHook text={r.tip} />}
+            </Card>
+          ))}
+        </Card>
       </div>
     );
   }
