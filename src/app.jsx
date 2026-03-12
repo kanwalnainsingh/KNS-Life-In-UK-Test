@@ -1935,85 +1935,24 @@ const classifyMockSubgroup = (question) => {
   return "culture-people";
 };
 
-const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-const textMatches = (text, regexes) => regexes.some((regex) => regex.test(text));
-
-const FIGURE_NAME_PATTERNS = [
-  ...new Set([...KEY_FIGURES, ...EXTRA_KEY_FIGURES].map((item) => item.name)),
-].map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i"));
-
-const INVENTOR_PATTERNS = [
-  ...INVENTORS
-    .map((item) => item?.who)
-    .filter(Boolean)
-    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
-  /penicillin|world wide web|television|jet engine|radar|turing machine|steam engine|gravity|evolution|vaccine|dna|ivf|dolly the sheep|cash machine|telephone|jodrell bank/i,
-];
-
-const SPORTS_PATTERNS = [
-  ...SPORTS_STARS
-    .map((item) => item?.name)
-    .filter(Boolean)
-    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
-  ...SPORTS_FACTS
-    .map((item) => item?.name)
-    .filter(Boolean)
-    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
-  /world cup|olympic|paralympic|rugby originated|tour de france/i,
-];
-
-const ARTS_NAME_PATTERNS = Object.values(ARTS)
-  .flat()
-  .map((item) => item?.who)
-  .filter(Boolean)
-  .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i"));
-
-const RELIGION_PATTERNS = [
-  ...RELIGIONS
-    .map((item) => item?.name || item?.faith)
-    .filter(Boolean)
-    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
-  ...FESTIVALS
-    .map((item) => item?.name)
-    .filter(Boolean)
-    .map((name) => new RegExp(escapeRegex(name.toLowerCase()), "i")),
-  /church of england|church of scotland|religion|christian|muslim|hindu|sikh|jew|buddh|diwali|eid|vaisakhi|hanukkah|easter|christmas|boxing day/i,
-];
-
-const LANDMARK_PATTERNS = [
-  /big ben|elizabeth tower|buckingham palace|windsor castle|tower of london|stonehenge|hadrian'?s wall|river severn|river thames|loch ness|cenotaph|jodrell bank|british museum|maiden castle|bodnant gardens|millennium stadium|giant'?s causeway/i,
-];
-
-const INTERNATIONAL_PATTERNS = [
-  /commonwealth|united nations|nato|council of europe|european convention on human rights|echr/i,
-];
-
-const SYMBOL_PATTERNS = [
-  /god save the (king|queen)|union jack|union flag|britannia|patron saint|st george|st andrew|st david|st patrick/i,
-];
-
-const TIMELINE_PATTERNS = [
-  /roman|claudius|julius caesar|boudicca|hadrian'?s wall|augustine|alfred|athelstan|norman|hastings|domesday|magna carta|model parliament|henry viii|church of england|armada|james i|union of crowns|bill of rights|reform act|chartist|wspu|suffragette|world war|beveridge|nhs|good friday agreement|devolution|supreme court|equality act/i,
-];
-
 const SECTION_TEST_CONFIG = {
-  timeline: { title: "Timeline mock", startLabel: "Start timeline mock", kind: "mock", accent: "#3b82f6", note: "Use all history-timeline questions for a full chronology pass.", match: (text) => textMatches(text, TIMELINE_PATTERNS) },
-  figures: { title: "People mock", startLabel: "Start people mock", kind: "mock", accent: "#8b5cf6", note: "Covers the key historical figures, reformers, scientists, and leaders on this page.", match: (text) => textMatches(text, FIGURE_NAME_PATTERNS) },
+  timeline: { title: "Timeline mock", startLabel: "Start timeline mock", kind: "mock", accent: "#3b82f6", note: "Use all history-timeline questions for a full chronology pass." },
+  figures: { title: "People mock", startLabel: "Start people mock", kind: "mock", accent: "#8b5cf6", note: "Covers the key historical figures, reformers, scientists, and leaders on this page." },
   confuse: { title: "Mix-Ups mock", startLabel: "Start mix-ups mock", kind: "mock", accent: "#f59e0b", note: "Use the full comparison bank to stop losing marks on the classic confusion pairs.", confusionOnly: true },
-  inventors: { title: "Inventors mock", startLabel: "Start inventors mock", kind: "mock", accent: "#06b6d4", note: "Runs every inventor and science question linked to this page.", match: (text) => textMatches(text, INVENTOR_PATTERNS) },
-  sports: { title: "Sports mini test", startLabel: "Start sports test", kind: "test", accent: "#f97316", note: "Covers sports stars, major sporting events, and the short handbook-style sports facts.", match: (text) => textMatches(text, SPORTS_PATTERNS) },
-  arts: { title: "Arts mini test", startLabel: "Start arts test", kind: "test", accent: "#ec4899", note: "Covers writers, music, art, architecture, fashion, film, and stage anchors from this page.", match: (text) => textMatches(text, ARTS_NAME_PATTERNS) || /bafta|turner prize|tate britain|tate modern|royal albert hall|proms|the mousetrap|edinburgh festival fringe/i.test(text) },
-  religion: { title: "Religion mini test", startLabel: "Start religion test", kind: "test", accent: "#22c55e", note: "Covers religions, census facts, and festivals shown on this page.", match: (text) => textMatches(text, RELIGION_PATTERNS) },
-  landmarks: { title: "Landmarks mini test", startLabel: "Start landmarks test", kind: "test", accent: "#6366f1", note: "Covers places, rivers, walls, palaces, memorials, and landmark facts from this page.", match: (text) => textMatches(text, LANDMARK_PATTERNS) },
-  international: { title: "World Orgs mini test", startLabel: "Start world orgs test", kind: "test", accent: "#0ea5e9", note: "Covers the organisations and labels shown on this page.", match: (text) => textMatches(text, INTERNATIONAL_PATTERNS) },
-  anthem: { title: "Symbols mini test", startLabel: "Start symbols test", kind: "test", accent: "#3b82f6", note: "Covers anthem, Union Jack, patron saints, and identity-symbol questions.", match: (text) => textMatches(text, SYMBOL_PATTERNS) },
+  inventors: { title: "Inventors mock", startLabel: "Start inventors mock", kind: "mock", accent: "#06b6d4", note: "Runs every inventor and science question linked to this page." },
+  sports: { title: "Sports mini test", startLabel: "Start sports test", kind: "test", accent: "#f97316", note: "Covers sports stars, major sporting events, and the short handbook-style sports facts." },
+  arts: { title: "Arts mini test", startLabel: "Start arts test", kind: "test", accent: "#ec4899", note: "Covers writers, music, art, architecture, fashion, film, and stage anchors from this page." },
+  religion: { title: "Religion mini test", startLabel: "Start religion test", kind: "test", accent: "#22c55e", note: "Covers religions, census facts, and festivals shown on this page." },
+  landmarks: { title: "Landmarks mini test", startLabel: "Start landmarks test", kind: "test", accent: "#6366f1", note: "Covers places, rivers, walls, palaces, memorials, and landmark facts from this page." },
+  international: { title: "World Orgs mini test", startLabel: "Start world orgs test", kind: "test", accent: "#0ea5e9", note: "Covers the organisations and labels shown on this page." },
+  anthem: { title: "Symbols mini test", startLabel: "Start symbols test", kind: "test", accent: "#3b82f6", note: "Covers anthem, Union Jack, patron saints, and identity-symbol questions." },
 };
 
 const buildSectionQuestionPool = (sectionId) => {
   const config = SECTION_TEST_CONFIG[sectionId];
   if (!config) return [];
   if (config.confusionOnly) return buildConfusionDeck();
-  return ALL_QUIZ.filter((question) => config.match(`${question.q} ${question.tip}`));
+  return ALL_QUIZ.filter((question) => Array.isArray(question.sectionIds) && question.sectionIds.includes(sectionId));
 };
 
 const SectionMockPanel = ({ sectionId }) => {
