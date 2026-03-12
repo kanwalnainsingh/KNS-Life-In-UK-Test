@@ -49,6 +49,7 @@ const captureScreenshot = async (page, baseUrl) => {
   if (!targetPath) return;
   const targetHash = process.env.SCREENSHOT_HASH || "#figures";
   const targetTheme = process.env.SCREENSHOT_THEME || "light";
+  const targetAction = process.env.SCREENSHOT_ACTION || "";
   await page.setViewport({ width: 430, height: 932, deviceScaleFactor: 2 });
   await page.goto(`${baseUrl}/${targetHash}`, { waitUntil: "networkidle0" });
   if (targetTheme === "dark") {
@@ -58,6 +59,10 @@ const captureScreenshot = async (page, baseUrl) => {
       document.documentElement.setAttribute("data-theme", "dark");
     });
     await page.reload({ waitUntil: "networkidle0" });
+  }
+  if (targetAction === "menu") {
+    await clickByText(page, "Menu");
+    await waitForText(page, "Study menu");
   }
   await page.screenshot({ path: targetPath, fullPage: true });
 };

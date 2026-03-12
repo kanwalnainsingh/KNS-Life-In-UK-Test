@@ -34,13 +34,15 @@ UI stack:
 ## 📸 Highlights
 
 <p align="center">
-  <img src="screenshots/exam-topics.png" width="28%" alt="Exam Topics course on mobile" />
+  <img src="screenshots/mobile-menu.png" width="22%" alt="Study menu on mobile" />
   &nbsp;
-  <img src="screenshots/quick-facts-course.png" width="28%" alt="Quick Facts Course on mobile" />
+  <img src="screenshots/exam-topics.png" width="22%" alt="Exam Topics course on mobile" />
   &nbsp;
-  <img src="screenshots/dark-home.png" width="28%" alt="Dark mode home screen on mobile" />
+  <img src="screenshots/quick-facts-course.png" width="22%" alt="Quick Facts Course on mobile" />
+  &nbsp;
+  <img src="screenshots/dark-home.png" width="22%" alt="Dark mode home screen on mobile" />
 </p>
-<p align="center"><strong>Current mobile views</strong> — exam-topic completion, quick-facts course flow, and the cleaner dark-mode home experience.</p>
+<p align="center"><strong>Current mobile views</strong> — the study menu, exam-topic completion, quick-facts course flow, and the cleaner dark-mode home experience.</p>
 
 ---
 
