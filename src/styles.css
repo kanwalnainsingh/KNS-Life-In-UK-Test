@@ -323,11 +323,12 @@
 
   .mobile-scroll-top {
     right: 14px;
-    bottom: 118px;
+    bottom: 76px;
   }
 
   .mobile-scroll-bottom {
-    right: 14px;
+    left: 14px;
+    right: auto;
     bottom: 76px;
   }
 
