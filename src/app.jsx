@@ -24,6 +24,7 @@ import {
   SheetTitle,
 } from "./components/ui/sheet.jsx";
 import {
+  CollapsibleDetails,
   InventorsTab,
   LandmarksTab,
   ReligionTab,
@@ -1534,6 +1535,33 @@ const MemoryHook = ({ text }) => (
     <span className="font-extrabold text-emerald-600 dark:text-emerald-300">💡 Memory: </span>{text}
   </div>
 );
+
+const CollapsibleFactList = ({ title, tone, items, emptyText, defaultOpen = false }) => {
+  if (!items.length) return null;
+  return (
+    <CollapsibleDetails
+      Card={Card}
+      Badge={Badge}
+      title={title}
+      note={emptyText}
+      badgeText={`${items.length} items`}
+      badgeColor={tone}
+      defaultOpen={defaultOpen}
+    >
+      <div style={{ display: "grid", gap: 10 }}>
+        {items.map((item) => (
+          <div key={item.text} className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 14 }}>{item.text}</div>
+              {item.source ? <Badge text={item.source} color={item.color || tone} /> : null}
+            </div>
+            {item.detail && <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{item.detail}</div>}
+          </div>
+        ))}
+      </div>
+    </CollapsibleDetails>
+  );
+};
 
 const TrapAlert = ({ text }) => (
   <div className="trap-alert mt-2 rounded-xl border border-red-500/20 bg-red-500/10 px-3 py-2.5 text-[13px] text-red-800 dark:text-red-200">
@@ -4502,17 +4530,15 @@ const TimelineTab = () => {
         </div>
       )})}
       {secondaryTimeline.length > 0 && (
-        <>
-          <Card className="support-card">
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
-              <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 16 }}>More detail</div>
-              <Badge text={`${secondaryTimeline.length} lower-priority events`} color="#64748b" />
-            </div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 6 }}>
-              These are useful for context, but they are less important than the core date anchors above if your main goal is to pass quickly.
-            </div>
-          </Card>
-          {secondaryTimeline.map((ev, i) => {
+        <CollapsibleDetails
+          Card={Card}
+          Badge={Badge}
+          title="More detail"
+          note="Open this for lower-priority context after the core date anchors are secure."
+          badgeText={`${secondaryTimeline.length} lower-priority events`}
+        >
+          <div style={{ display: "grid", gap: 14 }}>
+            {secondaryTimeline.map((ev, i) => {
             const timelineId = `timeline-${TIMELINE.indexOf(ev)}`;
             const isCheckpoint = checkpoint?.id === timelineId;
             return (
@@ -4550,7 +4576,8 @@ const TimelineTab = () => {
               </Card>
             </div>
           )})}
-        </>
+          </div>
+        </CollapsibleDetails>
       )}
       <SectionMockPanel sectionId="timeline" />
     </div>
@@ -5894,19 +5921,23 @@ const QuickFactsTab = ({ setActive }) => {
     });
   };
 
-  const renderFactList = (title, tone, items, emptyText) => (
-    <Card style={{ border: `1px solid color-mix(in srgb, ${tone} 35%, var(--card-border))`, background: `color-mix(in srgb, ${tone} 7%, var(--card-bg))` }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-        <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>{title}</div>
-        <Badge text={`${items.length} facts`} color={tone} />
-      </div>
-      {items.length ? items.map((fact, index) => (
-        <div key={`${title}-${index}`} style={{ fontSize: 13, color: "var(--text)", padding: "8px 0", borderTop: index ? "1px solid var(--card-border)" : "none", lineHeight: 1.6 }}>
-          <span style={{ color: fact.color, marginRight: 6 }}>{fact.icon}</span>
-          {fact.text}
+  const renderFactList = (title, tone, items, emptyText, collapsible = false) => (
+    collapsible ? (
+      <CollapsibleFactList title={title} tone={tone} items={items} emptyText={emptyText} />
+    ) : (
+      <Card style={{ border: `1px solid color-mix(in srgb, ${tone} 35%, var(--card-border))`, background: `color-mix(in srgb, ${tone} 7%, var(--card-bg))` }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>{title}</div>
+          <Badge text={`${items.length} facts`} color={tone} />
         </div>
-      )) : <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>{emptyText}</div>}
-    </Card>
+        {items.length ? items.map((fact, index) => (
+          <div key={`${title}-${index}`} style={{ fontSize: 13, color: "var(--text)", padding: "8px 0", borderTop: index ? "1px solid var(--card-border)" : "none", lineHeight: 1.6 }}>
+            <span style={{ color: fact.color, marginRight: 6 }}>{fact.icon}</span>
+            {fact.text}
+          </div>
+        )) : <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>{emptyText}</div>}
+      </Card>
+    )
   );
 
   return (
@@ -6094,7 +6125,7 @@ const QuickFactsTab = ({ setActive }) => {
 
           {renderFactList("Must know first", "#ef4444", currentGroup.mustKnow, "This group is already very compact.")}
           {renderFactList("Common mix-ups", "#f59e0b", currentGroup.mixups, "No big trap wording here. Focus on the main must-know facts.")}
-          {renderFactList("More detail", "#64748b", currentGroup.moreDetail, "No extra detail beyond the core facts in this group.")}
+          {renderFactList("More detail", "#64748b", currentGroup.moreDetail, "Open this when you want extra support after the core facts.", true)}
 
           {currentGroup.memory && <MemoryHook text={currentGroup.memory} />}
 

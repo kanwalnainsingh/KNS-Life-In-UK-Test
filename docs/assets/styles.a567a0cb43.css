@@ -1245,6 +1245,62 @@ video {
 .continue-learning-card:hover {
     transform: translateY(-1px);
   }
+.collapsible-panel {
+  border-radius: 1.25rem;
+  border-width: 1px;
+  border-color: hsl(var(--border));
+  background-color: hsl(var(--card) / 0.7);
+  --tw-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+  --tw-shadow-colored: 0 16px 40px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.collapsible-summary {
+  display: flex;
+  cursor: pointer;
+  list-style-type: none;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 1.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.875rem;
+  padding-bottom: 0.875rem;
+}
+.collapsible-summary::-webkit-details-marker {
+    display: none;
+  }
+.collapsible-title {
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 800;
+  color: hsl(var(--foreground));
+}
+.collapsible-note {
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: hsl(var(--muted-foreground));
+}
+.collapsible-panel[open] .collapsible-summary {
+  border-bottom-width: 1px;
+  border-color: hsl(var(--border));
+}
+.collapsible-summary::after {
+    content: "+";
+    margin-left: 0.5rem;
+    align-self: center;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 900;
+    color: hsl(var(--muted-foreground));
+  }
+.collapsible-panel[open] .collapsible-summary::after {
+    content: "−";
+  }
+.collapsible-content {
+  padding: 0.75rem;
+}
 .sr-only {
   position: absolute;
   width: 1px;

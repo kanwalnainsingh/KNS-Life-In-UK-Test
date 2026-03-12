@@ -379,4 +379,41 @@
   .continue-learning-card:hover {
     transform: translateY(-1px);
   }
+
+  .collapsible-panel {
+    @apply rounded-2xl border border-border bg-card/70 shadow-soft;
+  }
+
+  .collapsible-summary {
+    @apply flex cursor-pointer list-none items-start justify-between gap-3 rounded-2xl px-4 py-3.5;
+  }
+
+  .collapsible-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .collapsible-title {
+    @apply text-base font-extrabold text-foreground;
+  }
+
+  .collapsible-note {
+    @apply mt-1 text-sm text-muted-foreground;
+  }
+
+  .collapsible-panel[open] .collapsible-summary {
+    @apply border-b border-border;
+  }
+
+  .collapsible-summary::after {
+    content: "+";
+    @apply ml-2 self-center text-lg font-black text-muted-foreground;
+  }
+
+  .collapsible-panel[open] .collapsible-summary::after {
+    content: "−";
+  }
+
+  .collapsible-content {
+    @apply p-3;
+  }
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { SectionStudyActions } from "./reference-tabs.jsx";
+import { CollapsibleDetails, SectionStudyActions } from "./reference-tabs.jsx";
 
 const CORE_FIGURES = new Set([
   "William the Conqueror",
@@ -128,6 +128,8 @@ export const FiguresTabSection = ({
       if (coreDiff) return coreDiff;
       return (orderMap[a.name] ?? 999) - (orderMap[b.name] ?? 999);
     });
+  const coreFigures = figures.filter((item) => CORE_FIGURES.has(item.name));
+  const extraFigures = figures.filter((item) => !CORE_FIGURES.has(item.name));
 
   return (
     <div className="topic-page">
@@ -141,7 +143,7 @@ export const FiguresTabSection = ({
           <Badge text="Exam core" color="#ef4444" />
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-          {figures.filter((item) => CORE_FIGURES.has(item.name)).map((item) => <Badge key={item.name} text={item.name} color="#ef4444" />)}
+          {coreFigures.map((item) => <Badge key={item.name} text={item.name} color="#ef4444" />)}
         </div>
       </Card>
 
@@ -203,7 +205,7 @@ export const FiguresTabSection = ({
 
       <SectionMockPanel sectionId="figures" />
 
-      {figures.map((f) => (
+      {coreFigures.map((f) => (
         <Card key={f.name} className="quick-revision-card" style={{ border: `1px solid ${f.color}33` }}>
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
             <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
@@ -232,6 +234,47 @@ export const FiguresTabSection = ({
           {FIGURE_MEMORY[f.name] && <MemoryHook text={FIGURE_MEMORY[f.name]} />}
         </Card>
       ))}
+      {extraFigures.length > 0 && (
+        <CollapsibleDetails
+          Card={Card}
+          Badge={Badge}
+          title="More figure detail"
+          note="Open this once the main rulers, reformers, and wartime figures are secure."
+          badgeText={`${extraFigures.length} extra figures`}
+        >
+          <div style={{ display: "grid", gap: 12 }}>
+            {extraFigures.map((f) => (
+              <Card key={f.name} className="quick-revision-card" style={{ marginBottom: 0, border: `1px solid ${f.color}33` }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
+                  <div style={{ fontSize: 32, flexShrink: 0 }}>{f.icon}</div>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 4 }}>
+                      <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{f.name}</div>
+                      <Badge text="More detail" color="#64748b" />
+                    </div>
+                    <div style={{ color: f.color, fontSize: 12, fontWeight: 700, marginBottom: 8 }}>{f.role}</div>
+                    {!!FIGURE_HOOKS[f.name]?.length && (
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                        {FIGURE_HOOKS[f.name].map((hook) => <Badge key={hook} text={hook} color={f.color} />)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div style={{ marginBottom: 10, borderRadius: 12, padding: "10px 12px", background: `${f.color}12`, border: `1px solid ${f.color}33` }}>
+                  <div style={{ color: f.color, fontSize: 11, fontWeight: 800, marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.4 }}>Remember first</div>
+                  <div style={{ color: "var(--text-strong)", fontSize: 13, lineHeight: 1.55 }}>{f.facts[0]}</div>
+                </div>
+                <div style={{ display: "grid", gap: 6 }}>
+                  {f.facts.map((fact, fi) => (
+                    <div key={fi} style={{ fontSize: 13, color: "var(--text)", padding: "6px 0", borderBottom: fi < f.facts.length - 1 ? "1px solid var(--card-border)" : "none", lineHeight: 1.6 }}>• {fact}</div>
+                  ))}
+                </div>
+                {FIGURE_MEMORY[f.name] && <MemoryHook text={FIGURE_MEMORY[f.name]} />}
+              </Card>
+            ))}
+          </div>
+        </CollapsibleDetails>
+      )}
 
       <SectionStudyActions
         Card={Card}

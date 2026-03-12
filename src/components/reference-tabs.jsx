@@ -32,6 +32,30 @@ const ExamFocusPanel = ({ Card, Badge, title, note, items, color = "#3b82f6" }) 
   </Card>
 );
 
+export const CollapsibleDetails = ({
+  Card,
+  Badge,
+  title = "More detail",
+  note = "Open this when you want extra support after the core facts.",
+  badgeText,
+  badgeColor = "#64748b",
+  defaultOpen = false,
+  children,
+}) => (
+  <details className="collapsible-panel" open={defaultOpen}>
+    <summary className="collapsible-summary">
+      <div>
+        <div className="collapsible-title">{title}</div>
+        <div className="collapsible-note">{note}</div>
+      </div>
+      {badgeText ? <Badge text={badgeText} color={badgeColor} /> : null}
+    </summary>
+    <div className="collapsible-content">
+      <Card style={{ marginBottom: 0 }}>{children}</Card>
+    </div>
+  </details>
+);
+
 export const SectionStudyActions = ({
   title = "Study this next",
   note = "When you finish reading, move straight into recall while the facts are still fresh.",
@@ -75,6 +99,7 @@ export const InventorsTab = ({
     .filter((item) => cat === "All" || item.link === cat)
     .sort((a, b) => Number(CORE_INVENTORS.has(b.who)) - Number(CORE_INVENTORS.has(a.who)));
   const coreVisible = filtered.filter((item) => CORE_INVENTORS.has(item.who));
+  const extraVisible = filtered.filter((item) => !CORE_INVENTORS.has(item.who));
   const coreLinks = coreVisible.slice(0, 6).map((item) => `${item.who} = ${item.what}`);
   const likelyQuestions = {
     All: [
@@ -192,7 +217,7 @@ export const InventorsTab = ({
         items={inventorMixUps[cat]}
       />
       <SectionMockPanel sectionId="inventors" />
-      {filtered.map((inv) => (
+      {coreVisible.map((inv) => (
         <Card key={inv.who}>
           <div style={{ display: "flex", gap: 12 }}>
             <div style={{ fontSize: 36, flexShrink: 0 }}>{inv.icon}</div>
@@ -210,6 +235,36 @@ export const InventorsTab = ({
           </div>
         </Card>
       ))}
+      {extraVisible.length > 0 && (
+        <CollapsibleDetails
+          Card={Card}
+          Badge={Badge}
+          title="More inventor detail"
+          note="Open for the wider science list after the exam-core names are secure."
+          badgeText={`${extraVisible.length} extra names`}
+        >
+          <div style={{ display: "grid", gap: 12 }}>
+            {extraVisible.map((inv) => (
+              <Card key={inv.who} style={{ marginBottom: 0 }}>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <div style={{ fontSize: 36, flexShrink: 0 }}>{inv.icon}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                      <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{inv.who}</span>
+                      <Badge text={inv.nation} color="#64748b" />
+                      <Badge text={inv.link} color="#3b82f6" />
+                      <Badge text="More detail" color="#64748b" />
+                      {inv.when && <Badge text={inv.when} color="#d97706" />}
+                    </div>
+                    <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{inv.what}</div>
+                    <MemoryHook text={inv.memory} />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </CollapsibleDetails>
+      )}
       <SectionStudyActions
         Card={Card}
         Badge={Badge}
@@ -238,6 +293,8 @@ export const SportsTab = ({
 }) => {
   const coreEvents = SPORTS_FACTS.filter((item) => CORE_SPORT_EVENT_NAMES.has(item.name));
   const coreStars = SPORTS_STARS.filter((item) => CORE_SPORT_STAR_NAMES.has(item.name));
+  const extraEvents = SPORTS_FACTS.filter((item) => !CORE_SPORT_EVENT_NAMES.has(item.name));
+  const extraStars = SPORTS_STARS.filter((item) => !CORE_SPORT_STAR_NAMES.has(item.name));
   const starGroups = [
     {
       title: "Most tested sports names",
@@ -318,7 +375,7 @@ export const SportsTab = ({
         ]}
       />
       <SectionMockPanel sectionId="sports" />
-      {SPORTS_FACTS.map((item) => (
+      {coreEvents.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", gap: 12 }}>
             <div style={{ fontSize: 28, flexShrink: 0 }}>{item.icon}</div>
@@ -333,7 +390,7 @@ export const SportsTab = ({
           </div>
         </Card>
       ))}
-      {SPORTS_STARS.map((item) => (
+      {coreStars.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", gap: 12 }}>
             <div style={{ fontSize: 32, flexShrink: 0 }}>{item.icon}</div>
@@ -350,6 +407,50 @@ export const SportsTab = ({
           </div>
         </Card>
       ))}
+      {(extraEvents.length > 0 || extraStars.length > 0) && (
+        <CollapsibleDetails
+          Card={Card}
+          Badge={Badge}
+          title="More sports detail"
+          note="Open for the wider sports list after the core names and event anchors are fixed."
+          badgeText={`${extraEvents.length + extraStars.length} extra entries`}
+        >
+          <div style={{ display: "grid", gap: 12 }}>
+            {extraEvents.map((item) => (
+              <Card key={item.name} style={{ marginBottom: 0 }}>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <div style={{ fontSize: 28, flexShrink: 0 }}>{item.icon}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                      <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
+                      <Badge text="More detail" color="#64748b" />
+                    </div>
+                    <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{item.fact}</div>
+                    <MemoryHook text={item.memory} />
+                  </div>
+                </div>
+              </Card>
+            ))}
+            {extraStars.map((item) => (
+              <Card key={item.name} style={{ marginBottom: 0 }}>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <div style={{ fontSize: 32, flexShrink: 0 }}>{item.icon}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 4 }}>
+                      <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</span>
+                      <Badge text={item.sport} color="#f59e0b" />
+                      <Badge text="More detail" color="#64748b" />
+                      {item.year && <Badge text={item.year} color="#64748b" />}
+                    </div>
+                    <div style={{ color: "var(--text)", fontSize: 14, marginBottom: 6, lineHeight: 1.6 }}>{item.achievement}</div>
+                    <MemoryHook text={item.memory} />
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </CollapsibleDetails>
+      )}
       <ExamFocusPanel
         Card={Card}
         Badge={Badge}
@@ -385,6 +486,8 @@ export const ReligionTab = ({
   FESTIVALS,
 }) => {
   const orderedFestivals = [...FESTIVALS].sort((a, b) => Number(CORE_FESTIVAL_NAMES.has(b.name)) - Number(CORE_FESTIVAL_NAMES.has(a.name)));
+  const coreFestivals = orderedFestivals.filter((item) => CORE_FESTIVAL_NAMES.has(item.name));
+  const extraFestivals = orderedFestivals.filter((item) => !CORE_FESTIVAL_NAMES.has(item.name));
 
   return (
     <div className="topic-page">
@@ -406,7 +509,7 @@ export const ReligionTab = ({
           </div>
         </div>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 10 }}>
-          {orderedFestivals.filter((item) => CORE_FESTIVAL_NAMES.has(item.name)).map((item) => <Badge key={item.name} text={item.name} color="#d97706" />)}
+          {coreFestivals.map((item) => <Badge key={item.name} text={item.name} color="#d97706" />)}
         </div>
         <MemoryHook text="Identify the faith first, then the clue: Diwali-lights, Vaisakhi-Sikh New Year, Hanukkah-lights, Eid al-Fitr-end of Ramadan." />
       </Card>
@@ -439,7 +542,7 @@ export const ReligionTab = ({
           </div>
         ))}
       </Card>
-      {orderedFestivals.map((item) => (
+      {coreFestivals.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
             <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</span>
@@ -452,6 +555,31 @@ export const ReligionTab = ({
           <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{item.detail}</div>
         </Card>
       ))}
+      {extraFestivals.length > 0 && (
+        <CollapsibleDetails
+          Card={Card}
+          Badge={Badge}
+          title="More festival detail"
+          note="Open for the wider set of religious festivals once the highest-yield matches are secure."
+          badgeText={`${extraFestivals.length} extra festivals`}
+        >
+          <div style={{ display: "grid", gap: 12 }}>
+            {extraFestivals.map((item) => (
+              <Card key={item.name} style={{ marginBottom: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                  <span style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</span>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <Badge text={item.date} color="#d97706" />
+                    <Badge text="More detail" color="#64748b" />
+                  </div>
+                </div>
+                <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>{item.faith}</div>
+                <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>{item.detail}</div>
+              </Card>
+            ))}
+          </div>
+        </CollapsibleDetails>
+      )}
       <SectionStudyActions
         Card={Card}
         Badge={Badge}
@@ -481,6 +609,8 @@ export const LandmarksTab = ({
   CORE_LANDMARK_NAMES,
 }) => {
   const orderedLandmarks = [...LANDMARKS].sort((a, b) => Number(CORE_LANDMARK_NAMES.has(b.name)) - Number(CORE_LANDMARK_NAMES.has(a.name)));
+  const coreLandmarks = orderedLandmarks.filter((item) => CORE_LANDMARK_NAMES.has(item.name));
+  const extraLandmarks = orderedLandmarks.filter((item) => !CORE_LANDMARK_NAMES.has(item.name));
 
   return (
     <div className="topic-page">
@@ -504,7 +634,7 @@ export const LandmarksTab = ({
           <Badge text="Exam favourites first" color="#ef4444" />
         </div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
-          {orderedLandmarks.filter((item) => CORE_LANDMARK_NAMES.has(item.name)).map((item) => (
+          {coreLandmarks.map((item) => (
             <div key={item.name} style={{ borderRadius: 14, padding: 12, background: "var(--panel-bg)", border: "1px solid var(--card-border)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 8, flexWrap: "wrap", marginBottom: 6 }}>
                 <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>{item.name}</div>
@@ -530,7 +660,7 @@ export const LandmarksTab = ({
         ]}
       />
       <SectionMockPanel sectionId="landmarks" />
-      {orderedLandmarks.map((item) => (
+      {coreLandmarks.map((item) => (
         <Card key={item.name}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
             <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
@@ -543,6 +673,31 @@ export const LandmarksTab = ({
           <TrapAlert text={item.trap} />
         </Card>
       ))}
+      {extraLandmarks.length > 0 && (
+        <CollapsibleDetails
+          Card={Card}
+          Badge={Badge}
+          title="More places"
+          note="Open for the wider place list after the core location clues are fixed."
+          badgeText={`${extraLandmarks.length} extra places`}
+        >
+          <div style={{ display: "grid", gap: 12 }}>
+            {extraLandmarks.map((item) => (
+              <Card key={item.name} style={{ marginBottom: 0 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 6 }}>
+                  <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{item.name}</div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    <Badge text={item.where} color="#64748b" />
+                    <Badge text="More places" color="#64748b" />
+                  </div>
+                </div>
+                <div style={{ color: "var(--text)", fontSize: 14, marginTop: 8, lineHeight: 1.7 }}>{item.fact}</div>
+                <TrapAlert text={item.trap} />
+              </Card>
+            ))}
+          </div>
+        </CollapsibleDetails>
+      )}
       <SectionStudyActions
         Card={Card}
         Badge={Badge}
