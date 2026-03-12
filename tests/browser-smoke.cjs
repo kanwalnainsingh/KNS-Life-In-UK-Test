@@ -64,7 +64,7 @@ const captureScreenshot = async (page, baseUrl) => {
     await clickByText(page, "Menu");
     await waitForText(page, "Study menu");
   }
-  await page.screenshot({ path: targetPath, fullPage: true });
+  await page.screenshot({ path: targetPath, fullPage: false });
 };
 
 const startServer = () => {

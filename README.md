@@ -40,9 +40,9 @@ UI stack:
   &nbsp;
   <img src="screenshots/quick-facts-course.png" width="22%" alt="Quick Facts Course on mobile" />
   &nbsp;
-  <img src="screenshots/dark-home.png" width="22%" alt="Dark mode home screen on mobile" />
+  <img src="screenshots/mock-progress.png" width="22%" alt="Mock progress on mobile" />
 </p>
-<p align="center"><strong>Current mobile views</strong> — the study menu, exam-topic completion, quick-facts course flow, and the cleaner dark-mode home experience.</p>
+<p align="center"><strong>Current mobile views</strong> — the study menu, exam-topic completion, quick-facts course flow, and saved mock progress.</p>
 
 ---
 
