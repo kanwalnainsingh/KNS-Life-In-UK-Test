@@ -2614,6 +2614,29 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
     setPlanProgress(next);
     writeStore(STORAGE_KEYS.passPlan, next);
   };
+  const courseModes = [
+    {
+      id: "story",
+      eyebrow: "History first",
+      title: "Story Mode",
+      detail: "Learn the history story in order: Roman Britain, rulers, reform, wars, welfare state, and modern change.",
+      action: "Open Story Mode",
+    },
+    {
+      id: "quickfacts",
+      eyebrow: "Civics and daily life",
+      title: "Quick Facts Course",
+      detail: "Learn Parliament, law, rights, everyday Britain, citizenship basics, and identity facts that are tested directly.",
+      action: "Open Quick Facts",
+    },
+    {
+      id: "examtopics",
+      eyebrow: "Final exam-area check",
+      title: "Exam Topics",
+      detail: "Use this after learning the sections. It groups revision by official-style exam area and runs topic mocks.",
+      action: "Open Exam Topics",
+    },
+  ];
 
   return (
     <div className="page-stack">
@@ -2666,12 +2689,22 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Pass guide</div>
-            <div className="text-sm leading-6 text-muted-foreground">Pick a clear route, follow a short plan, then use the next best action instead of guessing what to study next.</div>
+            <div className="text-sm leading-6 text-muted-foreground">Use one clear route instead of guessing between modes: learn the history story, finish civics and everyday facts, then check yourself by exam area.</div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} plan steps done`} color={currentPlan.color} />
             <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
           </div>
+        </div>
+        <div className="mb-4 grid gap-3 lg:grid-cols-3">
+          {courseModes.map((mode) => (
+            <div key={mode.id} className="support-card-strong">
+              <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{mode.eyebrow}</div>
+              <div className="mb-2 text-base font-extrabold text-foreground">{mode.title}</div>
+              <div className="mb-3 text-sm leading-6 text-muted-foreground">{mode.detail}</div>
+              <Button variant="secondary" className="w-full" onClick={() => setActive(mode.id)}>{mode.action}</Button>
+            </div>
+          ))}
         </div>
         <div className="continue-learning-grid mb-4">
           <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
@@ -2699,7 +2732,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <div className="dashboard-grid">
           <div className="card-stack">
           <div className="dashboard-card">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Start Here</div>
+            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Best route to pass</div>
             <div className="mb-3 grid gap-2">
               {START_HERE_PATHS.map((path) => (
                 <button key={path.id} className="focus-ring rounded-xl border border-border bg-secondary/70 px-3 py-3 text-left" onClick={() => setActive(path.steps[0].tab)}>
@@ -2775,7 +2808,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Continue your revision</div>
-            <div className="text-sm leading-6 text-muted-foreground">Use these shortcuts when you want the app to pick up from where you last left off.</div>
+            <div className="text-sm leading-6 text-muted-foreground">These are personal shortcuts. Use them after you already know the main route above.</div>
           </div>
           <Badge text="Personal shortcuts" color="#14b8a6" />
         </div>
