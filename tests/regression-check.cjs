@@ -22,6 +22,8 @@ const normalizeQuestion = (text) =>
     const firstSeen = seenQuestions.get(key);
     assert(!firstSeen, `Duplicate quiz question detected at ${firstSeen} and ${index + 1}: ${question.q}`);
     seenQuestions.set(key, index + 1);
+    assert(question.examTopic, `Question ${index + 1} is missing examTopic metadata`);
+    assert(Array.isArray(question.sectionIds) && question.sectionIds.length, `Question ${index + 1} is missing sectionIds metadata`);
   });
 
   const chapterIds = new Set();

@@ -2379,6 +2379,7 @@ const buildMockCategoryBreakdown = (questions, answers) =>
     .filter((row) => row.total > 0);
 
 const classifyExamTopicGroup = (question) => {
+  if (question.examTopic) return question.examTopic;
   const questionText = question.q.toLowerCase();
   const tipText = question.tip.toLowerCase();
   const text = `${questionText} ${tipText}`;
@@ -2411,7 +2412,7 @@ const classifyExamTopicGroup = (question) => {
 };
 
 const buildExamTopicQuestionPool = (group) =>
-  ALL_QUIZ.filter((question) => classifyExamTopicGroup(question) === group.id);
+  ALL_QUIZ.filter((question) => (question.examTopic || classifyExamTopicGroup(question)) === group.id);
 
 const getExamTopicMockLabel = (groupId) => ({
   values: "Values mock",

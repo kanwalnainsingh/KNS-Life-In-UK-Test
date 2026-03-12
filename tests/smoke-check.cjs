@@ -20,6 +20,7 @@ const assert = (condition, message) => {
 
   assert(Array.isArray(data.ALL_QUIZ), "ALL_QUIZ should be defined");
   assert(data.ALL_QUIZ.length >= 250, "Expected at least 250 quiz questions");
+  assert(/question\.examTopic/.test(appSource), "Exam topics should use explicit question metadata");
   assert(Array.isArray(data.CONFUSABLES) && data.CONFUSABLES.length >= 6, "Expected confusion pairs");
   assert(Array.isArray(data.TABS) && data.TABS.length >= 16, "Expected expanded tab list");
   assert(Array.isArray(data.VISUAL_MNEMONICS) && data.VISUAL_MNEMONICS.length >= 4, "Expected mnemonic packs");
@@ -130,6 +131,12 @@ const assert = (condition, message) => {
     assert(Array.isArray(question.opts) && question.opts.length === 4, `Question ${index + 1} must have 4 options`);
     assert(Number.isInteger(question.a) && question.a >= 0 && question.a < 4, `Question ${index + 1} answer index invalid`);
     assert(typeof question.tip === "string" && question.tip.length > 8, `Question ${index + 1} tip missing`);
+    assert(typeof question.examTopic === "string", `Question ${index + 1} examTopic missing`);
+    assert(["values", "history", "government", "society", "everyday", "people"].includes(question.examTopic), `Question ${index + 1} examTopic invalid`);
+    assert(Array.isArray(question.sectionIds) && question.sectionIds.length >= 1, `Question ${index + 1} sectionIds missing`);
+    assert(question.sectionIds.every((sectionId) => typeof sectionId === "string" && sectionId.length > 1), `Question ${index + 1} sectionIds invalid`);
+    assert(typeof question.priority === "string", `Question ${index + 1} priority missing`);
+    assert(["core", "common", "extra"].includes(question.priority), `Question ${index + 1} priority invalid`);
   });
 
   data.CONFUSABLES.forEach((pair, index) => {

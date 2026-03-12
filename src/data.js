@@ -1028,7 +1028,7 @@ const POPULATION_HISTORY = [
 ];
 
 // ── QUIZ QUESTIONS ───────────────────────────────────────────
-const ALL_QUIZ = [
+const ALL_QUIZ_BASE = [
   // ── HISTORY — DATES ────────────────────────────────────────
   { q:"When was the Magna Carta signed?", opts:["1066","1215","1348","1485"], a:1, tip:"⭐ Exam favourite — King John forced by barons at Runnymede. 1215 = 'King John had no Choice'." },
   { q:"When was the Battle of Hastings?", opts:["1042","1066","1085","1100"], a:1, tip:"⭐ Exam favourite — 1066 = LAST successful invasion of England. William the Conqueror (Normandy) defeats Harold." },
@@ -1367,6 +1367,234 @@ const ALL_QUIZ = [
   { q:"Who was the first wife of Henry VIII?", opts:["Anne Boleyn","Catherine of Aragon","Jane Seymour","Anne of Cleves"], a:1, tip:"💡 Good to know — Catherine of Aragon was Henry VIII's first wife. The divorce dispute helped trigger the break with Rome." },
   { q:"What happened in the Dissolution of the Monasteries under Henry VIII?", opts:["Monasteries became Scottish churches","Monasteries were closed and their land and wealth were taken over","Monasteries became universities","Monasteries were moved to Wales"], a:1, tip:"📌 Often tested — Under Henry VIII, monasteries were closed and their land and wealth passed to the Crown." },
 ];
+
+const EXAM_TOPIC_IDS = ["values", "history", "government", "society", "everyday", "people"];
+const QUESTION_PRIORITY_IDS = ["core", "common", "extra"];
+
+const QUESTION_TOPIC_OVERRIDES = {
+  "Who was the FIRST Prime Minister of Britain?": "people",
+  "When was the voting age reduced to 18?": "government",
+  "When did the BBC launch its first TV service?": "society",
+  "What is Great Britain?": "society",
+  "What is the United Kingdom?": "society",
+  "What are the British Isles?": "society",
+  "Is the Republic of Ireland part of the United Kingdom?": "society",
+  "Which are the Crown Dependencies?": "society",
+  "Which islands are known as the Channel Islands in this context?": "society",
+  "Are the Crown Dependencies part of the United Kingdom?": "society",
+  "Why is Wales NOT in the Union Jack?": "values",
+  "What is the patron saint of Scotland?": "values",
+  "When is St George's Day (England)?": "values",
+  "When is St David's Day (Wales)?": "values",
+  "What is the patron saint of Ireland?": "values",
+  "What is Scotland's national animal?": "society",
+  "How many permanent members does the UN Security Council have?": "society",
+  "How many countries are in the Commonwealth?": "society",
+  "How many member countries does the Council of Europe have?": "society",
+  "Who appoints the Prime Minister?": "government",
+  "Which party did Winston Churchill lead?": "people",
+  "Which party did Clement Attlee lead?": "people",
+  "Why do many people take the Life in the UK Test?": "everyday",
+  "What are the two parts of the official knowledge requirement for many citizenship or settlement applicants?": "everyday",
+  "Which languages can count for the language requirement for citizenship or settlement?": "everyday",
+  "Who is exempt from the Life in the UK requirement because of age?": "everyday",
+  "Which long-term condition can exempt a person from the Life in the UK requirement if it prevents them from meeting it?": "everyday",
+  "What % identified as Christian in the 2011 Census?": "society",
+  "What is Remembrance Day?": "values",
+  "What exactly is 'Big Ben'?": "society",
+  "What is the name of the tower that contains Big Ben?": "society",
+  "What is the approximate population of the UK?": "society",
+  "What are bank holidays?": "everyday",
+  "What was the 1942 Beveridge Report about?": "history",
+  "When was the NI Parliament abolished?": "history",
+  "What were Huguenots?": "society",
+  "What is the UK Supreme Court?": "government",
+  "What is the difference between criminal and civil courts?": "government",
+  "What does the UK have instead of a written constitution?": "government",
+  "When is Guy Fawkes Night (Bonfire Night)?": "values",
+  "What did the Emancipation Act of 1829 do?": "history",
+  "What was the Royal Society set up to promote?": "society",
+  "What did Harold Macmillan's 'Wind of Change' speech refer to?": "history",
+  "What is the Industrial Revolution mainly associated with in Britain?": "history",
+  "What is the difference between Tate Britain and Tate Modern?": "people",
+  "What is the Turner Prize?": "people",
+  "What is NATO?": "society",
+  "When was the UK a founding member of the United Nations?": "society",
+  "What is the European Convention on Human Rights (ECHR)?": "government",
+  "What is the G7?": "society",
+  "Which is an example of a British Overseas Territory?": "society",
+  "How many British Overseas Territories are there?": "society",
+  "What is the UK national anthem?": "values",
+  "What colours make up the Union Jack?": "values",
+  "What flowers represent the four nations?": "values",
+  "What does Britannia symbolise?": "values",
+  "Where is the official London residence of the monarch?": "society",
+  "What is the Cenotaph used for?": "values",
+  "What is the longest river in the UK?": "society",
+  "What is the current voting age in the UK?": "government",
+  "What is the FA Cup?": "society",
+  "Windsor Castle is used as what?": "society",
+  "What is the River Thames known for?": "society",
+  "What is the capital city of England?": "society",
+  "Which set shows the core British values?": "values",
+  "What does the rule of law mean?": "values",
+  "What does 'innocent until proven guilty' mean?": "values",
+  "Which is an example of getting involved in your community?": "everyday",
+  "Who are magistrates in the UK?": "government",
+  "Which of these is a public duty when called?": "values",
+  "Which Act protects people from discrimination based on age, race, disability, and other characteristics?": "government",
+  "What is the capital city of Scotland?": "society",
+  "What is the capital city of Wales?": "society",
+  "What is the capital city of Northern Ireland?": "society",
+  "What does the British Museum hold?": "people",
+  "What is 10 Downing Street?": "government",
+  "The Bank of England is the UK's…?": "government",
+  "When are Prime Minister's Questions (PMQs) usually held when Parliament is sitting?": "government",
+  "In which part of the UK must voters show photo ID at the polling station?": "government",
+  "What is the official child-hearing system used in Scotland called?": "government",
+  "What is the highest civil court in Scotland?": "government",
+  "What does National Insurance help to fund?": "everyday",
+  "What is council tax paid to support?": "everyday",
+  "Which qualification is mainly used in Scotland instead of A-levels?": "everyday",
+  "Which number also works for emergencies in the UK besides 999?": "everyday",
+  "What happens every 10 years in the UK to collect population and society information?": "everyday",
+  "What must young people usually do after the age of 16 in England?": "everyday",
+  "What is the minimum driving age for a car in the UK?": "everyday",
+  "What is the minimum driving age for a moped in the UK?": "everyday",
+  "Who is responsible for the economy in the UK government?": "government",
+  "Which body can delay bills and ask the government to think again, but usually cannot block a bill forever?": "government",
+  "What is a civil servant?": "government",
+  "What is a coalition government?": "government",
+  "When are local elections often held in the UK?": "government",
+  "What do school governors help do?": "everyday",
+  "Which of these is a criminal offence in the UK?": "government",
+  "Where did rugby originate?": "society",
+  "Who was the first wife of Henry VIII?": "people",
+  "What happened in the Dissolution of the Monasteries under Henry VIII?": "history",
+};
+
+const inferQuestionPriority = (tip) => {
+  if (tip.startsWith("⭐")) return "core";
+  if (tip.startsWith("📌")) return "common";
+  return "extra";
+};
+
+const inferQuestionTopic = (question, index) => {
+  if (QUESTION_TOPIC_OVERRIDES[question.q]) return QUESTION_TOPIC_OVERRIDES[question.q];
+
+  if (index <= 31) return "history";
+  if (index <= 40) return "people";
+  if (index <= 52) return "people";
+  if (index <= 74) return "society";
+  if (index <= 102) return "government";
+  if (index <= 107) return "everyday";
+  if (index <= 118) return "society";
+  if (index <= 129) return "people";
+  if (index <= 144) return "people";
+  if (index <= 159) return "society";
+  if (index <= 169) return "everyday";
+  if (index <= 175) return "society";
+  if (index <= 180) return "government";
+  if (index <= 204) return "history";
+  if (index <= 213) return "government";
+  if (index <= 242) return "people";
+  if (index <= 255) return "society";
+  if (index <= 261) return "values";
+  if (index <= 266) return "society";
+  if (index <= 269) return "society";
+  if (index <= 276) return "values";
+  if (index <= 280) return "people";
+  if (index <= 283) return "government";
+  if (index <= 288) return "people";
+  if (index <= 302) return "government";
+  if (index <= 305) return "history";
+  if (index <= 310) return "everyday";
+  if (index <= 315) return "people";
+  return "history";
+};
+
+const inferQuestionSectionIds = (question, examTopic) => {
+  const text = `${question.q} ${question.tip}`.toLowerCase();
+  const sectionIds = new Set();
+
+  if (/(roman|caesar|claudius|boudicca|hadrian|augustine|alfred|athelstan|norman|hastings|domesday|magna carta|model parliament|battle of|armada|gunpowder plot|civil war|restoration|glorious revolution|bill of rights|reform act|chartist|industrial revolution|victoria|world war|blitz|dunkirk|d-day|beveridge|wind of change|union of crowns|act of union|henry viii|bosworth|culloden|bannockburn|agincourt|peterloo|wspu|suffragette|good friday agreement|devolution|ireland split|butler act|royal society)/.test(text)) {
+    sectionIds.add("timeline");
+    sectionIds.add("story");
+  }
+
+  if (/(battle of|world war|trafalgar|waterloo|blitz|dunkirk|d-day|armistice|jacobite|william of orange|roundheads|cavaliers|boyne|culloden|bannockburn|agincourt|hastings|boudicca)/.test(text)) {
+    sectionIds.add("wars");
+  }
+
+  if (/(great britain|united kingdom|british isles|republic of ireland|crown dependencies|channel islands|overseas territories|union jack|saint|senedd|holyrood|stormont|msp|mla|welsh|gaelic|capital city of|legal system|scotland's national animal|wales not in the union jack|flower|shamrock|thistle|daffodil|rose)/.test(text)) {
+    sectionIds.add("nations");
+  }
+
+  if (/(parliament|house of commons|house of lords|speaker|cabinet|prime minister|monarch|constitutional monarchy|parliamentary democracy|general election|electoral|first-past-the-post|state opening|hansard|life peer|hereditary peers|police and crime commissioner|supreme court|court of session|jury|magistrate|children's hearing|habeas corpus|criminal|civil court|fair trial|civil servant|coalition government|pmqs|economy|chancellor|bank of england|10 downing street|school governors|community|national insurance|council tax|census|minimum wage|equality act|public duty|driving age|moped|999|112|101|national lottery|education or training until 18|life in the uk test|language requirement|settlement|citizenship)/.test(text)) {
+    sectionIds.add("quickfacts");
+  }
+
+  if (/(democracy|rule of law|individual liberty|mutual respect|tolerance|human rights|freedom of speech|freedom of religion|innocent until proven guilty|church of england|remembrance day|bonfire night|union flag|union jack|british values|cenotaph|patron saint|st george|st andrew|st david|st patrick|britannia|national anthem|god save the king)/.test(text)) {
+    sectionIds.add("anthem");
+  }
+
+  if (/(church|christian|muslim|jew|budd|hindu|sikh|diwali|eid|vaisakhi|hanukkah|hogmanay|boxing day|mothering sunday|easter|christmas|religion|religious freedom)/.test(text)) {
+    sectionIds.add("religion");
+  }
+
+  if (/(wimbledon|grand national|golf|rogers bannister|bannister|redgrave|bobby moore|paralympic|torvill|dean|formula 1|athens 2004|london 2012|tour de france|andy murray|ashes|cricket|rugby|olympic|sport)/.test(text)) {
+    sectionIds.add("sports");
+  }
+
+  if (/(shakespeare|dickens|austen|mousetrap|beowulf|lord of the rings|roald dahl|cenotaph|edinburgh festival fringe|agatha christie|sherlock holmes|auld lang syne|john milton|messiah|handel|tate britain|tate modern|turner prize|british museum|beatles|rowling|art|writer|playwright|novelist|music|film|stage|theatre)/.test(text)) {
+    sectionIds.add("arts");
+  }
+
+  if (/(penicillin|world wide web|television|jet engine|radar|dolly|atm|insulin|ivf|radio telescope|concorde|steam engine|smallpox vaccine|dna|hovercraft|great western railway|locomotive|telephone|hawker siddeley|theory of gravity|evolution|scientist|invented|developed|discovered|built the radio telescope|jodrell bank|charles darwin|isaac newton|stephen hawking)/.test(text)) {
+    sectionIds.add("inventors");
+  }
+
+  if (/(stonehenge|tower of london|angel of the north|eden project|loch lomond|hadrian's wall|loch ness|big ben|elizabeth tower|giant's causeway|national park|skara brae|sutton hoo|boudicca statue|bodnant gardens|snowdonia|york minster|maiden castle|millennium stadium|river thames|river severn|buckingham palace|windsor castle|british museum)/.test(text)) {
+    sectionIds.add("landmarks");
+  }
+
+  if (/(united nations|un security council|commonwealth|council of europe|echr|nato|g7|overseas territory|international organisation)/.test(text)) {
+    sectionIds.add("international");
+  }
+
+  if (/(henry viii|elizabeth i|victoria|churchill|attlee|walpole|pankhurst|nightingale|mary seacole|newton|darwin|fleming|tim berners-lee|shakespeare|jane austen|beatles|william the conqueror|francis drake|james i|henry vii|alfred the great|bonnie prince charlie|william of orange|cromwell|charles i|charles ii|lord nelson|wellington|milton|boudicca|mary seacole|admiral nelson|roger bannister|andy murray|torvill|dean|margaret thatcher)/.test(text)) {
+    sectionIds.add("figures");
+  }
+
+  if (/(difference between|don't mix|not the same|vs |compared with|share one legal system|instead of a-levels|part of the uk|which body can delay|which church|which number also works|longest river|big ben|elizabeth tower|patron saint|crown dependencies|british isles)/.test(text)) {
+    sectionIds.add("confuse");
+  }
+
+  if (!sectionIds.size) {
+    if (examTopic === "history") {
+      sectionIds.add("timeline");
+      sectionIds.add("story");
+    } else if (examTopic === "government" || examTopic === "everyday" || examTopic === "values") {
+      sectionIds.add("quickfacts");
+    } else if (examTopic === "people") {
+      sectionIds.add("figures");
+    } else {
+      sectionIds.add("quickrev");
+    }
+  }
+
+  return Array.from(sectionIds);
+};
+
+const ALL_QUIZ = ALL_QUIZ_BASE.map((question, index) => {
+  const examTopic = inferQuestionTopic(question, index);
+  return {
+    ...question,
+    examTopic,
+    sectionIds: inferQuestionSectionIds(question, examTopic),
+    priority: inferQuestionPriority(question.tip),
+  };
+});
 
 // ── TABS ─────────────────────────────────────────────────────
 const TABS = [
