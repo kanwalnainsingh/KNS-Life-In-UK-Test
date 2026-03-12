@@ -2,9 +2,9 @@
 
 A free, mobile-friendly study guide and practice app for the **Life in the UK test**, built for **British citizenship** and **Indefinite Leave to Remain (ILR)** preparation.
 
-> 📖 324 quiz questions · 💡 Memory clues · ⚠️ Common Mix-Ups · 📅 Full timeline · 📝 Mock tests with saved progress
+> 📖 329 quiz questions · 💡 Memory clues · ⚠️ Common Mix-Ups · 📝 40 balanced mock papers · 📚 Story Mode + Quick Facts Course
 
-Current release: `v1.20.0`
+Current release: `v1.21.0`
 
 ---
 
@@ -14,12 +14,12 @@ Current release: `v1.20.0`
 
 Official test info: https://www.gov.uk/life-in-the-uk-test
 
-UI stack now uses:
+UI stack:
 - Tailwind CSS
 - shadcn-style open-source UI primitives
 - class-based dark mode with persisted preference
-- calmer shared visual system across Home, Quick Revision, Quiz, Mock, Story, Timeline, 4 Nations, and Figures
-- cleaner learner-first side menu and bottom navigation for mobile and desktop
+- learner-first mobile and desktop navigation
+- local progress saving across refreshes and new releases
 
 ---
 
@@ -31,18 +31,18 @@ UI stack now uses:
 
 ---
 
-## 📸 Screenshots
+## 📸 Highlights
 
 <p align="center">
-  <img src="screenshots/exam-topics.png" width="22%" alt="Exam topics course on mobile" />
+  <img src="screenshots/exam-topics.png" width="22%" alt="Exam Topics course on mobile" />
   &nbsp;
   <img src="screenshots/quick-facts-course.png" width="22%" alt="Quick Facts Course on mobile" />
   &nbsp;
   <img src="screenshots/common-mixups.png" width="22%" alt="Common Mix-Ups on mobile" />
   &nbsp;
-  <img src="screenshots/inventors.png" width="22%" alt="Inventors page with page-specific mock on mobile" />
+  <img src="screenshots/mock-progress.png" width="22%" alt="Mock progress and saved scores on mobile" />
 </p>
-<p align="center"><strong>Current mobile views</strong> — exam-topic course, quick facts course, common mix-ups, and a page-specific section mock.</p>
+<p align="center"><strong>Current mobile views</strong> — course-by-topic revision, civics/everyday-life revision, compare cards for common confusion points, and saved mock progress.</p>
 
 ---
 
@@ -50,17 +50,22 @@ UI stack now uses:
 
 1. Open the app at the live link above.
 2. Use the top menu on desktop or the bottom navigation / quick panel on mobile.
-3. Start with `Exam Topics` if you want to complete the course by official-style exam area.
-4. Use `Quick Facts Course` for government, law, everyday life, and identity facts.
+3. Best pass route:
+   - `Story Mode` for history
+   - `Quick Facts Course` for government, law, everyday life, and identity facts
+   - `4 Nations`
+   - `Common Mix-Ups`
+   - `Mock Test`
+4. Use `Exam Topics` when you want to revise by official-style exam area instead of by section name.
 5. Use `Quick Revise` for fast facts and memory clues.
-6. Use `Quiz` if you want normal practice with answer options:
+6. Use `Quiz` if you want flexible practice with answer options:
    - show answers instantly
    - show answers at the end
    - include context and memory tips
-7. Use `Mock Test` for a more exam-style run.
-8. Use page-specific mocks/tests inside sections like `Timeline`, `Key People`, `Inventors`, `Sports`, `Landmarks`, and `Common Mix-Ups` when you want to finish one topic properly.
-9. Use `Rapid Fire` for faster timed recall.
-10. Use `Revise Mistakes` to retry weak questions.
+7. Use `Mock Test` for the closest exam-style run.
+8. Use page-specific mocks/tests inside sections like `Timeline`, `Key People`, `Wars`, `Landmarks`, and `Common Mix-Ups` when you want to finish one topic properly.
+9. Use `Daily 10`, `Rapid Fire`, and `Dates Drill` for quick mobile revision.
+10. Use `Revise Mistakes` to retry weak questions and clean up errors before another mock.
 
 ---
 
@@ -68,23 +73,23 @@ UI stack now uses:
 
 | Section | What it does |
 |---|---|
-| 🏠 Home | Revision hub, coverage checklist, quick jump links, memory visuals |
-| 🧭 Exam Topics | Learn the course by exam-style topic areas: values, history, government, society, everyday life, and important people/events |
-| ↔️ Quick Revise | Fast card-by-card revision with topic filters, `Fresh mix`, `Pass core`, `Weak areas`, `Saved facts`, `Common traps`, `Dates`, and `4 Nations` focuses |
-| 📚 Story Mode | Chronological chapter-by-chapter revision with explicit dates, names, and pass-first memory anchors for the main history and modern-Britain story |
+| 🏠 Home | Pass guide, continue-learning strip, weakest-area guidance, mock progress |
+| 🧭 Exam Topics | Course completion by official-style exam area with per-topic mocks and learned/tested/reviewed progress |
+| ↔️ Quick Revise | Fast revision cards with topic filters, pass-core focus, weak areas, saved facts, dates, and 4 Nations filters |
+| 📚 Story Mode | Chronological history course with dates, names, and pass-first memory anchors |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
 | 📄 Cram Sheet | One-page night-before summary |
 | ✅ Tracker | Full-course completion tracker stored on device |
-| 📅 Timeline | Full history timeline with search, era filters, anchor dates, and a full timeline mock |
-| 🏴 4 Nations | Capitals, saints, symbols, languages, parliaments, and common traps |
-| ⚠️ Common Mix-Ups | Side-by-side comparisons for the facts people mix up most, plus a comparison-only mock |
-| ⚡ Quick Facts Course | A guided civics/law/everyday-life course with grouped facts, per-group checks, and completion tracking |
+| 📅 Timeline | Cleaned history timeline with anchor dates, checkpoint saving, and a timeline-only mock |
+| 🏴 4 Nations | Capitals, saints, symbols, legal-system differences, compare table, and section test |
+| ⚠️ Common Mix-Ups | Mobile swipe compare cards, grouped confusion points, and mix-up-only testing |
+| ⚡ Quick Facts Course | Guided civics/law/everyday-life course with grouped facts, per-group checks, and progress saving |
 | 🏛️ Landmarks | Important places with memory clues, exam traps, and a page-specific section test |
 | ⛪ Religion | Faith groups and major festivals |
-| 💡 Inventors | British inventors and key discoveries, plus a full inventor-only mock |
+| 💡 Inventors | British inventors and key discoveries, plus an inventor-only section test |
 | 🏅 Sports | Sports stars and high-yield exam facts, plus a sports-only section test |
-| 👑 Key People | Historic figures, grouped memory links, revision cues, and a full people mock |
+| 👑 Key People | Historic figures, grouped memory links, dates to remember, and a people-only mock |
 | 🎭 Arts | Literature, music, art, architecture, fashion, and film |
 | 🌍 World Orgs | Commonwealth, UN, NATO, Council of Europe, G7, plus a world-orgs section test |
 | 🧠 Quiz | Practice mode with answer timing options and memory tips |
@@ -94,267 +99,75 @@ UI stack now uses:
 
 ---
 
-## 🧠 What’s New
+## 🧠 Current Highlights
 
-- Better mobile navigation with bottom nav, quick panel, back controls, and less scrolling
-- Home now has a pass-focused learner layer on top of the existing modes:
-  - `Start here` routes for new learners, test-soon learners, and mock-first learners
-  - saved `7-day`, `3-day`, and `night-before` pass plans
-  - `Next best action`, readiness score, and weakest-area guidance
-- Bookmarks are now supported for:
-  - quick-revision fact cards
-  - quiz questions
-  - mock questions
-  - mistake-revision questions
-- `Quick Revise` now includes a `Saved facts` focus so bookmarked facts can be reviewed quickly
-- `Quick Revise` now shows answer, context, and memory clue immediately so it works as a true fast-scroll revision mode
-- `Quick Revise` now has a broad topic filter so you can stay inside one subject like `History`, `Wars`, `Law`, `Landmarks`, `Key People`, `World Orgs`, or `Arts`
-- `Quick Revise` keeps your place quietly in the background, while `Show all now` and `Reset progress` give you manual control when needed
-- `Quick Facts` has been redesigned into `Quick Facts Course`:
-  - grouped into Government, Law, Everyday Britain, Community, Citizenship, and Identity
-  - `Learn`, `Check me`, and `Complete course` flows
-  - saved completion state so learners can finish the civics/law side of the course in chunks
-- `4 Nations` now works more like a real study mode:
-  - one-glance compare table for capitals, saints, symbols, parliaments, and legal systems
-  - per-country `must know / people / places / events / trap` blocks
-  - embedded nation-only mini tests for capitals, saints/symbols, and common traps
-- `Wars & Battles` now works more like a real study section too:
-  - one-glance war compare table for battle/date/person anchors
-  - `Most tested first` war strip plus a `war to person` drill
-  - war-only mini tests for dates, world wars, and battle traps
-  - direct handoff into Story Mode, Timeline, and war-focused quick revision
-- New `Exam Topics` mode groups the course by likely exam area:
-  - British Values, Principles & Traditions
-  - UK History
-  - Government & Law
-  - Modern UK Society
-  - Everyday Life in the UK
-  - Important People & Events
-  - each topic has key facts, key names, and direct links into the best revision section
-  - each topic now also has a topic-specific mini mock built from the existing question bank, with saved attempts and wrong-answer review
-  - visual topic weighting and clearer completed-state styling now make it easier to scan on mobile and desktop
-- Home and navigation polish:
-  - `Continue learning` strip on Home for last section, next unfinished exam topic, and latest mock
-  - lighter bottom nav, study menu, and floating `Top` / `Bottom` controls for a cleaner mobile feel
-- `Revise Mistakes` now also links into saved questions and weak-fact study
-- Bottom mobile navigation now keeps the main study flow visible:
-  - `Home`
-  - `Revise`
-  - `Quiz`
-  - `Mock`
-  - `Menu`
-- The bottom nav now highlights the correct parent area when you are inside related study modes like `Story`, `Daily 10`, `Rapid Fire`, or `Revise Mistakes`
-- Long mobile pages now include both `Top` and `End` floating scroll helpers
-- UI migration to Tailwind CSS plus shadcn-style reusable primitives for cards, buttons, badges, progress, and sheets
-- Class-based dark mode now initializes before render and respects system preference when no saved choice exists
-- Stable `Story Mode` now uses dedicated chapter data instead of fragile runtime lookups
-- Story Mode now reads as a clearer chronological course with stronger date anchors from Roman Britain to devolution and modern civic life
-- Story Mode now surfaces exact `dates to remember`, `names to know`, and `pass-first notes` in every chapter so history revision is easier to lock in before a mock
-- Home is now cleaner above the fold with a simpler pass path, quieter surfaces, and less repeated guidance competing for attention
-- Longer topic pages now end with clear follow-up actions so `4 Nations`, `Quick Facts`, `Key People`, `Arts`, and `World Orgs` can lead straight into practice instead of feeling like dead-end reading screens
-- Shared mobile density is now lighter too, with tighter card padding and more consistent long-page spacing across the heavier revision sections
-- `Story Mode` chapter actions and the follow-up actions in `Religion`, `Landmarks`, `Inventors`, and `Sports` now open focused `Quick Revise` runs instead of generic reading dead ends
-- Added a browser smoke test using `puppeteer-core` and Chrome to validate Home, Quick Revision, Story Mode handoff, Mock start, Rapid Fire, and follow-up actions after each build
-- `Religion`, `Sports`, `Landmarks`, and `Inventors` are now more pass-first: each starts with `must know first` anchors before the longer reference list
-- Lower-priority reference tabs were extracted into a dedicated module so future UI changes are safer and `src/app.jsx` is less overloaded
-- `Key Historical Figures` now works more like a one-stop pass sheet:
-  - stronger exam hooks
-  - fuller coverage for figures like `Henry VIII`, `Elizabeth I`, `Churchill`, `Attlee`, `Victoria`, `Walpole`, and `Wilberforce`
-  - cleaner “likely question” and “dates to lock in” summaries above the full cards
-- `Religion`, `Sports`, `Landmarks`, and `Inventors` now have a second pass of exam-first polish with clearer `likely questions here` panels
-- The remaining topic pages now have page-specific section mocks/tests built from the existing question bank:
-  - `Timeline`
-  - `Key People`
-  - `Common Mix-Ups`
-  - `Inventors`
-  - `Sports`
-  - `Arts`
-  - `Religion`
-  - `Landmarks`
-  - `World Orgs`
-  - `Symbols`
-  - each one uses the questions that actually belong to that page and now gives a full right/wrong summary with memory-clue review
-- Home has stronger personalization guidance:
-  - readiness now includes a clearer confidence explanation
-  - direct weak-area and compare-trap shortcuts are surfaced more clearly
-- The figures page was extracted into its own component to keep the app structure safer as content keeps growing
-- The visual system is now cleaner and calmer in both light and dark mode, with softer surfaces, lighter mobile chrome, and stronger contrast discipline
-- `Home`, `Quick Revision`, `Quiz`, and `Mock Test` now have a clearer hierarchy and less visual noise on both mobile and desktop
-- More relevant grouped navigation with main actions first and topic subsections underneath
-- `Quick Revise` has been redesigned around short return-friendly sessions:
-  - `5 min`, `10 min`, and `15 min` runs
-  - `Fresh mix`, `Pass core`, `Weak areas`, `Common traps`, `Dates`, and `4 Nations` focuses
-  - session continuity across refreshes
-  - `Hard / Okay / Easy` feedback so weaker facts can come back later
-- `Daily 10` now ends with a proper review block for wrong answers:
-  - your answer
-  - correct answer
-  - why it matters
-  - memory clue
-- `Rapid Fire` now explains its fresh-question behavior more clearly and includes `Reset progress` to clear recent-history avoidance when you want a completely new run
-- `Mock Test` and `Revise Mistakes` modes
-- Mock results now give a better next-step handoff:
-  - weakest area
-  - direct link to that weak topic
-  - direct link to `Revise Mistakes`
-  - trap review shortcut
-- Answer reveal toggles for quiz and mock flows
-- Mock paper history is now saved per paper with best score, attempts, and last score kept in local storage across app updates
-- Visual mnemonic packs like `LECB`, `BSLH`, and `DRIM`
-- Expanded `Key Historical Figures` into a stronger single-place revision page with:
-  - fuller exam-focused fact sets
-  - stronger date anchors
-  - missing high-yield names like `Henry VII`, `Charles II`, `Sir Francis Drake`, `Isaac Newton`, `Alexander Fleming`, and `Sir Tim Berners-Lee`
-  - especially fuller coverage for `Henry VIII`
-- Improved timeline with extra high-yield history anchors:
-  - Boudicca
-  - St Augustine
-  - Athelstan
-  - Henry VIII and Wales
-  - first Union Flag
-  - Beveridge Report
-  - Elizabeth II coronation
-- Dedicated `Wars & Battles` section with battle cards, compare traps, and WWII anchors
-- Added direct quiz coverage for `Boxing Day`, closing the last festival audit gap
-- Added boundary-topic coverage for:
-  - `British Isles`
-  - `Republic of Ireland`
-  - `Crown Dependencies`
-  - `Channel Islands`
-  - `British Overseas Territories`
-- Added more direct high-yield question coverage for:
-  - Welsh and Scottish Gaelic language facts
-  - Holyrood and Stormont
-  - EU citizens and local-election voting
-  - census facts used across religion and society questions
-- Added more high-yield civics and everyday-life coverage across revision, mocks, and rapid modes:
-  - Model Parliament
-  - Cabinet ministers
-  - life peers and hereditary peers
-  - Police and Crime Commissioners
-  - jury-service eligibility
-  - National Lottery age
-  - blood donation timing
-  - National Trust as a charity
-  - post-war decolonisation / Empire winds down
-- Added the missing official-scope `citizenship / settlement` context with stable GOV.UK-style facts and questions:
-  - why people take the Life in the UK Test
-  - language + life in the UK as the two-part knowledge requirement
-  - English, Welsh, or Scottish Gaelic as accepted languages for that requirement
-  - age-based exemptions and long-term-condition exemptions
-- Added more compare-heavy exam coverage for underrepresented traps and modern facts:
-  - `National Insurance` vs `council tax`
-  - `Industrial Revolution` vs `Glorious Revolution`
-  - `Jacobites` vs `Williamites`
-  - `single-party government` vs `coalition government`
-  - `Police and Crime Commissioner` vs `local councillor`
-  - `Beveridge Report` vs `Butler Act`
-  - `criminal courts` vs `civil courts`
-  - `Cenotaph = empty tomb`
-  - `Maiden Castle = Dorset`
-- Strengthened the `4 Nations` section with cross-nation system facts:
-  - England and Wales share one legal system
-  - Scotland and Northern Ireland have separate legal systems
-  - Scotland uses `Highers`
-  - Northern Ireland requires photo ID at polling stations
-- Added new handbook-style civics and culture questions and revision cues for:
-  - civil servants
-  - coalition government
-  - school governors
-  - local elections in May
-  - offensive-weapon law
-  - John Milton and Handel's `Messiah`
-  - Tate Britain / Tate Modern
-  - Turner Prize
-  - rugby originating in England
-- Fixed the old mock-answer bias by shuffling option order safely across quiz, mock, rapid fire, sprint, and mistake-revision sessions
-- Expanded the revision layer so `Quick Revise`, `Cram Sheet`, and `Tracker` cover arts, sports-event anchors, symbols, and compare topics more evenly across the course
-  - nation-specific court, church, and devolution compare points
-- Expanded `Speaker of the House of Commons` coverage across the app:
-  - how the Speaker is chosen
-  - the Speaker's role in Commons debates
-  - political neutrality
-  - the fact that the Speaker still remains an MP
-- Reordered weaker reference-heavy sections so the most important facts appear first:
-  - `Quick Facts Course` now works as a grouped fast-track course instead of one flat fact wall
-  - `Key People`, `Inventors`, `Arts`, `Landmarks`, and `World Orgs` now surface exam-core names and facts before the fuller reference list
-  - broader facts are still included, but moved lower with clearer labels instead of competing with the highest-yield material
-- Improved `Story Mode` as a guided revision flow:
-  - remembers the last chapter you were on
-  - shows `Most tested in this chapter` anchors
-  - lets you mark chapters done
-  - shows progress across all chapters
-- Reworked the story chapters into a cleaner chronological arc:
-  - Roman Britain and early England
-  - conquest, medieval kings, Magna Carta, and Parliament
-  - Tudors and Reformation
-  - Stuarts, Civil War, Restoration, and Glorious Revolution
-  - union, empire, reform, world wars, devolution, and modern Britain
-- Tightened the `↻ Latest` refresh path:
-  - refresh now forces a service-worker update check before unregistering old registrations
-  - reload adds stronger cache-busting parameters so phones are more likely to fetch the newest bundle immediately
-- Rebalanced the fixed mock papers to a more exam-like spread:
-  - `7` history
-  - `7` government and law
-  - `5` 4 nations and places
-  - `4` people and culture
-  - `1` compare trap
-- Increased fixed papers from `30` to `40`
-- Added a dedicated mock-balance regression test so every paper stays at `24` questions with the intended coverage split
-- Improved mock-paper variety across the full 40-paper series so working through them gives broader whole-course revision instead of reusing the same subset too often
-- Offline cache support after first online load
-- Local bundled build setup for GitHub Pages with fingerprinted assets in `docs/`
+- Official-scope cleanup and topic rebalance for the current test
+- Metadata-driven question mapping, so section tests and exam-topic mocks use the right pools
+- `Exam Topics` course with topic mocks and learned / tested / reviewed progress
+- `Quick Facts Course` for civics, law, identity, and everyday-life revision
+- `Common Mix-Ups` redesigned for cleaner mobile comparison revision
+- Page-specific tests across the major sections
+- Mock history, saved progress, bookmarks, wrong-answer review, and local persistence across updates
 
 ---
 
-## 🛠️ Project Files
+## ✅ Why This Is Useful
 
-- `index.html` — page shell and shared CSS
-- `docs/` — GitHub Pages build output
-- `service-worker.js` — offline cache support
-- `src/app.jsx` — React UI and study modes
-- `src/main.jsx` — bundled app entry point
-- `src/data.js` — facts, mnemonics, categories, and question bank
-- `scripts/build.mjs` — static build for GitHub Pages
-- `tests/smoke-check.cjs` — structure/content checks
-- `tests/coverage-audit.cjs` — fact/question coverage audit
-- `tests/regression-check.cjs` — duplicate-question and key-content regression checks
-- `AGENTS.md` — notes for future contributors and coding agents
+- It covers the full course without forcing you to read the handbook straight through.
+- It gives multiple ways to revise:
+  - learn by story
+  - learn by exam topic
+  - revise by fact cards
+  - test by section
+  - sit full mocks
+- It keeps memory clues and compare points close to the facts so revision is faster on mobile.
 
 ---
 
-## ▶️ Run Locally
+## 🛠️ Run Locally
 
 ```bash
 npm install
-npm run build
 npm test
+npm run build
 npm run test:browser
-python3 -m http.server 4173 -d docs
 ```
 
-Then open `http://localhost:4173`
-
-For GitHub Pages:
-- build output is written to `docs/`
-- the repo now includes `.github/workflows/pages.yml` for automatic Pages deployment on every push to `main`
-- in GitHub repo settings, set Pages source to `GitHub Actions`
+GitHub Pages is deployed from `main` using the checked-in `docs/` build output and the GitHub Actions workflow.
 
 ---
 
-## 🚀 Release Versioning
+## 📁 Project Structure
 
-- The visible app release version comes from `package.json`
-- Bump `package.json` for each user-facing release
-- The current version is shown in the app footer and on the home screen
-- Users can tap `↻ Check Update` in the footer to force-refresh cached mobile pages
-- Saved mock paper progress uses local storage, so attempts and scores stay available after new versions are deployed
-- Timeline progress can be saved with a checkpoint so learners can jump back to the last remembered point
-- Section pages now include more exam-anchor cards, memory clues, and compare points for faster revision
-- Once the app has loaded online, the service worker can cache it for offline train revision
+| Path | Purpose |
+|---|---|
+| `src/data.js` | Facts, timeline, figures, compare cards, question bank, and topic metadata |
+| `src/app.jsx` | Main application UI and state |
+| `src/components/ui` | Reusable Tailwind / shadcn-style primitives |
+| `src/components/reference-tabs.jsx` | Lower-priority reference sections |
+| `src/components/figures-tab.jsx` | Key Historical Figures page |
+| `scripts/build.mjs` | Static build into `docs/` |
+| `tests/` | Smoke, regression, coverage, mock-balance, and browser checks |
+| `docs/` | GitHub Pages build output |
 
 ---
 
-## 📚 Source
+## 🧪 Test Commands
 
-Based on **Life in the United Kingdom: A Guide for New Residents** and organised into faster revision formats with extra memory clues and comparisons.
+```bash
+npm test
+npm run build
+npm run test:browser
+```
+
+Notes:
+- `npm run test:browser` should be run after `npm run build`
+- the browser smoke test reads the built `docs/index.html`
+
+---
+
+## 📌 Notes
+
+- This app is designed for **revision and practice**, not as an official source itself.
+- For current official test rules and booking details, always check GOV.UK:
+  https://www.gov.uk/life-in-the-uk-test
