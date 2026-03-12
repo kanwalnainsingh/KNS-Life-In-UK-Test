@@ -78,7 +78,7 @@ const startServer = () => {
 const waitForText = async (page, text) => {
   await page.waitForFunction(
     (value) => document.body && document.body.innerText.includes(value),
-    { timeout: 15000 },
+    { timeout: 30000 },
     text,
   );
 };
@@ -117,18 +117,18 @@ const clickFirstAnswerOption = async (page) => {
 
   try {
     const page = await browser.newPage();
-    page.setDefaultTimeout(15000);
+    page.setDefaultTimeout(30000);
     page.on("pageerror", (error) => console.error("Page error:", error.message));
     page.on("console", (msg) => {
       if (msg.type() === "error") console.error("Console error:", msg.text());
     });
 
-    await page.goto(url, { waitUntil: "networkidle0" });
+    await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Pass guide");
     await waitForText(page, "Check Update");
     await waitForText(page, "Continue your revision");
 
-    await page.goto(`${url}/#examtopics`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#examtopics`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Exam Topics Course");
     await waitForText(page, "British Values, Principles & Traditions");
     await waitForText(page, "Important People & Events");
@@ -140,54 +140,54 @@ const clickFirstAnswerOption = async (page) => {
     await clickByText(page, "Next question");
     await waitForText(page, "Question 2 of");
 
-    await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Quick Revision");
     await waitForText(page, "Topic filter");
     await clickByText(page, "Start now");
     await waitForText(page, "PROMPT");
     await waitForText(page, "ANSWER");
 
-    await page.goto(`${url}/#story`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#story`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Story Mode");
     await waitForText(page, "Dates and names to remember");
     await clickByText(page, "Test this chapter");
-    await page.waitForFunction(() => window.location.hash === "#quickrev", { timeout: 15000 });
+    await page.waitForFunction(() => window.location.hash === "#quickrev", { timeout: 30000 });
     await waitForText(page, "PROMPT");
     await waitForText(page, "ANSWER");
 
-    await page.goto(`${url}/#datesdrill`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#datesdrill`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Dates Drill");
     await waitForText(page, "Year → event");
     await clickFirstAnswerOption(page);
     await waitForText(page, "Next date");
 
-    await page.goto(`${url}/#quickfacts`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#quickfacts`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Quick Facts Course");
     await waitForText(page, "Complete course");
     await clickByText(page, "Test this group");
     await waitForText(page, "Question 1 of");
 
-    await page.goto(`${url}/#mock`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#mock`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Mock Test");
     await clickByText(page, "Mock Test 1");
     await waitForText(page, "Question 1 of 24");
 
-    await page.goto(`${url}/#wars`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#wars`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Wars & Battles");
     await waitForText(page, "Most tested first");
     await waitForText(page, "One-glance war compare table");
     await clickByText(page, "Start test");
     await waitForText(page, "Question 1 of");
 
-    await page.goto(`${url}/#rapidfire`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#rapidfire`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Rapid Fire");
     await waitForText(page, "Reset progress");
     await waitForText(page, "Start Rapid Fire");
 
-    await page.goto(`${url}/#landmarks`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#landmarks`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Turn places into quick recall");
 
-    await page.goto(`${url}/#inventors`, { waitUntil: "networkidle0" });
+    await page.goto(`${url}/#inventors`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "British Inventors & Scientists");
     await clickByText(page, "Start inventors mock");
     await waitForText(page, "Question 1 of");

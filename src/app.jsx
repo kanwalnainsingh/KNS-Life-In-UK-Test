@@ -235,9 +235,9 @@ const EXAM_TOPIC_MODE_GROUPS = [
       "Rights include freedom of speech, religion, association, and a fair trial.",
       "Responsibilities include obeying the law, paying taxes, jury service, and respecting others.",
       "Church of England is the established church in England and the monarch is its head.",
-      "Union Flag and the four patron saints are classic identity facts.",
+      "Union Flag, the four patron saints, Bonfire Night, and Remembrance Day are classic tradition and identity facts.",
     ],
-    people: ["Emmeline Pankhurst", "Church of England"],
+    people: ["Monarch", "Patron saints"],
     primaryTab: "quickfacts",
     secondaryTab: "anthem",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
@@ -299,13 +299,13 @@ const EXAM_TOPIC_MODE_GROUPS = [
     keyFacts: [
       "UK = England, Scotland, Wales, Northern Ireland.",
       "Population in the handbook-era facts = just over 66 million in 2017.",
-      "Religious freedom matters, and many people have no religion.",
+      "Religious freedom matters, and many people in the UK say they have no religion.",
       "BBC is the main public-service broadcaster funded mainly by the TV licence fee.",
-      "Know major sports and events like Wimbledon, Grand National, and the Boat Race.",
+      "Capitals, landmarks, national parks, and famous events like Wimbledon and the Grand National sit in this bucket.",
     ],
-    people: ["The Beatles", "William Shakespeare", "J. K. Rowling"],
-    primaryTab: "religion",
-    secondaryTab: "sports",
+    people: ["The Beatles", "William Shakespeare", "Andy Murray"],
+    primaryTab: "nations",
+    secondaryTab: "religion",
     quickFocus: { focus: "fresh", topic: "All topics", sessionType: "short" },
     mockCount: 8,
     match: /population|religion|church of england|church of scotland|bbc|tv licence|football|rugby|cricket|tennis|wimbledon|grand national|boat race|marathon|festival|christmas|easter|diwali|eid|vaisakhi|burns night|hogmanay|mothering sunday|beatles|shakespeare|jane austen|j\. k\. rowling|arts|sport/i,
@@ -321,11 +321,11 @@ const EXAM_TOPIC_MODE_GROUPS = [
     keyFacts: [
       "Compulsory school age is 5-16, but young people must stay in education or training until 18.",
       "GCSEs are taken around 16; Scotland uses Highers instead of A-levels.",
-      "NHS is funded by taxes and free at the point of use.",
+      "NHS is funded by taxes and most people start ordinary healthcare with a GP.",
       "National Insurance helps fund NHS, state pension, and benefits; council tax funds local services.",
       "People drive on the left. 999 and 112 are emergency numbers; 101 is non-emergency police.",
     ],
-    people: ["Aneurin Bevan", "School governors", "Civil servants"],
+    people: ["Aneurin Bevan", "School governors", "GPs"],
     primaryTab: "quickfacts",
     secondaryTab: "tracker",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
@@ -1901,7 +1901,7 @@ const classifyMockCategory = (question) => {
   const text = `${question.q} ${question.tip}`.toLowerCase();
   if (/compare mode/.test(text)) return "traps";
   if (/war|battle|roman|norman|tudor|stuart|victoria|magna carta|boudicca|athelstan|alfred|domesday|hastings|reformation|beveridge|nhs|wilberforce|chartist|peterloo|suffragette|general strike|union of crowns|james i|charles i|waterloo|world war/.test(text)) return "history";
-  if (/prime minister|monarch|commons|lords|parliament|speaker|democracy|vote|ballot|constituenc|jury|magistrate|law|equality act|rule of law|innocent|community|volunteer|bank of england|10 downing street|government|human rights/.test(text)) return "civics";
+  if (/prime minister|monarch|commons|lords|parliament|speaker|democracy|vote|ballot|constituenc|jury|magistrate|law|equality act|rule of law|innocent|community|volunteer|bank of england|10 downing street|government|human rights|citizenship|settlement|life in the uk test/.test(text)) return "civics";
   if (/england|scotland|wales|northern ireland|belfast|cardiff|edinburgh|london|saint|shamrock|daffodil|thistle|rose|senedd|holyrood|stormont|union jack|capital city|loch|snowdonia|river|wall|castle|palace|museum|stonehenge|tower of london|windsor|buckingham|cenotaph|welsh|gaelic|jersey|guernsey|isle of man/.test(text)) return "nations";
   return "culture";
 };
@@ -1929,7 +1929,7 @@ const classifyMockSubgroup = (question) => {
     return "nations-identity";
   }
 
-  if (/christmas|easter|diwali|hanukkah|eid|vaisakhi|bonfire|remembrance|burns|hogmanay|mothering|faith|religion|festival|anthem|union jack|world wide web|penicillin|invention|invent|scientist|writer|artist|poet|playwright|beatles|fashion|sport|wimbledon|fa cup|marathon|olympic|paralympic|commonwealth|nato|united nations|council of europe|g7/.test(text)) {
+  if (/christmas|easter|diwali|hanukkah|eid|vaisakhi|bonfire|remembrance|burns|hogmanay|mothering|faith|religion|festival|anthem|union jack|world wide web|penicillin|invention|invent|scientist|writer|wrote|author|artist|poet|playwright|beatles|fashion|sport|wimbledon|fa cup|marathon|olympic|paralympic|commonwealth|nato|united nations|council of europe|g7|canterbury tales/.test(text)) {
     return "culture-society";
   }
   return "culture-people";

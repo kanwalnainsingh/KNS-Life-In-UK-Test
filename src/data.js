@@ -1208,6 +1208,17 @@ const ALL_QUIZ_BASE = [
   { q:"What are bank holidays?", opts:["Days banks are open late","Public holidays when many businesses close","Banking regulations","School holidays only"], a:1, tip:"💡 Good to know — Bank holidays = public holidays. Examples: Christmas, Easter, May Day." },
   { q:"How long does giving blood usually take in the UK?", opts:["About 15 minutes","About 1 hour","About 2 hours","A whole day"], a:1, tip:"💡 Good to know — Giving blood usually takes about 1 hour from start to finish." },
   { q:"What is the minimum school-leaving age in England?", opts:["14","16","17","18"], a:3, tip:"💡 Good to know — Must stay in education/training until 18 in England (16 in Scotland/Wales)." },
+  { q:"What does democracy mean in the UK?", opts:["The monarch alone decides the laws","People elect their government through voting","Only judges can choose leaders","Only MPs can vote"], a:1, tip:"⭐ Exam favourite — Democracy means people elect their government through voting." },
+  { q:"What does individual liberty mean in the UK?", opts:["People can ignore the law","People are free to make their own choices within the law","Only Parliament has freedom","Only the monarch has personal freedom"], a:1, tip:"📌 Often tested — Individual liberty means people are free to make their own choices as long as they obey the law." },
+  { q:"What does mutual respect and tolerance mean in UK life?", opts:["Everyone must follow the same religion","People with different beliefs and backgrounds should be respected","Only Parliament should be respected","Only national traditions matter"], a:1, tip:"📌 Often tested — Mutual respect and tolerance means respecting people with different beliefs, faiths, and backgrounds." },
+  { q:"Which freedom allows people in the UK to express their opinions openly?", opts:["Freedom of speech","Freedom from taxation","Freedom to ignore courts","Freedom of Parliament only"], a:0, tip:"📌 Often tested — Freedom of speech is one of the key rights in the UK." },
+  { q:"Which freedom means people can follow any religion or no religion?", opts:["Freedom of movement","Freedom of religion","Freedom from jury service","Freedom to vote at 16"], a:1, tip:"📌 Often tested — Freedom of religion means people can follow any religion or none at all." },
+  { q:"What is encouraged as part of being a responsible citizen in the UK?", opts:["Ignoring elections","Voting in elections","Avoiding jury service","Refusing community involvement"], a:1, tip:"💡 Good to know — Voting is encouraged as part of civic responsibility, even though it is not compulsory." },
+  { q:"Who do most people usually see first for ordinary healthcare in the UK?", opts:["A hospital consultant","A GP (doctor)","A dentist","A magistrate"], a:1, tip:"📌 Often tested — Most people usually see a GP first for ordinary healthcare in the UK." },
+  { q:"How is the NHS mainly funded?", opts:["Private charity only","Taxes","Parking charges","Lottery tickets"], a:1, tip:"⭐ Exam favourite — The NHS is funded mainly through taxation." },
+  { q:"Which type of school is funded by the government in the UK?", opts:["Independent school","State school","Boarding school only","Private grammar school"], a:1, tip:"📌 Often tested — State schools are funded by the government and education there is free." },
+  { q:"What basic protection should workers receive in the UK?", opts:["At least the national minimum wage","Unpaid work only","No paid holiday rights","Pay fixed by the monarch"], a:0, tip:"📌 Often tested — Workers should receive at least the national minimum wage and other basic legal rights." },
+  { q:"What is one practical benefit of volunteering?", opts:["It removes the need to vote","It helps communities and can build skills","It replaces paid work by law","It stops you paying taxes"], a:1, tip:"💡 Good to know — Volunteering helps communities and can also build skills and experience." },
   // ── EXTRA KEY FACTS ─────────────────────────────────────────
   { q:"Who opened the first Indian restaurant in the UK (1810)?", opts:["Robert Burns","Sake Dean Mahomet","Guy Fawkes","William Wilberforce"], a:1, tip:"📌 Often tested — Sake Dean Mahomet = 1810 = also introduced shampoo to Britain." },
   { q:"What was the 1942 Beveridge Report about?", opts:["Creating the NHS","Setting out plans for the welfare state","Women's voting rights","Abolition of slavery"], a:1, tip:"⭐ Exam favourite — Beveridge Report = blueprint for welfare state: NHS, benefits, pensions." },
@@ -1388,6 +1399,11 @@ const QUESTION_TOPIC_OVERRIDES = {
   "When is St David's Day (Wales)?": "values",
   "What is the patron saint of Ireland?": "values",
   "What is Scotland's national animal?": "society",
+  "What happened in Ireland in 1801?": "history",
+  "When did women get fully EQUAL voting rights?": "history",
+  "What did the Bill of Rights 1689 establish?": "history",
+  "What is the age of criminal responsibility in England?": "government",
+  "Who designed the Cenotaph war memorial in Whitehall?": "people",
   "How many permanent members does the UN Security Council have?": "society",
   "How many countries are in the Commonwealth?": "society",
   "How many member countries does the Council of Europe have?": "society",
@@ -1411,7 +1427,11 @@ const QUESTION_TOPIC_OVERRIDES = {
   "What is the UK Supreme Court?": "government",
   "What is the difference between criminal and civil courts?": "government",
   "What does the UK have instead of a written constitution?": "government",
+  "Ben Nevis, Snowdon, Scafell Pike — which is the HIGHEST in the UK?": "society",
+  "Rose, Thistle, Daffodil, Shamrock — which is SCOTLAND's flower?": "values",
+  "Edinburgh, Cardiff, Belfast — which has the SCOTTISH Parliament?": "society",
   "When is Guy Fawkes Night (Bonfire Night)?": "values",
+  "What was the Gunpowder Plot (1605)?": "history",
   "What did the Emancipation Act of 1829 do?": "history",
   "What was the Royal Society set up to promote?": "society",
   "What did Harold Macmillan's 'Wind of Change' speech refer to?": "history",
@@ -1449,6 +1469,19 @@ const QUESTION_TOPIC_OVERRIDES = {
   "What does the British Museum hold?": "people",
   "What is 10 Downing Street?": "government",
   "The Bank of England is the UK's…?": "government",
+  "What is the difference between 1603 and 1707?": "history",
+  "When did England and Scotland's parliaments fully unite?": "history",
+  "When was the NHS founded?": "history",
+  "When was the Good Friday Agreement?": "history",
+  "What were the Chartists (1830s–40s)?": "history",
+  "What changed for most hereditary peers in 1999?": "government",
+  "When was the National Trust founded?": "society",
+  "What was the Butler Act of 1944?": "history",
+  "Who was Clement Attlee?": "people",
+  "Who created the NHS in 1948?": "people",
+  "What does council tax pay for?": "everyday",
+  "What is the main role of a Police and Crime Commissioner?": "government",
+  "Who was the first woman Prime Minister of the UK?": "people",
   "When are Prime Minister's Questions (PMQs) usually held when Parliament is sitting?": "government",
   "In which part of the UK must voters show photo ID at the polling station?": "government",
   "What is the official child-hearing system used in Scotland called?": "government",
@@ -1468,6 +1501,7 @@ const QUESTION_TOPIC_OVERRIDES = {
   "When are local elections often held in the UK?": "government",
   "What do school governors help do?": "everyday",
   "Which of these is a criminal offence in the UK?": "government",
+  "What does the word 'cenotaph' mean?": "values",
   "Where did rugby originate?": "society",
   "Who was the first wife of Henry VIII?": "people",
   "What happened in the Dissolution of the Monasteries under Henry VIII?": "history",
@@ -1479,38 +1513,36 @@ const inferQuestionPriority = (tip) => {
   return "extra";
 };
 
-const inferQuestionTopic = (question, index) => {
+const inferQuestionTopic = (question) => {
   if (QUESTION_TOPIC_OVERRIDES[question.q]) return QUESTION_TOPIC_OVERRIDES[question.q];
 
-  if (index <= 31) return "history";
-  if (index <= 40) return "people";
-  if (index <= 52) return "people";
-  if (index <= 74) return "society";
-  if (index <= 102) return "government";
-  if (index <= 107) return "everyday";
-  if (index <= 118) return "society";
-  if (index <= 129) return "people";
-  if (index <= 144) return "people";
-  if (index <= 159) return "society";
-  if (index <= 169) return "everyday";
-  if (index <= 175) return "society";
-  if (index <= 180) return "government";
-  if (index <= 204) return "history";
-  if (index <= 213) return "government";
-  if (index <= 242) return "people";
-  if (index <= 255) return "society";
-  if (index <= 261) return "values";
-  if (index <= 266) return "society";
-  if (index <= 269) return "society";
-  if (index <= 276) return "values";
-  if (index <= 280) return "people";
-  if (index <= 283) return "government";
-  if (index <= 288) return "people";
-  if (index <= 302) return "government";
-  if (index <= 305) return "history";
-  if (index <= 310) return "everyday";
-  if (index <= 315) return "people";
-  return "history";
+  const questionText = question.q.toLowerCase();
+  const tipText = question.tip.toLowerCase();
+  const text = `${questionText} ${tipText}`;
+
+  if (/(democracy|rule of law|individual liberty|mutual respect|tolerance|rights|responsibilit|freedom of speech|freedom of religion|freedom of association|fair trial|human rights|union flag|union jack|bonfire night|guy fawkes|remembrance day|cenotaph|patron saint|britannia|national anthem|god save the king|public duty|obeying the law|respecting others)/.test(text)) {
+    return "values";
+  }
+
+  if (/(life in the uk test|settlement|citizenship|language requirement|education|training until 18|school-leaving age|gcse|highers|a-level|nhs|gp|national insurance|council tax|minimum wage|paid holiday|volunteer|community|school governor|blood donation|driv|moped|mot test|999|112|101|lottery|bank holidays|currency|census|alcohol|tobacco)/.test(text)) {
+    return "everyday";
+  }
+
+  if (/(parliament|house of commons|house of lords|speaker|cabinet|prime minister|constitutional monarchy|parliamentary democracy|general election|voting age|first-past-the-post|electoral register|secret ballot|senedd|holyrood|stormont|supreme court|jury|magistrate|crown court|court of session|children's hearing|police and crime commissioner|civil servant|coalition government|innocent until proven guilty|habeas corpus|state opening|hansard|life peer|hereditary peers|bank of england|10 downing street|chancellor|pmqs|criminal offence|written constitution|equality act|human rights act|european convention on human rights)/.test(text)) {
+    return "government";
+  }
+
+  if (/(roman|caesar|claudius|boudicca|hadrian|augustine|alfred|athelstan|hastings|domesday|magna carta|model parliament|bannockburn|bosworth|tudor|stuart|reformation|armada|civil war|glorious revolution|bill of rights 1689|industrial revolution|reform act|chartist|victoria|peterloo|wspu|suffragette|general strike|crimean war|world war|battle of britain|blitz|d-day|dunkirk|armistice|beveridge|nhs founded|wind of change|great exhibition|black death|battle of|slave trade|slavery|union of crowns|act of union|good friday agreement|devolution|ireland split|restoration|jacobites|monasteries|gunpowder plot|huguenots|royal society|butler act|windrush)/.test(text)) {
+    return "history";
+  }
+
+  if ((/^who\b|^which party did\b|^what was .* invention\b|^who wrote\b|^who invented\b|^who developed\b|^who rebuilt\b|^who campaigned\b|^who founded\b|^who improved\b|^who co-discovered\b|^who cloned\b|^who opened\b|^who won\b|^who captained\b|^who predicted\b|^who mapped\b|^who co-commanded\b|^who created\b/.test(questionText)
+    || /novelist|playwright|music group|scientist|inventor|known as|olympic|paralympic|wimbledon|formula 1|tour de france|playwright|author|composer/.test(text))
+    && !/(parliament|house of commons|house of lords|speaker|cabinet|prime minister|jury|court|national insurance|council tax|school governor|community|public duty|union jack|patron saint|capital city|population)/.test(text)) {
+    return "people";
+  }
+
+  return "society";
 };
 
 const inferQuestionSectionIds = (question, examTopic) => {
@@ -1586,8 +1618,8 @@ const inferQuestionSectionIds = (question, examTopic) => {
   return Array.from(sectionIds);
 };
 
-const ALL_QUIZ = ALL_QUIZ_BASE.map((question, index) => {
-  const examTopic = inferQuestionTopic(question, index);
+const ALL_QUIZ = ALL_QUIZ_BASE.map((question) => {
+  const examTopic = inferQuestionTopic(question);
   return {
     ...question,
     examTopic,
