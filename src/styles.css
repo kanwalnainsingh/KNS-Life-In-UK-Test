@@ -318,15 +318,17 @@
 
   .mobile-scroll-top,
   .mobile-scroll-bottom {
-    @apply fixed right-4 z-[121] flex items-center gap-1.5 rounded-full border border-primary/20 bg-background/80 px-2.5 py-1.5 text-[11px] font-extrabold text-foreground shadow-soft backdrop-blur transition-all;
+    @apply fixed z-[121] flex items-center gap-1 rounded-full border border-primary/20 bg-background/80 px-2 py-1.5 text-[10px] font-extrabold text-foreground shadow-soft backdrop-blur transition-all;
   }
 
   .mobile-scroll-top {
-    bottom: 122px;
+    right: 14px;
+    bottom: 118px;
   }
 
   .mobile-scroll-bottom {
-    bottom: 74px;
+    right: 14px;
+    bottom: 76px;
   }
 
   .desktop-nav-panel {

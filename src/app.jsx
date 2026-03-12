@@ -5262,6 +5262,52 @@ const ConfuseTab = () => {
     group,
     items: CONFUSABLES.filter((item) => getConfusableGroup(item.title) === group),
   })).filter((entry) => entry.items.length > 0);
+  const [selectedGroup, setSelectedGroup] = useState(grouped[0]?.group || "");
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const [isMobileDeck, setIsMobileDeck] = useState(() => window.innerWidth < 768);
+  const touchStartX = useRef(null);
+
+  useEffect(() => {
+    const onResize = () => setIsMobileDeck(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    if (!grouped.some((entry) => entry.group === selectedGroup)) {
+      setSelectedGroup(grouped[0]?.group || "");
+    }
+  }, [grouped, selectedGroup]);
+
+  useEffect(() => {
+    setMobileIndex(0);
+  }, [selectedGroup]);
+
+  const currentGroup = grouped.find((entry) => entry.group === selectedGroup) || grouped[0];
+  const currentItems = currentGroup?.items || [];
+  const currentCard = currentItems[mobileIndex] || null;
+  const currentLevel = currentCard ? getConfusableLevel(currentCard.title) : null;
+  const stepMobileCard = (direction) => {
+    if (!currentItems.length) return;
+    setMobileIndex((index) => {
+      const next = index + direction;
+      if (next < 0) return 0;
+      if (next >= currentItems.length) return currentItems.length - 1;
+      return next;
+    });
+  };
+  const handleDeckTouchStart = (event) => {
+    touchStartX.current = event.touches[0]?.clientX ?? null;
+  };
+  const handleDeckTouchEnd = (event) => {
+    if (touchStartX.current == null) return;
+    const endX = event.changedTouches[0]?.clientX ?? touchStartX.current;
+    const deltaX = endX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(deltaX) < 48) return;
+    if (deltaX < 0) stepMobileCard(1);
+    if (deltaX > 0) stepMobileCard(-1);
+  };
 
   return (
     <div className="topic-page">
@@ -5288,7 +5334,78 @@ const ConfuseTab = () => {
         </div>
         <MemoryHook text="Use these in pairs: read the left side, cover the right side, then say the difference out loud before checking." />
       </Card>
-      {grouped.map(({ group, items }) => (
+      <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 12 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{isMobileDeck ? "Swipe mode" : "Browse by group"}</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>
+              {isMobileDeck
+                ? "Pick a group, then swipe left or right through the compare cards one by one."
+                : "Use the grouped list below to scan the full compare pack by topic."}
+            </div>
+          </div>
+          <Badge text={isMobileDeck ? "Mobile deck" : "Full list"} color={isMobileDeck ? "#7c3aed" : "#64748b"} />
+        </div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {grouped.map(({ group, items }) => (
+            <button
+              key={group}
+              className="focus-ring"
+              onClick={() => setSelectedGroup(group)}
+              style={{
+                borderRadius: 999,
+                border: `1px solid ${selectedGroup === group ? "var(--accent)" : "var(--card-border)"}`,
+                background: selectedGroup === group ? "var(--accent-soft)" : "var(--panel-bg)",
+                color: selectedGroup === group ? "var(--accent-text)" : "var(--text)",
+                padding: "8px 12px",
+                fontSize: 12,
+                fontWeight: 800,
+                cursor: "pointer",
+              }}
+            >
+              {group.replace(" and ", " & ")} · {items.length}
+            </button>
+          ))}
+        </div>
+      </Card>
+      {isMobileDeck && currentCard ? (
+        <Card
+          style={{ border: "1px solid #374151" }}
+          onTouchStart={handleDeckTouchStart}
+          onTouchEnd={handleDeckTouchEnd}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 12, flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{currentCard.icon} {currentCard.title}</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>
+                {currentGroup.group} · {mobileIndex + 1} of {currentItems.length}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <Badge text={currentLevel.text} color={currentLevel.color} />
+            </div>
+          </div>
+          <div className="compare-grid" style={{ display: "grid", gap: 10, marginBottom: 10 }}>
+            {[currentCard.left, currentCard.right].map((side, si) => (
+              <div key={si} style={{ background: side.color + "11", border: `1px solid ${side.color}44`, borderRadius: 14, padding: 12 }}>
+                <div style={{ fontWeight: 800, color: side.color, marginBottom: 8, fontSize: 13 }}>{side.label}</div>
+                {side.points.map((p, pi) => (
+                  <div key={pi} style={{ fontSize: 13, color: "var(--text)", padding: "5px 0", borderBottom: pi < side.points.length - 1 ? `1px solid ${side.color}22` : "none", lineHeight: 1.55 }}>{p}</div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <MemoryHook text={currentCard.memory} />
+          <TrapAlert text={currentCard.alert} />
+          <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
+            <Button variant="secondary" className="flex-1" onClick={() => stepMobileCard(-1)} disabled={mobileIndex === 0}>Previous</Button>
+            <Button className="flex-1" onClick={() => stepMobileCard(1)} disabled={mobileIndex === currentItems.length - 1}>
+              {mobileIndex === currentItems.length - 1 ? "Last card" : "Next"}
+            </Button>
+          </div>
+        </Card>
+      ) : null}
+      {!isMobileDeck && grouped.map(({ group, items }) => (
         <div key={group} style={{ display: "grid", gap: 12 }}>
           <Card style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
