@@ -82,6 +82,7 @@ const STORAGE_KEYS = {
   quickFactsCourse: "lifeuk-quickfacts-course",
   examTopicsMode: "lifeuk-examtopics-mode",
   examTopicMocks: "lifeuk-examtopic-mocks",
+  examTopicReviewed: "lifeuk-examtopic-reviewed",
   sectionMocks: "lifeuk-section-mocks",
 };
 
@@ -2412,6 +2413,15 @@ const buildExamTopicMockProgress = (history) =>
     return acc;
   }, {});
 
+const EXAM_TOPIC_REVIEW_ACTIONS = {
+  values: { label: "Open Quick Facts", tab: "quickfacts" },
+  history: { label: "Open Story Mode", tab: "story" },
+  government: { label: "Open Quick Facts", tab: "quickfacts" },
+  society: { label: "Open 4 Nations", tab: "nations" },
+  everyday: { label: "Open Quick Facts", tab: "quickfacts" },
+  people: { label: "Open Key People", tab: "figures" },
+};
+
 const buildSectionMockProgress = (history = []) =>
   history.reduce((acc, item) => {
     const prev = acc[item.sectionId] || {
@@ -3401,6 +3411,8 @@ const TrueFalseSprintTab = () => {
 const ExamTopicsModeTab = ({ setActive }) => {
   const [completed, setCompleted] = useState(() => readStore(STORAGE_KEYS.examTopicsMode, []));
   const [topicMockHistory, setTopicMockHistory] = useState(() => readStore(STORAGE_KEYS.examTopicMocks, []));
+  const [reviewed, setReviewed] = useState(() => readStore(STORAGE_KEYS.examTopicReviewed, []));
+  const [wrongBank, setWrongBank] = useState(() => readStore(STORAGE_KEYS.wrongQuestions, []));
   const topicMockAreaRefs = useRef({});
   const [topicMock, setTopicMock] = useState({
     groupId: null,
@@ -3414,7 +3426,9 @@ const ExamTopicsModeTab = ({ setActive }) => {
     finished: false,
   });
   const completedSet = new Set(completed);
+  const reviewedSet = new Set(reviewed);
   const doneCount = completedSet.size;
+  const reviewedCount = reviewedSet.size;
   const progress = Math.round((doneCount / EXAM_TOPIC_MODE_GROUPS.length) * 100);
   const examWeightTotal = EXAM_TOPIC_MODE_GROUPS.reduce((sum, group) => sum + group.weight, 0);
   const topicMockProgress = useMemo(() => buildExamTopicMockProgress(topicMockHistory), [topicMockHistory]);
@@ -3437,7 +3451,14 @@ const ExamTopicsModeTab = ({ setActive }) => {
   }, [topicMockHistory]);
 
   useEffect(() => {
-    if (topicMock.finished && topicMock.wrong.length) saveWrongQuestions(topicMock.wrong);
+    writeStore(STORAGE_KEYS.examTopicReviewed, reviewed);
+  }, [reviewed]);
+
+  useEffect(() => {
+    if (topicMock.finished && topicMock.wrong.length) {
+      saveWrongQuestions(topicMock.wrong);
+      setWrongBank(readStore(STORAGE_KEYS.wrongQuestions, []));
+    }
   }, [topicMock.finished, topicMock.wrong]);
 
   const toggleCompleted = (id) => {
@@ -3446,6 +3467,35 @@ const ExamTopicsModeTab = ({ setActive }) => {
       if (next.has(id)) next.delete(id);
       else next.add(id);
       return [...next];
+    });
+  };
+
+  const toggleReviewed = (id) => {
+    setReviewed((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return [...next];
+    });
+  };
+
+  const buildTopicWrongCount = (groupId) =>
+    wrongBank.filter((question) => question.examTopic === groupId).length;
+
+  const resetExamTopicProgress = () => {
+    setCompleted([]);
+    setReviewed([]);
+    setTopicMockHistory([]);
+    setTopicMock({
+      groupId: null,
+      questions: [],
+      current: 0,
+      selected: null,
+      confirmed: false,
+      score: 0,
+      wrong: [],
+      results: [],
+      finished: false,
     });
   };
 
@@ -3530,7 +3580,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
         <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", marginTop: 16 }}>
           <Button onClick={() => setActive("story")}>Start with history</Button>
           <Button variant="secondary" onClick={() => setActive("quickfacts")}>Open civics facts</Button>
-          <Button variant="outline" onClick={() => setCompleted([])}>Reset topic progress</Button>
+          <Button variant="outline" onClick={resetExamTopicProgress}>Reset topic progress</Button>
         </div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginTop: 14 }}>
           <div className="subtle-panel" style={{ padding: 12 }}>
@@ -3542,6 +3592,11 @@ const ExamTopicsModeTab = ({ setActive }) => {
             <div style={{ fontSize: 12, color: "#f97316", fontWeight: 800, marginBottom: 4 }}>Topic mocks</div>
             <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{Object.keys(topicMockProgress).length}/{groupedTopics.length} attempted</div>
             <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>Use the mini mock in each topic card to turn reading into recall before full 24-question papers.</div>
+          </div>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Completion states</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>{doneCount} learned · {Object.keys(topicMockProgress).length} tested · {reviewedCount} reviewed</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6, marginTop: 4 }}>Mark a topic learned after reading it, test it with the topic mock, then mark it reviewed once you have cleaned up the mistakes.</div>
           </div>
         </div>
       </Card>
@@ -3577,6 +3632,18 @@ const ExamTopicsModeTab = ({ setActive }) => {
 
       {groupedTopics.map((group) => (
         <Card key={group.id} style={{ border: `1px solid ${completedSet.has(group.id) ? "#22c55e55" : `${group.color}2f`}`, background: completedSet.has(group.id) ? "color-mix(in srgb, #22c55e 5%, var(--card-bg))" : `color-mix(in srgb, ${group.color} 4%, var(--card-bg))` }}>
+          <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", marginBottom: 12 }}>
+            {[
+              { label: "Learned", done: completedSet.has(group.id), color: "#22c55e" },
+              { label: "Tested", done: !!topicMockProgress[group.id], color: group.color },
+              { label: "Reviewed", done: reviewedSet.has(group.id), color: "#8b5cf6" },
+            ].map((state) => (
+              <div key={state.label} className="subtle-panel" style={{ padding: 10, border: `1px solid ${state.done ? `${state.color}44` : "var(--card-border)"}`, background: state.done ? `color-mix(in srgb, ${state.color} 8%, var(--card-bg))` : "var(--panel-bg)" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: state.done ? state.color : "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>{state.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-strong)" }}>{state.done ? "Done" : "Not yet"}</div>
+              </div>
+            ))}
+          </div>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "flex-start", marginBottom: 12 }}>
             <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
               <div style={{ width: 42, height: 42, borderRadius: 14, background: `color-mix(in srgb, ${group.color} 14%, var(--card-bg))`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, flexShrink: 0 }}>
@@ -3591,6 +3658,7 @@ const ExamTopicsModeTab = ({ setActive }) => {
               <Badge text={group.approx} color={group.color} />
               {topicMockProgress[group.id] && <Badge text={`Best ${topicMockProgress[group.id].bestPercent}%`} color="#22c55e" />}
               {completedSet.has(group.id) && <Badge text="Completed" color="#22c55e" />}
+              {buildTopicWrongCount(group.id) > 0 && <Badge text={`${buildTopicWrongCount(group.id)} mistakes saved`} color="#ef4444" />}
             </div>
           </div>
 
@@ -3658,7 +3726,10 @@ const ExamTopicsModeTab = ({ setActive }) => {
               <Button onClick={() => startTopicMock(group.id)} className="min-w-[170px]">
                 {topicMock.groupId === group.id && !topicMock.finished ? `Restart ${getExamTopicMockLabel(group.id).toLowerCase()}` : getExamTopicMockLabel(group.id)}
               </Button>
-              <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Mark not done" : "Mark done"}</Button>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <Button variant="ghost" onClick={() => toggleCompleted(group.id)}>{completedSet.has(group.id) ? "Unmark learned" : "Mark learned"}</Button>
+                <Button variant="outline" onClick={() => toggleReviewed(group.id)}>{reviewedSet.has(group.id) ? "Unmark reviewed" : "Mark reviewed"}</Button>
+              </div>
             </div>
 
             {topicMock.groupId === group.id && topicMock.questions.length > 0 && (
@@ -3715,6 +3786,15 @@ const ExamTopicsModeTab = ({ setActive }) => {
                     </div>
                     <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
                       Use this result to decide whether this topic is ready for full mocks or needs one more pass through the facts and traps.
+                    </div>
+                    <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", marginTop: 14 }}>
+                      <Button onClick={() => setActive(EXAM_TOPIC_REVIEW_ACTIONS[group.id]?.tab || group.primaryTab)}>
+                        {EXAM_TOPIC_REVIEW_ACTIONS[group.id]?.label || "Open topic section"}
+                      </Button>
+                      <Button variant="secondary" onClick={() => setActive("revise")}>Revise mistakes</Button>
+                      <Button variant="outline" onClick={() => toggleReviewed(group.id)}>
+                        {reviewedSet.has(group.id) ? "Reviewed already" : "Mark topic reviewed"}
+                      </Button>
                     </div>
                     {topicMock.results.some((item) => item.correct) && (
                       <Card style={{ border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))", background: "color-mix(in srgb, #22c55e 7%, var(--card-bg))", marginTop: 14 }}>
