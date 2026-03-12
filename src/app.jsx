@@ -237,7 +237,7 @@ const EXAM_TOPIC_MODE_GROUPS = [
       "Church of England is the established church in England and the monarch is its head.",
       "Union Flag and the four patron saints are classic identity facts.",
     ],
-    people: ["Emmeline Pankhurst", "Elizabeth II"],
+    people: ["Emmeline Pankhurst", "Church of England"],
     primaryTab: "quickfacts",
     secondaryTab: "anthem",
     quickFocus: { focus: "core", topic: "All topics", sessionType: "short" },
@@ -529,7 +529,7 @@ const COVERAGE_CONTEXT = {
   religion: "Focus on the 2011 census, the largest groups, and major festivals like Christmas, Easter, Diwali, Vaisakhi, Hanukkah, and the Eids.",
   figures: "These people unlock many history and society questions: rulers, reformers, wartime leaders, scientists, and welfare-state figures.",
   anthem: "Includes the national anthem, Union Jack parts, and identity facts that often appear as short memory questions.",
-  international: "The biggest traps are Council of Europe vs EU and voluntary bodies vs military alliances.",
+  international: "The biggest traps are rights bodies versus defence or voluntary organisations.",
 };
 
 const CRAM_SECTIONS = [
@@ -608,7 +608,7 @@ const CRAM_SECTIONS = [
       "God Save the King = national anthem, Britannia = female figure with shield and trident",
       "Union Jack = St George + St Andrew + St Patrick",
       "UN = peace, NATO = defence, Commonwealth = voluntary, Council of Europe = rights",
-      "Council of Europe is not the EU",
+      "Council of Europe is linked with rights and the ECHR",
     ],
   },
   {
@@ -648,7 +648,7 @@ const buildQuickFactContext = (section, factIndex) => {
 };
 
 const buildLandmarkContext = (landmark) => {
-  if (/Big Ben|Elizabeth Tower/.test(landmark.name)) return "Classic exam trap: Big Ben is the bell, not the tower. Link it with Westminster and Elizabeth II.";
+  if (/Big Ben|Elizabeth Tower/.test(landmark.name)) return "Classic exam trap: Big Ben is the bell, not the tower. Link it with Westminster and the Palace of Westminster.";
   if (/Windsor Castle|Buckingham Palace/.test(landmark.name)) return "Royal-residence questions usually test official London home versus weekend or ceremonial residence.";
   if (/River Severn|Loch Ness|Loch Lomond|Snowdonia|Hadrian's Wall/.test(landmark.name)) return "These place questions are often mixed with longest/highest/location compare traps.";
   return "Landmark questions usually test one location plus one standout clue such as who built it, what it contains, or why it is famous.";
@@ -861,7 +861,7 @@ const buildQuickRevisionDeck = () => {
     { front: "🤝 Community role", back: "Volunteering, fundraising, jury service and local participation all matter.", context: "Useful for questions about what good citizenship looks like in practice.", memory: "Community = take part, do not just observe.", topic: "Community", color: "#8b5cf6" },
     { front: "🗺️ UK capitals", back: "London, Edinburgh, Cardiff, Belfast.", context: "These are among the easiest marks in the test, but also easy to mix up under pressure.", memory: "LECB mnemonic.", topic: "Geography", color: "#06b6d4" },
     { front: "📜 Anchor dates", back: "43, 1066, 1215, 1534, 1948.", context: "Roman invasion, Hastings, Magna Carta, Church of England, NHS.", memory: "Use these as a history spine for the whole course.", topic: "History", color: "#f97316" },
-    { front: "🌍 World organisations", back: "UN, NATO, Commonwealth, Council of Europe.", context: "The most common trap is Council of Europe versus EU.", memory: "Council of Europe ≠ EU.", topic: "International", color: "#0ea5e9" },
+    { front: "🌍 World organisations", back: "UN, NATO, Commonwealth, Council of Europe.", context: "The key distinction is peace, defence, voluntary association, or rights body.", memory: "UN peace, NATO defence, Commonwealth voluntary, Council rights.", topic: "International", color: "#0ea5e9" },
     { front: "🎵 National anthem", back: ANTHEM.title, context: ANTHEM.note, memory: ANTHEM.memory, topic: "Symbols", color: "#3b82f6" },
     { front: "🇬🇧 Union Jack", back: "St George + St Andrew + St Patrick", context: "The Union Jack combines three crosses. Wales is not shown separately because it was already united with England when the first Union Flag was created.", memory: "Union Jack = 3 crosses. Wales not shown separately.", topic: "Symbols", color: "#3b82f6" },
     { front: "🪙 Britannia", back: "Female symbol of Britain with shield and trident.", context: "Britannia appears on coins and works as a short identity/symbol question.", memory: "Britannia = Britain personified.", topic: "Symbols", color: "#3b82f6" },
@@ -1053,7 +1053,7 @@ const TOP_TESTED_FACTS = [
   "1918 = women over 30 vote. 1928 = equal age 21. 1969 = age 18.",
   "Great Britain = 3 nations. United Kingdom = 4 (add N. Ireland).",
   "Church of England = Monarch IS head. Church of Scotland = NO role.",
-  "Council of Europe (47) ≠ EU (27). Council CANNOT make laws.",
+  "Council of Europe = rights and ECHR. NATO = defence.",
   "House of Commons = ELECTED. House of Lords = APPOINTED.",
   "NHS = 1948. Aneurin Bevan = Minister. Attlee = PM.",
   "Big Ben = THE BELL. Tower = Elizabeth Tower.",
@@ -1076,7 +1076,7 @@ const TOP_TRAP_TITLES = new Set([
   "Church of England vs Church of Scotland",
   "1603 Union of Crowns vs 1707 Act of Union",
   "Slave Trade 1807 vs Slavery Abolished 1833",
-  "Council of Europe vs European Union",
+  "Council of Europe vs NATO",
   "Big Ben vs Elizabeth Tower",
   "Magna Carta 1215 vs Model Parliament 1295",
   "General election vs local election",
@@ -5477,7 +5477,7 @@ const FiguresTab = ({ setActive }) => (
 const InternationalTab = ({ setActive }) => (
   <div className="topic-page">
     <SectionTitle icon="🌍" meta="Most questions here are compare traps: voluntary group, military alliance, human-rights body, or UN role.">International Organisations</SectionTitle>
-    <TrapAlert text="Council of Europe ≠ EU. Council has 47 members and cannot make laws. EU has 27 and can." />
+    <TrapAlert text="Council of Europe = human rights and the ECHR. NATO = defence alliance. Commonwealth = voluntary association." />
     <CompactVisualStrip
       title="Organisation map"
       accent="#10b981"

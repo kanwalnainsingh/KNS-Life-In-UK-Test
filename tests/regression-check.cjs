@@ -37,10 +37,10 @@ const normalizeQuestion = (text) =>
   const mustCover = [
     "What is the United Kingdom?",
     "Which church is Presbyterian and does NOT have the monarch as its head?",
-    "Which organisation created the European Convention on Human Rights?",
+    "Which organisation is linked with the European Convention on Human Rights?",
     "What is the name of the tower that contains Big Ben?",
     "Which language has official status and is spoken by many people in Wales?",
-    "Which group can vote in local elections but not UK general elections?",
+    "Which qualification is mainly used in Scotland instead of A-levels?",
     "Why do many people take the Life in the UK Test?",
   ];
 
