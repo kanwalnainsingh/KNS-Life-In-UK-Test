@@ -66,6 +66,7 @@ const assert = (condition, message) => {
   assert(/Quick cards, full-course coverage/.test(appSource), "Quick revision hero missing");
   assert(/Hands-free revision for the whole test/.test(appSource), "Audio mode hero missing");
   assert(/Driving cram/.test(appSource) && /Full course audio/.test(appSource), "Audio playlists missing");
+  assert(/Driving audio view/.test(appSource) && /Back to full view/.test(appSource), "Driving-only audio view missing");
   assert(/Date-first memory flow/.test(appSource), "Story mode chapter hero missing");
   assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
   assert(/Dates Drill/.test(appSource), "Dates drill heading missing");

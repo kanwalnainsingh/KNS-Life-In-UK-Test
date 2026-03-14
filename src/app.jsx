@@ -652,6 +652,7 @@ const AUDIO_MODE_DEFAULT_STATE = {
   includeMemory: true,
   autoAdvance: true,
   isPlaying: false,
+  drivingView: false,
 };
 
 const AUDIO_RATE_OPTIONS = [
@@ -4734,6 +4735,52 @@ const AudioModeTab = ({ setActive }) => {
     setAudioState((state) => ({ ...state, currentIndex: 0, isPlaying: false }));
   };
 
+  const toggleDrivingView = () => {
+    setAudioState((state) => ({ ...state, drivingView: !state.drivingView, isPlaying: false }));
+    scrollPageTop();
+  };
+
+  if (audioState.drivingView) {
+    return (
+      <div className="page-stack">
+        <SectionTitle icon="🚗" meta="Large controls and a stripped-down now-playing screen for fast glances while parked or stopped.">Driving audio view</SectionTitle>
+        <Card className="support-card-strong" style={{ padding: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", marginBottom: 12, flexWrap: "wrap" }}>
+            <Badge text={playlist.title} color="#3b82f6" />
+            <Badge text={progressLabel} color="#f97316" />
+          </div>
+          <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 10 }}>Now speaking</div>
+          <div style={{ fontSize: 30, lineHeight: 1.2, fontWeight: 900, color: "var(--text-strong)", marginBottom: 10 }}>{current?.title || "Choose a playlist"}</div>
+          <div style={{ fontSize: 16, lineHeight: 1.8, color: "var(--text)", marginBottom: 16 }}>
+            {current?.body || "Select a playlist and press play to begin spoken revision."}
+          </div>
+          {audioState.includeMemory && current?.memory && (
+            <div className="subtle-panel" style={{ padding: 14, marginBottom: 16 }}>
+              <div style={{ fontSize: 12, color: "#14b8a6", fontWeight: 800, marginBottom: 4 }}>Memory clue</div>
+              <div style={{ fontSize: 15, lineHeight: 1.7, color: "var(--text)" }}>{current.memory}</div>
+            </div>
+          )}
+          <Progress value={completion} className="mb-5 h-3.5" />
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+            <Button variant="outline" className="min-h-[64px] text-base font-extrabold" onClick={() => moveSegment("prev")} disabled={currentIndex === 0}>◀ Previous</Button>
+            <Button variant="outline" className="min-h-[64px] text-base font-extrabold" onClick={() => moveSegment("next")} disabled={currentIndex >= playlist.segments.length - 1}>Next ▶</Button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+            <Button className="min-h-[72px] text-lg font-extrabold" onClick={playAudio}>{audioState.isPlaying ? "Replay audio" : "Play audio"}</Button>
+            <Button variant="secondary" className="min-h-[72px] text-lg font-extrabold" onClick={stopAudio}>Pause audio</Button>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 12 }}>
+            <Button variant="ghost" className="min-h-[56px] font-bold" onClick={resetPlaylist}>Restart</Button>
+            <Button variant="ghost" className="min-h-[56px] font-bold" onClick={toggleDrivingView}>Back to full view</Button>
+          </div>
+          <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.7 }}>
+            Best for use before a journey starts or when stopped. Keep a local offline-friendly voice selected if you want the best chance of uninterrupted offline playback.
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="page-stack">
       <SectionTitle icon="🔊" meta="Listen through the course hands-free while driving, walking, or doing chores. The queue is built from the same Story, Quick Facts, 4 Nations, Key People, and Common Mix-Ups data used elsewhere in the app.">Audio Mode</SectionTitle>
@@ -4782,6 +4829,7 @@ const AudioModeTab = ({ setActive }) => {
           <Button variant="secondary" onClick={stopAudio}>Pause audio</Button>
           <Button variant="outline" onClick={() => moveSegment("prev")} disabled={currentIndex === 0}>Previous</Button>
           <Button variant="outline" onClick={() => moveSegment("next")} disabled={currentIndex >= playlist.segments.length - 1}>Next</Button>
+          <Button variant="outline" onClick={toggleDrivingView}>Driving view</Button>
           <Button variant="ghost" onClick={resetPlaylist}>Restart playlist</Button>
         </div>
       </Card>

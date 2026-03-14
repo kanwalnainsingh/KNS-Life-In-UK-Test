@@ -1438,6 +1438,9 @@ video {
 .h-3 {
   height: 0.75rem;
 }
+.h-3\.5 {
+  height: 0.875rem;
+}
 .h-4 {
   height: 1rem;
 }
@@ -1452,6 +1455,15 @@ video {
 }
 .max-h-\[78vh\] {
   max-height: 78vh;
+}
+.min-h-\[56px\] {
+  min-height: 56px;
+}
+.min-h-\[64px\] {
+  min-height: 64px;
+}
+.min-h-\[72px\] {
+  min-height: 72px;
 }
 .w-10 {
   width: 2.5rem;
