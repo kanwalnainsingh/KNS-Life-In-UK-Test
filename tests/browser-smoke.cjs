@@ -138,9 +138,9 @@ const clickFirstAnswerOption = async (page) => {
     });
 
     await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
-    await waitForText(page, "Pass guide");
+    await waitForText(page, "Study tools");
     await waitForText(page, "Check Update");
-    await waitForText(page, "Continue your revision");
+    await waitForText(page, "Top 10 Most-Tested Facts");
 
     await page.goto(`${url}/#examtopics`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Exam Topics Course");
@@ -156,8 +156,8 @@ const clickFirstAnswerOption = async (page) => {
 
     await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Quick Revision");
-    await waitForText(page, "Topic filter");
-    await clickByText(page, "Start now");
+    await waitForText(page, "One fact at a time");
+    await clickByText(page, "Start your first session");
     await waitForText(page, "PROMPT");
     await waitForText(page, "ANSWER");
 
