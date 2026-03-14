@@ -3033,13 +3033,16 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const nextStoryChapter = STORY_CHAPTERS[Math.min(storyChapterIndex, STORY_CHAPTERS.length - 1)];
   const lastActiveTab = TABS.find((tab) => tab.id === lastActiveTabId && tab.id !== "home");
   const nextExamTopic = EXAM_TOPIC_MODE_GROUPS.find((group) => !examTopicsProgress.includes(group.id)) || EXAM_TOPIC_MODE_GROUPS[0];
-  const nextBestAction = wrongQuestions.length > 6
-    ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
-    : bestPaperScore < 75
-      ? { title: `Take ${nextPaper.title}`, detail: "You need repeated exam-format practice to reach a safe pass score.", tab: "mock" }
-      : hardCardCount > 0
-        ? { title: "Run a Weak Areas quick session", detail: `${hardCardCount} quick-revision cards are still marked hard.`, tab: "quickrev" }
-        : { title: "Use Common Mix-Ups for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
+  const isNewUser = completedPapers === 0 && trackerCompleted === 0 && hardCardCount === 0 && wrongQuestions.length === 0;
+  const nextBestAction = isNewUser
+    ? { title: "Start with Quick Revise", detail: "You have not studied yet. Build quick recall first, then tackle mix-ups, then try a mock.", tab: "quickrev" }
+    : wrongQuestions.length > 6
+      ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
+      : bestPaperScore < 75
+        ? { title: `Take ${nextPaper.title}`, detail: "You need repeated exam-format practice to reach a safe pass score.", tab: "mock" }
+        : hardCardCount > 0
+          ? { title: "Run a Weak Areas quick session", detail: `${hardCardCount} quick-revision cards are still marked hard.`, tab: "quickrev" }
+          : { title: "Use Common Mix-Ups for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const visibleFacts = useMemo(() => {
@@ -3164,17 +3167,17 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
         <div className="continue-learning-grid mb-4">
           <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
-            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Continue learning</div>
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{lastActiveTab ? "Continue learning" : "Start learning"}</div>
             <div className="mb-1 text-base font-extrabold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} ${lastActiveTab.label}` : "↔️ Quick Revise"}</div>
             <div className="text-sm leading-6 text-muted-foreground">
               {lastActiveTab ? "Jump back into the last section you used." : "Start with the fastest study mode for quick recall."}
             </div>
           </button>
           <button className="focus-ring continue-learning-card" onClick={() => setActive("examtopics")}>
-            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Next unfinished topic</div>
-            <div className="mb-1 text-base font-extrabold text-foreground">🧭 {nextExamTopic.title}</div>
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "All topics complete" : "Next unfinished topic"}</div>
+            <div className="mb-1 text-base font-extrabold text-foreground">{examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "🎉 All areas done" : `🧭 ${nextExamTopic.title}`}</div>
             <div className="text-sm leading-6 text-muted-foreground">
-              {examTopicsProgress.length}/{EXAM_TOPIC_MODE_GROUPS.length} exam-topic areas done. Use this to keep course coverage moving.
+              {examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "You have finished all exam-topic areas. Open Exam Topics to review any section." : `${examTopicsProgress.length}/${EXAM_TOPIC_MODE_GROUPS.length} exam-topic areas done. Use this to keep course coverage moving.`}
             </div>
           </button>
           <button className="focus-ring continue-learning-card" onClick={() => setActive("mock")}>
@@ -3281,8 +3284,8 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           </button>
           <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("story")}>
             <div className="eyebrow mb-2">Story mode</div>
-            <div className="text-base font-extrabold text-foreground">{nextStoryChapter?.title || "Continue history story"}</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">Return to your last chapter and keep the history sequence in order.</div>
+            <div className="text-base font-extrabold text-foreground">{nextStoryChapter?.title || "Start the history story"}</div>
+            <div className="mt-2 text-sm leading-6 text-muted-foreground">{storyChapterIndex > 0 ? "Return to your last chapter and keep the history sequence in order." : "Begin the history story from Roman Britain and work through it in order."}</div>
           </button>
         </div>
       </Card>
@@ -3291,7 +3294,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
         <StatTile label="Bookmarked facts" value={bookmarks.cards.length + bookmarks.questions.length} color="#14b8a6" />
         <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
-        <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "0%"} color="#f59e0b" />
+        <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "—"} color="#f59e0b" />
       </div>
       <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -3304,7 +3307,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           <Badge text={`${completedPapers}/${MOCK_PAPERS.length} papers tried`} color="#8b5cf6" />
         </div>
         <div className="mb-3 flex flex-wrap gap-2">
-          <Badge text={`Next paper: #${nextPaper.id}`} color={nextPaper.accent} />
+          <Badge text={completedPapers ? `Next paper: #${nextPaper.id}` : `Start with: #${nextPaper.id}`} color={nextPaper.accent} />
           <Badge text={latestMock ? `Last score ${latestMock.score}/24` : "No paper done yet"} color="#10b981" />
         </div>
         <Button variant="secondary" onClick={() => setActive("mock")}>Open Mock Tracker</Button>
@@ -7659,8 +7662,8 @@ const MockExamTab = ({ setActive }) => {
               <div className="study-mode-grid" style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))" }}>
                 <StatTile label="Attempts saved" value={mockHistory.length} color="#3b82f6" />
                 <StatTile label="Papers completed" value={completedPapers} color="#8b5cf6" />
-                <StatTile label="Last result" value={latestMock ? `${latestMock.score}/24` : "0/24"} color="#22c55e" />
-                <StatTile label="Best paper" value={strongestPaper ? `${strongestPaper}%` : "0%"} color="#f59e0b" />
+                <StatTile label="Last result" value={latestMock ? `${latestMock.score}/24` : "—"} color="#22c55e" />
+                <StatTile label="Best paper" value={strongestPaper ? `${strongestPaper}%` : "—"} color="#f59e0b" />
               </div>
             </div>
             <HeroIllustration variant="mock" />
@@ -7677,7 +7680,7 @@ const MockExamTab = ({ setActive }) => {
             <Badge text={`${passedPapers} papers at pass standard`} color="#22c55e" />
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <Badge text={`Next suggested paper: #${nextPaper.id}`} color={nextPaper.accent} />
+            <Badge text={completedPapers ? `Next suggested paper: #${nextPaper.id}` : `Start with paper: #${nextPaper.id}`} color={nextPaper.accent} />
             <Badge text={latestMock ? `Last attempt ${formatAttemptDate(latestMock.date)}` : "No attempts yet"} color="#64748b" />
           </div>
         </Card>
@@ -8016,6 +8019,7 @@ const ReviseTab = ({ setActive }) => {
   };
 
   const clearBank = () => {
+    if (!window.confirm("Clear all saved mistakes? This cannot be undone.")) return;
     writeStore(STORAGE_KEYS.wrongQuestions, []);
     setBank([]);
     setStarted(false);
