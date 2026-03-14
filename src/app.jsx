@@ -3214,6 +3214,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
               </div>
             </button>
           </div>
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass guide</div>
           <div className="dashboard-grid">
             <div className="dashboard-card">
               <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
