@@ -3033,13 +3033,16 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const nextStoryChapter = STORY_CHAPTERS[Math.min(storyChapterIndex, STORY_CHAPTERS.length - 1)];
   const lastActiveTab = TABS.find((tab) => tab.id === lastActiveTabId && tab.id !== "home");
   const nextExamTopic = EXAM_TOPIC_MODE_GROUPS.find((group) => !examTopicsProgress.includes(group.id)) || EXAM_TOPIC_MODE_GROUPS[0];
-  const nextBestAction = wrongQuestions.length > 6
-    ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
-    : bestPaperScore < 75
-      ? { title: `Take ${nextPaper.title}`, detail: "You need repeated exam-format practice to reach a safe pass score.", tab: "mock" }
-      : hardCardCount > 0
-        ? { title: "Run a Weak Areas quick session", detail: `${hardCardCount} quick-revision cards are still marked hard.`, tab: "quickrev" }
-        : { title: "Use Common Mix-Ups for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
+  const isNewUser = completedPapers === 0 && trackerCompleted === 0 && hardCardCount === 0 && wrongQuestions.length === 0;
+  const nextBestAction = isNewUser
+    ? { title: "Start with Quick Revise", detail: "You have not studied yet. Build quick recall first, then tackle mix-ups, then try a mock.", tab: "quickrev" }
+    : wrongQuestions.length > 6
+      ? { title: "Revise your mistakes next", detail: `${wrongQuestions.length} wrong answers are saved. Clean those up before another full mock.`, tab: "revise" }
+      : bestPaperScore < 75
+        ? { title: `Take ${nextPaper.title}`, detail: "You need repeated exam-format practice to reach a safe pass score.", tab: "mock" }
+        : hardCardCount > 0
+          ? { title: "Run a Weak Areas quick session", detail: `${hardCardCount} quick-revision cards are still marked hard.`, tab: "quickrev" }
+          : { title: "Use Common Mix-Ups for final polish", detail: "Your next gain is reducing compare mistakes before the test.", tab: "confuse" };
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const visibleFacts = useMemo(() => {
