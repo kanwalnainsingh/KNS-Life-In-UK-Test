@@ -68,6 +68,7 @@ const assert = (condition, message) => {
   assert(/Driving cram/.test(appSource) && /Full course audio/.test(appSource), "Audio playlists missing");
   assert(/Driving audio view/.test(appSource) && /Back to full view/.test(appSource), "Driving-only audio view missing");
   assert(/Question drill/.test(appSource) && /Resume where you left off/.test(appSource), "Audio drill or resume flow missing");
+  assert(/Weak areas audio/.test(appSource) && /Headset and lock-screen controls/.test(appSource), "Weak-audio or media-control UI missing");
   assert(/Date-first memory flow/.test(appSource), "Story mode chapter hero missing");
   assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
   assert(/Dates Drill/.test(appSource), "Dates drill heading missing");

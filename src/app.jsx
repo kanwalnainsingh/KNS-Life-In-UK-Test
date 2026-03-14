@@ -4663,7 +4663,41 @@ const AudioModeTab = ({ setActive }) => {
   const [voices, setVoices] = useState([]);
   const synthRef = useRef(null);
   const interruptRef = useRef(false);
-  const playlist = AUDIO_MODE_PLAYLISTS.find((item) => item.id === audioState.playlistId) || AUDIO_MODE_PLAYLISTS[0];
+  const quickRevisionDeck = useMemo(() => buildQuickRevisionDeck(), []);
+  const quickRevisionRatings = useMemo(() => readStore(STORAGE_KEYS.quickRevRatings, {}), []);
+  const wrongQuestions = useMemo(() => readStore(STORAGE_KEYS.wrongQuestions, []), []);
+  const weakAudioPlaylist = useMemo(() => {
+    const weakestTopics = buildQuickRevisionTopicConfidence(quickRevisionDeck, quickRevisionRatings).slice(0, 3);
+    const weakCards = getQuickRevisionFocusPool(quickRevisionDeck, "weak", quickRevisionRatings).slice(0, 18);
+    const weakQuestionSegments = wrongQuestions.slice(0, 8).map((question, index) => buildAudioSegment(
+      `weak-question-${index}`,
+      `Saved mistake ${index + 1}`,
+      question.examTopic || "Review",
+      `${question.q} Correct answer: ${question.opts[question.a]}.`,
+      question.tip.replace(/^[⭐📌💡]\s*/, ""),
+    ));
+    const segments = [
+      ...weakCards.map((card, index) => buildAudioSegment(
+        `weak-card-${index}`,
+        card.front,
+        card.topic || "Weak facts",
+        `${card.back}. ${card.context}`,
+        card.memory,
+      )),
+      ...weakQuestionSegments,
+    ];
+    return {
+      id: "weak-areas",
+      title: "Weak areas audio",
+      description: weakestTopics.length
+        ? `Built from your lowest-confidence quick-revision topics: ${weakestTopics.map((item) => item.topic).join(", ")}.`
+        : "Built from saved mistakes and harder cards.",
+      approxMinutes: Math.max(5, Math.round((segments.reduce((count, segment) => count + `${segment.body} ${segment.memory}`.split(/\s+/).filter(Boolean).length, 0)) / 155)),
+      segments,
+    };
+  }, [quickRevisionDeck, quickRevisionRatings, wrongQuestions]);
+  const availablePlaylists = useMemo(() => [weakAudioPlaylist, ...AUDIO_MODE_PLAYLISTS], [weakAudioPlaylist]);
+  const playlist = availablePlaylists.find((item) => item.id === audioState.playlistId) || availablePlaylists[0];
   const currentIndex = Math.min(audioState.currentIndex, Math.max(playlist.segments.length - 1, 0));
   const current = playlist.segments[currentIndex];
   const completion = playlist.segments.length ? Math.round(((currentIndex + 1) / playlist.segments.length) * 100) : 0;
@@ -4716,7 +4750,7 @@ const AudioModeTab = ({ setActive }) => {
       if (interruptRef.current) return;
       setAudioState((state) => {
         if (!state.autoAdvance) return { ...state, isPlaying: false };
-        const activePlaylist = AUDIO_MODE_PLAYLISTS.find((item) => item.id === state.playlistId) || AUDIO_MODE_PLAYLISTS[0];
+        const activePlaylist = availablePlaylists.find((item) => item.id === state.playlistId) || availablePlaylists[0];
         if (state.currentIndex >= activePlaylist.segments.length - 1) {
           return { ...state, isPlaying: false };
         }
@@ -4732,7 +4766,38 @@ const AudioModeTab = ({ setActive }) => {
       interruptRef.current = true;
       synth.cancel();
     };
-  }, [supported, audioState.isPlaying, audioState.rate, audioState.voiceURI, audioState.includeMemory, audioState.autoAdvance, audioState.playlistId, currentIndex, speechText, current, selectedVoice]);
+  }, [supported, audioState.isPlaying, audioState.rate, audioState.voiceURI, audioState.includeMemory, audioState.autoAdvance, audioState.playlistId, currentIndex, speechText, current, selectedVoice, availablePlaylists]);
+
+  useEffect(() => {
+    if (typeof navigator === "undefined" || !("mediaSession" in navigator) || !current || typeof window.MediaMetadata === "undefined") return undefined;
+    const mediaSession = navigator.mediaSession;
+    mediaSession.metadata = new window.MediaMetadata({
+      title: current.title,
+      artist: playlist.title,
+      album: "Life in the UK Audio Mode",
+    });
+    mediaSession.playbackState = audioState.isPlaying ? "playing" : "paused";
+
+    const clearAction = (action) => {
+      try {
+        mediaSession.setActionHandler(action, null);
+      } catch (err) {
+        // unsupported action, ignore
+      }
+    };
+
+    try { mediaSession.setActionHandler("play", playAudio); } catch (err) {}
+    try { mediaSession.setActionHandler("pause", stopAudio); } catch (err) {}
+    try { mediaSession.setActionHandler("previoustrack", () => moveSegment("prev")); } catch (err) {}
+    try { mediaSession.setActionHandler("nexttrack", () => moveSegment("next")); } catch (err) {}
+
+    return () => {
+      clearAction("play");
+      clearAction("pause");
+      clearAction("previoustrack");
+      clearAction("nexttrack");
+    };
+  }, [audioState.isPlaying, current, playlist.title]);
 
   const stopAudio = () => {
     interruptRef.current = true;
@@ -4749,7 +4814,7 @@ const AudioModeTab = ({ setActive }) => {
     interruptRef.current = true;
     synthRef.current?.cancel();
     setAudioState((state) => {
-      const activePlaylist = AUDIO_MODE_PLAYLISTS.find((item) => item.id === state.playlistId) || AUDIO_MODE_PLAYLISTS[0];
+      const activePlaylist = availablePlaylists.find((item) => item.id === state.playlistId) || availablePlaylists[0];
       const nextIndex = direction === "next"
         ? Math.min(state.currentIndex + 1, activePlaylist.segments.length - 1)
         : Math.max(state.currentIndex - 1, 0);
@@ -4830,11 +4895,12 @@ const AudioModeTab = ({ setActive }) => {
           Pick a course playlist, press play, and move through the key facts in spoken order. This works best for passive revision while driving, walking, or cooking. It uses your browser&apos;s built-in speech engine, so there is no paid service and no account needed.
         </div>
         <div className="flex flex-wrap gap-2">
-          <Badge text={`${AUDIO_MODE_PLAYLISTS.length} playlists`} color="#3b82f6" />
+          <Badge text={`${availablePlaylists.length} playlists`} color="#3b82f6" />
           <Badge text={`${playlist.segments.length} spoken cards`} color="#14b8a6" />
           <Badge text={`About ${playlist.approxMinutes} min`} color="#f97316" />
           <Badge text={supported ? "Browser audio ready" : "Browser audio unavailable"} color={supported ? "#22c55e" : "#ef4444"} />
           <Badge text={offlineVoiceCount > 0 ? `${offlineVoiceCount} offline-friendly voices` : "Pick a device voice for offline use"} color={offlineVoiceCount > 0 ? "#10b981" : "#64748b"} />
+          <Badge text="Headset and lock-screen controls" color="#6366f1" />
         </div>
       </Card>
 
@@ -4894,7 +4960,7 @@ const AudioModeTab = ({ setActive }) => {
       <Card className="setup-card">
         <div className="mb-2 text-xs text-muted-foreground">Choose your audio route</div>
         <div className="choice-grid mb-4">
-          {AUDIO_MODE_PLAYLISTS.map((item) => (
+          {availablePlaylists.map((item) => (
             <button
               key={item.id}
               className={`focus-ring choice-tile ${audioState.playlistId === item.id ? "choice-tile-active" : ""}`}
@@ -4906,7 +4972,7 @@ const AudioModeTab = ({ setActive }) => {
           ))}
         </div>
         <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.7, marginBottom: 14 }}>
-          Includes shorter driving playlists, a full-course run, a questions-only drill, and separate Story Mode chapter playlists when you want focused history listening.
+          Includes shorter driving playlists, a full-course run, a weak-areas playlist from your saved progress, a questions-only drill, and separate Story Mode chapter playlists when you want focused history listening.
         </div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 12 }}>
           <div>

@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 329 quiz questions · 💡 Memory clues · ⚠️ Common Mix-Ups · 📝 40 balanced mock papers · 📚 Story Mode + Quick Facts Course
 
-Current release: `v1.23.2`
+Current release: `v1.23.3`
 
 ---
 
@@ -77,7 +77,7 @@ UI stack:
 | 🏠 Home | Pass guide, continue-learning strip, weakest-area guidance, mock progress |
 | 🧭 Exam Topics | Course completion by official-style exam area with cleaner topic summaries, per-topic mocks, and learned/tested/reviewed progress |
 | ↔️ Quick Revise | Fast revision cards with weak-facts focus, topic confidence, saved facts, and smarter “study this next” guidance |
-| 🔊 Audio Mode | Hands-free spoken revision with full-course playlists, chapter playlists, question drill, offline-friendly voice support, and a larger driving view |
+| 🔊 Audio Mode | Hands-free spoken revision with full-course playlists, weak-area audio, chapter playlists, question drill, offline-friendly voice support, and a larger driving view |
 | 📚 Story Mode | Chronological history course with dates, names, pass-first memory anchors, and chapter-end mini quizzes |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
@@ -111,6 +111,7 @@ UI stack:
 - `Audio Mode` for hands-free driving or walking revision with built-in browser speech
 - `Driving view` inside Audio Mode for larger controls and a simpler now-playing screen
 - `Question drill` and Story chapter playlists inside Audio Mode for more focused listening
+- `Weak areas audio` from saved mistakes and hard facts, plus lock-screen / headset playback controls
 - `Quick Revise` now surfaces weak facts, topic confidence, and a stronger next-step suggestion
 - `Story Mode` now ends chapters with mini quizzes tied to the chapter you just studied
 - `Common Mix-Ups` redesigned for cleaner mobile comparison revision
