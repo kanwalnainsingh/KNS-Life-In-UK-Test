@@ -3099,225 +3099,271 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
 
   return (
     <div className="page-stack">
+
+      {/* ── SECTION 1: HERO ── */}
       <Card className="hero-panel">
-        <CardHeader className="pb-4">
-          <div className="hero-grid items-start">
-            <div className="max-w-2xl">
-              <div className="eyebrow mb-2">Free study guide for ILR and citizenship</div>
-              <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">Life in the UK test practice for ILR and citizenship</CardTitle>
-              <CardDescription className="mt-3 max-w-2xl text-sm leading-7">
-                Free revision for the Life in the UK test with topic study, common confusions, mock exams, and memory clues for British citizenship and Indefinite Leave to Remain preparation.
-              </CardDescription>
-              <div className="section-strip mt-4">
-                <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
-                <Badge text="24 questions" color="#3b82f6" />
-                <Badge text="45 minutes" color="#10b981" />
-                <Badge text="75% to pass" color="#f59e0b" />
-                <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
-              </div>
-            </div>
-            <div className="dashboard-card">
-              <div className="eyebrow mb-2">Start your revision</div>
-              <div className="mb-2 text-lg font-extrabold text-foreground">Use a fast path, then move into practice</div>
-              <div className="mb-4 text-sm leading-6 text-muted-foreground">Start with quick recall, lock in the main traps, then test yourself in a real paper format.</div>
-              <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-1">
-                <Button variant="default" className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("quickrev")}>Start Here</Button>
-                <Button variant="secondary" onClick={() => setActive("mock")}>Mock Test</Button>
-                <Button variant="outline" onClick={() => setActive("daily10")}>Daily 10</Button>
-              </div>
-            </div>
+        <CardHeader className="pb-3">
+          <div className="eyebrow mb-2">Free study guide · ILR &amp; citizenship</div>
+          <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">
+            Life in the UK Test Practice
+          </CardTitle>
+          <CardDescription className="mt-2 max-w-xl text-sm leading-7">
+            Free revision for the Life in the UK test — topic study, memory clues, common mix-ups, and full mock papers for British citizenship and ILR.
+          </CardDescription>
+          <div className="section-strip mt-3">
+            <Badge text="24 questions" color="#3b82f6" />
+            <Badge text="45 minutes" color="#10b981" />
+            <Badge text="75% to pass" color="#f59e0b" />
+            <Badge text={`${ALL_QUIZ.length} quiz prompts`} color="#ef4444" />
+            <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-        <div className="hero-summary-grid">
-          <div className="support-card-strong">
-            <div className="eyebrow mb-2">Best starting path</div>
-            <div className="text-base font-extrabold text-foreground">Quick Revise → Mix-Ups → Mock</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">Use short revision first, lock in the main mix-ups, then move into balanced full papers.</div>
+          <div className="hero-summary-grid">
+            <div className="support-card-strong">
+              <div className="eyebrow mb-1">Your next step</div>
+              <div className="text-base font-extrabold text-foreground">{nextBestAction.title}</div>
+              <div className="mt-1 mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
+              <Button className="w-full bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive(nextBestAction.tab)}>
+                {isNewUser ? "Start Here" : "Open now"}
+              </Button>
+            </div>
+            <div className="support-card">
+              <div className="eyebrow mb-1">Recommended path</div>
+              <div className="text-base font-extrabold text-foreground">Quick Revise → Mix-Ups → Mock</div>
+              <div className="mt-1 text-sm leading-6 text-muted-foreground">
+                Build quick recall first, lock in the common traps, then test yourself in full exam format.
+              </div>
+            </div>
           </div>
-          <div className="support-card">
-            <div className="eyebrow mb-2">Right now</div>
-            <div className="text-base font-extrabold text-foreground">{nextBestAction.title}</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
-          </div>
-        </div>
         </CardContent>
       </Card>
 
-      <Card className="quiet-tint">
-        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+      {/* ── SECTION 2: WHERE TO START (new) vs PICK UP (returning) ── */}
+      {isNewUser ? (
+        <Card className="quiet-tint">
+          <div className="mb-4">
+            <div className="text-lg font-extrabold text-foreground">Where to start</div>
+            <div className="text-sm leading-6 text-muted-foreground">
+              Pick one course and work through it in order. Most people start with Story Mode to learn the history, then Quick Facts for civics.
+            </div>
+          </div>
+          <div className="mb-4 grid gap-3 lg:grid-cols-3">
+            {courseModes.map((mode) => (
+              <div key={mode.id} className="support-card-strong">
+                <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{mode.eyebrow}</div>
+                <div className="mb-2 text-base font-extrabold text-foreground">{mode.title}</div>
+                <div className="mb-3 text-sm leading-6 text-muted-foreground">{mode.detail}</div>
+                <Button variant="secondary" className="w-full" onClick={() => setActive(mode.id)}>{mode.action}</Button>
+              </div>
+            ))}
+          </div>
+          <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Ready-made pass paths</div>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {START_HERE_PATHS.map((path) => (
+              <button key={path.id} className="focus-ring rounded-xl border border-border bg-secondary/70 px-3 py-3 text-left" onClick={() => setActive(path.steps[0].tab)}>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <div className="text-sm font-extrabold text-foreground">{path.title}</div>
+                  <Badge text="Pass path" color={path.color} />
+                </div>
+                <div className="text-xs leading-6 text-muted-foreground">{path.steps.map((step) => step.label).join(" → ")}</div>
+              </button>
+            ))}
+          </div>
+        </Card>
+      ) : (
+        <Card className="quiet-tint">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <div className="text-lg font-extrabold text-foreground">Pick up where you left off</div>
+              <div className="text-sm leading-6 text-muted-foreground">Your progress is saved on this device.</div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} plan steps`} color={currentPlan.color} />
+              <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
+            </div>
+          </div>
+          <div className="continue-learning-grid mb-4">
+            <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{lastActiveTab ? "Continue learning" : "Start learning"}</div>
+              <div className="mb-1 text-base font-extrabold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} ${lastActiveTab.label}` : "↔️ Quick Revise"}</div>
+              <div className="text-sm leading-6 text-muted-foreground">
+                {lastActiveTab ? "Jump back into the last section you used." : "Start with the fastest study mode for quick recall."}
+              </div>
+            </button>
+            <button className="focus-ring continue-learning-card" onClick={() => setActive("examtopics")}>
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "All topics complete" : "Next unfinished topic"}</div>
+              <div className="mb-1 text-base font-extrabold text-foreground">{examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "🎉 All areas done" : `🧭 ${nextExamTopic.title}`}</div>
+              <div className="text-sm leading-6 text-muted-foreground">
+                {examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "You have finished all exam-topic areas. Open Exam Topics to review any section." : `${examTopicsProgress.length}/${EXAM_TOPIC_MODE_GROUPS.length} exam-topic areas done.`}
+              </div>
+            </button>
+            <button className="focus-ring continue-learning-card" onClick={() => setActive("mock")}>
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Mock test progress</div>
+              <div className="mb-1 text-base font-extrabold text-foreground">{latestMock ? `📝 ${latestMock.paperTitle}` : "📝 Mock Test"}</div>
+              <div className="text-sm leading-6 text-muted-foreground">
+                {latestMock ? `Last result ${latestMock.score}/24. ${nextPaper.title} is next.` : "No paper done yet. Start when you want exam-format practice."}
+              </div>
+            </button>
+          </div>
+          <div className="dashboard-grid">
+            <div className="dashboard-card">
+              <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
+              <div className="mb-3 flex flex-wrap gap-2">
+                {PASS_PLANS.map((plan) => (
+                  <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
+                ))}
+              </div>
+              <div className="mb-3 rounded-xl border border-border bg-secondary/50 p-3 text-xs leading-6 text-muted-foreground">{currentPlan.note}</div>
+              <div className="grid gap-2">
+                {currentPlan.steps.map((step, idx) => {
+                  const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
+                  return (
+                    <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-secondary/40 px-3 py-2.5">
+                      <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-card text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
+                        {done ? "✓" : idx + 1}
+                      </button>
+                      <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
+                        {step.label}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="dashboard-card">
+              <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Confidence Guide</div>
+              <div className="mb-1 text-base font-extrabold text-foreground">{readiness}% readiness</div>
+              <div className="mb-3 text-sm leading-6 text-muted-foreground">{readinessNote}</div>
+              <div className="grid gap-2">
+                <div className="rounded-xl border border-border bg-secondary/60 p-3">
+                  <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Weakest area</div>
+                  <div className="text-sm font-semibold text-foreground">{weakestTopic}</div>
+                </div>
+                <div className="rounded-xl border border-border bg-secondary/60 p-3">
+                  <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Saved for later</div>
+                  <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length + bookmarks.questions.length} bookmarked facts/questions</div>
+                </div>
+                <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
+                  <div className="text-sm font-semibold text-foreground">Run Weak Areas now</div>
+                  <div className="mt-1 text-xs leading-5 text-muted-foreground">Best if you keep missing the same facts.</div>
+                </button>
+                <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive("confuse")}>
+                  <div className="text-sm font-semibold text-foreground">Open compare traps</div>
+                  <div className="mt-1 text-xs leading-5 text-muted-foreground">Stop losing marks on UK vs GB, dates, Parliament, and law mix-ups.</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* ── SECTION 3: TOP 10 MOST-TESTED FACTS (moved up for immediate value) ── */}
+      <Card className="border-emerald-500/25 bg-emerald-500/5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-lg font-extrabold text-foreground">Pass guide</div>
-            <div className="text-sm leading-6 text-muted-foreground">Use one clear route instead of guessing between modes: learn the history story, finish civics and everyday facts, then check yourself by exam area.</div>
+            <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">🎯 Top 10 Most-Tested Facts</div>
+            <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">The facts that come up most in the real test. Refresh for a new batch.</div>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Badge text={`${completedPlanSteps}/${currentPlan.steps.length} plan steps done`} color={currentPlan.color} />
-            <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
+            <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh</Button>
+            <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
           </div>
         </div>
-        <div className="mb-4 grid gap-3 lg:grid-cols-3">
-          {courseModes.map((mode) => (
-            <div key={mode.id} className="support-card-strong">
-              <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{mode.eyebrow}</div>
-              <div className="mb-2 text-base font-extrabold text-foreground">{mode.title}</div>
-              <div className="mb-3 text-sm leading-6 text-muted-foreground">{mode.detail}</div>
-              <Button variant="secondary" className="w-full" onClick={() => setActive(mode.id)}>{mode.action}</Button>
-            </div>
+        {visibleFacts.map((fact, index) => (
+          <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
+            <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
+            <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
+          </div>
+        ))}
+      </Card>
+
+      {/* ── SECTION 4: STUDY TOOLS ── */}
+      <Card className="quiet-tint">
+        <div className="mb-3">
+          <div className="text-lg font-extrabold text-foreground">Study tools</div>
+          <div className="text-sm leading-6 text-muted-foreground">All revision modes — pick what fits your time and stage.</div>
+        </div>
+        <div className="feature-grid">
+          {[
+            { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
+            { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
+            { id: "datesdrill", icon: "🗓️", title: "Dates Drill", desc: "Lock in history years, events, and battle anchors quickly.", color: "#8b5cf6" },
+            { id: "sprint", icon: "⚡", title: "True/False Sprint", desc: "Fast mobile revision with simple true/false calls.", color: "#0ea5e9" },
+            { id: "confuse", icon: "⚖️", title: "Common Mix-Ups", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
+            { id: "cram", icon: "📄", title: "One-Page Cram", desc: "Night-before summary of the highest-yield facts.", color: "#f59e0b" },
+            { id: "tracker", icon: "✅", title: "Topic Tracker", desc: "Mark what feels done and see full-course progress.", color: "#22c55e" },
+            { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
+          ].map((item) => (
+            <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-[26px]">{item.icon}</div>
+                <Badge text="Study mode" color={item.color} />
+              </div>
+              <div className="mb-1.5 text-base font-extrabold text-foreground">{item.title}</div>
+              <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
+            </button>
           ))}
         </div>
-        <div className="continue-learning-grid mb-4">
-          <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
-            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{lastActiveTab ? "Continue learning" : "Start learning"}</div>
-            <div className="mb-1 text-base font-extrabold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} ${lastActiveTab.label}` : "↔️ Quick Revise"}</div>
-            <div className="text-sm leading-6 text-muted-foreground">
-              {lastActiveTab ? "Jump back into the last section you used." : "Start with the fastest study mode for quick recall."}
-            </div>
-          </button>
-          <button className="focus-ring continue-learning-card" onClick={() => setActive("examtopics")}>
-            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "All topics complete" : "Next unfinished topic"}</div>
-            <div className="mb-1 text-base font-extrabold text-foreground">{examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "🎉 All areas done" : `🧭 ${nextExamTopic.title}`}</div>
-            <div className="text-sm leading-6 text-muted-foreground">
-              {examTopicsProgress.length === EXAM_TOPIC_MODE_GROUPS.length ? "You have finished all exam-topic areas. Open Exam Topics to review any section." : `${examTopicsProgress.length}/${EXAM_TOPIC_MODE_GROUPS.length} exam-topic areas done. Use this to keep course coverage moving.`}
-            </div>
-          </button>
-          <button className="focus-ring continue-learning-card" onClick={() => setActive("mock")}>
-            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Latest test pressure</div>
-            <div className="mb-1 text-base font-extrabold text-foreground">{latestMock ? `📝 ${latestMock.paperTitle}` : "📝 Mock Test"}</div>
-            <div className="text-sm leading-6 text-muted-foreground">
-              {latestMock ? `Last result ${latestMock.score}/24. ${nextPaper.title} is the next paper to keep moving.` : "No paper done yet. Start a balanced mock when you want exam-format practice."}
-            </div>
-          </button>
-        </div>
-        <div className="dashboard-grid">
-          <div className="card-stack">
-          <div className="dashboard-card">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Best route to pass</div>
-            <div className="mb-3 grid gap-2">
-              {START_HERE_PATHS.map((path) => (
-                <button key={path.id} className="focus-ring rounded-xl border border-border bg-secondary/70 px-3 py-3 text-left" onClick={() => setActive(path.steps[0].tab)}>
-                  <div className="mb-1 flex items-center justify-between gap-2">
-                    <div className="font-extrabold text-foreground">{path.title}</div>
-                    <Badge text="Pass path" color={path.color} />
-                  </div>
-                  <div className="text-xs leading-6 text-muted-foreground">{path.steps.map((step) => step.label).join(" → ")}</div>
-                </button>
-              ))}
-            </div>
+      </Card>
+
+      {/* ── SECTION 5: YOUR PROGRESS (only shown for returning users) ── */}
+      {!isNewUser && (
+        <>
+          <div className="metric-grid">
+            <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
+            <StatTile label="Bookmarked facts" value={bookmarks.cards.length + bookmarks.questions.length} color="#14b8a6" />
+            <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
+            <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "—"} color="#f59e0b" />
           </div>
-          <div className="dashboard-card">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Next Best Action</div>
-            <div className="mb-1 text-base font-extrabold text-foreground">{nextBestAction.title}</div>
-            <div className="mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
-            <Button className="mb-3 w-full" onClick={() => setActive(nextBestAction.tab)}>Open now</Button>
-            <div className="grid gap-2">
-              <div className="rounded-xl border border-border bg-secondary/60 p-3">
-                <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Weakest area</div>
-                <div className="text-sm font-semibold text-foreground">{weakestTopic}</div>
+          <Card className="quiet-tint">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-lg font-extrabold text-foreground">Mock progress</div>
+                <div className="text-sm leading-6 text-muted-foreground">Papers, scores and attempts saved on this device.</div>
               </div>
-              <div className="rounded-xl border border-border bg-secondary/60 p-3">
-                <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Saved for later</div>
-                <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length + bookmarks.questions.length} bookmarked facts/questions</div>
-              </div>
+              <Badge text={`${completedPapers}/${MOCK_PAPERS.length} papers tried`} color="#8b5cf6" />
             </div>
-          </div>
-          </div>
-          <div className="dashboard-card">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Pass Plan</div>
             <div className="mb-3 flex flex-wrap gap-2">
-              {PASS_PLANS.map((plan) => (
-                <TabButton key={plan.id} active={selectedPlan === plan.id} onClick={() => choosePlan(plan.id)}>{plan.title}</TabButton>
-              ))}
+              <Badge text={completedPapers ? `Next paper: #${nextPaper.id}` : `Start with: #${nextPaper.id}`} color={nextPaper.accent} />
+              <Badge text={latestMock ? `Last score ${latestMock.score}/24` : "No paper done yet"} color="#10b981" />
             </div>
-            <div className="mb-3 rounded-xl border border-border bg-secondary/50 p-3 text-xs leading-6 text-muted-foreground">{currentPlan.note}</div>
-            <div className="grid gap-2">
-              {currentPlan.steps.map((step, idx) => {
-                const done = Boolean(planProgress.done?.[`${currentPlan.id}:${step.id}`]);
-                return (
-                  <div key={step.id} className="flex items-center gap-2 rounded-xl border border-border bg-secondary/40 px-3 py-2.5">
-                    <button className="focus-ring grid h-7 w-7 place-items-center rounded-full border border-border bg-card text-sm font-extrabold text-foreground" onClick={() => togglePlanStep(step.id)}>
-                      {done ? "✓" : idx + 1}
-                    </button>
-                    <button className="focus-ring flex-1 text-left text-sm font-semibold text-foreground" onClick={() => setActive(step.tab)}>
-                      {step.label}
-                    </button>
-                  </div>
-                );
-              })}
+            <Button variant="secondary" onClick={() => setActive("mock")}>Open Mock Tracker</Button>
+          </Card>
+          <Card className="quiet-tint">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-lg font-extrabold text-foreground">Personal shortcuts</div>
+                <div className="text-sm leading-6 text-muted-foreground">Quick access to your saved and hard-marked material.</div>
+              </div>
             </div>
-          </div>
-          <div className="dashboard-card">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Confidence Guide</div>
-            <div className="mb-1 text-base font-extrabold text-foreground">{readiness}% readiness</div>
-            <div className="mb-3 text-sm leading-6 text-muted-foreground">{readinessNote}</div>
-            <div className="grid gap-2">
-              <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
-                <div className="text-sm font-semibold text-foreground">Run Weak Areas now</div>
-                <div className="mt-1 text-xs leading-5 text-muted-foreground">Best if your score is not stable yet or you keep missing the same facts.</div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
+                <div className="eyebrow mb-2">Hard cards</div>
+                <div className="text-base font-extrabold text-foreground">{hardCardCount || 0} hard cards saved</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">Run a short weak-areas revision with the cards you marked hard.</div>
               </button>
-              <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive("confuse")}>
-                <div className="text-sm font-semibold text-foreground">Open compare traps</div>
-                <div className="mt-1 text-xs leading-5 text-muted-foreground">Fastest way to stop losing marks on UK vs GB, dates, Parliament, and law mix-ups.</div>
+              <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
+                <div className="eyebrow mb-2">Saved facts</div>
+                <div className="text-base font-extrabold text-foreground">{bookmarks.cards.length} saved cards</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">Jump back into the facts you bookmarked for later revision.</div>
+              </button>
+              <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("story")}>
+                <div className="eyebrow mb-2">Story mode</div>
+                <div className="text-base font-extrabold text-foreground">{nextStoryChapter?.title || "Start the history story"}</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">{storyChapterIndex > 0 ? "Return to your last chapter and keep the history sequence in order." : "Begin the history story from Roman Britain and work through it in order."}</div>
               </button>
             </div>
-          </div>
-        </div>
-      </Card>
+          </Card>
+        </>
+      )}
 
-      <Card className="quiet-tint">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-lg font-extrabold text-foreground">Continue your revision</div>
-            <div className="text-sm leading-6 text-muted-foreground">These are personal shortcuts. Use them after you already know the main route above.</div>
-          </div>
-          <Badge text="Personal shortcuts" color="#14b8a6" />
-        </div>
-        <div className="grid gap-3 md:grid-cols-3">
-          <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
-            <div className="eyebrow mb-2">Hard cards</div>
-            <div className="text-base font-extrabold text-foreground">{hardCardCount || 0} hard cards saved</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">Run a short weak-areas revision with the cards you marked hard.</div>
-          </button>
-          <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
-            <div className="eyebrow mb-2">Saved facts</div>
-            <div className="text-base font-extrabold text-foreground">{bookmarks.cards.length} saved cards</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">Jump back into the facts you bookmarked for later revision.</div>
-          </button>
-          <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("story")}>
-            <div className="eyebrow mb-2">Story mode</div>
-            <div className="text-base font-extrabold text-foreground">{nextStoryChapter?.title || "Start the history story"}</div>
-            <div className="mt-2 text-sm leading-6 text-muted-foreground">{storyChapterIndex > 0 ? "Return to your last chapter and keep the history sequence in order." : "Begin the history story from Roman Britain and work through it in order."}</div>
-          </button>
-        </div>
-      </Card>
-
-      <div className="metric-grid">
-        <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
-        <StatTile label="Bookmarked facts" value={bookmarks.cards.length + bookmarks.questions.length} color="#14b8a6" />
-        <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
-        <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "—"} color="#f59e0b" />
-      </div>
-      <Card className="quiet-tint">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-lg font-extrabold text-foreground">Mock progress saved on this device</div>
-            <div className="text-sm leading-6 text-muted-foreground">
-              Your completed papers, best scores, and last results stay in local storage, so they still work after new app releases.
-            </div>
-          </div>
-          <Badge text={`${completedPapers}/${MOCK_PAPERS.length} papers tried`} color="#8b5cf6" />
-        </div>
-        <div className="mb-3 flex flex-wrap gap-2">
-          <Badge text={completedPapers ? `Next paper: #${nextPaper.id}` : `Start with: #${nextPaper.id}`} color={nextPaper.accent} />
-          <Badge text={latestMock ? `Last score ${latestMock.score}/24` : "No paper done yet"} color="#10b981" />
-        </div>
-        <Button variant="secondary" onClick={() => setActive("mock")}>Open Mock Tracker</Button>
-      </Card>
-
+      {/* ── SECTION 6: REFERENCE ── */}
       <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <div className="text-lg font-extrabold text-foreground">Visual memory clues</div>
-            <div className="text-sm text-muted-foreground">Short codes from the revision pack, now built into the app</div>
+            <div className="text-sm text-muted-foreground">Short codes to lock in tricky facts</div>
           </div>
           <Badge text={`${VISUAL_MNEMONICS.length} memory packs`} color="#06b6d4" />
         </div>
@@ -3356,46 +3402,6 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <div className="feature-grid">
-        {[
-          { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
-          { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
-          { id: "datesdrill", icon: "🗓️", title: "Dates Drill", desc: "Lock in history years, events, and battle anchors quickly.", color: "#8b5cf6" },
-          { id: "sprint", icon: "⚡", title: "True/False Sprint", desc: "Fast mobile revision with simple true/false calls.", color: "#0ea5e9" },
-          { id: "confuse", icon: "⚖️", title: "Common Mix-Ups", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
-          { id: "cram", icon: "📄", title: "One-Page Cram", desc: "Night-before summary of the highest-yield facts.", color: "#f59e0b" },
-          { id: "tracker", icon: "✅", title: "Topic Tracker", desc: "Mark what feels done and see full-course progress.", color: "#22c55e" },
-          { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
-        ].map((item) => (
-          <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
-            <div className="mb-3 flex items-center justify-between">
-              <div className="text-[26px]">{item.icon}</div>
-              <Badge text="Study mode" color={item.color} />
-            </div>
-            <div className="mb-1.5 text-base font-extrabold text-foreground">{item.title}</div>
-            <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
-          </button>
-        ))}
-      </div>
-
-      <Card className="border-emerald-500/25 bg-emerald-500/5">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">🎯 Top 10 Most-Tested Facts</div>
-            <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Refresh for a new mix or move to the next batch.</div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh facts</Button>
-            <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
-          </div>
-        </div>
-        {visibleFacts.map((fact, index) => (
-          <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
-            <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
-            <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
-          </div>
-        ))}
-      </Card>
     </div>
   );
 };
