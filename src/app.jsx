@@ -85,6 +85,7 @@ const STORAGE_KEYS = {
   examTopicReviewed: "lifeuk-examtopic-reviewed",
   sectionMocks: "lifeuk-section-mocks",
   storyQuizzes: "lifeuk-story-quizzes",
+  audioMode: "lifeuk-audio-mode",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -102,6 +103,7 @@ const SEO_COPY = {
   },
   examtopics: { title: "Exam Topics Course | Life in the UK Test Practice" },
   quickrev: { title: "Quick Revision Cards | Life in the UK Test Practice" },
+  audio: { title: "Audio Revision Mode | Life in the UK Test Practice" },
   story: { title: "Story Mode Revision | Life in the UK Test Practice" },
   datesdrill: { title: "Dates Drill | Life in the UK Test Practice" },
   daily10: { title: "Daily 10 Revision | Life in the UK Test Practice" },
@@ -123,13 +125,13 @@ const SEO_COPY = {
 
 const PRIMARY_DESKTOP_TABS = ["home", "examtopics", "quickrev", "story", "quiz", "mock"];
 const NAV_GROUPS = [
-  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "story", "quiz", "mock"] },
+  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "audio", "story", "quiz", "mock"] },
   { title: "Core Course", hint: "Main pass-first sections and high-yield comparisons", ids: ["quickfacts", "nations", "timeline", "wars", "confuse", "figures"] },
   { title: "Culture & Reference", hint: "Religion, places, inventors, sport, arts, symbols, world organisations", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
   { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
 ];
 const MOBILE_MORE_GROUPS = [
-  { title: "Study Now", hint: "Best next actions", ids: ["examtopics", "quickrev", "story", "confuse"] },
+  { title: "Study Now", hint: "Best next actions", ids: ["examtopics", "quickrev", "audio", "story", "confuse"] },
   { title: "Core Course", hint: "Finish the course in strong exam order", ids: ["quickfacts", "nations", "timeline", "wars", "figures"] },
   { title: "Culture & Reference", hint: "Browse the lower-priority fact sections", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
   { title: "Review", hint: "Short drills and mistake work", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
@@ -641,6 +643,283 @@ const CRAM_SECTIONS = [
     ],
   },
 ];
+
+const AUDIO_MODE_DEFAULT_STATE = {
+  playlistId: "driving-cram",
+  currentIndex: 0,
+  rate: 0.95,
+  voiceURI: "",
+  includeMemory: true,
+  autoAdvance: true,
+  isPlaying: false,
+};
+
+const AUDIO_RATE_OPTIONS = [
+  { value: 0.85, label: "Slow" },
+  { value: 0.95, label: "Steady" },
+  { value: 1.05, label: "Normal" },
+  { value: 1.15, label: "Fast" },
+];
+
+const normaliseSpeechText = (text) => String(text || "")
+  .replace(/WWI/g, "World War One")
+  .replace(/WWII/g, "World War Two")
+  .replace(/\bN\. ?Ireland\b/g, "Northern Ireland")
+  .replace(/\bN\. ?I\.\b/g, "Northern Ireland")
+  .replace(/\bPMQs\b/g, "Prime Minister's Questions")
+  .replace(/\bMSPs\b/g, "M S Ps")
+  .replace(/\bMLAs\b/g, "M L As")
+  .replace(/\bSMs\b/g, "Senedd Members")
+  .replace(/\bMPs\b/g, "M Ps")
+  .replace(/\bNHS\b/g, "N H S")
+  .replace(/\bIVF\b/g, "I V F")
+  .replace(/\bDNA\b/g, "D N A")
+  .replace(/\bMRI\b/g, "M R I")
+  .replace(/\bATM\b/g, "A T M")
+  .replace(/\bWWW\b/g, "World Wide Web")
+  .replace(/\bECHR\b/g, "E C H R")
+  .replace(/\bUK\b/g, "U K")
+  .replace(/\s+/g, " ")
+  .trim();
+
+const buildAudioSegment = (id, title, topic, body, memory = "") => ({
+  id,
+  title,
+  topic,
+  body: normaliseSpeechText(body),
+  memory: normaliseSpeechText(memory),
+});
+
+const speakableNationName = (name) => name === "N. IRELAND" ? "Northern Ireland" : name;
+
+const formatConfusableSummary = (pair) => {
+  const left = pair.left.points.slice(0, 2).join(". ");
+  const right = pair.right.points.slice(0, 2).join(". ");
+  return `${pair.title}. ${pair.left.label}: ${left}. ${pair.right.label}: ${right}.`;
+};
+
+const chunkItems = (items, size) => {
+  const chunks = [];
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size));
+  }
+  return chunks;
+};
+
+const AUDIO_MODE_PLAYLISTS = (() => {
+  const historySegments = STORY_CHAPTERS.flatMap((chapter) => chapter.items.map((item, index) => buildAudioSegment(
+    `${chapter.id}-${index}`,
+    `${chapter.title}: ${item.title}`,
+    "History",
+    `${item.fact} ${item.context}`,
+    item.memory,
+  )));
+
+  const quickFactsSegments = QUICK_FACTS.map((group, index) => buildAudioSegment(
+    `quickfacts-${index}`,
+    group.cat,
+    "Quick Facts",
+    group.facts.join(". "),
+    group.facts.find((fact) => /memory clue/i.test(fact)) || "",
+  ));
+
+  const nationSegments = NATIONS.map((nation) => buildAudioSegment(
+    `nation-${nation.name}`,
+    `${speakableNationName(nation.name)} essentials`,
+    "4 Nations",
+    `${speakableNationName(nation.name)}. Capital ${nation.capital}. Saint ${nation.saint}. Saint day ${nation.day}. Parliament or assembly: ${nation.parliament}. Language clue: ${nation.lang}. Key memory points: ${nation.tricks.slice(0, 3).join(". ")}.`,
+    nation.tricks[3] || nation.tricks[0],
+  ));
+
+  const religionSegments = [
+    buildAudioSegment(
+      "religion-census",
+      "Religion and census anchors",
+      "Religion",
+      RELIGIONS.map((entry) => `${entry.faith}: ${entry.pct}. ${entry.note}`).join(". "),
+      "2011 census anchors: Christian 59 percent, no religion 25 percent, Muslim 4.8 percent.",
+    ),
+    buildAudioSegment(
+      "religion-festivals",
+      "Major festivals",
+      "Religion",
+      FESTIVALS.slice(0, 10).map((festival) => `${festival.name}: ${festival.date}. ${festival.detail}`).join(". "),
+      "Christmas 25 December, Boxing Day 26 December, Bonfire Night 5 November, Remembrance Day 11 November.",
+    ),
+  ];
+
+  const landmarkSegments = chunkItems(LANDMARKS, 5).map((chunk, index) => buildAudioSegment(
+    `landmarks-${index}`,
+    `Landmarks and places ${index + 1}`,
+    "Landmarks",
+    chunk.map((place) => `${place.name.replace(/[^\w\s'.-]/g, "").trim()}, ${place.where}. ${place.fact}`).join(". "),
+    chunk[0]?.trap || "",
+  ));
+
+  const inventorSegments = chunkItems(INVENTORS, 5).map((chunk, index) => buildAudioSegment(
+    `inventors-${index}`,
+    `Inventors and science ${index + 1}`,
+    "Inventors",
+    chunk.map((item) => `${item.who}. ${item.what}. ${item.when}. ${item.memory}`).join(". "),
+    chunk[0]?.memory || "",
+  ));
+
+  const sportsSegments = [
+    buildAudioSegment(
+      "sports-facts",
+      "Sports events and anchors",
+      "Sports",
+      SPORTS_FACTS.map((item) => `${item.name}. ${item.fact}`).join(". "),
+      SPORTS_FACTS[0]?.memory || "",
+    ),
+    ...chunkItems(SPORTS_STARS, 6).map((chunk, index) => buildAudioSegment(
+      `sports-stars-${index}`,
+      `Sports stars ${index + 1}`,
+      "Sports",
+      chunk.map((item) => `${item.name}. ${item.achievement}`).join(". "),
+      chunk[0]?.memory || "",
+    )),
+  ];
+
+  const artsSegments = Object.entries(ARTS).map(([section, items], index) => buildAudioSegment(
+    `arts-${section}-${index}`,
+    `Arts: ${section}`,
+    "Arts",
+    items.map((item) => `${item.who}. ${item.what}`).join(". "),
+    items[0]?.mem || "",
+  ));
+
+  const internationalSegments = [
+    buildAudioSegment(
+      "world-orgs",
+      "World organisations",
+      "World Orgs",
+      INT_ORGS.map((org) => `${org.name}. ${org.purpose}. ${org.ukRole}.`).join(" "),
+      "United Nations for peace, NATO for defence, Commonwealth voluntary, Council of Europe for rights.",
+    ),
+  ];
+
+  const symbolSegments = [
+    buildAudioSegment(
+      "symbols-anthem",
+      "National anthem and symbols",
+      "Symbols",
+      `${ANTHEM.title}. ${ANTHEM.note}. ${ANTHEM.words.slice(0, 3).join(" ")}.`,
+      ANTHEM.memory,
+    ),
+  ];
+
+  const figureSegments = [...KEY_FIGURES.slice(0, 14), ...EXTRA_KEY_FIGURES.slice(0, 10)].map((person, index) => buildAudioSegment(
+    `figure-${index}-${person.name}`,
+    person.name,
+    "Key People",
+    `${person.name}. ${person.role}. ${person.facts.slice(0, 3).join(". ")}.`,
+    FIGURE_MEMORY[person.name] || person.facts[0],
+  ));
+
+  const mixupSegments = CONFUSABLES.map((pair, index) => buildAudioSegment(
+    `mixup-${index}`,
+    pair.title,
+    "Common Mix-Ups",
+    formatConfusableSummary(pair),
+    pair.memory,
+  ));
+
+  const drivingCramSegments = [
+    ...VISUAL_MNEMONICS.map((item, index) => buildAudioSegment(
+      `mnemonic-${index}`,
+      item.title,
+      "Driving cram",
+      `${item.clue}. ${item.visual}.`,
+      item.clue,
+    )),
+    ...historySegments.slice(0, 18),
+    ...quickFactsSegments.slice(0, 6),
+    ...nationSegments,
+    ...religionSegments.slice(0, 1),
+    ...inventorSegments.slice(0, 1),
+    ...sportsSegments.slice(0, 1),
+    ...artsSegments.slice(0, 1),
+    ...internationalSegments,
+    ...symbolSegments,
+    ...figureSegments.slice(0, 10),
+    ...mixupSegments.slice(0, 10),
+  ];
+
+  const fullCourseSegments = [
+    ...historySegments,
+    ...quickFactsSegments,
+    ...nationSegments,
+    ...religionSegments,
+    ...landmarkSegments,
+    ...inventorSegments,
+    ...sportsSegments,
+    ...artsSegments,
+    ...internationalSegments,
+    ...symbolSegments,
+    ...figureSegments,
+    ...mixupSegments,
+  ];
+
+  const withMinutes = (playlist) => {
+    const words = playlist.segments.reduce((count, segment) => count + `${segment.body} ${segment.memory}`.trim().split(/\s+/).filter(Boolean).length, 0);
+    return {
+      ...playlist,
+      approxMinutes: Math.max(5, Math.round(words / 155)),
+    };
+  };
+
+  return [
+    withMinutes({
+      id: "driving-cram",
+      title: "Driving cram",
+      description: "Shorter mixed revision run for dates, civics, 4 nations, people, and the main compare traps.",
+      segments: drivingCramSegments,
+    }),
+    withMinutes({
+      id: "full-course",
+      title: "Full course audio",
+      description: "Longer hands-free revision built from Story Mode, Quick Facts, 4 Nations, Key People, and Common Mix-Ups.",
+      segments: fullCourseSegments,
+    }),
+    withMinutes({
+      id: "history-story",
+      title: "History story",
+      description: "Chronological history and modern Britain, chapter by chapter.",
+      segments: historySegments,
+    }),
+    withMinutes({
+      id: "quick-facts",
+      title: "Quick facts course",
+      description: "Government, law, rights, everyday life, settlement, and identity facts in listen-first form.",
+      segments: quickFactsSegments,
+    }),
+    withMinutes({
+      id: "nations-symbols",
+      title: "4 nations essentials",
+      description: "Capitals, saints, parliaments, language clues, and classic nation traps.",
+      segments: nationSegments,
+    }),
+    withMinutes({
+      id: "key-people",
+      title: "Key people",
+      description: "Rulers, reformers, wartime leaders, and famous figures most worth remembering.",
+      segments: figureSegments,
+    }),
+    withMinutes({
+      id: "culture-reference",
+      title: "Culture and reference",
+      description: "Religion, festivals, landmarks, inventors, sports, arts, symbols, and world organisations.",
+      segments: [...religionSegments, ...landmarkSegments, ...inventorSegments, ...sportsSegments, ...artsSegments, ...internationalSegments, ...symbolSegments],
+    }),
+    withMinutes({
+      id: "mixups",
+      title: "Common mix-ups",
+      description: "Side-by-side audio comparisons for the facts learners confuse most often.",
+      segments: mixupSegments,
+    }),
+  ];
+})();
 
 const TRACKER_SECTIONS = [
   { id: "timeline", label: "History timeline", detail: "Dates, rulers, reforms, and era anchors", tab: "timeline", icon: "📅" },
@@ -1825,7 +2104,7 @@ const getHashTab = () => {
 };
 
 const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
-  const quickActions = ["examtopics", "quickrev", "mock", "quiz", "story"];
+  const quickActions = ["examtopics", "quickrev", "audio", "mock", "story"];
   const currentTab = TABS.find((tab) => tab.id === active);
   const currentGroup = MOBILE_MORE_GROUPS.find((group) => group.ids.includes(active));
   return (
@@ -4334,6 +4613,289 @@ const QuickRevisionTab = ({ setActive }) => {
           ))}
         </div>
       </Card>
+    </div>
+  );
+};
+
+const AudioModeTab = ({ setActive }) => {
+  const supported = typeof window !== "undefined" && "speechSynthesis" in window && typeof window.SpeechSynthesisUtterance !== "undefined";
+  const [audioState, setAudioState] = useState(() => ({ ...AUDIO_MODE_DEFAULT_STATE, ...readStore(STORAGE_KEYS.audioMode, {}) }));
+  const [voices, setVoices] = useState([]);
+  const synthRef = useRef(null);
+  const interruptRef = useRef(false);
+  const playlist = AUDIO_MODE_PLAYLISTS.find((item) => item.id === audioState.playlistId) || AUDIO_MODE_PLAYLISTS[0];
+  const currentIndex = Math.min(audioState.currentIndex, Math.max(playlist.segments.length - 1, 0));
+  const current = playlist.segments[currentIndex];
+  const completion = playlist.segments.length ? Math.round(((currentIndex + 1) / playlist.segments.length) * 100) : 0;
+  const progressLabel = playlist.segments.length ? `${currentIndex + 1} of ${playlist.segments.length}` : "0 of 0";
+  const selectedVoice = voices.find((voice) => voice.voiceURI === audioState.voiceURI) || voices.find((voice) => voice.localService) || voices[0] || null;
+  const offlineVoiceCount = voices.filter((voice) => voice.localService).length;
+  const speechText = current
+    ? normaliseSpeechText(`${current.title}. ${current.body}${audioState.includeMemory && current.memory ? ` Memory clue: ${current.memory}.` : ""}`)
+    : "";
+
+  useEffect(() => {
+    writeStore(STORAGE_KEYS.audioMode, { ...audioState, currentIndex, isPlaying: false });
+  }, [audioState, currentIndex]);
+
+  useEffect(() => {
+    if (!supported) return undefined;
+    const synth = window.speechSynthesis;
+    synthRef.current = synth;
+    const loadVoices = () => {
+      const nextVoices = synth.getVoices()
+        .filter((voice) => !voice.lang || voice.lang.startsWith("en"))
+        .sort((a, b) => Number(Boolean(b.localService)) - Number(Boolean(a.localService)));
+      setVoices(nextVoices.length ? nextVoices : synth.getVoices());
+    };
+    loadVoices();
+    if (typeof synth.addEventListener === "function") synth.addEventListener("voiceschanged", loadVoices);
+    else synth.onvoiceschanged = loadVoices;
+    return () => {
+      interruptRef.current = true;
+      synth.cancel();
+      if (typeof synth.removeEventListener === "function") synth.removeEventListener("voiceschanged", loadVoices);
+      else synth.onvoiceschanged = null;
+    };
+  }, [supported]);
+
+  useEffect(() => {
+    if (!supported || !audioState.isPlaying || !current) return undefined;
+    const synth = synthRef.current || window.speechSynthesis;
+    interruptRef.current = false;
+    synth.cancel();
+    const utterance = new window.SpeechSynthesisUtterance(speechText);
+    utterance.rate = audioState.rate;
+    utterance.pitch = 1;
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+      utterance.lang = selectedVoice.lang;
+    }
+    utterance.onend = () => {
+      if (interruptRef.current) return;
+      setAudioState((state) => {
+        if (!state.autoAdvance) return { ...state, isPlaying: false };
+        const activePlaylist = AUDIO_MODE_PLAYLISTS.find((item) => item.id === state.playlistId) || AUDIO_MODE_PLAYLISTS[0];
+        if (state.currentIndex >= activePlaylist.segments.length - 1) {
+          return { ...state, isPlaying: false };
+        }
+        return { ...state, currentIndex: state.currentIndex + 1 };
+      });
+    };
+    utterance.onerror = () => {
+      if (interruptRef.current) return;
+      setAudioState((state) => ({ ...state, isPlaying: false }));
+    };
+    synth.speak(utterance);
+    return () => {
+      interruptRef.current = true;
+      synth.cancel();
+    };
+  }, [supported, audioState.isPlaying, audioState.rate, audioState.voiceURI, audioState.includeMemory, audioState.autoAdvance, audioState.playlistId, currentIndex, speechText, current, selectedVoice]);
+
+  const stopAudio = () => {
+    interruptRef.current = true;
+    synthRef.current?.cancel();
+    setAudioState((state) => ({ ...state, isPlaying: false }));
+  };
+
+  const playAudio = () => {
+    if (!current) return;
+    setAudioState((state) => ({ ...state, isPlaying: true, currentIndex }));
+  };
+
+  const moveSegment = (direction) => {
+    interruptRef.current = true;
+    synthRef.current?.cancel();
+    setAudioState((state) => {
+      const activePlaylist = AUDIO_MODE_PLAYLISTS.find((item) => item.id === state.playlistId) || AUDIO_MODE_PLAYLISTS[0];
+      const nextIndex = direction === "next"
+        ? Math.min(state.currentIndex + 1, activePlaylist.segments.length - 1)
+        : Math.max(state.currentIndex - 1, 0);
+      return { ...state, currentIndex: nextIndex };
+    });
+  };
+
+  const selectPlaylist = (playlistId) => {
+    interruptRef.current = true;
+    synthRef.current?.cancel();
+    setAudioState((state) => ({
+      ...state,
+      playlistId,
+      currentIndex: 0,
+      isPlaying: false,
+    }));
+    scrollPageTop();
+  };
+
+  const resetPlaylist = () => {
+    interruptRef.current = true;
+    synthRef.current?.cancel();
+    setAudioState((state) => ({ ...state, currentIndex: 0, isPlaying: false }));
+  };
+
+  return (
+    <div className="page-stack">
+      <SectionTitle icon="🔊" meta="Listen through the course hands-free while driving, walking, or doing chores. The queue is built from the same Story, Quick Facts, 4 Nations, Key People, and Common Mix-Ups data used elsewhere in the app.">Audio Mode</SectionTitle>
+      <Card className="setup-card mb-4">
+        <div className="mb-2 text-lg font-extrabold text-foreground">Hands-free revision for the whole test</div>
+        <div className="mb-4 text-sm leading-7 text-muted-foreground">
+          Pick a course playlist, press play, and move through the key facts in spoken order. This works best for passive revision while driving, walking, or cooking. It uses your browser&apos;s built-in speech engine, so there is no paid service and no account needed.
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge text={`${AUDIO_MODE_PLAYLISTS.length} playlists`} color="#3b82f6" />
+          <Badge text={`${playlist.segments.length} spoken cards`} color="#14b8a6" />
+          <Badge text={`About ${playlist.approxMinutes} min`} color="#f97316" />
+          <Badge text={supported ? "Browser audio ready" : "Browser audio unavailable"} color={supported ? "#22c55e" : "#ef4444"} />
+          <Badge text={offlineVoiceCount > 0 ? `${offlineVoiceCount} offline-friendly voices` : "Pick a device voice for offline use"} color={offlineVoiceCount > 0 ? "#10b981" : "#64748b"} />
+        </div>
+      </Card>
+
+      <Card className="support-card-strong">
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap", marginBottom: 14 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 20 }}>{playlist.title}</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginTop: 4 }}>{playlist.description}</div>
+          </div>
+          <Badge text={progressLabel} color="#6366f1" />
+        </div>
+        <Progress value={completion} className="mb-4 h-3" />
+        <div className="fact-grid-two" style={{ display: "grid", gap: 12, marginBottom: 14 }}>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "#3b82f6", fontWeight: 800, marginBottom: 4 }}>Now speaking</div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 6 }}>{current?.title || "No items yet"}</div>
+            <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.7 }}>{current?.body || "Choose a playlist to begin."}</div>
+            {audioState.includeMemory && current?.memory && <MemoryHook text={current.memory} />}
+          </div>
+          <div className="subtle-panel" style={{ padding: 12 }}>
+            <div style={{ fontSize: 12, color: "#f97316", fontWeight: 800, marginBottom: 4 }}>Driving-friendly notes</div>
+            <div style={{ color: "var(--text)", fontSize: 13, lineHeight: 1.7 }}>
+              Keep the route simple: use <strong>Driving cram</strong> when you want a shorter mixed run, and <strong>Full course audio</strong> when you want broader revision in the background.
+            </div>
+            <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.7, marginTop: 8 }}>
+              After the app has been loaded once, it can keep working offline through the cached app shell. For the best offline audio result, choose a device voice marked as offline-friendly below and open the playlist before you start driving.
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={playAudio}>{audioState.isPlaying ? "Replay current" : "Play audio"}</Button>
+          <Button variant="secondary" onClick={stopAudio}>Pause audio</Button>
+          <Button variant="outline" onClick={() => moveSegment("prev")} disabled={currentIndex === 0}>Previous</Button>
+          <Button variant="outline" onClick={() => moveSegment("next")} disabled={currentIndex >= playlist.segments.length - 1}>Next</Button>
+          <Button variant="ghost" onClick={resetPlaylist}>Restart playlist</Button>
+        </div>
+      </Card>
+
+      <Card className="setup-card">
+        <div className="mb-2 text-xs text-muted-foreground">Choose your audio route</div>
+        <div className="choice-grid mb-4">
+          {AUDIO_MODE_PLAYLISTS.map((item) => (
+            <button
+              key={item.id}
+              className={`focus-ring choice-tile ${audioState.playlistId === item.id ? "choice-tile-active" : ""}`}
+              onClick={() => selectPlaylist(item.id)}
+            >
+              <div>{item.title}</div>
+              <div className="mt-1 text-xs font-normal text-muted-foreground">{item.segments.length} spoken cards · about {item.approxMinutes} min</div>
+            </button>
+          ))}
+        </div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 12 }}>
+          <div>
+            <div className="mb-2 text-xs text-muted-foreground">Voice speed</div>
+            <div className="noscroll flex gap-2 overflow-x-auto">
+              {AUDIO_RATE_OPTIONS.map((item) => (
+                <TabButton key={item.value} active={audioState.rate === item.value} onClick={() => setAudioState((state) => ({ ...state, rate: item.value }))}>
+                  {item.label}
+                </TabButton>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-2 text-xs text-muted-foreground">Memory clues</div>
+            <div className="noscroll flex gap-2 overflow-x-auto">
+              <TabButton active={audioState.includeMemory} onClick={() => setAudioState((state) => ({ ...state, includeMemory: true }))}>Include memory clues</TabButton>
+              <TabButton active={!audioState.includeMemory} onClick={() => setAudioState((state) => ({ ...state, includeMemory: false }))}>Facts only</TabButton>
+            </div>
+          </div>
+        </div>
+        {voices.length > 0 && (
+          <div style={{ marginTop: 14 }}>
+            <div className="mb-2 text-xs text-muted-foreground">Voice</div>
+            <select
+              className="focus-ring w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground"
+              value={audioState.voiceURI}
+              onChange={(event) => setAudioState((state) => ({ ...state, voiceURI: event.target.value }))}
+            >
+              <option value="">Default device voice</option>
+              {voices.map((voice) => (
+                <option key={voice.voiceURI} value={voice.voiceURI}>
+                  {voice.name} {voice.lang ? `· ${voice.lang}` : ""}{voice.localService ? " · Offline-friendly" : ""}
+                </option>
+              ))}
+            </select>
+            <div style={{ marginTop: 8, color: "var(--text-muted)", fontSize: 12, lineHeight: 1.6 }}>
+              Local device voices are best for offline driving revision. Streaming voices can stop if your signal drops.
+            </div>
+          </div>
+        )}
+        <div style={{ marginTop: 14 }}>
+          <label className="inline-flex items-center gap-2 text-sm text-foreground">
+            <input
+              type="checkbox"
+              checked={audioState.autoAdvance}
+              onChange={(event) => setAudioState((state) => ({ ...state, autoAdvance: event.target.checked }))}
+            />
+            Auto-advance through the playlist
+          </label>
+        </div>
+      </Card>
+
+      <Card>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 800 }}>Up next</div>
+            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Use this when you want to skip ahead before you start driving.</div>
+          </div>
+          <Badge text={`${playlist.segments.length - (currentIndex + 1)} left`} color="#64748b" />
+        </div>
+        <div style={{ display: "grid", gap: 10 }}>
+          {playlist.segments.slice(currentIndex, currentIndex + 5).map((segment, index) => (
+            <button
+              key={segment.id}
+              className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left"
+              onClick={() => setAudioState((state) => ({ ...state, currentIndex: currentIndex + index, isPlaying: false }))}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
+                <div style={{ fontWeight: 800, color: "var(--text-strong)" }}>{segment.title}</div>
+                <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{currentIndex + index + 1}</div>
+              </div>
+              <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>{segment.topic}</div>
+            </button>
+          ))}
+        </div>
+      </Card>
+
+      {!supported && (
+        <Card style={{ border: "1px solid color-mix(in srgb, #ef4444 35%, var(--card-border))", background: "color-mix(in srgb, #ef4444 7%, var(--card-bg))" }}>
+          <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 6 }}>Audio is not available in this browser</div>
+          <div style={{ color: "var(--text)", fontSize: 14, lineHeight: 1.7 }}>
+            Try opening the app in a recent version of Safari or Chrome on your phone. The rest of the study modes still work normally even if browser speech is unavailable here.
+          </div>
+        </Card>
+      )}
+
+      <SectionStudyActions
+        Card={Card}
+        Badge={Badge}
+        title="Use audio with the main course"
+        note="Best route: listen to Driving cram or Full course audio when you want passive revision, then use Story Mode, Quick Facts Course, and Mock Test when you can actively study."
+        actions={[
+          { label: "Open Story Mode", primary: true, onClick: () => setActive("story") },
+          { label: "Open Quick Facts", onClick: () => setActive("quickfacts") },
+          { label: "Take a Mock", onClick: () => setActive("mock") },
+        ]}
+      />
     </div>
   );
 };
@@ -7785,6 +8347,7 @@ const App = () => {
       case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
       case "examtopics": return <ExamTopicsModeTab setActive={navigateTo} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
+      case "audio": return <AudioModeTab setActive={navigateTo} />;
       case "story": return <StoryModeTab setActive={navigateTo} />;
       case "datesdrill": return <DatesDrillTab />;
       case "daily10": return <DailyTenTab />;

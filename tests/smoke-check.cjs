@@ -28,6 +28,7 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "mock"), "Mock tab missing");
   assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
   assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
+  assert(data.TABS.some((tab) => tab.id === "audio"), "Audio mode tab missing");
   assert(data.TABS.some((tab) => tab.id === "examtopics"), "Exam topics tab missing");
   assert(data.TABS.some((tab) => tab.id === "story"), "Story mode tab missing");
   assert(data.TABS.some((tab) => tab.id === "datesdrill"), "Dates drill tab missing");
@@ -39,6 +40,7 @@ const assert = (condition, message) => {
   assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
+  assert(/AudioModeTab/.test(appSource), "Audio mode UI missing");
   assert(/ExamTopicsModeTab/.test(appSource), "Exam topics UI missing");
   assert(/SectionMockPanel/.test(appSource), "Reusable section test UI missing");
   assert(/sectionMocks/.test(appSource), "Section test progress storage missing");
@@ -62,6 +64,8 @@ const assert = (condition, message) => {
   assert(/Saved mock paper tracker/.test(appSource), "Mock tracker summary missing");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
   assert(/Quick cards, full-course coverage/.test(appSource), "Quick revision hero missing");
+  assert(/Hands-free revision for the whole test/.test(appSource), "Audio mode hero missing");
+  assert(/Driving cram/.test(appSource) && /Full course audio/.test(appSource), "Audio playlists missing");
   assert(/Date-first memory flow/.test(appSource), "Story mode chapter hero missing");
   assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
   assert(/Dates Drill/.test(appSource), "Dates drill heading missing");

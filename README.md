@@ -4,7 +4,7 @@ A free, mobile-friendly study guide and practice app for the **Life in the UK te
 
 > 📖 329 quiz questions · 💡 Memory clues · ⚠️ Common Mix-Ups · 📝 40 balanced mock papers · 📚 Story Mode + Quick Facts Course
 
-Current release: `v1.22.0`
+Current release: `v1.23.0`
 
 ---
 
@@ -58,14 +58,15 @@ UI stack:
    - `Mock Test`
 4. Use `Exam Topics` when you want to revise by official-style exam area instead of by section name.
 5. Use `Quick Revise` for fast facts and memory clues.
-6. Use `Quiz` if you want flexible practice with answer options:
+6. Use `Audio Mode` when you want hands-free revision while driving, walking, or doing chores.
+7. Use `Quiz` if you want flexible practice with answer options:
    - show answers instantly
    - show answers at the end
    - include context and memory tips
-7. Use `Mock Test` for the closest exam-style run.
-8. Use page-specific mocks/tests inside sections like `Timeline`, `Key People`, `Wars`, `Landmarks`, and `Common Mix-Ups` when you want to finish one topic properly.
-9. Use `Daily 10`, `Rapid Fire`, and `Dates Drill` for quick mobile revision.
-10. Use `Revise Mistakes` to retry weak questions and clean up errors before another mock.
+8. Use `Mock Test` for the closest exam-style run.
+9. Use page-specific mocks/tests inside sections like `Timeline`, `Key People`, `Wars`, `Landmarks`, and `Common Mix-Ups` when you want to finish one topic properly.
+10. Use `Daily 10`, `Rapid Fire`, and `Dates Drill` for quick mobile revision.
+11. Use `Revise Mistakes` to retry weak questions and clean up errors before another mock.
 
 ---
 
@@ -76,6 +77,7 @@ UI stack:
 | 🏠 Home | Pass guide, continue-learning strip, weakest-area guidance, mock progress |
 | 🧭 Exam Topics | Course completion by official-style exam area with cleaner topic summaries, per-topic mocks, and learned/tested/reviewed progress |
 | ↔️ Quick Revise | Fast revision cards with weak-facts focus, topic confidence, saved facts, and smarter “study this next” guidance |
+| 🔊 Audio Mode | Hands-free spoken revision built from Story Mode, Quick Facts, 4 Nations, Key People, and Common Mix-Ups |
 | 📚 Story Mode | Chronological history course with dates, names, pass-first memory anchors, and chapter-end mini quizzes |
 | 🔟 Daily 10 | Fresh 10-question practice set for quick phone sessions, with wrong-answer review at the end |
 | ⚡ T/F Sprint | Very fast true/false mobile revision |
@@ -106,6 +108,7 @@ UI stack:
 - `Exam Topics` course with topic mocks and learned / tested / reviewed progress
 - Cleaner `Exam Topics` summaries with metadata-backed question pools and topic-specific coverage notes
 - `Quick Facts Course` for civics, law, identity, and everyday-life revision
+- `Audio Mode` for hands-free driving or walking revision with built-in browser speech
 - `Quick Revise` now surfaces weak facts, topic confidence, and a stronger next-step suggestion
 - `Story Mode` now ends chapters with mini quizzes tied to the chapter you just studied
 - `Common Mix-Ups` redesigned for cleaner mobile comparison revision

@@ -1642,6 +1642,7 @@ const TABS = [
   { id:"home",          label:"Home",         icon:"🏠" },
   { id:"examtopics",    label:"Exam Topics",  icon:"🧭" },
   { id:"quickrev",      label:"Quick Revise", icon:"↔️" },
+  { id:"audio",         label:"Audio Mode",   icon:"🔊" },
   { id:"story",         label:"Story Mode",   icon:"📚" },
   { id:"datesdrill",    label:"Dates Drill",  icon:"🗓️" },
   { id:"daily10",       label:"Daily 10",     icon:"🔟" },

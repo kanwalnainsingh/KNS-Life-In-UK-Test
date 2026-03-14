@@ -161,6 +161,12 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "PROMPT");
     await waitForText(page, "ANSWER");
 
+    await page.goto(`${url}/#audio`, { waitUntil: "networkidle0", timeout: 30000 });
+    await waitForText(page, "Audio Mode");
+    await waitForText(page, "Hands-free revision for the whole test");
+    await waitForText(page, "Driving cram");
+    await waitForText(page, "Play audio");
+
     await page.goto(`${url}/#story`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Story Mode");
     await waitForText(page, "Dates and names to remember");
