@@ -810,6 +810,33 @@ const AUDIO_MODE_PLAYLISTS = (() => {
     ),
   ];
 
+  const storyChapterPlaylists = STORY_CHAPTERS.map((chapter) => ({
+    id: `story-${chapter.id}`,
+    title: chapter.title.replace(/^Chapter \d+:\s*/, ""),
+    description: `Chapter audio playlist for ${chapter.title}.`,
+    segments: chapter.items.map((item, index) => buildAudioSegment(
+      `story-${chapter.id}-${index}`,
+      item.title,
+      chapter.title,
+      `${item.fact} ${item.context}`,
+      item.memory,
+    )),
+  }));
+
+  const questionDrillSegments = ALL_QUIZ
+    .filter((question) => question.priority !== "extra")
+    .slice(0, 80)
+    .map((question, index) => {
+      const answer = question.opts[question.a];
+      return buildAudioSegment(
+        `question-drill-${index}`,
+        `Question drill ${index + 1}`,
+        question.examTopic,
+        `${question.q} Option A: ${question.opts[0]}. Option B: ${question.opts[1]}. Option C: ${question.opts[2]}. Option D: ${question.opts[3]}. Correct answer: ${answer}.`,
+        question.tip.replace(/^[⭐📌💡]\s*/, ""),
+      );
+    });
+
   const figureSegments = [...KEY_FIGURES.slice(0, 14), ...EXTRA_KEY_FIGURES.slice(0, 10)].map((person, index) => buildAudioSegment(
     `figure-${index}-${person.name}`,
     person.name,
@@ -919,6 +946,18 @@ const AUDIO_MODE_PLAYLISTS = (() => {
       description: "Side-by-side audio comparisons for the facts learners confuse most often.",
       segments: mixupSegments,
     }),
+    withMinutes({
+      id: "question-drill",
+      title: "Question drill",
+      description: "Questions, answer options, correct answers, and memory clues spoken aloud for hands-free recall.",
+      segments: questionDrillSegments,
+    }),
+    ...storyChapterPlaylists.map((playlist) => withMinutes({
+      id: playlist.id,
+      title: playlist.title,
+      description: playlist.description,
+      segments: playlist.segments,
+    })),
   ];
 })();
 
@@ -4631,6 +4670,7 @@ const AudioModeTab = ({ setActive }) => {
   const progressLabel = playlist.segments.length ? `${currentIndex + 1} of ${playlist.segments.length}` : "0 of 0";
   const selectedVoice = voices.find((voice) => voice.voiceURI === audioState.voiceURI) || voices.find((voice) => voice.localService) || voices[0] || null;
   const offlineVoiceCount = voices.filter((voice) => voice.localService).length;
+  const canResume = currentIndex > 0 || audioState.playlistId !== AUDIO_MODE_DEFAULT_STATE.playlistId;
   const speechText = current
     ? normaliseSpeechText(`${current.title}. ${current.body}${audioState.includeMemory && current.memory ? ` Memory clue: ${current.memory}.` : ""}`)
     : "";
@@ -4798,6 +4838,23 @@ const AudioModeTab = ({ setActive }) => {
         </div>
       </Card>
 
+      {canResume && (
+        <Card className="support-card-strong">
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ color: "var(--text-strong)", fontWeight: 800, marginBottom: 4 }}>Resume where you left off</div>
+              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>
+                {playlist.title} · {progressLabel} · {current?.title || "Current segment"}
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={playAudio}>Resume audio</Button>
+              <Button variant="outline" onClick={resetPlaylist}>Restart</Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <Card className="support-card-strong">
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap", marginBottom: 14 }}>
           <div>
@@ -4847,6 +4904,9 @@ const AudioModeTab = ({ setActive }) => {
               <div className="mt-1 text-xs font-normal text-muted-foreground">{item.segments.length} spoken cards · about {item.approxMinutes} min</div>
             </button>
           ))}
+        </div>
+        <div style={{ color: "var(--text-muted)", fontSize: 12, lineHeight: 1.7, marginBottom: 14 }}>
+          Includes shorter driving playlists, a full-course run, a questions-only drill, and separate Story Mode chapter playlists when you want focused history listening.
         </div>
         <div className="fact-grid-two" style={{ display: "grid", gap: 12 }}>
           <div>

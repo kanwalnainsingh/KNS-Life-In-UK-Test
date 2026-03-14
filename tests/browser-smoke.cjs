@@ -165,6 +165,7 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "Audio Mode");
     await waitForText(page, "Hands-free revision for the whole test");
     await waitForText(page, "Driving cram");
+    await waitForText(page, "Question drill");
     await waitForText(page, "Play audio");
     await clickByText(page, "Driving view");
     await waitForText(page, "Driving audio view");
