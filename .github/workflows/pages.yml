@@ -10,12 +10,16 @@ permissions:
   pages: write
   id-token: write
 
+# Never cancel an in-progress deploy — only queue one pending run at a time
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  build:
+  # ── JOB 1: ALL TESTS ────────────────────────────────────────────────────────
+  # Build the site, run every test suite. Deploy only starts if this passes.
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run local regression suite
+      - name: Unit and regression tests
         run: npm test
 
       - name: Build site
@@ -40,7 +44,7 @@ jobs:
         id: chrome
         uses: browser-actions/setup-chrome@v1
 
-      - name: Run browser smoke test
+      - name: Browser smoke test
         env:
           CHROME_BIN: ${{ steps.chrome.outputs.chrome-path }}
         run: npm run test:browser
@@ -50,12 +54,16 @@ jobs:
         with:
           path: docs
 
+  # ── JOB 2: DEPLOY ───────────────────────────────────────────────────────────
+  # Runs only when every step in the test job passes. Gate is needs + if.
   deploy:
+    name: Deploy
+    needs: test
+    if: ${{ success() }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
