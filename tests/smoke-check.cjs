@@ -38,6 +38,7 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "cram"), "Cram tab missing");
   assert(data.TABS.some((tab) => tab.id === "tracker"), "Tracker tab missing");
   assert(data.TABS.some((tab) => tab.id === "guide"), "Guide tab missing");
+  assert(data.TABS.some((tab) => tab.id === "testday"), "Test Day tab missing");
   assert(/UserGuideTab/.test(appSource), "User guide component missing");
   assert(/How to Pass the Life in the UK Test/.test(appSource), "User guide heading missing");
   assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
@@ -77,13 +78,16 @@ const assert = (condition, message) => {
   assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
   assert(/Dates Drill/.test(appSource), "Dates drill heading missing");
   assert(/Year → event|Event → year/.test(appSource), "Dates drill mode options missing");
-  assert(/Day of your test/.test(appSource), "Day of test section missing on home page");
+  assert(/TestDayTab/.test(appSource), "Test Day tab component missing");
+  assert(/Test Day/.test(appSource), "Test Day section title missing");
   assert(/Unique Reference Number/.test(appSource), "URN info missing from day-of-test section");
-  assert(/Reset progress/.test(appSource), "Quick revision reset action missing");
+  assert(/The night before/.test(appSource), "Test Day night-before section missing");
+  assert(/After you pass/.test(appSource), "Test Day after-passing section missing");
   assert(/Review the ones you missed/.test(appSource), "Daily 10 wrong-answer review missing");
   assert(/<span>Menu<\/span>/.test(appSource), "Bottom menu label missing");
   assert(/Start here/.test(appSource), "Pass-focused start guidance missing");
-  assert(/Pass guide/.test(appSource) && /Pass Plan/.test(appSource), "Saved pass plan UI missing");
+  assert(/If your test is in 1/.test(appSource), "Cram plan section missing from home");
+  assert(/Your progress/.test(appSource), "Progress dashboard missing from home");
   assert(/Exam Topics Course/.test(appSource), "Exam topics course heading missing");
   assert(/lifeuk-examtopic-mocks/.test(appSource), "Exam topic mock storage missing");
   assert(/Topic mock/.test(appSource), "Exam topic mock UI missing");
@@ -123,8 +127,8 @@ const assert = (condition, message) => {
   assert(/desktop-nav-panel/.test(indexSource), "Desktop grouped navigation styling missing");
   assert(/AppFooterBar/.test(appSource), "Footer version bar missing");
   assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");
-  assert(/Visual memory clues/.test(appSource), "Mnemonic home panel missing");
-  assert(/Day of your test/.test(appSource), "Day of test home section missing");
+  assert(/Study path/.test(appSource), "Study path section missing from home");
+  assert(/Topic sections/.test(appSource), "Topic sections menu highlights missing from home");
   assert(/SectionStudyActions/.test(appSource), "Section follow-up action rows missing");
   assert(/Use these nation facts right away/.test(appSource), "4 Nations follow-up actions missing");
   assert(/Quick Facts Course/.test(appSource), "Quick Facts course heading missing");
