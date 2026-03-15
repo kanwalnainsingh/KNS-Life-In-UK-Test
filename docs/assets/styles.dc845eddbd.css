@@ -1633,6 +1633,10 @@ video {
 .bg-background\/85 {
   background-color: hsl(var(--background) / 0.85);
 }
+.bg-blue-600 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(37 99 235 / var(--tw-bg-opacity, 1));
+}
 .bg-card {
   background-color: hsl(var(--card));
 }
@@ -2054,6 +2058,9 @@ video {
 }
 .hover\:bg-amber-500\/15:hover {
   background-color: rgb(245 158 11 / 0.15);
+}
+.hover\:bg-blue-600\/90:hover {
+  background-color: rgb(37 99 235 / 0.9);
 }
 .hover\:bg-emerald-500\/15:hover {
   background-color: rgb(16 185 129 / 0.15);

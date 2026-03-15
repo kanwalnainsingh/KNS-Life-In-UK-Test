@@ -3154,6 +3154,59 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
+      {/* ── CORE COURSE ── */}
+      {(() => {
+        const CORE_SECTIONS = [
+          { id: "quickfacts", icon: "⚡", title: "Quick Facts Course", desc: "Parliament, law, voting, rights, elections and everyday British life." },
+          { id: "nations",    icon: "🏴", title: "4 Nations",           desc: "Capitals, patron saints, parliaments, flowers — on almost every paper." },
+          { id: "timeline",   icon: "📅", title: "Timeline",            desc: "Key years and reforms with memory anchors." },
+          { id: "wars",       icon: "⚔️", title: "Wars & Battles",      desc: "Major conflicts, battle dates, WWI and WWII." },
+          { id: "confuse",    icon: "⚠️", title: "Common Mix-Ups",      desc: "UK vs GB, Commons vs Lords, dates side by side — where marks are lost." },
+          { id: "figures",    icon: "👑", title: "Key People",          desc: "Rulers, reformers, wartime leaders grouped with memory links." },
+        ];
+        const done = CORE_SECTIONS.filter((s) => !!trackerProgress[s.id]).length;
+        const pct = Math.round((done / CORE_SECTIONS.length) * 100);
+        const nextItem = CORE_SECTIONS.find((s) => !trackerProgress[s.id]) || CORE_SECTIONS[0];
+        return (
+          <Card style={{ border: "1px solid var(--card-border)" }}>
+            <div className="mb-1 flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div className="text-lg font-extrabold text-foreground">Core Course</div>
+                <div className="text-sm text-muted-foreground">Main pass-first sections and high-yield comparisons</div>
+              </div>
+              <Badge text={done === CORE_SECTIONS.length ? "Complete ✓" : `${done}/${CORE_SECTIONS.length} done`} color={done === CORE_SECTIONS.length ? "#22c55e" : "#3b82f6"} />
+            </div>
+            <div style={{ height: 5, borderRadius: 999, background: "var(--surface-muted)", margin: "12px 0 14px" }}>
+              <div style={{ height: "100%", borderRadius: 999, background: done === CORE_SECTIONS.length ? "#22c55e" : "#3b82f6", width: `${pct}%`, transition: "width 0.6s ease" }} />
+            </div>
+            <div style={{ display: "grid", gap: 7 }}>
+              {CORE_SECTIONS.map((item) => {
+                const isDone = !!trackerProgress[item.id];
+                return (
+                  <button key={item.id} className="focus-ring" onClick={() => setActive(item.id)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "11px 13px", border: `1px solid ${isDone ? "#22c55e40" : "var(--card-border)"}`, borderRadius: 13, background: isDone ? "color-mix(in srgb, #22c55e 6%, var(--surface-strong))" : "var(--surface-strong)", cursor: "pointer", textAlign: "left" }}>
+                    <span style={{ fontSize: 18, flexShrink: 0, width: 24, textAlign: "center" }}>{item.icon}</span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 13 }}>{item.title}</span>
+                      <span style={{ display: "block", fontSize: 11, color: "var(--text-muted)", marginTop: 2, lineHeight: 1.45 }}>{item.desc}</span>
+                    </span>
+                    {isDone
+                      ? <span style={{ color: "#22c55e", fontSize: 15, fontWeight: 900, flexShrink: 0 }}>✓</span>
+                      : <span style={{ color: "var(--text-muted)", fontSize: 13, flexShrink: 0 }}>›</span>}
+                  </button>
+                );
+              })}
+            </div>
+            {done < CORE_SECTIONS.length && (
+              <div style={{ marginTop: 14 }}>
+                <Button className="w-full bg-blue-600 hover:bg-blue-600/90" onClick={() => setActive(nextItem.id)}>
+                  {done === 0 ? "Start Core Course →" : `Continue: ${nextItem.title} →`}
+                </Button>
+              </div>
+            )}
+          </Card>
+        );
+      })()}
+
       {/* ── CRITICAL TOPICS ── */}
       <div className="grid gap-3 sm:grid-cols-2">
         <button className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" style={{ borderColor: "#10b981", background: "color-mix(in srgb, #10b981 8%, transparent)", cursor: "pointer" }} onClick={() => setActive("nations")}>
