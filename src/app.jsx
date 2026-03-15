@@ -121,11 +121,12 @@ const SEO_COPY = {
   landmarks: { title: "Landmarks and Places | Life in the UK Test Practice" },
   religion: { title: "Religion and Festivals | Life in the UK Test Practice" },
   figures: { title: "Key Historical Figures | Life in the UK Test Practice" },
+  guide: { title: "How to Pass the Life in the UK Test | Study Guide" },
 };
 
-const PRIMARY_DESKTOP_TABS = ["home", "examtopics", "quickrev", "story", "quiz", "mock"];
+const PRIMARY_DESKTOP_TABS = ["home", "guide", "examtopics", "quickrev", "story", "quiz", "mock"];
 const NAV_GROUPS = [
-  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "examtopics", "quickrev", "audio", "story", "quiz", "mock"] },
+  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "guide", "examtopics", "quickrev", "audio", "story", "quiz", "mock"] },
   { title: "Core Course", hint: "Main pass-first sections and high-yield comparisons", ids: ["quickfacts", "nations", "timeline", "wars", "confuse", "figures"] },
   { title: "Culture & Reference", hint: "Religion, places, inventors, sport, arts, symbols, world organisations", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
   { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
@@ -8475,6 +8476,305 @@ const RapidFireTab = () => {
   );
 };
 
+// ── USER GUIDE TAB ────────────────────────────────────────────
+const UserGuideTab = ({ setActive }) => {
+  const STUDY_MODES = [
+    {
+      group: "Learn the content first",
+      hint: "Start here before doing any practice tests.",
+      modes: [
+        { icon: "📚", id: "story",     label: "Story Mode",          when: "Start here for history. 10 chapters from Romans to devolution in chronological order.", time: "15–20 min per chapter" },
+        { icon: "🧭", id: "examtopics",label: "Exam Topics Course",  when: "After Story Mode. Revise by the 6 official exam areas with topic-specific mocks.",    time: "10–15 min per topic" },
+        { icon: "⚡", id: "quickfacts", label: "Quick Facts Course",  when: "Civics, law, rights and everyday life — 11 grouped fact categories, each with a quick check.", time: "5–10 min per group" },
+        { icon: "🏴", id: "nations",   label: "4 Nations",           when: "Capitals, saints, flowers, legal differences — these facts appear in nearly every paper.", time: "10 min" },
+        { icon: "💡", id: "inventors", label: "Inventors",           when: "Named British inventors and scientists are frequent traps. Match person → invention.",   time: "5 min" },
+      ],
+    },
+    {
+      group: "Practise and test yourself",
+      hint: "Use these after you have done at least one learning session.",
+      modes: [
+        { icon: "📝", id: "mock",      label: "Mock Test",           when: "40 balanced papers, 24 questions each — identical format to the real test.",            time: "45 min max" },
+        { icon: "🔟", id: "daily10",   label: "Daily 10",            when: "Quick daily habit. Fresh 10-question set with wrong-answer review at the end.",         time: "5 min" },
+        { icon: "🧠", id: "quiz",      label: "Quiz Me",             when: "Flexible practice: instant answers, end-of-quiz, or no reveals. Any topic, any length.", time: "Any" },
+        { icon: "🔥", id: "rapidfire", label: "Rapid Fire",          when: "Fast recall under pressure. Lower repetition than Quiz Me for variety.",                time: "5 min" },
+        { icon: "⚡", id: "sprint",    label: "T/F Sprint",          when: "True/false mobile revision. The fastest session in the app.",                           time: "2–3 min" },
+        { icon: "🗓️", id: "datesdrill",label: "Dates Drill",         when: "History dates and events only. Plug the single most common knowledge gap.",            time: "5 min" },
+      ],
+    },
+    {
+      group: "Fix weak spots",
+      hint: "Use these after you have some wrong answers or hard cards saved.",
+      modes: [
+        { icon: "↔️", id: "quickrev",  label: "Quick Revise",        when: "Cards with Hard/Okay/Easy ratings. Hard cards come back automatically — set and forget.", time: "10 min" },
+        { icon: "🧩", id: "revise",    label: "Revise Mistakes",     when: "Retry every wrong answer saved from your mock papers.",                                  time: "10–15 min" },
+        { icon: "⚠️", id: "confuse",   label: "Common Mix-Ups",      when: "Side-by-side compare for the facts people confuse most — dates, roles, numbers.",        time: "5–10 min" },
+      ],
+    },
+    {
+      group: "Reference and memory",
+      hint: "Browse these to fill gaps or the night before the test.",
+      modes: [
+        { icon: "📅", id: "timeline",     label: "Timeline",        when: "Date anchors with memory cues. Save a checkpoint to resume where you stopped.",       time: "10 min" },
+        { icon: "⚔️", id: "wars",         label: "Wars & Battles",  when: "Conflicts, dates, outcomes — tested more than most candidates expect.",               time: "10 min" },
+        { icon: "👑", id: "figures",      label: "Key People",      when: "Rulers, reformers, scientists, writers — grouped with memory links.",                  time: "10 min" },
+        { icon: "🏛️", id: "landmarks",   label: "Landmarks",       when: "Important UK places with memory clues and exam traps.",                                time: "5 min" },
+        { icon: "⛪", id: "religion",     label: "Religion",        when: "Faith groups, 2011 census facts, major festivals.",                                     time: "5 min" },
+        { icon: "🌍", id: "international",label: "World Orgs",      when: "UN, NATO, Commonwealth, Council of Europe — who belongs to what.",                     time: "5 min" },
+        { icon: "🏅", id: "sports",       label: "Sports",          when: "Named sports stars appear more often than people expect.",                              time: "5 min" },
+        { icon: "🎭", id: "arts",         label: "Arts",            when: "Literature, music, architecture, film.",                                                time: "5 min" },
+        { icon: "🎵", id: "anthem",       label: "Symbols",         when: "National anthem, Union Jack, Britannia, patron saints.",                               time: "5 min" },
+        { icon: "📄", id: "cram",         label: "Cram Sheet",      when: "Night-before summary. The highest-yield facts on one page.",                           time: "5 min" },
+        { icon: "🔊", id: "audio",        label: "Audio Mode",      when: "Hands-free revision. Car, gym or commute. Driving view removes all distractions.",     time: "Any" },
+        { icon: "✅", id: "tracker",      label: "Tracker",         when: "Mark sections done. See full-course progress at a glance.",                            time: "2 min" },
+      ],
+    },
+  ];
+
+  const CONFUSABLE_DATES = [
+    { left: "1807", right: "1833", leftLabel: "Slave trade abolished", rightLabel: "Slavery abolished" },
+    { left: "1918", right: "1928", leftLabel: "Women over 30 get the vote", rightLabel: "Equal voting age (21)" },
+    { left: "1928", right: "1969", leftLabel: "Equal voting age (21)", rightLabel: "Voting age lowered to 18" },
+    { left: "55 BC", right: "43 AD", leftLabel: "Caesar invades — fails", rightLabel: "Claudius invades — succeeds" },
+    { left: "1215", right: "1295", leftLabel: "Magna Carta", rightLabel: "Model Parliament" },
+    { left: "1605", right: "1649", leftLabel: "Gunpowder Plot", rightLabel: "Charles I executed" },
+  ];
+
+  const KEY_NUMBERS = [
+    { number: "650", label: "MPs in the House of Commons" },
+    { number: "12", label: "Jurors in England, Wales & Northern Ireland" },
+    { number: "Up to 15", label: "Jurors in Scotland" },
+    { number: "10", label: "Age of criminal responsibility in England, Wales & NI" },
+    { number: "12", label: "Age of criminal responsibility in Scotland" },
+    { number: "18+", label: "Voting age (since 1969)" },
+    { number: "75%", label: "Pass mark — 18 of 24 questions correct" },
+    { number: "40", label: "Mock papers available in this app" },
+  ];
+
+  const FAQS = [
+    {
+      q: "Do I need to create an account?",
+      a: "No. All progress is saved on your device using local storage. Nothing is uploaded anywhere.",
+    },
+    {
+      q: "Is this based on the official handbook?",
+      a: "Yes. Every question is sourced from \"Life in the UK: A Guide for New Residents\" — the only official study material for the test.",
+    },
+    {
+      q: "How many questions are in this app?",
+      a: "329 unique practice questions across 40 full mock papers (24 questions each, matching the real test format).",
+    },
+    {
+      q: "Which mode should I start with?",
+      a: "Quick Revise if you want to start right now with no setup. Story Mode if you want to learn history first. Exam Topics Course if you prefer to follow the official exam structure.",
+    },
+    {
+      q: "How do I know when I am ready?",
+      a: "Aim for 80%+ on three mock papers in a row. Use the Tracker to confirm all 13 topic areas feel solid.",
+    },
+    {
+      q: "Can I use this offline?",
+      a: "Yes — most features work offline after the first load. Audio Mode uses your browser's built-in speech engine.",
+    },
+  ];
+
+  return (
+    <div className="page-stack">
+      <SectionTitle icon="📖" meta="Everything you need to know about the test and how to use this app.">How to Pass the Life in the UK Test</SectionTitle>
+
+      {/* ── SECTION 1: HERO ── */}
+      <Card className="hero-panel">
+        <div className="mb-3 flex flex-wrap gap-2">
+          <Badge text="24 questions" color="#3b82f6" />
+          <Badge text="75% to pass" color="#f59e0b" />
+          <Badge text="45 minutes" color="#10b981" />
+          <Badge text="Multiple choice" color="#8b5cf6" />
+          <Badge text="At an approved test centre" color="#64748b" />
+        </div>
+        <div className="mb-2 text-xl font-extrabold text-foreground">Free preparation for ILR and British citizenship</div>
+        <div className="mb-4 text-sm leading-7 text-muted-foreground">
+          The Life in the UK test is required for Indefinite Leave to Remain (ILR) and British citizenship. It covers UK history, government, values, society, and everyday life — all drawn from the official handbook. You need 18 correct answers out of 24 to pass. This app gives you 329 practice questions, 40 mock papers, and every study mode you need to get there.
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("quickrev")}>Start your first session →</Button>
+          <Button variant="secondary" onClick={() => setActive("mock")}>Take a mock test</Button>
+        </div>
+      </Card>
+
+      {/* ── SECTION 2: THE TEST AT A GLANCE ── */}
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">The test at a glance</div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card>
+          <div className="mb-2 text-base font-extrabold text-foreground">📋 The Format</div>
+          <ul className="space-y-2 text-sm leading-7 text-muted-foreground">
+            <li>24 multiple-choice questions, 4 options each</li>
+            <li>45 minutes — most people finish in under 20</li>
+            <li>Taken at an approved test centre on a computer</li>
+            <li>Results shown immediately after you finish</li>
+            <li>Pass mark: 18 correct (75%)</li>
+            <li>Cost: approximately £50 per attempt</li>
+          </ul>
+        </Card>
+        <Card>
+          <div className="mb-2 text-base font-extrabold text-foreground">📚 What's Tested</div>
+          <ul className="space-y-2 text-sm leading-7 text-muted-foreground">
+            {EXAM_TOPIC_MODE_GROUPS.map((g) => (
+              <li key={g.id} className="flex items-start gap-2">
+                <span>{g.icon}</span>
+                <span><strong>{g.title}</strong> — {g.approx.replace("Study guide estimate: ", "")}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+        <Card>
+          <div className="mb-2 text-base font-extrabold text-foreground">🎯 How to Pass</div>
+          <ul className="space-y-2 text-sm leading-7 text-muted-foreground">
+            <li>Most failures come from mixing up dates and named people</li>
+            <li>"Compare" questions — 1807 vs 1833, 1918 vs 1928 — are the biggest traps</li>
+            <li>4 Nations differences (capitals, saints, legal systems) appear in almost every paper</li>
+            <li>Government structure — 650 MPs, who sits where, what each body does</li>
+            <li>Aim for 80%+ on three mock papers before booking the real test</li>
+          </ul>
+        </Card>
+      </div>
+
+      {/* ── SECTION 3: STUDY PATHS ── */}
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Choose your study path</div>
+      <div className="grid gap-4 md:grid-cols-3">
+        {PASS_PLANS.map((plan) => (
+          <Card key={plan.id} style={{ borderColor: `${plan.color}40` }}>
+            <div className="mb-1 text-base font-extrabold text-foreground" style={{ color: plan.color }}>{plan.title}</div>
+            <div className="mb-3 text-xs leading-6 text-muted-foreground">{plan.note}</div>
+            <ol className="mb-4 space-y-1.5">
+              {plan.steps.map((step, idx) => (
+                <li key={step.id} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-extrabold" style={{ background: `${plan.color}20`, color: plan.color }}>{idx + 1}</span>
+                  <button className="focus-ring text-left text-sm font-semibold text-foreground hover:underline" onClick={() => setActive(step.tab)}>{step.label}</button>
+                </li>
+              ))}
+            </ol>
+            <Button variant="secondary" className="w-full" onClick={() => setActive(plan.steps[0].tab)}>Start this plan →</Button>
+          </Card>
+        ))}
+      </div>
+
+      {/* ── SECTION 4: ALL MODES ── */}
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">All study modes explained</div>
+      <div className="grid gap-4">
+        {STUDY_MODES.map((group) => (
+          <Card key={group.group}>
+            <div className="mb-1 text-base font-extrabold text-foreground">{group.group}</div>
+            <div className="mb-3 text-xs leading-6 text-muted-foreground">{group.hint}</div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {group.modes.map((mode) => (
+                <button
+                  key={mode.id}
+                  className="focus-ring rounded-2xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:bg-secondary/70"
+                  onClick={() => setActive(mode.id)}
+                >
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="text-xl">{mode.icon}</span>
+                    <span className="text-sm font-extrabold text-foreground">{mode.label}</span>
+                    <span className="ml-auto shrink-0 rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">{mode.time}</span>
+                  </div>
+                  <div className="text-xs leading-5 text-muted-foreground">{mode.when}</div>
+                </button>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* ── SECTION 5: TRAPS ── */}
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">The questions that catch people out</div>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <div className="mb-3 text-base font-extrabold text-foreground">📅 Dates people mix up</div>
+          <div className="space-y-2">
+            {CONFUSABLE_DATES.map((pair) => (
+              <div key={pair.left} className="flex items-center gap-2 rounded-xl border border-border bg-secondary/40 px-3 py-2 text-xs">
+                <span className="font-extrabold text-orange-400">{pair.left}</span>
+                <span className="text-muted-foreground">{pair.leftLabel}</span>
+                <span className="mx-auto text-muted-foreground">vs</span>
+                <span className="font-extrabold text-blue-400">{pair.right}</span>
+                <span className="text-muted-foreground">{pair.rightLabel}</span>
+              </div>
+            ))}
+          </div>
+          <Button variant="outline" className="mt-3 w-full" onClick={() => setActive("confuse")}>Open Common Mix-Ups →</Button>
+        </Card>
+        <Card>
+          <div className="mb-3 text-base font-extrabold text-foreground">🔢 Numbers and facts to know exactly</div>
+          <div className="space-y-2">
+            {KEY_NUMBERS.map((item) => (
+              <div key={item.number} className="flex items-baseline gap-3 rounded-xl border border-border bg-secondary/40 px-3 py-2 text-xs">
+                <span className="shrink-0 text-sm font-extrabold text-foreground">{item.number}</span>
+                <span className="text-muted-foreground">{item.label}</span>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <div className="mb-3 text-base font-extrabold text-foreground">🧠 Memory shortcuts</div>
+          <div className="space-y-3">
+            {VISUAL_MNEMONICS.map((item) => (
+              <div key={item.code} className="rounded-xl border border-border bg-secondary/40 px-3 py-2">
+                <div className="mb-0.5 flex items-center gap-2">
+                  <span className="rounded bg-secondary px-2 py-0.5 font-mono text-xs font-extrabold text-foreground">{item.code}</span>
+                  <span className="text-xs font-semibold text-foreground">{item.label}</span>
+                </div>
+                <div className="text-xs leading-5 text-muted-foreground">{item.meaning}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <div className="mb-3 text-base font-extrabold text-foreground">🏴 4 Nations — the most tested structure</div>
+          <div className="space-y-2 text-xs leading-6 text-muted-foreground">
+            <div className="rounded-xl border border-border bg-secondary/40 px-3 py-2">
+              <span className="font-extrabold text-foreground">England</span> — London · St George · Tudor Rose · No separate legislature (Westminster covers England)
+            </div>
+            <div className="rounded-xl border border-border bg-secondary/40 px-3 py-2">
+              <span className="font-extrabold text-foreground">Scotland</span> — Edinburgh · St Andrew · Thistle · Holyrood Parliament · Scots law (separate)
+            </div>
+            <div className="rounded-xl border border-border bg-secondary/40 px-3 py-2">
+              <span className="font-extrabold text-foreground">Wales</span> — Cardiff · St David · Daffodil/Leek · Senedd (Welsh Parliament)
+            </div>
+            <div className="rounded-xl border border-border bg-secondary/40 px-3 py-2">
+              <span className="font-extrabold text-foreground">Northern Ireland</span> — Belfast · St Patrick · Shamrock/Flax · Stormont Assembly
+            </div>
+          </div>
+          <Button variant="outline" className="mt-3 w-full" onClick={() => setActive("nations")}>Open 4 Nations →</Button>
+        </Card>
+      </div>
+
+      {/* ── SECTION 6: FAQ ── */}
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Frequently asked questions</div>
+      <Card>
+        <div className="divide-y divide-border">
+          {FAQS.map((item) => (
+            <div key={item.q} className="py-3 first:pt-0 last:pb-0">
+              <div className="mb-1 text-sm font-extrabold text-foreground">{item.q}</div>
+              <div className="text-sm leading-7 text-muted-foreground">{item.a}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── SECTION 7: CTA STRIP ── */}
+      <Card className="support-card-strong text-center">
+        <div className="mb-1 text-base font-extrabold text-foreground">Ready to start?</div>
+        <div className="mb-4 text-sm leading-7 text-muted-foreground">Free · No account needed · Works offline · 329 practice questions · 40 mock papers</div>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("quickrev")}>Start learning now →</Button>
+          <Button variant="secondary" onClick={() => setActive("mock")}>Take a mock test</Button>
+          <Button variant="outline" onClick={() => setActive("home")}>See all study modes</Button>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 // ── ROOT ──────────────────────────────────────────────────────
 const App = () => {
   const isMobile = useViewportMobile();
@@ -8595,6 +8895,7 @@ const App = () => {
 
   const renderTab = () => {
     switch (active) {
+      case "guide": return <UserGuideTab setActive={navigateTo} />;
       case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
       case "examtopics": return <ExamTopicsModeTab setActive={navigateTo} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
