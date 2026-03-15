@@ -60,13 +60,14 @@ const assert = (condition, message) => {
   assert(/mockProgress/.test(appSource), "Mock progress storage missing");
   assert(/QUICK_REVISION_SESSION_OPTIONS/.test(appSource), "Quick revision session presets missing");
   assert(/QUICK_REVISION_FOCUS_OPTIONS/.test(appSource), "Quick revision focus presets missing");
-  assert(/Topic filter/.test(appSource), "Quick revision topic filter missing");
   assert(/All topics/.test(appSource), "Quick revision all-topics option missing");
   assert(/Fresh mix/.test(appSource), "Fresh mix quick revision focus missing");
   assert(/Weak areas/.test(appSource), "Weak areas quick revision focus missing");
   assert(/Saved mock paper tracker/.test(appSource), "Mock tracker summary missing");
   assert(/Confirm finish/.test(appSource), "Mock finish confirmation missing");
-  assert(/Quick cards, full-course coverage/.test(appSource), "Quick revision hero missing");
+  assert(/Swipe through facts/.test(appSource), "Quick revision swipe card hero missing");
+  assert(/Swipe left to mark Okay/.test(appSource), "Quick revision swipe hint missing");
+  assert(/Hard cards only/.test(appSource), "Quick revision hard-cards action missing");
   assert(/Hands-free revision for the whole test/.test(appSource), "Audio mode hero missing");
   assert(/Driving cram/.test(appSource) && /Full course audio/.test(appSource), "Audio playlists missing");
   assert(/Driving audio view/.test(appSource) && /Back to full view/.test(appSource), "Driving-only audio view missing");
@@ -76,8 +77,8 @@ const assert = (condition, message) => {
   assert(/Dates and names to remember/.test(appSource), "Story mode memory anchor panel missing");
   assert(/Dates Drill/.test(appSource), "Dates drill heading missing");
   assert(/Year → event|Event → year/.test(appSource), "Dates drill mode options missing");
-  assert(/Quick answer view/.test(appSource), "Quick revision auto-answer view missing");
-  assert(/Show all now/.test(appSource), "Quick revision show-all action missing");
+  assert(/Day of your test/.test(appSource), "Day of test section missing on home page");
+  assert(/Unique Reference Number/.test(appSource), "URN info missing from day-of-test section");
   assert(/Reset progress/.test(appSource), "Quick revision reset action missing");
   assert(/Review the ones you missed/.test(appSource), "Daily 10 wrong-answer review missing");
   assert(/<span>Menu<\/span>/.test(appSource), "Bottom menu label missing");
@@ -123,7 +124,7 @@ const assert = (condition, message) => {
   assert(/AppFooterBar/.test(appSource), "Footer version bar missing");
   assert(/Offline ready|Offline now|Online only/.test(appSource), "Offline footer status missing");
   assert(/Visual memory clues/.test(appSource), "Mnemonic home panel missing");
-  assert(/Coverage checklist/.test(appSource), "Coverage checklist missing");
+  assert(/Day of your test/.test(appSource), "Day of test home section missing");
   assert(/SectionStudyActions/.test(appSource), "Section follow-up action rows missing");
   assert(/Use these nation facts right away/.test(appSource), "4 Nations follow-up actions missing");
   assert(/Quick Facts Course/.test(appSource), "Quick Facts course heading missing");

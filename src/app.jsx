@@ -3574,6 +3574,89 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
+      {/* ── SECTION 7: DAY OF YOUR TEST ── */}
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <div className="text-lg font-extrabold text-foreground">Day of your test</div>
+            <div className="text-sm text-muted-foreground">Everything you need to know before you walk through the door</div>
+          </div>
+        </div>
+
+        {/* Document */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 14, marginBottom: 8 }}>ID — bring the document you registered with</div>
+          <div style={{ display: "grid", gap: 6 }}>
+            {[
+              "Bring the exact same original document you used to book — no photocopies or screenshots",
+              "Accepted: valid passport or Biometric Residence Permit (BRP)",
+              "eVisa holders: bring your share code",
+              "Expired BRP accepted (from Jan 2025) only if that is what you registered with",
+              "Your name must exactly match your booking, including middle names — mismatches can invalidate your result",
+              "Name changed since registering? Bring the original supporting document (marriage certificate, deed poll)",
+            ].map((point) => (
+              <div key={point} style={{ display: "flex", gap: 8, fontSize: 13, color: "var(--text)", lineHeight: 1.6 }}>
+                <span style={{ color: "#22c55e", fontWeight: 800, flexShrink: 0 }}>✓</span>
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Warning block */}
+        <div style={{ background: "color-mix(in srgb, #f59e0b 10%, var(--card-bg))", border: "1px solid color-mix(in srgb, #f59e0b 40%, var(--card-border))", borderRadius: 14, padding: 14, marginBottom: 12 }}>
+          <div style={{ fontWeight: 800, color: "#b45309", fontSize: 13, marginBottom: 6 }}>⚠️ Registered with a Driving Licence or Immigration Status Document?</div>
+          <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.65 }}>
+            UK Driving Licences and Immigration Status Documents are <strong>no longer accepted</strong> on the day of the test. You must update your registered ID to an accepted document <strong>no later than the day before</strong>. Changes cannot be made on the day itself for security reasons.
+          </div>
+        </div>
+
+        {/* Timing + Centre + Result in two-column grid */}
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
+          <div style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 14, padding: 14 }}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 13, marginBottom: 8 }}>Timing</div>
+            {[
+              "Arrive at least 15 minutes early",
+              "Late arrivals may be turned away and forfeit the £50 fee",
+            ].map((point) => (
+              <div key={point} style={{ display: "flex", gap: 8, fontSize: 13, color: "var(--text)", lineHeight: 1.6, marginBottom: 4 }}>
+                <span style={{ color: "#3b82f6", fontWeight: 800, flexShrink: 0 }}>→</span>
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 14, padding: 14 }}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 13, marginBottom: 8 }}>At the test centre</div>
+            {[
+              "Photo and fingerprints taken on arrival",
+              "No phone, watch, notes or any device — everything goes in a locker",
+              "No children or family members permitted inside",
+            ].map((point) => (
+              <div key={point} style={{ display: "flex", gap: 8, fontSize: 13, color: "var(--text)", lineHeight: 1.6, marginBottom: 4 }}>
+                <span style={{ color: "#3b82f6", fontWeight: 800, flexShrink: 0 }}>→</span>
+                <span>{point}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* After passing + Cancellations */}
+        <div className="fact-grid-two" style={{ display: "grid", gap: 10 }}>
+          <div style={{ background: "color-mix(in srgb, #22c55e 8%, var(--card-bg))", border: "1px solid color-mix(in srgb, #22c55e 30%, var(--card-border))", borderRadius: 14, padding: 14 }}>
+            <div style={{ fontWeight: 800, color: "#15803d", fontSize: 13, marginBottom: 8 }}>After passing</div>
+            <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.65 }}>
+              Result shown immediately on screen. You receive a <strong>Unique Reference Number (URN)</strong> — keep it safe, you will need it for your ILR or citizenship application.
+            </div>
+          </div>
+          <div style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 14, padding: 14 }}>
+            <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 13, marginBottom: 8 }}>Cancellations</div>
+            <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.65 }}>
+              Cancel <strong>72+ hours in advance</strong> for a refund. No refund for late arrival, wrong ID, or missing documents.
+            </div>
+          </div>
+        </div>
+      </Card>
+
     </div>
   );
 };
