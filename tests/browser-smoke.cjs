@@ -145,8 +145,8 @@ const clickFirstAnswerOption = async (page) => {
     await page.goto(`${url}/#guide`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "How to Pass the Life in the UK Test");
     await waitForText(page, "24 questions");
-    await waitForText(page, "Choose your study path");
-    await waitForText(page, "All study modes explained");
+    await waitForText(page, "7-day pass plan");
+    await waitForText(page, "Do I need to create an account?");
 
     await page.goto(`${url}/#examtopics`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Exam Topics Course");
