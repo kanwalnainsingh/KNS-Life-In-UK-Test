@@ -37,6 +37,9 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "sprint"), "Sprint tab missing");
   assert(data.TABS.some((tab) => tab.id === "cram"), "Cram tab missing");
   assert(data.TABS.some((tab) => tab.id === "tracker"), "Tracker tab missing");
+  assert(data.TABS.some((tab) => tab.id === "guide"), "Guide tab missing");
+  assert(/UserGuideTab/.test(appSource), "User guide component missing");
+  assert(/How to Pass the Life in the UK Test/.test(appSource), "User guide heading missing");
   assert(/MockExamTab/.test(appSource), "Mock exam UI missing");
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");

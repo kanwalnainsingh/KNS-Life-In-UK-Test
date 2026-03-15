@@ -142,6 +142,12 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "Check Update");
     await waitForText(page, "Top 10 Most-Tested Facts");
 
+    await page.goto(`${url}/#guide`, { waitUntil: "networkidle0", timeout: 30000 });
+    await waitForText(page, "How to Pass the Life in the UK Test");
+    await waitForText(page, "24 questions");
+    await waitForText(page, "7-day pass plan");
+    await waitForText(page, "Do I need to create an account?");
+
     await page.goto(`${url}/#examtopics`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Exam Topics Course");
     await waitForText(page, "British Values, Principles & Traditions");
@@ -223,6 +229,7 @@ const clickFirstAnswerOption = async (page) => {
 
     console.log("Browser smoke test passed:");
     console.log("- home loads with pass-guide shortcuts");
+    console.log("- user guide page renders with test facts and study paths");
     console.log("- exam topics course renders");
     console.log("- quick revision topic filter and card flow render");
     console.log("- story mode chapter handoff to quick revision works");

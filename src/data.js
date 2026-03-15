@@ -1666,6 +1666,7 @@ const TABS = [
   { id:"quickfacts",    label:"Quick Facts",  icon:"⚡" },
   { id:"quiz",          label:"QUIZ ME",      icon:"🧠" },
   { id:"rapidfire",     label:"Rapid Fire",   icon:"🔥" },
+  { id:"guide",         label:"Guide",        icon:"📖" },
 ];
 
 export {
