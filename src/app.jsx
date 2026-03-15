@@ -8800,6 +8800,125 @@ const UserGuideTab = ({ setActive }) => {
   );
 };
 
+// ── TEST DAY TAB ──────────────────────────────────────────────
+const TestDayTab = () => {
+  const NIGHT_BEFORE = [
+    { icon: "🪪", text: "Locate the original document you registered with — passport, BRP, or share code printout. Put it somewhere you will not forget in the morning." },
+    { icon: "📋", text: "Find your test booking confirmation email and note the test centre address and your appointment time." },
+    { icon: "🗺️", text: "Check how long the journey takes. Add 20 minutes buffer for delays or parking." },
+    { icon: "📄", text: "If your name has changed since booking, pack the original supporting document (marriage certificate or deed poll)." },
+    { icon: "💤", text: "Get a good night's sleep. Fatigue is one of the most common reasons people make avoidable mistakes on recall questions." },
+  ];
+
+  const DAY_OF = [
+    { icon: "⏰", text: "Arrive at least 15 minutes early. Late arrivals may be turned away and forfeit the £50 fee — no exceptions." },
+    { icon: "🪪", text: "Bring the exact same original document you used to register. No photocopies, no screenshots, no damaged IDs." },
+    { icon: "📵", text: "Leave your phone, watch, notes, and any electronic device in the locker provided. Nothing is allowed in the test room." },
+    { icon: "👤", text: "Your photo and fingerprints are taken on arrival to verify your identity." },
+    { icon: "👨‍👩‍👧", text: "You cannot bring children, partners, or other family members inside the test centre." },
+    { icon: "🖥️", text: "The test is on a computer. 24 multiple-choice questions. 45 minutes. You need 18 correct (75%) to pass." },
+    { icon: "✅", text: "Your result is shown on screen immediately when you finish." },
+  ];
+
+  const AFTER_PASSING = [
+    { icon: "🔢", text: "You receive a Unique Reference Number (URN) on screen. Write it down or photograph it immediately — you cannot retrieve it later." },
+    { icon: "📬", text: "A confirmation letter is sent to your registered address. Keep both the letter and your URN safe." },
+    { icon: "📁", text: "For ILR (SET(O) or SET(LR)): include your URN and the pass letter with your settlement application to UK Visas and Immigration." },
+    { icon: "🇬🇧", text: "For British citizenship (Form AN): enter your URN in the application and attach the pass letter. The certificate counts alongside your Life in the UK pass." },
+    { icon: "📅", text: "The pass is valid indefinitely — it does not expire. You only need to pass once." },
+  ];
+
+  const IMPORTANT_NOTICE = [
+    "UK Driving Licences are no longer accepted as ID at the test centre.",
+    "If you registered with a Driving Licence or Immigration Status Document, update your registered ID to an accepted document no later than the day before. Changes cannot be made on the day for security reasons.",
+    "Accepted forms of ID: valid passport · Biometric Residence Permit (BRP) · eVisa share code.",
+    "Expired BRP accepted (from Jan 2025) only if that is what you used to register.",
+  ];
+
+  return (
+    <div className="page-stack">
+      <SectionTitle icon="📋" meta="Everything you need to know before you walk through the door.">Test Day</SectionTitle>
+
+      {/* ── IMPORTANT ID NOTICE ── */}
+      <Card style={{ background: "color-mix(in srgb, #f59e0b 8%, var(--card-bg))", border: "1px solid color-mix(in srgb, #f59e0b 45%, var(--card-border))" }}>
+        <div style={{ fontWeight: 800, color: "#b45309", fontSize: 15, marginBottom: 12 }}>⚠️ ID rules — read this first</div>
+        <div style={{ display: "grid", gap: 8 }}>
+          {IMPORTANT_NOTICE.map((note) => (
+            <div key={note} style={{ display: "flex", gap: 10, fontSize: 13, color: "var(--text)", lineHeight: 1.65 }}>
+              <span style={{ color: "#b45309", fontWeight: 800, flexShrink: 0, marginTop: 1 }}>!</span>
+              <span>{note}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── NIGHT BEFORE ── */}
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 16, marginBottom: 4 }}>The night before</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>Do these before you sleep so the morning is stress-free.</div>
+        <div style={{ display: "grid", gap: 12 }}>
+          {NIGHT_BEFORE.map((item) => (
+            <div key={item.text} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1.4 }}>{item.icon}</span>
+              <span style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── DAY OF TEST ── */}
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 16, marginBottom: 4 }}>On the day</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>What to expect from arrival to result.</div>
+        <div style={{ display: "grid", gap: 12 }}>
+          {DAY_OF.map((item) => (
+            <div key={item.text} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1.4 }}>{item.icon}</span>
+              <span style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── AFTER PASSING ── */}
+      <Card style={{ background: "color-mix(in srgb, #22c55e 6%, var(--card-bg))", border: "1px solid color-mix(in srgb, #22c55e 30%, var(--card-border))" }}>
+        <div style={{ fontWeight: 800, color: "#15803d", fontSize: 16, marginBottom: 4 }}>After you pass</div>
+        <div style={{ color: "var(--text-muted)", fontSize: 13, marginBottom: 16 }}>What to do with your result and where it goes in your application.</div>
+        <div style={{ display: "grid", gap: 12 }}>
+          {AFTER_PASSING.map((item) => (
+            <div key={item.text} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+              <span style={{ fontSize: 20, flexShrink: 0, lineHeight: 1.4 }}>{item.icon}</span>
+              <span style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{item.text}</span>
+            </div>
+          ))}
+        </div>
+      </Card>
+
+      {/* ── QUICK FACTS ── */}
+      <Card style={{ border: "1px solid var(--card-border)" }}>
+        <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 15, marginBottom: 12 }}>Quick facts about the test</div>
+        <div className="fact-grid-two" style={{ display: "grid", gap: 8 }}>
+          {[
+            { label: "Questions", value: "24 multiple choice" },
+            { label: "Time allowed", value: "45 minutes" },
+            { label: "Pass mark", value: "18/24 correct (75%)" },
+            { label: "Result", value: "Shown immediately" },
+            { label: "Fee", value: "£50 per attempt" },
+            { label: "Cancellation", value: "72+ hours for refund" },
+            { label: "How to book", value: "GOV.UK only — not third-party sites" },
+            { label: "Pass validity", value: "Does not expire" },
+          ].map((item) => (
+            <div key={item.label} style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "10px 14px" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>{item.label}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text-strong)" }}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 // ── ROOT ──────────────────────────────────────────────────────
 const App = () => {
   const isMobile = useViewportMobile();
