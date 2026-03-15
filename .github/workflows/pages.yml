@@ -180,7 +180,7 @@ jobs:
           echo "run_id=$LAST_GOOD" >> "$GITHUB_OUTPUT"
 
       - name: Download previous stable docs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: docs-candidate
           run-id: ${{ steps.find-run.outputs.run_id }}
