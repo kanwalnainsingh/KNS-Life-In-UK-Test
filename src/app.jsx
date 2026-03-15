@@ -3140,6 +3140,48 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </CardContent>
       </Card>
 
+      {/* ── CRITICAL TOPICS CALLOUT ── */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: "#10b981", background: "color-mix(in srgb, #10b981 8%, transparent)", cursor: "pointer" }}
+          onClick={() => setActive("nations")}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-2xl">🏴</div>
+            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#10b981" }}>Critical topic</span>
+          </div>
+          <div className="mb-1 text-base font-extrabold text-foreground">4 Nations — don't skip this</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">
+            England, Scotland, Wales, Northern Ireland — each nation has its own capital, patron saint, saint's day, flower, parliament name and number of members. These facts appear on almost every real test paper.
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-xs">
+            {["Capitals", "Patron saints", "Saint's days", "Parliaments", "Member counts", "National flowers"].map((tag) => (
+              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#10b98150" }}>{tag}</span>
+            ))}
+          </div>
+        </button>
+        <button
+          className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: "#7c3aed", background: "color-mix(in srgb, #7c3aed 8%, transparent)", cursor: "pointer" }}
+          onClick={() => setActive("confuse")}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-2xl">⚠️</div>
+            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#7c3aed" }}>Critical topic</span>
+          </div>
+          <div className="mb-1 text-base font-extrabold text-foreground">Common Mix-Ups — where marks are lost</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">
+            GB vs UK vs British Isles, Commons vs Lords, 1807 vs 1833, 1603 vs 1707, Church of England vs Church of Scotland, Caesar vs Claudius. These are the distinctions that catch almost everyone — study them side-by-side.
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-xs">
+            {["GB vs UK", "Commons vs Lords", "1807 vs 1833", "1603 vs 1707", "Caesar vs Claudius", "Church comparison"].map((tag) => (
+              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#7c3aed50" }}>{tag}</span>
+            ))}
+          </div>
+        </button>
+      </div>
+
       {/* ── SECTION 2: WHERE TO START (new) vs PICK UP (returning) ── */}
       {isNewUser ? (
         <>
@@ -3288,29 +3330,170 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         ))}
       </Card>
 
-      {/* ── SECTION 4: STUDY TOOLS ── */}
+      {/* ── SECTION 4: STUDY PATH ── */}
       <Card className="quiet-tint">
-        <div className="mb-3">
-          <div className="text-lg font-extrabold text-foreground">Study tools</div>
-          <div className="text-sm leading-6 text-muted-foreground">All revision modes — pick what fits your time and stage.</div>
+        <div className="mb-4">
+          <div className="text-lg font-extrabold text-foreground">Your study path</div>
+          <div className="text-sm leading-6 text-muted-foreground">
+            Follow the phases in order. Each phase builds on the last — learn the content first, then drill it, then check gaps, then test under real conditions.
+          </div>
+        </div>
+
+        {/* Phase flow indicator */}
+        <div className="mb-5 flex flex-wrap items-center gap-2 text-sm font-semibold">
+          {[
+            { n: 1, label: "Learn", color: "#3b82f6" },
+            { n: 2, label: "Drill", color: "#f97316" },
+            { n: 3, label: "Check", color: "#8b5cf6" },
+            { n: 4, label: "Test", color: "#ef4444" },
+          ].map((phase, idx) => (
+            <React.Fragment key={phase.n}>
+              <span className="flex items-center gap-1.5 rounded-full px-3 py-1" style={{ background: `${phase.color}18`, color: phase.color, border: `1px solid ${phase.color}40` }}>
+                <span className="grid h-5 w-5 place-items-center rounded-full text-xs font-black text-white" style={{ background: phase.color }}>{phase.n}</span>
+                {phase.label}
+              </span>
+              {idx < 3 && <span className="text-muted-foreground">→</span>}
+            </React.Fragment>
+          ))}
+        </div>
+
+        {/* Phase 1: Learn */}
+        <div className="mb-5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-full text-xs font-black text-white" style={{ background: "#3b82f6" }}>1</span>
+            <span className="text-base font-extrabold text-foreground">Learn the content</span>
+            <span className="ml-auto text-xs text-muted-foreground">Start here — before any quizzes</span>
+          </div>
+          <div className="feature-grid">
+            {[
+              { id: "story", icon: "📚", title: "Story Mode", when: "First", desc: "UK history told as a continuous story — Romans through to today. Read it in order before attempting any questions.", color: "#3b82f6" },
+              { id: "quickfacts", icon: "⚡", title: "Quick Facts Course", when: "Second", desc: "Parliament, law, voting, rights, elections, and everyday British life — the civics half of the test.", color: "#0ea5e9" },
+              { id: "nations", icon: "🏴", title: "4 Nations", when: "Must know", desc: "England, Scotland, Wales, Northern Ireland — capitals, patron saints, parliaments, flowers, and national symbols. Almost every paper tests this.", color: "#10b981" },
+              { id: "timeline", icon: "📅", title: "Timeline Drill", when: "After Story Mode", desc: "Fix the key years, rulers, and reforms after reading the story. Turn narrative memory into date recall.", color: "#06b6d4" },
+            ].map((item) => (
+              <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-[24px]">{item.icon}</div>
+                  <Badge text={item.when} color={item.color} />
+                </div>
+                <div className="mb-1 text-base font-extrabold text-foreground">{item.title}</div>
+                <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Phase 2: Drill */}
+        <div className="mb-5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-full text-xs font-black text-white" style={{ background: "#f97316" }}>2</span>
+            <span className="text-base font-extrabold text-foreground">Drill and practice</span>
+            <span className="ml-auto text-xs text-muted-foreground">Use these every day</span>
+          </div>
+          <div className="feature-grid">
+            {[
+              { id: "quickrev", icon: "↔️", title: "Quick Revise", when: "Daily", desc: "Flashcard recall — tap to reveal, mark Hard / Okay / Easy. The app brings back hard cards automatically until they stick.", color: "#f97316" },
+              { id: "confuse", icon: "⚠️", title: "Common Mix-Ups", when: "Must know", desc: "The facts people mix up most: UK vs GB, Commons vs Lords, Church of England vs Church of Scotland, 1807 vs 1833 slavery, 1603 vs 1707 union.", color: "#7c3aed" },
+              { id: "datesdrill", icon: "🗓️", title: "Dates Drill", when: "For history", desc: "Targeted year and event recall. Best for locking in battles, Reform Acts, and welfare-state dates.", color: "#8b5cf6" },
+              { id: "daily10", icon: "🔟", title: "Daily 10", when: "Short sessions", desc: "10 fresh random questions. Best for 5-minute phone revision at lunch or on the bus.", color: "#10b981" },
+              { id: "sprint", icon: "⚡", title: "True/False Sprint", when: "Mobile revision", desc: "Simple true/false calls on key facts — very fast, runs well on mobile with one thumb.", color: "#0ea5e9" },
+              { id: "audio", icon: "🔊", title: "Audio Mode", when: "Commute/hands-free", desc: "Listen to facts read aloud and answer without looking — good for commuting or when your hands are busy.", color: "#64748b" },
+            ].map((item) => (
+              <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-[24px]">{item.icon}</div>
+                  <Badge text={item.when} color={item.color} />
+                </div>
+                <div className="mb-1 text-base font-extrabold text-foreground">{item.title}</div>
+                <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Phase 3: Check */}
+        <div className="mb-5">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-full text-xs font-black text-white" style={{ background: "#8b5cf6" }}>3</span>
+            <span className="text-base font-extrabold text-foreground">Check your knowledge</span>
+            <span className="ml-auto text-xs text-muted-foreground">After at least one week of learning</span>
+          </div>
+          <div className="feature-grid">
+            {[
+              { id: "examtopics", icon: "🧭", title: "Exam Topics", when: "Before mocks", desc: "Grouped by official exam areas: History, Values, Government, Society. Runs a topic mock and shows exactly where your gaps are.", color: "#8b5cf6" },
+              { id: "quiz", icon: "🧠", title: "Quiz Me", when: "Varied practice", desc: "Full question bank in open-ended format. Good for testing recall depth without the time pressure of a full mock.", color: "#6366f1" },
+              { id: "rapidfire", icon: "🔥", title: "Rapid Fire", when: "Speed drill", desc: "Fast-paced Q&A drill. Use it to build confident recall speed — knowing answers quickly matters in the real test.", color: "#ef4444" },
+            ].map((item) => (
+              <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-[24px]">{item.icon}</div>
+                  <Badge text={item.when} color={item.color} />
+                </div>
+                <div className="mb-1 text-base font-extrabold text-foreground">{item.title}</div>
+                <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Phase 4: Test */}
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="grid h-6 w-6 place-items-center rounded-full text-xs font-black text-white" style={{ background: "#ef4444" }}>4</span>
+            <span className="text-base font-extrabold text-foreground">Mock tests and final prep</span>
+            <span className="ml-auto text-xs text-muted-foreground">When you are scoring 70%+ in Quick Revise</span>
+          </div>
+          <div className="feature-grid">
+            {[
+              { id: "mock", icon: "📝", title: "Mock Test", when: "When ready", desc: "Real format: 24 questions, 45 minutes, one attempt per paper. All answers reviewed at the end. Aim for 75%+ before booking.", color: "#ef4444" },
+              { id: "revise", icon: "🧩", title: "Revise Mistakes", when: "After every mock", desc: "Every wrong answer is saved here automatically. Clear your mistakes before taking the next paper — do not skip this step.", color: "#f97316" },
+              { id: "cram", icon: "📄", title: "Cram Sheet", when: "Night before", desc: "One-page summary of the highest-yield facts. A quick read the evening before your test date — not for learning, for confirming.", color: "#f59e0b" },
+              { id: "tracker", icon: "✅", title: "Topic Tracker", when: "Throughout", desc: "Tick off sections as you complete them. See full-course coverage at a glance and spot anything you have not revisited.", color: "#22c55e" },
+            ].map((item) => (
+              <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+                <div className="mb-2 flex items-center justify-between">
+                  <div className="text-[24px]">{item.icon}</div>
+                  <Badge text={item.when} color={item.color} />
+                </div>
+                <div className="mb-1 text-base font-extrabold text-foreground">{item.title}</div>
+                <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      {/* ── SECTION 4b: WHAT'S IN THE MENU ── */}
+      <Card className="quiet-tint">
+        <div className="mb-4">
+          <div className="text-lg font-extrabold text-foreground">What's in the menu (☰)</div>
+          <div className="text-sm leading-6 text-muted-foreground">
+            The menu contains topic-specific study modes. Use these alongside your main path — open them when you hit a weak area in a mock or just want to drill one subject deeply.
+          </div>
+        </div>
+        <div className="mb-4 rounded-xl border border-border bg-secondary/50 px-4 py-3 text-sm leading-7 text-muted-foreground">
+          <span className="font-semibold text-foreground">On mobile:</span> tap ☰ in the bottom bar.&nbsp;&nbsp;
+          <span className="font-semibold text-foreground">On desktop:</span> use the top navigation or the side panel button. All modes are always one tap away.
         </div>
         <div className="feature-grid">
           {[
-            { id: "mock", icon: "📝", title: "Mock Test", desc: "Real exam format: 24 questions, 45 minutes, results at the end.", color: "#f97316" },
-            { id: "daily10", icon: "🔟", title: "Daily 10", desc: "Fresh 10-question set for quick phone practice.", color: "#10b981" },
-            { id: "datesdrill", icon: "🗓️", title: "Dates Drill", desc: "Lock in history years, events, and battle anchors quickly.", color: "#8b5cf6" },
-            { id: "sprint", icon: "⚡", title: "True/False Sprint", desc: "Fast mobile revision with simple true/false calls.", color: "#0ea5e9" },
-            { id: "confuse", icon: "⚖️", title: "Common Mix-Ups", desc: "Side-by-side answers for the facts learners mix up most.", color: "#7c3aed" },
-            { id: "cram", icon: "📄", title: "One-Page Cram", desc: "Night-before summary of the highest-yield facts.", color: "#f59e0b" },
-            { id: "tracker", icon: "✅", title: "Topic Tracker", desc: "Mark what feels done and see full-course progress.", color: "#22c55e" },
-            { id: "timeline", icon: "📅", title: "Timeline Drill", desc: "Use date anchors and memory cues to fix history quickly.", color: "#3b82f6" },
+            { id: "figures", icon: "👑", title: "Key People", when: "History gaps", desc: "Rulers, reformers, wartime leaders, welfare architects — who did what and in which era.", color: "#d97706" },
+            { id: "wars", icon: "⚔️", title: "Wars & Battles", desc: "WWI, WWII, battle names, outcomes, and key dates. Includes side-by-side compare for common mix-ups.", when: "History gaps", color: "#dc2626" },
+            { id: "landmarks", icon: "🏛️", title: "Landmarks & Places", when: "Society gaps", desc: "Palaces, ancient walls, rivers, mountains, museums, and galleries — tested more than people expect.", color: "#0891b2" },
+            { id: "inventors", icon: "💡", title: "Inventors & Science", when: "Society gaps", desc: "World Wide Web, television, radar, penicillin, DNA — British discoveries and the people behind them.", color: "#ca8a04" },
+            { id: "religion", icon: "⛪", title: "Religion & Festivals", when: "Society gaps", desc: "2011 census religion figures, main faiths in the UK, and key festivals from different traditions.", color: "#7c3aed" },
+            { id: "sports", icon: "🏅", title: "Sports", when: "Culture gaps", desc: "Sporting heroes, Wimbledon rules, FA Cup, cricket, golf, and landmark sporting events.", color: "#16a34a" },
+            { id: "arts", icon: "🎭", title: "Arts & Culture", when: "Culture gaps", desc: "Writers, poets, composers, architects, galleries, and iconic British cultural figures.", color: "#db2777" },
+            { id: "anthem", icon: "🎵", title: "Symbols & Anthem", when: "Values gaps", desc: "Union Jack, national anthem, Britannia, patron saints, and national-identity facts.", color: "#9333ea" },
+            { id: "international", icon: "🌍", title: "World Organisations", when: "Government gaps", desc: "UN, NATO, Commonwealth, Council of Europe, G8 — which the UK belongs to and what each does.", color: "#0284c7" },
+            { id: "guide", icon: "📖", title: "How to Use This App", when: "New user", desc: "Full guide to every mode, the study path, what to do on which day, and how to read your readiness score.", color: "#6366f1" },
           ].map((item) => (
             <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
-              <div className="mb-3 flex items-center justify-between">
-                <div className="text-[26px]">{item.icon}</div>
-                <Badge text="Study mode" color={item.color} />
+              <div className="mb-2 flex items-center justify-between">
+                <div className="text-[24px]">{item.icon}</div>
+                <Badge text={item.when} color={item.color} />
               </div>
-              <div className="mb-1.5 text-base font-extrabold text-foreground">{item.title}</div>
+              <div className="mb-1 text-base font-extrabold text-foreground">{item.title}</div>
               <div className="text-sm leading-6 text-muted-foreground">{item.desc}</div>
             </button>
           ))}
