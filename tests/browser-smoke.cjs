@@ -164,7 +164,7 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "Quick Revision");
     await waitForText(page, "Swipe through facts one at a time");
     await waitForText(page, "ANSWER");
-    await waitForText(page, "Why this matters");
+    await waitForText(page, "WHY THIS MATTERS");
 
     await page.goto(`${url}/#audio`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Audio Mode");
@@ -183,7 +183,7 @@ const clickFirstAnswerOption = async (page) => {
     await clickByText(page, "Test this chapter");
     await page.waitForFunction(() => window.location.hash === "#quickrev", { timeout: 30000 });
     await waitForText(page, "ANSWER");
-    await waitForText(page, "Why this matters");
+    await waitForText(page, "WHY THIS MATTERS");
 
     await page.goto(`${url}/#datesdrill`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Dates Drill");
