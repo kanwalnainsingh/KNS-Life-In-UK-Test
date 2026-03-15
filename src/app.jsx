@@ -2068,8 +2068,8 @@ const SettingGroup = ({ label, options, value, onChange }) => (
 const getPrimaryNavKey = (tabId) => {
   if (["home"].includes(tabId)) return "home";
   if (["quickrev", "story", "daily10", "sprint", "cram", "tracker"].includes(tabId)) return "revise";
-  if (["quiz", "rapidfire", "revise"].includes(tabId)) return "quiz";
   if (["mock"].includes(tabId)) return "mock";
+  if (["quiz", "rapidfire", "revise", "examtopics", "audio", "datesdrill", "timeline", "wars", "nations", "confuse", "inventors", "sports", "figures", "religion", "landmarks", "international", "arts", "anthem", "quickfacts", "guide", "testday"].includes(tabId)) return "menu";
   return "menu";
 };
 
@@ -2078,8 +2078,8 @@ const BottomNav = ({ active, setActive, openQuickPanel }) => {
   const items = [
     { id: "home", icon: "🏠", label: "Home" },
     { id: "quickrev", icon: "↔️", label: "Revise" },
-    { id: "quiz", icon: "🧠", label: "Quiz" },
     { id: "mock", icon: "📝", label: "Mock" },
+    { id: "menu", icon: "☰", label: "Topics", action: openQuickPanel },
   ];
 
   return (
@@ -2088,7 +2088,7 @@ const BottomNav = ({ active, setActive, openQuickPanel }) => {
         <button
           key={item.id}
           className="focus-ring mobile-nav-item"
-          onClick={() => setActive(item.id)}
+          onClick={() => (item.action ? item.action() : setActive(item.id))}
           data-active={primaryActive === item.id ? "true" : "false"}
           style={{ border: "none", cursor: "pointer" }}
         >
@@ -2096,15 +2096,6 @@ const BottomNav = ({ active, setActive, openQuickPanel }) => {
           <span>{item.label}</span>
         </button>
       ))}
-      <button
-        className="focus-ring mobile-nav-item mobile-nav-menu"
-        onClick={openQuickPanel}
-        data-active={primaryActive === "menu" ? "true" : "false"}
-        style={{ cursor: "pointer" }}
-      >
-        <span style={{ fontSize: 18 }}>☰</span>
-        <span>Menu</span>
-      </button>
     </div>
   );
 };
@@ -2144,16 +2135,16 @@ const getHashTab = () => {
   return TABS.some((tab) => tab.id === hash) ? hash : null;
 };
 
-const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
-  const quickActions = ["examtopics", "quickrev", "audio", "mock", "story"];
+const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack, onForceRefresh, offlineReady, isOffline }) => {
+  const quickActions = ["quickrev", "mock", "examtopics", "story"];
   const currentTab = TABS.find((tab) => tab.id === active);
   const currentGroup = MOBILE_MORE_GROUPS.find((group) => group.ids.includes(active));
   return (
     <Sheet open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <SheetContent side="bottom" hideClose className="mobile-sheet overflow-y-auto p-4">
         <SheetHeader className="mb-3 pr-14">
-          <SheetTitle>Study menu</SheetTitle>
-          <SheetDescription>Open a study mode quickly or jump to a topic when you need it.</SheetDescription>
+          <SheetTitle>Topics</SheetTitle>
+          <SheetDescription>Resume where you are, move between the main routes, or jump to a specific topic.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-3">
           <div className="study-menu-hero">
@@ -2165,7 +2156,38 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
                   {currentGroup ? `${currentGroup.title} section` : "Main study mode"}
                 </div>
               </div>
-              <Badge text="Open now" color="#3b82f6" />
+              <button
+                className="focus-ring rounded-full bg-blue-600 px-3 py-2 text-xs font-extrabold text-white"
+                onClick={() => onClose()}
+                style={{ border: "none", cursor: "pointer" }}
+              >
+                Resume
+              </button>
+            </div>
+          </div>
+
+          <div className="study-menu-section">
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Primary navigation</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">The main routes for moving around the app.</div>
+            <div className="study-menu-topic-grid" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+              {[
+                { id: "home", label: "Home", icon: "🏠" },
+                { id: "quickrev", label: "Revise", icon: "↔️" },
+                { id: "mock", label: "Mock", icon: "📝" },
+                { id: "examtopics", label: "Topics", icon: "🗂️" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  className="focus-ring study-menu-topic"
+                  data-active={active === item.id ? "true" : "false"}
+                  onClick={() => { setActive(item.id); onClose(); }}
+                >
+                  <div className="flex flex-col items-center gap-1 text-center">
+                    <span className="text-lg">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -2187,8 +2209,8 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
           </div>
 
           <div className="study-menu-section">
-            <div className="mb-1 text-xs font-bold text-muted-foreground">Start studying</div>
-            <div className="mb-2 text-[11px] text-muted-foreground">Best actions when you want to learn or test yourself right away.</div>
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Start fast</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">Best actions when you want to study right now.</div>
             <div className="study-menu-primary-grid">
               {quickActions.map((id) => {
                 const item = TABS.find((tab) => tab.id === id);
@@ -2209,8 +2231,7 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
                       {item.id === "quickrev" ? "Fresh facts quickly" :
                         item.id === "examtopics" ? "Learn by exam category" :
                         item.id === "mock" ? "Closest to the real test" :
-                          item.id === "quiz" ? "Flexible practice mode" :
-                            "Learn the course in order"}
+                          "Learn the course in order"}
                     </div>
                   </button>
                 );
@@ -2242,6 +2263,21 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
               </div>
             </div>
           ))}
+          <div className="study-menu-section">
+            <div className="mb-1 text-xs font-bold text-muted-foreground">App status</div>
+            <div className="rounded-2xl border border-border bg-card/80 p-4">
+              <div className="mb-3 flex flex-wrap gap-2">
+                <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
+                <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="secondary" className="rounded-xl text-xs font-extrabold" onClick={onForceRefresh}>↻ Check Update</Button>
+                <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" className="inline-flex items-center rounded-xl border border-border px-3 py-2 text-xs font-bold text-muted-foreground no-underline">
+                  Open Source
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
@@ -2864,7 +2900,7 @@ const buildSectionMockProgress = (history = []) =>
   }, {});
 
 // ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel, isMobile }) => {
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel, isMobile, onBack, canGoBack }) => {
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === "Escape") setMenuOpen(false);
@@ -2880,6 +2916,10 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 
   const handleMenuButton = () => {
     if (isMobile) {
+      if (active !== "home" && canGoBack) {
+        onBack();
+        return;
+      }
       openQuickPanel();
       return;
     }
@@ -2890,8 +2930,8 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
     <>
       <div className="sticky top-0 z-[100] border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="flex items-center gap-2 px-4 py-3">
-        <button aria-label={isMobile ? "Open quick panel" : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring rounded-xl border border-border bg-card px-3 py-2 text-lg text-foreground shadow-sm" onClick={handleMenuButton}>
-          ☰
+        <button aria-label={isMobile ? (active !== "home" && canGoBack ? "Go back" : "Open topics") : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring rounded-xl border border-border bg-card px-3 py-2 text-lg text-foreground shadow-sm" onClick={handleMenuButton}>
+          {isMobile && active !== "home" && canGoBack ? "←" : "☰"}
         </button>
         <button aria-label="Go to home" className="focus-ring rounded-xl bg-transparent px-0 text-lg font-extrabold text-primary" onClick={() => setActive("home")} style={{ border: "none", cursor: "pointer" }}>
           🇬🇧 Life in the UK
@@ -2986,7 +3026,8 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
   );
 };
 
-const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
+const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline, isMobile }) => (
+  isMobile ? null : (
   <div className="px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-2">
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/88 px-3 py-3 shadow-soft backdrop-blur-xl">
       <div className="flex flex-wrap items-center gap-2">
@@ -3004,7 +3045,7 @@ const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
       </Button>
     </div>
   </div>
-);
+));
 
 // ── HOME ─────────────────────────────────────────────────────
 const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
@@ -3038,6 +3079,8 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const [expandedPhase, setExpandedPhase] = useState(null);
+  const [showFacts, setShowFacts] = useState(false);
+  const [showTopics, setShowTopics] = useState(false);
   const visibleFacts = useMemo(() => {
     const start = factPage * 10;
     const slice = factOrder.slice(start, start + 10);
@@ -3096,16 +3139,14 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
 
   return (
     <div className="page-stack">
-
-      {/* ── HERO ── */}
       <Card className="hero-panel">
         <CardHeader className="pb-3">
-          <div className="eyebrow mb-2">Free · ILR &amp; British citizenship</div>
+          <div className="eyebrow mb-2">Today&apos;s next step</div>
           <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">
-            Life in the UK Test Practice
+            {nextBestAction.title}
           </CardTitle>
           <CardDescription className="mt-2 max-w-xl text-sm leading-7">
-            Everything you need to pass — quick-revision cards, common mix-ups, mock papers, and a Test Day checklist.
+            {nextBestAction.detail}
           </CardDescription>
           <div className="section-strip mt-3">
             <Badge text="24 questions" color="#3b82f6" />
@@ -3114,33 +3155,28 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="support-card-strong">
-            <div className="eyebrow mb-1">Your next step</div>
-            <div className="text-base font-extrabold text-foreground">{nextBestAction.title}</div>
-            <div className="mt-1 mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
-            <div className="flex flex-wrap gap-2">
-              <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive(nextBestAction.tab)}>
-                {isNewUser ? "Start here →" : "Open now →"}
-              </Button>
-              <Button variant="secondary" onClick={() => setActive("testday")}>📋 Test Day info</Button>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive(nextBestAction.tab)}>
+              {isNewUser ? "Start here →" : "Open now →"}
+            </Button>
+            <Button variant="secondary" onClick={() => setActive("testday")}>📋 Test Day info</Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* ── CRAM PLAN — neutral checklist, for the 1-3 day user ── */}
-      <Card style={{ border: "1px solid var(--card-border)" }}>
+      <Card style={{ border: "1px solid color-mix(in srgb, #10b981 35%, var(--card-border))" }}>
         <div className="mb-4">
+          <div className="eyebrow mb-1 text-emerald-600 dark:text-emerald-300">Urgent plan</div>
           <div className="text-lg font-extrabold text-foreground">If your test is in 1–3 days</div>
-          <div className="text-sm text-muted-foreground">Do these in order. Skip anything you have already covered.</div>
+          <div className="text-sm text-muted-foreground">Do these in order. Skip anything you already know well.</div>
         </div>
         <div style={{ display: "grid", gap: 8 }}>
           {[
-            { step: 1, label: "Quick Revise", detail: "Swipe through facts — mark what you know and what you don't", tab: "quickrev", color: "#f97316" },
-            { step: 2, label: "4 Nations", detail: "Capitals, saints, parliaments, flowers — appears on almost every paper", tab: "nations", color: "#10b981" },
-            { step: 3, label: "Common Mix-Ups", detail: "UK vs GB, dates, church comparisons — the most common lost marks", tab: "confuse", color: "#7c3aed" },
-            { step: 4, label: "Mock Test", detail: "Full 24-question paper — see your actual score under exam conditions", tab: "mock", color: "#ef4444" },
-            { step: 5, label: "Cram Sheet", detail: "One-page summary the night before — not for learning, for confirming", tab: "cram", color: "#f59e0b" },
+            { step: 1, label: "Quick Revise", detail: "Fast card recall first", tab: "quickrev", color: "#f97316" },
+            { step: 2, label: "4 Nations", detail: "Capitals, saints, parliaments, flowers", tab: "nations", color: "#10b981" },
+            { step: 3, label: "Common Mix-Ups", detail: "UK vs GB and high-confusion comparisons", tab: "confuse", color: "#7c3aed" },
+            { step: 4, label: "Mock Test", detail: "Check your real pass score under test conditions", tab: "mock", color: "#ef4444" },
+            { step: 5, label: "Cram Sheet", detail: "Final night confirmation only", tab: "cram", color: "#f59e0b" },
           ].map((item) => (
             <button key={item.step} className="focus-ring" onClick={() => setActive(item.tab)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", border: "1px solid var(--card-border)", borderRadius: 14, background: "var(--surface-strong)", cursor: "pointer", textAlign: "left" }}>
               <span style={{ background: item.color, color: "#fff", fontWeight: 900, fontSize: 13, borderRadius: "50%", width: 28, height: 28, display: "grid", placeItems: "center", flexShrink: 0 }}>{item.step}</span>
@@ -3154,157 +3190,140 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      {/* ── CRITICAL TOPICS ── */}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <button className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" style={{ borderColor: "#10b981", background: "color-mix(in srgb, #10b981 8%, transparent)", cursor: "pointer" }} onClick={() => setActive("nations")}>
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className="text-2xl">🏴</div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#10b981" }}>Critical topic</span>
-          </div>
-          <div className="mb-1 text-base font-extrabold text-foreground">4 Nations — don't skip this</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">Capitals, patron saints, saint's days, parliaments, flowers — each nation separately. On almost every real paper.</div>
-          <div className="flex flex-wrap gap-1.5 text-xs">
-            {["Capitals", "Patron saints", "Saint's days", "Parliaments", "Member counts", "National flowers"].map((tag) => (
-              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#10b98150" }}>{tag}</span>
-            ))}
-          </div>
-        </button>
-        <button className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" style={{ borderColor: "#7c3aed", background: "color-mix(in srgb, #7c3aed 8%, transparent)", cursor: "pointer" }} onClick={() => setActive("confuse")}>
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className="text-2xl">⚠️</div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#7c3aed" }}>Critical topic</span>
-          </div>
-          <div className="mb-1 text-base font-extrabold text-foreground">Common Mix-Ups — where marks are lost</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">GB vs UK, Commons vs Lords, 1807 vs 1833, 1603 vs 1707, Church of England vs Church of Scotland — study them side by side.</div>
-          <div className="flex flex-wrap gap-1.5 text-xs">
-            {["GB vs UK", "Commons vs Lords", "1807 vs 1833", "1603 vs 1707", "Caesar vs Claudius", "Church comparison"].map((tag) => (
-              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#7c3aed50" }}>{tag}</span>
-            ))}
-          </div>
-        </button>
-      </div>
-
-      {/* ── TOP 10 MOST-TESTED FACTS ── */}
-      <Card className="border-emerald-500/25 bg-emerald-500/5">
+      {/* ── PROGRESS DASHBOARD (returning users only) ── */}
+      <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">🎯 Top 10 Most-Tested Facts</div>
-            <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">The facts that come up most on the real test.</div>
+            <div className="text-lg font-extrabold text-foreground">Continue learning</div>
+            <div className="text-sm text-muted-foreground">Keep the next move obvious and small.</div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh</Button>
-            <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
-          </div>
+          <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
         </div>
-        {visibleFacts.map((fact, index) => (
-          <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
-            <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
-            <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
-          </div>
-        ))}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })} style={{ borderColor: "#f9731630", cursor: "pointer" }}>
+            <div className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">Weakest area</div>
+            <div className="mb-1 text-lg font-extrabold text-foreground">{weakestTopic}</div>
+            <div className="text-sm leading-6 text-muted-foreground">Run a short weak-areas session now.</div>
+          </button>
+          <button className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive("mock")} style={{ borderColor: "#8b5cf630", cursor: "pointer" }}>
+            <div className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">Mock status</div>
+            <div className="mb-1 text-lg font-extrabold text-foreground">{latestMock ? `Best: ${bestPaperScore}%` : "No paper yet"}</div>
+            <div className="text-sm leading-6 text-muted-foreground">{latestMock ? `${nextPaper.title} is next.` : "Start when you want exam-format practice."}</div>
+          </button>
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
+            <div className="text-sm font-semibold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} Continue ${lastActiveTab.label}` : "↔️ Start Quick Revise"}</div>
+            <div className="mt-1 text-xs leading-5 text-muted-foreground">{lastActiveTab ? "Jump back into the last section you used." : "Fastest route into revision."}</div>
+          </button>
+          <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
+            <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length} saved facts · {bookmarks.questions.length} saved questions</div>
+            <div className="mt-1 text-xs leading-5 text-muted-foreground">Open your bookmarked material.</div>
+          </button>
+        </div>
       </Card>
 
-      {/* ── PROGRESS DASHBOARD (returning users only) ── */}
-      {!isNewUser && (
-        <Card className="quiet-tint">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-lg font-extrabold text-foreground">Your progress</div>
-              <div className="text-sm text-muted-foreground">Saved on this device.</div>
-            </div>
-            <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
-          </div>
-          <div className="metric-grid mb-4">
-            <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
-            <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
-            <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "—"} color="#f59e0b" />
-            <StatTile label="Hard cards" value={hardCardCount} color="#f97316" />
-          </div>
-          <div className="continue-learning-grid mb-4">
-            <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
-              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{lastActiveTab ? "Continue" : "Start"}</div>
-              <div className="mb-1 text-base font-extrabold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} ${lastActiveTab.label}` : "↔️ Quick Revise"}</div>
-              <div className="text-sm leading-6 text-muted-foreground">{lastActiveTab ? "Jump back into the last section you used." : "Start with the fastest study mode."}</div>
-            </button>
-            <button className="focus-ring continue-learning-card" onClick={() => setActive("mock")}>
-              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Mock tests</div>
-              <div className="mb-1 text-base font-extrabold text-foreground">{latestMock ? `📝 Last: ${latestMock.score}/24` : "📝 No paper yet"}</div>
-              <div className="text-sm leading-6 text-muted-foreground">{latestMock ? `${nextPaper.title} is next.` : "Start when you want exam-format practice."}</div>
-            </button>
-            <button className="focus-ring continue-learning-card" onClick={() => setActive("revise")}>
-              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Mistakes</div>
-              <div className="mb-1 text-base font-extrabold text-foreground">🧩 {wrongQuestions.length} wrong answers</div>
-              <div className="text-sm leading-6 text-muted-foreground">{wrongQuestions.length > 0 ? "Clear these before your next mock." : "Clean slate — no mistakes saved."}</div>
-            </button>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
-              <div className="text-sm font-semibold text-foreground">Weakest area: {weakestTopic}</div>
-              <div className="mt-1 text-xs leading-5 text-muted-foreground">Run a short weak-areas session now.</div>
-            </button>
-            <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
-              <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length} saved facts · {bookmarks.questions.length} saved questions</div>
-              <div className="mt-1 text-xs leading-5 text-muted-foreground">Open your bookmarked material.</div>
-            </button>
-          </div>
-        </Card>
-      )}
-
-      {/* ── STUDY PATH — collapsed by default, each phase expandable ── */}
       <Card className="quiet-tint">
         <div className="mb-4">
-          <div className="text-lg font-extrabold text-foreground">Study path</div>
-          <div className="text-sm text-muted-foreground">Learn → Drill → Check → Test. Tap a phase to see the tools in it.</div>
+          <div className="text-lg font-extrabold text-foreground">Browse topics</div>
+          <div className="text-sm text-muted-foreground">Keep the home screen light. Open only the section you need.</div>
         </div>
-        <div style={{ display: "grid", gap: 6 }}>
-          {STUDY_PHASES.map((phase) => {
-            const isOpen = expandedPhase === phase.n;
-            return (
-              <div key={phase.n} style={{ border: `1px solid ${isOpen ? phase.color + "50" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden", transition: "border-color 0.2s" }}>
-                <button className="focus-ring" onClick={() => setExpandedPhase(isOpen ? null : phase.n)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: isOpen ? `${phase.color}0e` : "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
-                  <span style={{ background: phase.color, color: "#fff", fontWeight: 900, fontSize: 13, borderRadius: "50%", width: 28, height: 28, display: "grid", placeItems: "center", flexShrink: 0 }}>{phase.n}</span>
-                  <span style={{ flex: 1 }}>
-                    <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{phase.label}</span>
-                    <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>{phase.hint} · {phase.items.length} tools</span>
-                  </span>
-                  <span style={{ color: "var(--text-muted)", fontSize: 14, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
-                </button>
-                {isOpen && (
-                  <div style={{ padding: "0 12px 12px", background: `${phase.color}06` }}>
-                    <div className="feature-grid" style={{ paddingTop: 12 }}>
-                      {phase.items.map((item) => (
-                        <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive(item.id)} style={{ borderColor: `${phase.color}30`, cursor: "pointer" }}>
-                          <div className="mb-2 flex items-center justify-between">
-                            <div className="text-[22px]">{item.icon}</div>
-                            <Badge text={item.when} color={phase.color} />
-                          </div>
-                          <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
-                          <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </Card>
-
-      {/* ── MENU HIGHLIGHTS — top 5 topic sections ── */}
-      <Card className="quiet-tint">
-        <div className="mb-3">
-          <div className="text-base font-extrabold text-foreground">Topic sections (☰ menu)</div>
-          <div className="text-sm text-muted-foreground">Deep-dive sections for specific gaps. Open the menu for the full list.</div>
-        </div>
-        <div className="feature-grid">
-          {MENU_HIGHLIGHTS.map((item) => (
-            <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
-              <div className="mb-2 text-[22px]">{item.icon}</div>
-              <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
-              <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ border: `1px solid ${expandedPhase ? "#3b82f650" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+            <button className="focus-ring" onClick={() => setExpandedPhase(expandedPhase ? null : 1)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>Study path</span>
+                <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>4 clear phases. Tap to expand only what you need.</span>
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 14, transform: expandedPhase ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
             </button>
-          ))}
+            {expandedPhase && (
+              <div style={{ padding: "12px", background: "color-mix(in srgb, #3b82f6 4%, var(--card-bg))", display: "grid", gap: 6 }}>
+                {STUDY_PHASES.map((phase) => {
+                  const isOpen = expandedPhase === phase.n;
+                  return (
+                    <div key={phase.n} style={{ border: `1px solid ${isOpen ? phase.color + "50" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+                      <button className="focus-ring" onClick={() => setExpandedPhase(isOpen ? null : phase.n)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: isOpen ? `${phase.color}0e` : "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+                        <span style={{ background: phase.color, color: "#fff", fontWeight: 900, fontSize: 13, borderRadius: "50%", width: 28, height: 28, display: "grid", placeItems: "center", flexShrink: 0 }}>{phase.n}</span>
+                        <span style={{ flex: 1 }}>
+                          <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{phase.label}</span>
+                          <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>{phase.hint} · {phase.items.length} tools</span>
+                        </span>
+                        <span style={{ color: "var(--text-muted)", fontSize: 14, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+                      </button>
+                      {isOpen && (
+                        <div style={{ padding: "0 12px 12px", background: `${phase.color}06` }}>
+                          <div className="feature-grid" style={{ paddingTop: 12 }}>
+                            {phase.items.map((item) => (
+                              <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive(item.id)} style={{ borderColor: `${phase.color}30`, cursor: "pointer" }}>
+                                <div className="mb-2 flex items-center justify-between">
+                                  <div className="text-[22px]">{item.icon}</div>
+                                  <Badge text={item.when} color={phase.color} />
+                                </div>
+                                <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
+                                <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div style={{ border: `1px solid ${showFacts ? "#10b98150" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+            <button className="focus-ring" onClick={() => setShowFacts((v) => !v)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>Top tested facts</span>
+                <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>Collapsed by default. Open when you want a quick scan.</span>
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 14, transform: showFacts ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+            </button>
+            {showFacts && (
+              <div className="border-t border-border bg-emerald-500/5 p-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">Top tested facts</div>
+                    <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">The facts that come up most on the real test.</div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh</Button>
+                    <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
+                  </div>
+                </div>
+                {visibleFacts.map((fact, index) => (
+                  <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
+                    <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
+                    <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ border: `1px solid ${showTopics ? "#7c3aed50" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+            <button className="focus-ring" onClick={() => setShowTopics((v) => !v)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>Topic sections</span>
+                <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>Deep-dive sections for specific gaps.</span>
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 14, transform: showTopics ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+            </button>
+            {showTopics && (
+              <div className="feature-grid border-t border-border bg-purple-500/5 p-4">
+                {MENU_HIGHLIGHTS.map((item) => (
+                  <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+                    <div className="mb-2 text-[22px]">{item.icon}</div>
+                    <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
+                    <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </Card>
 
@@ -4278,7 +4297,10 @@ const QuickRevisionTab = ({ setActive }) => {
 
   const moveCard = (direction) => {
     if (!session.length) return;
-    setIndex((v) => direction === "next" ? (v + 1) % session.length : (v - 1 + session.length) % session.length);
+    setIndex((v) => {
+      if (direction === "prev") return Math.max(0, v - 1);
+      return Math.min(session.length, v + 1);
+    });
   };
 
   const toggleCurrentBookmark = () => {
@@ -4286,20 +4308,22 @@ const QuickRevisionTab = ({ setActive }) => {
     setBookmarks(toggleBookmarkEntry("card", current.id));
   };
 
-  // Swipe: left = next card (okay), right = previous card
+  const skipCard = () => moveCard("next");
+
+  // Swipe: left = hard, right = easy
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0]?.clientX ?? null; };
   const handleTouchEnd = (e) => {
     if (touchStartX.current == null) return;
     const delta = (e.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
     touchStartX.current = null;
     if (Math.abs(delta) < 48) return;
-    if (delta < 0) markCard("okay");
-    else moveCard("prev");
+    if (delta < 0) markCard("hard");
+    else markCard("easy");
   };
 
   return (
     <div className="page-stack">
-      <SectionTitle icon="↔️" meta="Swipe through facts one at a time. Hard cards come back automatically.">Quick Revision</SectionTitle>
+      <SectionTitle icon="↔️" meta="Rate cards quickly. Swipe left for Hard, swipe right for Easy, or tap Okay.">Quick Revision</SectionTitle>
 
       {isFinished ? (
         <>
@@ -4346,62 +4370,58 @@ const QuickRevisionTab = ({ setActive }) => {
         </>
       ) : current && (
         <>
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
-            <Badge text={`${remaining} left`} color="#64748b" />
-            {completed > 0 && <Badge text={`${completed} done`} color="#22c55e" />}
-            {hardCount > 0 && <Badge text={`${hardCount} hard`} color="#f59e0b" />}
-            <div className="ml-auto flex gap-2">
-              <Button variant="secondary" onClick={() => startSession("fresh", 20)}>New mix</Button>
+          <Card className="mb-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <div>
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Session</div>
+                <div className="text-lg font-extrabold text-foreground">{sessionMeta.reviewCount > 0 ? "Weak-areas run" : "Fresh revision run"}</div>
+              </div>
+              <div className="ml-auto flex flex-wrap gap-2">
+                <Badge text={`${index + 1} / ${session.length}`} color="#3b82f6" />
+                <Badge text={`${remaining} left`} color="#64748b" />
+                {completed > 0 && <Badge text={`${completed} rated`} color="#22c55e" />}
+                {hardCount > 0 && <Badge text={`${hardCount} hard`} color="#f59e0b" />}
+              </div>
             </div>
-          </div>
+          </Card>
 
-          {/* ── FACT CARD — styled like Common Mix-Ups ── */}
           <Card
-            style={{ border: "1px solid #374151", userSelect: "none" }}
+            style={{ border: "1px solid #27577A", userSelect: "none" }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Header row */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{current.front}</div>
-                <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>{current.topic} · {current.bucket}</div>
+                <div style={{ fontWeight: 800, color: current.color, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{current.topic}</div>
+                <div style={{ fontWeight: 900, color: "var(--text-strong)", fontSize: 32, lineHeight: 1.2 }}>{current.front}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 14, marginTop: 10 }}>{current.back}</div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                <Badge text={current.topic} color={current.color} />
                 <button className="focus-ring" onClick={toggleCurrentBookmark} style={{ border: "1px solid var(--card-border)", background: bookmarks.cards.includes(current.id) ? "color-mix(in srgb, #14b8a6 12%, var(--card-bg))" : "var(--panel-bg)", color: bookmarks.cards.includes(current.id) ? "#0f766e" : "var(--text)", borderRadius: 999, padding: "7px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   {bookmarks.cards.includes(current.id) ? "★ Saved" : "☆ Save"}
                 </button>
               </div>
             </div>
 
-            {/* Answer block */}
-            <div style={{ background: `${current.color}11`, border: `1px solid ${current.color}44`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
-              <div style={{ fontWeight: 800, color: current.color, marginBottom: 8, fontSize: 13 }}>ANSWER</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text-strong)", lineHeight: 1.5 }}>{current.back}</div>
-            </div>
-
-            {/* Context block */}
-            <div style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 14, padding: 14, marginBottom: 10 }}>
-              <div style={{ fontWeight: 800, color: "var(--text-muted)", fontSize: 11, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.1em" }}>Why this matters</div>
-              <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{current.context}</div>
+            <div style={{ background: `${current.color}11`, border: `1px solid ${current.color}44`, borderRadius: 18, padding: 16, marginBottom: 10 }}>
+              <div style={{ fontWeight: 800, color: current.color, marginBottom: 8, fontSize: 13 }}>Why it matters</div>
+              <div style={{ fontSize: 15, color: "var(--text-strong)", lineHeight: 1.6 }}>{current.context}</div>
             </div>
 
             <MemoryHook text={current.memory} />
 
-            {/* Navigation */}
             <div style={{ marginTop: 14, display: "grid", gap: 8 }}>
               <div style={{ display: "flex", gap: 8 }}>
-                <Button variant="secondary" className="flex-1" onClick={() => moveCard("prev")}>← Prev</Button>
-                <Button variant="secondary" className="flex-1" onClick={() => moveCard("next")}>Next →</Button>
+                <Button variant="secondary" className="flex-1" onClick={() => moveCard("prev")} disabled={index === 0}>← Prev</Button>
+                <Button variant="secondary" className="flex-1" onClick={skipCard}>Skip →</Button>
+                <Button variant="secondary" onClick={() => startSession("fresh", 20)}>New mix</Button>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <Button variant="secondary" className="min-w-[100px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
                 <Button variant="secondary" className="min-w-[100px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
                 <Button variant="secondary" className="min-w-[100px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
               </div>
-              <div style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Swipe left to mark Okay · Swipe right to go back</div>
+              <div style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Swipe left = Hard · Swipe right = Easy · Tap Okay if it is already in memory</div>
             </div>
           </Card>
         </>
@@ -8777,9 +8797,9 @@ const App = () => {
   return (
     <div className="app-shell" style={{ minHeight: "100vh" }}>
     <div className="mx-auto max-w-[1120px]" style={{ paddingBottom: isMobile ? 112 : 12 }}>
-      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} isMobile={isMobile} />
+      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} isMobile={isMobile} onBack={handleBack} canGoBack={tabHistory.length > 0} />
       <div className="tabcontent">{renderTab()}</div>
-      <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />
+      <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} isMobile={isMobile} />
       <div className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
         Open Source — Share Freely ·{" "}
         <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" className="text-primary no-underline">
@@ -8789,7 +8809,7 @@ const App = () => {
       {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} />}
       {isMobile && <ScrollTopButton visible={showScrollTop} />}
       {isMobile && <ScrollBottomButton visible={showScrollBottom} />}
-      {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
+      {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />}
     </div>
     </div>
   );

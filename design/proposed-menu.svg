@@ -1,0 +1,35 @@
+<svg width="420" height="780" viewBox="0 0 420 780" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="780" rx="44" fill="#060A16" stroke="#334155" stroke-width="4"/>
+  <rect x="130" y="18" width="160" height="20" rx="10" fill="#111827"/>
+  <text x="26" y="74" fill="#E5E7EB" font-family="Georgia, serif" font-size="16" font-weight="700">Menu proposal</text>
+  <rect x="24" y="96" width="372" height="86" rx="22" fill="#0F172A" stroke="#243244"/>
+  <text x="44" y="126" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">YOU ARE HERE</text>
+  <text x="44" y="154" fill="#F8FAFC" font-family="Georgia, serif" font-size="24" font-weight="700">Quick Revise</text>
+  <rect x="288" y="120" width="84" height="30" rx="15" fill="#1D4ED8"/>
+  <text x="307" y="140" fill="#EFF6FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Resume</text>
+  <text x="24" y="220" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">PRIMARY NAVIGATION</text>
+  <rect x="24" y="236" width="372" height="64" rx="18" fill="#151C31" stroke="#243244"/>
+  <text x="42" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Home</text>
+  <text x="142" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Revise</text>
+  <text x="252" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Mock</text>
+  <text x="338" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Topics</text>
+  <text x="24" y="340" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">START FAST</text>
+  <rect x="24" y="356" width="180" height="94" rx="20" fill="#151C31" stroke="#243244"/>
+  <text x="42" y="388" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Quick Revise</text>
+  <text x="42" y="414" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Fresh facts quickly</text>
+  <rect x="216" y="356" width="180" height="94" rx="20" fill="#151C31" stroke="#243244"/>
+  <text x="234" y="388" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Mock Test</text>
+  <text x="234" y="414" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Closest to the real exam</text>
+  <text x="24" y="490" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">TOPICS</text>
+  <rect x="24" y="506" width="372" height="58" rx="18" fill="#151C31" stroke="#243244"/>
+  <text x="42" y="541" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">4 Nations</text>
+  <text x="330" y="541" fill="#94A3B8" font-family="Arial, sans-serif" font-size="20">›</text>
+  <rect x="24" y="576" width="372" height="58" rx="18" fill="#151C31" stroke="#243244"/>
+  <text x="42" y="611" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Common Mix-Ups</text>
+  <text x="330" y="611" fill="#94A3B8" font-family="Arial, sans-serif" font-size="20">›</text>
+  <rect x="24" y="646" width="372" height="58" rx="18" fill="#151C31" stroke="#243244"/>
+  <text x="42" y="681" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Story Mode</text>
+  <text x="330" y="681" fill="#94A3B8" font-family="Arial, sans-serif" font-size="20">›</text>
+  <rect x="24" y="716" width="372" height="40" rx="18" fill="#0F172A" stroke="#243244"/>
+  <text x="42" y="741" fill="#94A3B8" font-family="Arial, sans-serif" font-size="13">Version, update, and open-source move here, not in study screens.</text>
+</svg>

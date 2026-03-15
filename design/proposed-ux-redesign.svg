@@ -1,0 +1,150 @@
+<svg width="1600" height="1080" viewBox="0 0 1600 1080" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="1080" fill="#0B1020"/>
+  <rect x="40" y="40" width="1520" height="1000" rx="32" fill="#11172A" stroke="#1E293B"/>
+
+  <text x="76" y="100" fill="#F8FAFC" font-family="Georgia, serif" font-size="34" font-weight="700">Life in the UK App</text>
+  <text x="76" y="136" fill="#8FA2C3" font-family="Arial, sans-serif" font-size="18">Proposed mobile UX refresh before implementation</text>
+
+  <g transform="translate(80 190)">
+    <rect x="0" y="0" width="420" height="780" rx="44" fill="#060A16" stroke="#334155" stroke-width="4"/>
+    <rect x="130" y="18" width="160" height="20" rx="10" fill="#111827"/>
+    <text x="26" y="74" fill="#E5E7EB" font-family="Georgia, serif" font-size="16" font-weight="700">1. Home</text>
+
+    <rect x="24" y="96" width="372" height="76" rx="20" fill="#0F172A" stroke="#243244"/>
+    <text x="44" y="124" fill="#7DD3FC" font-family="Arial, sans-serif" font-size="12" font-weight="700">TODAY'S NEXT STEP</text>
+    <text x="44" y="150" fill="#F8FAFC" font-family="Georgia, serif" font-size="24" font-weight="700">Quick Revise for 10 minutes</text>
+    <rect x="278" y="118" width="96" height="34" rx="17" fill="#F97316"/>
+    <text x="304" y="140" fill="#FFF7ED" font-family="Arial, sans-serif" font-size="14" font-weight="700">Start</text>
+
+    <rect x="24" y="188" width="372" height="112" rx="22" fill="#0B1325" stroke="#1F7A62"/>
+    <text x="44" y="216" fill="#6EE7B7" font-family="Arial, sans-serif" font-size="12" font-weight="700">URGENT PLAN</text>
+    <text x="44" y="242" fill="#F8FAFC" font-family="Georgia, serif" font-size="22" font-weight="700">Test in 1 to 3 days</text>
+    <text x="44" y="268" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="15">1. Quick Revise  2. 4 Nations  3. Common Mix-Ups</text>
+    <text x="44" y="290" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="15">4. Mock Test  5. Cram Sheet</text>
+
+    <text x="24" y="336" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">CONTINUE LEARNING</text>
+    <rect x="24" y="352" width="178" height="124" rx="20" fill="#151C31" stroke="#243244"/>
+    <text x="42" y="384" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Weakest area</text>
+    <text x="42" y="412" fill="#FB923C" font-family="Arial, sans-serif" font-size="16" font-weight="700">4 Nations</text>
+    <text x="42" y="436" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Short focused session</text>
+    <rect x="42" y="448" width="120" height="28" rx="14" fill="#1D4ED8"/>
+    <text x="68" y="467" fill="#EFF6FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Open now</text>
+
+    <rect x="218" y="352" width="178" height="124" rx="20" fill="#151C31" stroke="#243244"/>
+    <text x="236" y="384" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Mock status</text>
+    <text x="236" y="412" fill="#A78BFA" font-family="Arial, sans-serif" font-size="16" font-weight="700">Best: 18 / 24</text>
+    <text x="236" y="436" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Next suggested paper: #4</text>
+    <rect x="236" y="448" width="120" height="28" rx="14" fill="#312E81"/>
+    <text x="268" y="467" fill="#EEF2FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Resume</text>
+
+    <text x="24" y="512" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">BROWSE TOPICS</text>
+    <rect x="24" y="528" width="372" height="66" rx="18" fill="#151C31" stroke="#243244"/>
+    <text x="44" y="553" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Study path</text>
+    <text x="44" y="576" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">4 clear phases. Tap to expand only what you need.</text>
+    <text x="360" y="567" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24">›</text>
+
+    <rect x="24" y="608" width="372" height="66" rx="18" fill="#151C31" stroke="#243244"/>
+    <text x="44" y="633" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Top tested facts</text>
+    <text x="44" y="656" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Collapsed by default. Open when you want a quick scan.</text>
+    <text x="360" y="647" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24">›</text>
+
+    <rect x="24" y="694" width="372" height="62" rx="24" fill="#0F172A" stroke="#243244"/>
+    <text x="58" y="733" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="15" font-weight="700">Home</text>
+    <text x="150" y="733" fill="#7C8AA5" font-family="Arial, sans-serif" font-size="15">Revise</text>
+    <text x="240" y="733" fill="#7C8AA5" font-family="Arial, sans-serif" font-size="15">Mock</text>
+    <text x="324" y="733" fill="#7C8AA5" font-family="Arial, sans-serif" font-size="15">Menu</text>
+  </g>
+
+  <g transform="translate(590 190)">
+    <rect x="0" y="0" width="420" height="780" rx="44" fill="#060A16" stroke="#334155" stroke-width="4"/>
+    <rect x="130" y="18" width="160" height="20" rx="10" fill="#111827"/>
+    <text x="26" y="74" fill="#E5E7EB" font-family="Georgia, serif" font-size="16" font-weight="700">2. Quick Revise</text>
+
+    <rect x="24" y="96" width="372" height="62" rx="18" fill="#0F172A" stroke="#243244"/>
+    <text x="42" y="123" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">SESSION</text>
+    <text x="42" y="145" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">10-card weak areas run</text>
+    <text x="306" y="145" fill="#60A5FA" font-family="Arial, sans-serif" font-size="14" font-weight="700">3 / 10</text>
+
+    <rect x="24" y="176" width="372" height="374" rx="26" fill="#131B31" stroke="#27577A"/>
+    <text x="42" y="212" fill="#7DD3FC" font-family="Arial, sans-serif" font-size="12" font-weight="700">KEY PEOPLE</text>
+    <text x="42" y="248" fill="#F8FAFC" font-family="Georgia, serif" font-size="30" font-weight="700">James Cook</text>
+    <text x="42" y="286" fill="#94A3B8" font-family="Arial, sans-serif" font-size="14">Explorer 1728 to 1779</text>
+
+    <rect x="42" y="314" width="336" height="78" rx="18" fill="#102234" stroke="#1E88C6"/>
+    <text x="60" y="340" fill="#38BDF8" font-family="Arial, sans-serif" font-size="11" font-weight="700">WHY IT MATTERS</text>
+    <text x="60" y="366" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="15">Mapped the coast of Australia and made</text>
+    <text x="60" y="387" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="15">three Pacific voyages.</text>
+
+    <rect x="42" y="408" width="336" height="70" rx="18" fill="#123126" stroke="#1F7A62"/>
+    <text x="60" y="434" fill="#6EE7B7" font-family="Arial, sans-serif" font-size="11" font-weight="700">MEMORY CLUE</text>
+    <text x="60" y="460" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="15">Cook = Pacific voyages = Australia map.</text>
+
+    <rect x="42" y="496" width="100" height="32" rx="16" fill="#1E293B"/>
+    <text x="71" y="517" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="13" font-weight="700">Save</text>
+    <rect x="154" y="496" width="100" height="32" rx="16" fill="#1E293B"/>
+    <text x="182" y="517" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="13" font-weight="700">Prev</text>
+    <rect x="266" y="496" width="112" height="32" rx="16" fill="#1D4ED8"/>
+    <text x="301" y="517" fill="#EFF6FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Skip</text>
+
+    <text x="24" y="590" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">RATE THIS CARD</text>
+    <rect x="24" y="606" width="116" height="62" rx="20" fill="#3B250A" stroke="#F59E0B"/>
+    <text x="66" y="644" fill="#FCD34D" font-family="Arial, sans-serif" font-size="18" font-weight="700">Hard</text>
+    <rect x="152" y="606" width="116" height="62" rx="20" fill="#102234" stroke="#38BDF8"/>
+    <text x="193" y="644" fill="#7DD3FC" font-family="Arial, sans-serif" font-size="18" font-weight="700">Okay</text>
+    <rect x="280" y="606" width="116" height="62" rx="20" fill="#123126" stroke="#34D399"/>
+    <text x="324" y="644" fill="#86EFAC" font-family="Arial, sans-serif" font-size="18" font-weight="700">Easy</text>
+
+    <text x="24" y="702" fill="#94A3B8" font-family="Arial, sans-serif" font-size="13">Swipe left = Hard, swipe right = Easy, tap = Okay</text>
+
+    <rect x="24" y="724" width="372" height="32" rx="16" fill="#0F172A" stroke="#243244"/>
+    <rect x="24" y="724" width="112" height="32" rx="16" fill="#14B8A6"/>
+    <text x="176" y="745" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="13">Deck adapts around hard cards automatically</text>
+  </g>
+
+  <g transform="translate(1100 190)">
+    <rect x="0" y="0" width="420" height="780" rx="44" fill="#060A16" stroke="#334155" stroke-width="4"/>
+    <rect x="130" y="18" width="160" height="20" rx="10" fill="#111827"/>
+    <text x="26" y="74" fill="#E5E7EB" font-family="Georgia, serif" font-size="16" font-weight="700">3. Mobile Menu</text>
+
+    <rect x="24" y="96" width="372" height="86" rx="22" fill="#0F172A" stroke="#243244"/>
+    <text x="44" y="126" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">YOU ARE HERE</text>
+    <text x="44" y="154" fill="#F8FAFC" font-family="Georgia, serif" font-size="24" font-weight="700">Quick Revise</text>
+    <rect x="288" y="120" width="84" height="30" rx="15" fill="#1D4ED8"/>
+    <text x="307" y="140" fill="#EFF6FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Resume</text>
+
+    <text x="24" y="220" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">PRIMARY NAVIGATION</text>
+    <rect x="24" y="236" width="372" height="64" rx="18" fill="#151C31" stroke="#243244"/>
+    <text x="42" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Home</text>
+    <text x="142" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Revise</text>
+    <text x="252" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Mock</text>
+    <text x="338" y="275" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Topics</text>
+
+    <text x="24" y="340" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">START FAST</text>
+    <rect x="24" y="356" width="180" height="94" rx="20" fill="#151C31" stroke="#243244"/>
+    <text x="42" y="388" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Quick Revise</text>
+    <text x="42" y="414" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Fresh facts quickly</text>
+
+    <rect x="216" y="356" width="180" height="94" rx="20" fill="#151C31" stroke="#243244"/>
+    <text x="234" y="388" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Mock Test</text>
+    <text x="234" y="414" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Closest to the real exam</text>
+
+    <text x="24" y="490" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">TOPICS</text>
+    <rect x="24" y="506" width="372" height="58" rx="18" fill="#151C31" stroke="#243244"/>
+    <text x="42" y="541" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">4 Nations</text>
+    <text x="330" y="541" fill="#94A3B8" font-family="Arial, sans-serif" font-size="20">›</text>
+
+    <rect x="24" y="576" width="372" height="58" rx="18" fill="#151C31" stroke="#243244"/>
+    <text x="42" y="611" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Common Mix-Ups</text>
+    <text x="330" y="611" fill="#94A3B8" font-family="Arial, sans-serif" font-size="20">›</text>
+
+    <rect x="24" y="646" width="372" height="58" rx="18" fill="#151C31" stroke="#243244"/>
+    <text x="42" y="681" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="16" font-weight="700">Story Mode</text>
+    <text x="330" y="681" fill="#94A3B8" font-family="Arial, sans-serif" font-size="20">›</text>
+
+    <rect x="24" y="716" width="372" height="40" rx="18" fill="#0F172A" stroke="#243244"/>
+    <text x="42" y="741" fill="#94A3B8" font-family="Arial, sans-serif" font-size="13">Version, update, and open-source move here, not in study screens.</text>
+  </g>
+
+  <text x="86" y="1002" fill="#E2E8F0" font-family="Arial, sans-serif" font-size="18" font-weight="700">What changed</text>
+  <text x="86" y="1032" fill="#94A3B8" font-family="Arial, sans-serif" font-size="16">Home is reduced to one main action, progress is grouped, Quick Revise uses one interaction model, and footer utilities are moved out of active study flows.</text>
+</svg>

@@ -61,8 +61,8 @@ const captureScreenshot = async (page, baseUrl) => {
     await page.reload({ waitUntil: "networkidle0" });
   }
   if (targetAction === "menu") {
-    await clickByText(page, "Menu");
-    await waitForText(page, "Study menu");
+    await clickByAriaLabel(page, "Open topics");
+    await waitForText(page, "Primary navigation");
   }
   await page.screenshot({ path: targetPath, fullPage: false });
 };
@@ -106,6 +106,15 @@ const clickByText = async (page, text) => {
   });
 };
 
+const clickByAriaLabel = async (page, label) => {
+  const handle = await page.$(`button[aria-label="${label}"]`);
+  assert(handle, `Could not find button with aria-label: ${label}`);
+  await handle.evaluate((element) => {
+    element.scrollIntoView({ block: "center", inline: "center" });
+    element.click();
+  });
+};
+
 const clickFirstAnswerOption = async (page) => {
   const handles = await page.$x(`//button[contains(@class, "option-button")]`);
   assert(handles.length > 0, "Could not find any quiz option buttons");
@@ -138,9 +147,9 @@ const clickFirstAnswerOption = async (page) => {
     });
 
     await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
+    await waitForText(page, "TODAY'S NEXT STEP");
     await waitForText(page, "Study path");
-    await waitForText(page, "Check Update");
-    await waitForText(page, "Top 10 Most-Tested Facts");
+    await waitForText(page, "Browse topics");
 
     await page.goto(`${url}/#guide`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "How to Pass the Life in the UK Test");
@@ -162,9 +171,9 @@ const clickFirstAnswerOption = async (page) => {
 
     await page.goto(`${url}/#quickrev`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Quick Revision");
-    await waitForText(page, "Swipe through facts one at a time");
-    await waitForText(page, "ANSWER");
-    await waitForText(page, "WHY THIS MATTERS");
+    await waitForText(page, "Swipe left for Hard");
+    await waitForText(page, "SESSION");
+    await waitForText(page, "Why it matters");
 
     await page.goto(`${url}/#audio`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Audio Mode");
@@ -182,8 +191,7 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "Dates and names to remember");
     await clickByText(page, "Test this chapter");
     await page.waitForFunction(() => window.location.hash === "#quickrev", { timeout: 30000 });
-    await waitForText(page, "ANSWER");
-    await waitForText(page, "WHY THIS MATTERS");
+    await waitForText(page, "Why it matters");
 
     await page.goto(`${url}/#datesdrill`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Dates Drill");
