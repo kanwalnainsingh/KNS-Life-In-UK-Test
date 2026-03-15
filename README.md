@@ -36,11 +36,6 @@ UI stack:
 <p align="center">
   <img src="screenshots/mobile-menu.png" width="22%" alt="Study menu on mobile" />
   &nbsp;
-  <img src="screenshots/exam-topics.png" width="22%" alt="Exam Topics course on mobile" />
-  &nbsp;
-  <img src="screenshots/quick-facts-course.png" width="22%" alt="Quick Facts Course on mobile" />
-  &nbsp;
-  <img src="screenshots/mock-progress.png" width="22%" alt="Mock progress on mobile" />
 </p>
 <p align="center"><strong>Current mobile views</strong> — the study menu, exam-topic completion, quick-facts course flow, and saved mock progress.</p>
 
