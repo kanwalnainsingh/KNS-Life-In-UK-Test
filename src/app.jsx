@@ -4478,82 +4478,51 @@ const ExamTopicsModeTab = ({ setActive }) => {
 
 const QuickRevisionTab = ({ setActive }) => {
   const deck = useMemo(() => buildQuickRevisionDeck(), []);
-  const availableTopics = useMemo(() => getQuickRevisionTopics(deck), [deck]);
-  const wrongQuestions = useMemo(() => readStore(STORAGE_KEYS.wrongQuestions, []), []);
-  const [focus, setFocus] = useState("fresh");
-  const [topicFilter, setTopicFilter] = useState("All topics");
-  const [sessionType, setSessionType] = useState("medium");
   const [session, setSession] = useState([]);
   const [index, setIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
   const [completed, setCompleted] = useState(0);
   const [hardCount, setHardCount] = useState(0);
   const [sessionMeta, setSessionMeta] = useState({ newCount: 0, reviewCount: 0, buckets: {} });
   const [ratings, setRatings] = useState(() => readStore(STORAGE_KEYS.quickRevRatings, {}));
   const [bookmarks, setBookmarks] = useState(() => loadBookmarks());
+  const touchStartX = useRef(null);
+
   const current = session[index];
-  const topicConfidence = useMemo(() => buildQuickRevisionTopicConfidence(deck, ratings), [deck, ratings]);
-  const weakestTopics = topicConfidence.slice(0, 3);
-  const strongestTopics = [...topicConfidence].reverse().slice(0, 2);
-  const nextStep = useMemo(() => getQuickRevisionNextStep(topicConfidence, wrongQuestions), [topicConfidence, wrongQuestions]);
+  const remaining = Math.max(session.length - index, 0);
+  const isFinished = session.length > 0 && index >= session.length;
 
-  const selectedSession = QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === sessionType) || QUICK_REVISION_SESSION_OPTIONS[1];
-  const selectedFocus = QUICK_REVISION_FOCUS_OPTIONS.find((item) => item.id === focus) || QUICK_REVISION_FOCUS_OPTIONS[0];
-  const selectedTopic = availableTopics.includes(topicFilter) ? topicFilter : "All topics";
-  const isFirstVisit = Object.keys(ratings).length === 0 && !session.length;
-  const [wasFirstSession, setWasFirstSession] = useState(false);
-  const persistQuickRevisionState = (next) => writeStore(STORAGE_KEYS.quickRevState, next);
-  const clearQuickRevisionState = () => writeStore(STORAGE_KEYS.quickRevState, null);
-  const resetQuickRevisionProgress = () => {
-    writeStore(STORAGE_KEYS.quickRevRatings, {});
-    writeStore(STORAGE_KEYS.recentQuickRev, []);
-    clearQuickRevisionState();
-    setRatings({});
-    setSession([]);
-    setIndex(0);
-    setCompleted(0);
-    setHardCount(0);
-    setRevealed(true);
-    setSessionMeta({ newCount: 0, reviewCount: 0, buckets: {} });
-    setFocus("fresh");
-    setTopicFilter("All topics");
-    setSessionType("medium");
-    scrollPageTop();
-  };
-
-  const startSession = (overrideFocus = focus, overrideType = sessionType, overrideTopic = selectedTopic) => {
-    if (Object.keys(ratings).length === 0) setWasFirstSession(true);
-    const length = (QUICK_REVISION_SESSION_OPTIONS.find((item) => item.id === overrideType) || QUICK_REVISION_SESSION_OPTIONS[1]).count;
-    const safeTopic = availableTopics.includes(overrideTopic) ? overrideTopic : "All topics";
-    const built = buildQuickRevisionSession(deck, overrideFocus, length, ratings, safeTopic);
-    setFocus(overrideFocus);
-    setTopicFilter(safeTopic);
-    setSessionType(overrideType);
+  const startSession = (focus = "fresh", count = 20) => {
+    const built = buildQuickRevisionSession(deck, focus, count, ratings, "All topics");
     setSession(built.cards);
     setIndex(0);
     setCompleted(0);
     setHardCount(0);
-    setRevealed(true);
     setSessionMeta({ newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets });
     scrollPageTop();
-    persistQuickRevisionState({
-      focus: overrideFocus,
-      topicFilter: safeTopic,
-      sessionType: overrideType,
-      sessionIds: built.cards.map((item) => item.id),
-      index: 0,
-      completed: 0,
-      hardCount: 0,
-      revealed: true,
-      sessionMeta: { newCount: built.newCount, reviewCount: built.reviewCount, buckets: built.buckets },
-    });
   };
 
-  const moveToNext = () => {
-    setIndex((value) => value + 1);
-    setCompleted((value) => value + 1);
-    setRevealed(true);
-  };
+  // Auto-start on mount — restore saved session or build fresh
+  useEffect(() => {
+    const saved = readStore(STORAGE_KEYS.quickRevState, null);
+    if (saved?.sessionIds?.length) {
+      const restoredCards = saved.sessionIds.map((id) => deck.find((item) => item.id === id)).filter(Boolean);
+      if (restoredCards.length) {
+        setSession(restoredCards);
+        setIndex(Math.min(saved.index || 0, Math.max(restoredCards.length - 1, 0)));
+        setCompleted(saved.completed || 0);
+        setHardCount(saved.hardCount || 0);
+        setSessionMeta(saved.sessionMeta || { newCount: 0, reviewCount: 0, buckets: {} });
+        return;
+      }
+    }
+    startSession("fresh", 20);
+  }, [deck]);
+
+  // Persist current position while studying
+  useEffect(() => {
+    if (!session.length || isFinished) { writeStore(STORAGE_KEYS.quickRevState, null); return; }
+    writeStore(STORAGE_KEYS.quickRevState, { sessionIds: session.map((c) => c.id), index, completed, hardCount, sessionMeta });
+  }, [session, index, completed, hardCount, sessionMeta, isFinished]);
 
   const markCard = (result) => {
     if (!current) return;
@@ -4568,220 +4537,43 @@ const QuickRevisionTab = ({ setActive }) => {
     };
     setRatings(nextRatings);
     writeStore(STORAGE_KEYS.quickRevRatings, nextRatings);
-    if (result === "hard") {
-      setSession((items) => [...items, current]);
-      setHardCount((value) => value + 1);
-    }
-    moveToNext();
+    if (result === "hard") { setSession((items) => [...items, current]); setHardCount((v) => v + 1); }
+    setIndex((v) => v + 1);
+    setCompleted((v) => v + 1);
   };
 
   const moveCard = (direction) => {
     if (!session.length) return;
-    setIndex((value) => {
-      if (direction === "next") return (value + 1) % session.length;
-      return (value - 1 + session.length) % session.length;
-    });
-    setRevealed(true);
+    setIndex((v) => direction === "next" ? (v + 1) % session.length : (v - 1 + session.length) % session.length);
   };
-  const jumpRandomCard = () => {
-    if (!session.length) return;
-    setIndex(Math.floor(Math.random() * session.length));
-    setRevealed(true);
-  };
+
   const toggleCurrentBookmark = () => {
     if (!current) return;
     setBookmarks(toggleBookmarkEntry("card", current.id));
   };
 
-  const remaining = Math.max(session.length - index, 0);
-  const isFinished = session.length > 0 && index >= session.length;
-
-  useEffect(() => {
-    const launch = readStore(STORAGE_KEYS.quickRevLaunch, null);
-    if (!launch) return undefined;
-    writeStore(STORAGE_KEYS.quickRevLaunch, null);
-    startSession(launch.focus || "fresh", launch.sessionType || "short", launch.topic || "All topics");
-    return undefined;
-  }, []);
-
-  useEffect(() => {
-    const saved = readStore(STORAGE_KEYS.quickRevState, null);
-    if (!saved?.sessionIds?.length) return;
-    const restoredCards = saved.sessionIds
-      .map((id) => deck.find((item) => item.id === id))
-      .filter(Boolean);
-    if (!restoredCards.length) return;
-    setSession(restoredCards);
-    setFocus(saved.focus || "fresh");
-    setTopicFilter(availableTopics.includes(saved.topicFilter) ? saved.topicFilter : "All topics");
-    setSessionType(saved.sessionType || "medium");
-    setIndex(Math.min(saved.index || 0, Math.max(restoredCards.length - 1, 0)));
-    setCompleted(saved.completed || 0);
-    setHardCount(saved.hardCount || 0);
-    setRevealed(true);
-    setSessionMeta(saved.sessionMeta || { newCount: 0, reviewCount: 0, buckets: {} });
-  }, [deck, availableTopics]);
-
-  useEffect(() => {
-    if (!session.length || isFinished) {
-      clearQuickRevisionState();
-      return;
-    }
-    persistQuickRevisionState({
-      focus,
-      topicFilter: selectedTopic,
-      sessionType,
-      sessionIds: session.map((item) => item.id),
-      index,
-      completed,
-      hardCount,
-      revealed,
-      sessionMeta,
-    });
-  }, [focus, selectedTopic, sessionType, session, index, completed, hardCount, revealed, sessionMeta, isFinished]);
+  // Swipe: left = next card (okay), right = previous card
+  const handleTouchStart = (e) => { touchStartX.current = e.touches[0]?.clientX ?? null; };
+  const handleTouchEnd = (e) => {
+    if (touchStartX.current == null) return;
+    const delta = (e.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(delta) < 48) return;
+    if (delta < 0) markCard("okay");
+    else moveCard("prev");
+  };
 
   return (
     <div className="page-stack">
-      <SectionTitle icon="↔️" meta="Fast card-by-card revision that remembers your place and brings in fresh facts over time.">Quick Revision</SectionTitle>
+      <SectionTitle icon="↔️" meta="Swipe through facts one at a time. Hard cards come back automatically.">Quick Revision</SectionTitle>
 
-      {isFirstVisit ? (
-        /* ── FIRST VISIT: clean welcome, one button ── */
-        <>
-          <Card className="support-card-strong">
-            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">How it works</div>
-            <div className="mb-2 text-xl font-extrabold text-foreground">One fact at a time</div>
-            <div className="mb-4 text-sm leading-7 text-muted-foreground">
-              Each card shows a prompt and the answer. After reading it, mark it <strong>Hard</strong>, <strong>Okay</strong> or <strong>Easy</strong>. Hard cards come back later automatically — so the things you struggle with get more repetition without you having to think about it.
-            </div>
-            <div className="mb-5 flex flex-wrap gap-2">
-              <Badge text={`${deck.length} cards in the deck`} color="#06b6d4" />
-              <Badge text="~10 minutes per session" color="#8b5cf6" />
-              <Badge text="Hard cards repeat automatically" color="#f59e0b" />
-            </div>
-            <Button className="w-full bg-orange-500 hover:bg-orange-500/90 sm:w-auto" onClick={() => startSession("fresh", "medium", "All topics")}>
-              Start your first session →
-            </Button>
-          </Card>
-          <Card className="setup-card">
-            <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Want to customise first?</div>
-            <div className="mb-3 text-xs leading-6 text-muted-foreground">You can pick a shorter session or focus on specific topics. Otherwise just hit Start above — the defaults are fine.</div>
-            <div className="mb-2 text-xs text-muted-foreground">Time</div>
-            <div className="choice-grid mb-3">
-              {QUICK_REVISION_SESSION_OPTIONS.map((item) => (
-                <button key={item.id} className={`focus-ring choice-tile ${sessionType === item.id ? "choice-tile-active" : ""}`} onClick={() => setSessionType(item.id)}>
-                  <div>{item.label}</div>
-                  <div className="mt-1 text-xs font-normal text-muted-foreground">{item.detail}</div>
-                </button>
-              ))}
-            </div>
-            <div className="mb-2 text-xs text-muted-foreground">Focus</div>
-            <div className="noscroll mb-3 flex gap-2 overflow-x-auto">
-              {QUICK_REVISION_FOCUS_OPTIONS.map((item) => <TabButton key={item.id} active={focus === item.id} onClick={() => setFocus(item.id)}>{item.label}</TabButton>)}
-            </div>
-            <div className="mb-3 text-xs leading-6 text-muted-foreground">{selectedFocus.detail}</div>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => startSession(focus, sessionType, selectedTopic)}>Start with these settings</Button>
-            </div>
-          </Card>
-        </>
-      ) : (
-        /* ── RETURNING VISITOR: full setup + advisory ── */
-        <>
-          <Card className="setup-card mb-4">
-            <div className="mb-2 text-lg font-extrabold text-foreground">Quick cards, full-course coverage</div>
-            <div className="mb-4 text-sm leading-7 text-muted-foreground">
-              The app remembers what you have already seen, brings in fresh cards when you come back, and lets hard facts return later so they stick.
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Badge text={`${deck.length} cards total`} color="#06b6d4" />
-              <Badge text="New cards + smart review" color="#22c55e" />
-              <Badge text={`${bookmarks.cards.length} saved facts`} color="#14b8a6" />
-            </div>
-          </Card>
-          <Card className="support-card-strong">
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center", marginBottom: 10 }}>
-              <div>
-                <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Study this next</div>
-                <div style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>{nextStep.detail}</div>
-              </div>
-              <Badge text={nextStep.title} color="#f97316" />
-            </div>
-            {(weakestTopics.length > 0 || strongestTopics.length > 0) && (
-              <div className="fact-grid-two" style={{ display: "grid", gap: 10, marginBottom: 12 }}>
-                <div className="subtle-panel" style={{ padding: 12 }}>
-                  <div style={{ fontSize: 12, color: "#ef4444", fontWeight: 800, marginBottom: 4 }}>Weakest topics</div>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    {weakestTopics.map((item) => (
-                      <div key={item.topic} style={{ display: "flex", justifyContent: "space-between", gap: 8, color: "var(--text)", fontSize: 13 }}>
-                        <span>{item.topic}</span>
-                        <span style={{ color: "var(--text-muted)" }}>{item.level} · {item.score}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="subtle-panel" style={{ padding: 12 }}>
-                  <div style={{ fontSize: 12, color: "#22c55e", fontWeight: 800, marginBottom: 4 }}>Strongest topics</div>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    {strongestTopics.map((item) => (
-                      <div key={item.topic} style={{ display: "flex", justifyContent: "space-between", gap: 8, color: "var(--text)", fontSize: 13 }}>
-                        <span>{item.topic}</span>
-                        <span style={{ color: "var(--text-muted)" }}>{item.level} · {item.score}%</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => startSession(nextStep.focus, "short", nextStep.topic)}>{nextStep.button}</Button>
-              <Button variant="secondary" onClick={() => startSession("weak", "short", "All topics")}>Weak facts only</Button>
-              {weakestTopics[0] && <Button variant="outline" onClick={() => startSession("weak", "short", weakestTopics[0].topic)}>Focus {weakestTopics[0].topic}</Button>}
-            </div>
-          </Card>
-          <Card className="setup-card">
-            <div className="mb-2 text-xs text-muted-foreground">Time</div>
-            <div className="choice-grid mb-3">
-              {QUICK_REVISION_SESSION_OPTIONS.map((item) => (
-                <button key={item.id} className={`focus-ring choice-tile ${sessionType === item.id ? "choice-tile-active" : ""}`} onClick={() => setSessionType(item.id)}>
-                  <div>{item.label}</div>
-                  <div className="mt-1 text-xs font-normal text-muted-foreground">{item.detail}</div>
-                </button>
-              ))}
-            </div>
-            <div className="mb-2 text-xs text-muted-foreground">Focus</div>
-            <div className="noscroll mb-3 flex gap-2 overflow-x-auto">
-              {QUICK_REVISION_FOCUS_OPTIONS.map((item) => <TabButton key={item.id} active={focus === item.id} onClick={() => setFocus(item.id)}>{item.label}</TabButton>)}
-            </div>
-            <div className="mb-3 text-xs leading-6 text-muted-foreground">{selectedFocus.detail}</div>
-            <div className="mb-2 text-xs text-muted-foreground">Topic filter</div>
-            <div className="noscroll mb-3 flex gap-2 overflow-x-auto">
-              {availableTopics.map((item) => (
-                <TabButton key={item} active={selectedTopic === item} onClick={() => setTopicFilter(item)}>{item}</TabButton>
-              ))}
-            </div>
-            <div className="mb-3 text-xs leading-6 text-muted-foreground">
-              {selectedTopic === "All topics" ? "Use all topics for the broadest revision mix." : `Show only ${selectedTopic} cards inside the chosen session focus.`}
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={() => startSession("fresh", "medium")}>Start now</Button>
-              <Button variant="secondary" onClick={() => startSession(focus, sessionType, selectedTopic)}>Use these settings</Button>
-              <Button variant="outline" onClick={() => startSession(focus, sessionType, "All topics")}>Show all now</Button>
-              {bookmarks.cards.length > 0 && <Button variant="outline" onClick={() => startSession("saved", "short")}>Open saved facts</Button>}
-              <Button variant="outline" onClick={() => startSession("weak", "short", selectedTopic)}>Weak facts only</Button>
-              <Button variant="ghost" onClick={resetQuickRevisionProgress}>Reset progress</Button>
-            </div>
-          </Card>
-        </>
-      )}
       {isFinished ? (
         <>
           <Card style={{ textAlign: "center", border: "1px solid color-mix(in srgb, #22c55e 35%, var(--card-border))" }}>
             <div style={{ fontSize: 42, marginBottom: 8 }}>✅</div>
-            <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 6 }}>
-              {wasFirstSession ? "Great first session!" : "Quick revision complete"}
-            </div>
+            <div style={{ color: "var(--text-strong)", fontWeight: 900, fontSize: 24, marginBottom: 6 }}>Quick revision complete</div>
             <div style={{ color: "var(--text-muted)", fontSize: 14, lineHeight: 1.7, marginBottom: 16 }}>
-              You went through {completed} cards. {hardCount > 0 ? `${hardCount} cards were marked hard and will come back in later sessions automatically.` : "No cards were marked hard — well done."}
+              You went through {completed} cards. {hardCount > 0 ? `${hardCount} marked hard and will come back next time.` : "No cards marked hard — well done."}
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap", marginBottom: 16 }}>
               <Badge text={`${sessionMeta.newCount} new`} color="#22c55e" />
@@ -4789,109 +4581,97 @@ const QuickRevisionTab = ({ setActive }) => {
               {Object.entries(sessionMeta.buckets || {}).slice(0, 4).map(([bucket, total]) => <Badge key={bucket} text={`${bucket} ${total}`} color="#64748b" />)}
             </div>
             <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
-              <button className="focus-ring" onClick={() => startSession(focus, sessionType, selectedTopic)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>New cards</button>
-              <button className="focus-ring" onClick={() => startSession("weak", "short", selectedTopic)} style={{ background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review hard cards</button>
-              {bookmarks.cards.length > 0 && <button className="focus-ring" onClick={() => startSession("saved", "short")} style={{ background: "color-mix(in srgb, #14b8a6 12%, var(--card-bg))", color: "#0f766e", border: "1px solid color-mix(in srgb, #14b8a6 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Review saved facts</button>}
-              <button className="focus-ring" onClick={() => startSession(focus, sessionType, "All topics")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Show all now</button>
+              <button className="focus-ring" onClick={() => startSession("fresh", 20)} style={{ background: "var(--accent)", color: "#fff", border: "none", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 800 }}>New cards</button>
+              <button className="focus-ring" onClick={() => startSession("weak", 20)} style={{ background: "color-mix(in srgb, #f59e0b 12%, var(--card-bg))", color: "#b45309", border: "1px solid color-mix(in srgb, #f59e0b 35%, var(--card-border))", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Hard cards only</button>
               <button className="focus-ring" onClick={() => setActive("home")} style={{ background: "var(--chip-bg)", color: "var(--text)", border: "1px solid var(--card-border)", borderRadius: 12, padding: "12px 16px", cursor: "pointer", fontWeight: 700 }}>Back home</button>
             </div>
           </Card>
-          {wasFirstSession && (
-            <Card className="quiet-tint">
-              <div className="mb-3">
-                <div className="text-base font-extrabold text-foreground">What to do next</div>
-                <div className="text-sm leading-6 text-muted-foreground">You have made a start. Here are three good follow-up sessions to build on it.</div>
-              </div>
-              <div className="grid gap-3 md:grid-cols-3">
-                <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => startSession("fresh", "medium", "All topics")}>
-                  <div className="eyebrow mb-2">Step 2</div>
-                  <div className="text-base font-extrabold text-foreground">↔️ Another Quick Revise</div>
-                  <div className="mt-2 text-sm leading-6 text-muted-foreground">Keep building coverage. Come back daily and the app will mix in hard cards from last time.</div>
-                </button>
-                <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("confuse")}>
-                  <div className="eyebrow mb-2">Step 3</div>
-                  <div className="text-base font-extrabold text-foreground">⚖️ Common Mix-Ups</div>
-                  <div className="mt-2 text-sm leading-6 text-muted-foreground">Lock in the facts people confuse most — UK vs GB, dates, Parliament, and law comparisons.</div>
-                </button>
-                <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("mock")}>
-                  <div className="eyebrow mb-2">Step 4 (when ready)</div>
-                  <div className="text-base font-extrabold text-foreground">📝 Mock Test</div>
-                  <div className="mt-2 text-sm leading-6 text-muted-foreground">Try a full 24-question paper once you have done a few revision sessions. It shows exactly where your gaps are.</div>
-                </button>
-              </div>
-            </Card>
-          )}
+          <Card className="quiet-tint">
+            <div className="mb-3">
+              <div className="text-base font-extrabold text-foreground">What to do next</div>
+              <div className="text-sm leading-6 text-muted-foreground">Keep the momentum going with one of these.</div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-3">
+              <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => startSession("fresh", 20)}>
+                <div className="eyebrow mb-2">More revision</div>
+                <div className="text-base font-extrabold text-foreground">↔️ Another round</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">Keep building coverage. Hard cards from this session will be mixed in.</div>
+              </button>
+              <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("confuse")}>
+                <div className="eyebrow mb-2">Common Mix-Ups</div>
+                <div className="text-base font-extrabold text-foreground">⚖️ Side-by-side facts</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">Lock in the facts people confuse most — UK vs GB, dates, Parliament comparisons.</div>
+              </button>
+              <button className="focus-ring rounded-2xl border border-border bg-card/80 p-4 text-left" onClick={() => setActive("mock")}>
+                <div className="eyebrow mb-2">When ready</div>
+                <div className="text-base font-extrabold text-foreground">📝 Mock Test</div>
+                <div className="mt-2 text-sm leading-6 text-muted-foreground">Try a full 24-question paper to see exactly where your gaps are.</div>
+              </button>
+            </div>
+          </Card>
         </>
       ) : current && (
-      <>
-      <div className="mb-3 flex flex-wrap gap-2">
-        <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
-        <Badge text={`${remaining} left`} color="#64748b" />
-        <Badge text={`${completed} done`} color="#22c55e" />
-        <Badge text={`${sessionMeta.newCount} new cards`} color="#3b82f6" />
-        {selectedTopic !== "All topics" && <Badge text={selectedTopic} color={current.color} />}
-        {hardCount > 0 && <Badge text={`${hardCount} marked hard`} color="#f59e0b" />}
-        <div className="ml-auto">
-          <Button variant="secondary" onClick={() => startSession(focus, sessionType, selectedTopic)}>New mix</Button>
-        </div>
-      </div>
-      <Card className="quick-revision-card overflow-hidden" style={{ border: `1px solid ${current.color}66`, background: `linear-gradient(135deg, ${current.color}10, color-mix(in srgb, var(--card-bg) 82%, white))`, userSelect: "none" }}>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap gap-2">
-            <Badge text={current.topic} color={current.color} />
-            <button className="focus-ring" onClick={toggleCurrentBookmark} style={{ border: "1px solid var(--card-border)", background: bookmarks.cards.includes(current.id) ? "color-mix(in srgb, #14b8a6 12%, var(--card-bg))" : "var(--panel-bg)", color: bookmarks.cards.includes(current.id) ? "#0f766e" : "var(--text)", borderRadius: 999, padding: "7px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-              {bookmarks.cards.includes(current.id) ? "★ Saved" : "☆ Save"}
-            </button>
+        <>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
+            <Badge text={`${remaining} left`} color="#64748b" />
+            {completed > 0 && <Badge text={`${completed} done`} color="#22c55e" />}
+            {hardCount > 0 && <Badge text={`${hardCount} hard`} color="#f59e0b" />}
+            <div className="ml-auto flex gap-2">
+              <Button variant="secondary" onClick={() => startSession("fresh", 20)}>New mix</Button>
+            </div>
           </div>
-          <div className="text-xs text-muted-foreground">Quick answer view · {current.bucket}</div>
-        </div>
-        <div className="grid gap-3">
-          <div className="rounded-2xl border border-border bg-card/86 p-4">
-            <div className="mb-1 text-[11px] font-bold text-muted-foreground">PROMPT</div>
-            <div className="text-[22px] font-black leading-8 text-foreground">{current.front}</div>
-          </div>
-          <div className="rounded-2xl border border-primary/20 bg-primary/10 p-4">
-            <div className="mb-1 text-[11px] font-bold text-muted-foreground">ANSWER</div>
-            <div className="text-xl font-extrabold leading-8 text-foreground">{current.back}</div>
-          </div>
-          <div className="rounded-2xl border border-border bg-card/86 p-4">
-            <div className="mb-1 text-[11px] font-bold text-muted-foreground">WHY THIS MATTERS</div>
-            <div className="text-sm leading-7 text-foreground">{current.context}</div>
-          </div>
-          <MemoryHook text={current.memory} />
-        </div>
-        <div className="mt-4 grid gap-2">
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" onClick={() => moveCard("prev")}>
-              ← Previous
-            </Button>
-            <Button variant="secondary" onClick={jumpRandomCard}>
-              Random
-            </Button>
-            <Button variant="secondary" onClick={() => moveCard("next")}>
-              Next →
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant="secondary" className="min-w-[140px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
-            <Button variant="secondary" className="min-w-[140px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
-            <Button variant="secondary" className="min-w-[140px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
-          </div>
-        </div>
-      </Card>
-      </>
+
+          {/* ── FACT CARD — styled like Common Mix-Ups ── */}
+          <Card
+            style={{ border: "1px solid #374151", userSelect: "none" }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Header row */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{current.front}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>{current.topic} · {current.bucket}</div>
+              </div>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                <Badge text={current.topic} color={current.color} />
+                <button className="focus-ring" onClick={toggleCurrentBookmark} style={{ border: "1px solid var(--card-border)", background: bookmarks.cards.includes(current.id) ? "color-mix(in srgb, #14b8a6 12%, var(--card-bg))" : "var(--panel-bg)", color: bookmarks.cards.includes(current.id) ? "#0f766e" : "var(--text)", borderRadius: 999, padding: "7px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
+                  {bookmarks.cards.includes(current.id) ? "★ Saved" : "☆ Save"}
+                </button>
+              </div>
+            </div>
+
+            {/* Answer block */}
+            <div style={{ background: `${current.color}11`, border: `1px solid ${current.color}44`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
+              <div style={{ fontWeight: 800, color: current.color, marginBottom: 8, fontSize: 13 }}>ANSWER</div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text-strong)", lineHeight: 1.5 }}>{current.back}</div>
+            </div>
+
+            {/* Context block */}
+            <div style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 14, padding: 14, marginBottom: 10 }}>
+              <div style={{ fontWeight: 800, color: "var(--text-muted)", fontSize: 11, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.1em" }}>Why this matters</div>
+              <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{current.context}</div>
+            </div>
+
+            <MemoryHook text={current.memory} />
+
+            {/* Navigation */}
+            <div style={{ marginTop: 14, display: "grid", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button variant="secondary" className="flex-1" onClick={() => moveCard("prev")}>← Prev</Button>
+                <Button variant="secondary" className="flex-1" onClick={() => moveCard("next")}>Next →</Button>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <Button variant="secondary" className="min-w-[100px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
+                <Button variant="secondary" className="min-w-[100px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
+                <Button variant="secondary" className="min-w-[100px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
+              </div>
+              <div style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Swipe left to mark Okay · Swipe right to go back</div>
+            </div>
+          </Card>
+        </>
       )}
-      <Card>
-        <div style={{ fontWeight: 800, color: "var(--text-strong)", marginBottom: 10 }}>Coverage checklist</div>
-        <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
-          {COVERAGE_AREAS.map((item) => (
-            <button key={item.title} className="focus-ring" onClick={() => setActive(item.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 14, padding: "12px 14px", cursor: "pointer", textAlign: "left" }}>
-              <div style={{ fontWeight: 700, color: "var(--text-strong)", marginBottom: 4 }}>{item.icon} {item.title}</div>
-              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{item.detail}</div>
-            </button>
-          ))}
-        </div>
-      </Card>
     </div>
   );
 };
