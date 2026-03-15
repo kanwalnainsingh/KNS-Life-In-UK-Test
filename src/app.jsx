@@ -3140,6 +3140,48 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </CardContent>
       </Card>
 
+      {/* ── CRITICAL TOPICS CALLOUT ── */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <button
+          className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: "#10b981", background: "color-mix(in srgb, #10b981 8%, transparent)", cursor: "pointer" }}
+          onClick={() => setActive("nations")}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-2xl">🏴</div>
+            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#10b981" }}>Critical topic</span>
+          </div>
+          <div className="mb-1 text-base font-extrabold text-foreground">4 Nations — don't skip this</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">
+            England, Scotland, Wales, Northern Ireland — each nation has its own capital, patron saint, saint's day, flower, parliament name and number of members. These facts appear on almost every real test paper.
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-xs">
+            {["Capitals", "Patron saints", "Saint's days", "Parliaments", "Member counts", "National flowers"].map((tag) => (
+              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#10b98150" }}>{tag}</span>
+            ))}
+          </div>
+        </button>
+        <button
+          className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5"
+          style={{ borderColor: "#7c3aed", background: "color-mix(in srgb, #7c3aed 8%, transparent)", cursor: "pointer" }}
+          onClick={() => setActive("confuse")}
+        >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <div className="text-2xl">⚠️</div>
+            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#7c3aed" }}>Critical topic</span>
+          </div>
+          <div className="mb-1 text-base font-extrabold text-foreground">Common Mix-Ups — where marks are lost</div>
+          <div className="mb-3 text-sm leading-6 text-muted-foreground">
+            GB vs UK vs British Isles, Commons vs Lords, 1807 vs 1833, 1603 vs 1707, Church of England vs Church of Scotland, Caesar vs Claudius. These are the distinctions that catch almost everyone — study them side-by-side.
+          </div>
+          <div className="flex flex-wrap gap-1.5 text-xs">
+            {["GB vs UK", "Commons vs Lords", "1807 vs 1833", "1603 vs 1707", "Caesar vs Claudius", "Church comparison"].map((tag) => (
+              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#7c3aed50" }}>{tag}</span>
+            ))}
+          </div>
+        </button>
+      </div>
+
       {/* ── SECTION 2: WHERE TO START (new) vs PICK UP (returning) ── */}
       {isNewUser ? (
         <>
@@ -3326,7 +3368,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
             {[
               { id: "story", icon: "📚", title: "Story Mode", when: "First", desc: "UK history told as a continuous story — Romans through to today. Read it in order before attempting any questions.", color: "#3b82f6" },
               { id: "quickfacts", icon: "⚡", title: "Quick Facts Course", when: "Second", desc: "Parliament, law, voting, rights, elections, and everyday British life — the civics half of the test.", color: "#0ea5e9" },
-              { id: "nations", icon: "🏴", title: "4 Nations", when: "Third", desc: "England, Scotland, Wales, Northern Ireland — capitals, patron saints, parliaments, flowers, and national symbols.", color: "#10b981" },
+              { id: "nations", icon: "🏴", title: "4 Nations", when: "Must know", desc: "England, Scotland, Wales, Northern Ireland — capitals, patron saints, parliaments, flowers, and national symbols. Almost every paper tests this.", color: "#10b981" },
               { id: "timeline", icon: "📅", title: "Timeline Drill", when: "After Story Mode", desc: "Fix the key years, rulers, and reforms after reading the story. Turn narrative memory into date recall.", color: "#06b6d4" },
             ].map((item) => (
               <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
@@ -3351,7 +3393,7 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           <div className="feature-grid">
             {[
               { id: "quickrev", icon: "↔️", title: "Quick Revise", when: "Daily", desc: "Flashcard recall — tap to reveal, mark Hard / Okay / Easy. The app brings back hard cards automatically until they stick.", color: "#f97316" },
-              { id: "confuse", icon: "⚠️", title: "Common Mix-Ups", when: "After Quick Revise", desc: "The facts learners mix up most, shown side-by-side: UK vs GB, Parliament numbers, voting ages, court types.", color: "#7c3aed" },
+              { id: "confuse", icon: "⚠️", title: "Common Mix-Ups", when: "Must know", desc: "The facts people mix up most: UK vs GB, Commons vs Lords, Church of England vs Church of Scotland, 1807 vs 1833 slavery, 1603 vs 1707 union.", color: "#7c3aed" },
               { id: "datesdrill", icon: "🗓️", title: "Dates Drill", when: "For history", desc: "Targeted year and event recall. Best for locking in battles, Reform Acts, and welfare-state dates.", color: "#8b5cf6" },
               { id: "daily10", icon: "🔟", title: "Daily 10", when: "Short sessions", desc: "10 fresh random questions. Best for 5-minute phone revision at lunch or on the bus.", color: "#10b981" },
               { id: "sprint", icon: "⚡", title: "True/False Sprint", when: "Mobile revision", desc: "Simple true/false calls on key facts — very fast, runs well on mobile with one thumb.", color: "#0ea5e9" },
