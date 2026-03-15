@@ -138,7 +138,7 @@ const clickFirstAnswerOption = async (page) => {
     });
 
     await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
-    await waitForText(page, "Study tools");
+    await waitForText(page, "Your study path");
     await waitForText(page, "Check Update");
     await waitForText(page, "Top 10 Most-Tested Facts");
 
