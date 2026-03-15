@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Keep GitHub Actions versions up to date (monthly — low noise)
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "ci"
+
+  # Keep npm dependencies up to date (weekly)
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps"
+    # Group all non-major updates into one PR to reduce noise
+    groups:
+      minor-and-patch:
+        update-types:
+          - minor
+          - patch
