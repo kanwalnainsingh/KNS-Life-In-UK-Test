@@ -31,16 +31,6 @@ UI stack:
 
 ---
 
-## 📸 Highlights
-
-<p align="center">
-  <img src="screenshots/mobile-menu.png" width="22%" alt="Study menu on mobile" />
-  &nbsp;
-</p>
-<p align="center"><strong>Current mobile views</strong> — the study menu, exam-topic completion, quick-facts course flow, and saved mock progress.</p>
-
----
-
 ## 📱 How to Use
 
 1. Open the app at the live link above.
