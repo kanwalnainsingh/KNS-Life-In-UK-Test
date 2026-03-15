@@ -3574,27 +3574,6 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         </div>
       </Card>
 
-      <Card style={{ border: "1px solid var(--card-border)" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
-          <div>
-            <div style={{ color: "var(--text-strong)", fontWeight: 800, fontSize: 18 }}>Coverage checklist</div>
-            <div style={{ color: "var(--text-muted)", fontSize: 13 }}>Handbook-style areas organised for quick navigation</div>
-          </div>
-          <Badge text={`${COVERAGE_AREAS.length} areas covered`} color="#22c55e" />
-        </div>
-        <div className="study-mode-grid" style={{ display: "grid", gap: 8 }}>
-          {COVERAGE_AREAS.map((item) => (
-            <button key={item.title} className="focus-ring" onClick={() => setActive(item.tab)} style={{ border: "1px solid var(--card-border)", background: "var(--panel-bg)", color: "var(--text)", borderRadius: 16, padding: 12, textAlign: "left", cursor: "pointer" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 4 }}>
-                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 14 }}>{item.icon} {item.title}</div>
-                <span style={{ color: "#22c55e", fontWeight: 800, fontSize: 13 }}>✓</span>
-              </div>
-              <div style={{ color: "var(--text-muted)", fontSize: 13, lineHeight: 1.6 }}>{item.detail}</div>
-            </button>
-          ))}
-        </div>
-      </Card>
-
     </div>
   );
 };
