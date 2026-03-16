@@ -148,8 +148,17 @@ const clickFirstAnswerOption = async (page) => {
 
     await page.goto(url, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "TODAY'S NEXT STEP");
+    await waitForText(page, "Start Practice Test");
     await waitForText(page, "Study path");
     await waitForText(page, "Browse topics");
+
+    await page.goto(`${url}/#progress`, { waitUntil: "networkidle0", timeout: 30000 });
+    await waitForText(page, "Progress");
+    await waitForText(page, "See what is strong, weak, and worth doing next");
+
+    await page.goto(`${url}/#about`, { waitUntil: "networkidle0", timeout: 30000 });
+    await waitForText(page, "About");
+    await waitForText(page, "An unofficial study app");
 
     await page.goto(`${url}/#guide`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "How to Pass the Life in the UK Test");
@@ -174,6 +183,13 @@ const clickFirstAnswerOption = async (page) => {
     await waitForText(page, "Swipe left for Hard");
     await waitForText(page, "SESSION");
     await waitForText(page, "Why it matters");
+
+    await page.goto(`${url}/#quiz`, { waitUntil: "networkidle0", timeout: 30000 });
+    await waitForText(page, "Practice quiz with answer feedback");
+    await clickByText(page, "Start Quiz");
+    await waitForText(page, "Question 1 of");
+    await clickFirstAnswerOption(page);
+    await waitForText(page, "Correct answer:");
 
     await page.goto(`${url}/#audio`, { waitUntil: "networkidle0", timeout: 30000 });
     await waitForText(page, "Audio Mode");

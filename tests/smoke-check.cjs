@@ -29,6 +29,8 @@ const assert = (condition, message) => {
   assert(data.TABS.some((tab) => tab.id === "revise"), "Revise tab missing");
   assert(data.TABS.some((tab) => tab.id === "quickrev"), "Quick revision tab missing");
   assert(data.TABS.some((tab) => tab.id === "audio"), "Audio mode tab missing");
+  assert(data.TABS.some((tab) => tab.id === "progress"), "Progress tab missing");
+  assert(data.TABS.some((tab) => tab.id === "about"), "About tab missing");
   assert(data.TABS.some((tab) => tab.id === "examtopics"), "Exam topics tab missing");
   assert(data.TABS.some((tab) => tab.id === "story"), "Story mode tab missing");
   assert(data.TABS.some((tab) => tab.id === "datesdrill"), "Dates drill tab missing");
@@ -45,6 +47,8 @@ const assert = (condition, message) => {
   assert(/ReviseTab/.test(appSource), "Revision UI missing");
   assert(/QuickRevisionTab/.test(appSource), "Quick revision UI missing");
   assert(/AudioModeTab/.test(appSource), "Audio mode UI missing");
+  assert(/ProgressTab/.test(appSource), "Progress tab UI missing");
+  assert(/AboutTab/.test(appSource), "About tab UI missing");
   assert(/ExamTopicsModeTab/.test(appSource), "Exam topics UI missing");
   assert(/SectionMockPanel/.test(appSource), "Reusable section test UI missing");
   assert(/sectionMocks/.test(appSource), "Section test progress storage missing");
@@ -85,9 +89,11 @@ const assert = (condition, message) => {
   assert(/After you pass/.test(appSource), "Test Day after-passing section missing");
   assert(/Review the ones you missed/.test(appSource), "Daily 10 wrong-answer review missing");
   assert(/label: "Topics"/.test(appSource), "Bottom topics label missing");
-  assert(/Start here/.test(appSource), "Pass-focused start guidance missing");
+  assert(/Start Practice Test/.test(appSource), "Landing-page primary CTA missing");
   assert(/If your test is in 1/.test(appSource), "Cram plan section missing from home");
   assert(/Continue learning/.test(appSource), "Continue-learning section missing from home");
+  assert(/Trust and about/.test(appSource), "Trust/about section missing from home");
+  assert(/lifeuk-quiz-history/.test(appSource), "Quiz history local storage missing");
   assert(/Exam Topics Course/.test(appSource), "Exam topics course heading missing");
   assert(/lifeuk-examtopic-mocks/.test(appSource), "Exam topic mock storage missing");
   assert(/Topic mock/.test(appSource), "Exam topic mock UI missing");
@@ -103,8 +109,9 @@ const assert = (condition, message) => {
   assert(/const scrollPageTop =/.test(appSource), "Shared session scroll-top helper missing");
   assert(/forceLatestAppReload/.test(appSource), "Forced refresh helper missing");
   assert(/↻ Check Update/.test(appSource), "Update-check button missing");
-  assert(/Today&apos;s next step|Today's next step/.test(appSource), "Home next-step hero missing");
+  assert(/TODAY&apos;S NEXT STEP|TODAY'S NEXT STEP/.test(appSource), "Home next-step hero missing");
   assert(/Browse topics/.test(appSource), "Browse-topics home section missing");
+  assert(/Open Progress/.test(appSource), "Progress action missing from key flows");
   assert(/registration\.update\(\)/.test(indexSource), "Service worker should check for updates on load");
   assert(/assets\/styles\.css/.test(indexSource), "Tailwind stylesheet link missing from template");
   assert(/classList\.toggle\("dark"/.test(indexSource), "Initial theme script should set dark class");

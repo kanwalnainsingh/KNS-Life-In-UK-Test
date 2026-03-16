@@ -1640,6 +1640,8 @@ const ALL_QUIZ = ALL_QUIZ_BASE.map((question) => {
 // ── TABS ─────────────────────────────────────────────────────
 const TABS = [
   { id:"home",          label:"Home",         icon:"🏠" },
+  { id:"progress",      label:"Progress",     icon:"📈" },
+  { id:"about",         label:"About",        icon:"ℹ️" },
   { id:"examtopics",    label:"Exam Topics",  icon:"🧭" },
   { id:"quickrev",      label:"Quick Revise", icon:"↔️" },
   { id:"audio",         label:"Audio Mode",   icon:"🔊" },
