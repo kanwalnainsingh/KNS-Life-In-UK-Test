@@ -86,6 +86,7 @@ const STORAGE_KEYS = {
   sectionMocks: "lifeuk-section-mocks",
   storyQuizzes: "lifeuk-story-quizzes",
   audioMode: "lifeuk-audio-mode",
+  quizHistory: "lifeuk-quiz-history",
 };
 
 const RUNTIME_APP_VERSION = (() => {
@@ -112,6 +113,8 @@ const SEO_COPY = {
   tracker: { title: "Topic Completion Tracker | Life in the UK Test Practice" },
   quiz: { title: "Quiz Practice | Life in the UK Test Practice" },
   mock: { title: "Mock Test | Life in the UK Test Practice" },
+  progress: { title: "Progress Dashboard | Life in the UK Test Practice" },
+  about: { title: "About This Study App | Life in the UK Test Practice" },
   rapidfire: { title: "Rapid Fire Revision | Life in the UK Test Practice" },
   timeline: { title: "History Timeline | Life in the UK Test Practice" },
   wars: { title: "Wars and Battles Revision | Life in the UK Test Practice" },
@@ -124,18 +127,26 @@ const SEO_COPY = {
   guide: { title: "How to Pass the Life in the UK Test | Study Guide" },
 };
 
-const PRIMARY_DESKTOP_TABS = ["home", "testday", "examtopics", "quickrev", "story", "quiz", "mock"];
+const TOP_LEVEL_NAV = [
+  { id: "home", label: "Home", icon: "🏠", tab: "home" },
+  { id: "practice", label: "Practice Test", icon: "📝", tab: "mock" },
+  { id: "topics", label: "Topics", icon: "🗂️", tab: "examtopics" },
+  { id: "progress", label: "Progress", icon: "📈", tab: "progress" },
+  { id: "about", label: "About", icon: "ℹ️", tab: "about" },
+];
 const NAV_GROUPS = [
-  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "testday", "guide", "examtopics", "quickrev", "audio", "story", "quiz", "mock"] },
+  { title: "Study Now", hint: "Start here for revision and practice", ids: ["home", "mock", "quiz", "examtopics", "quickrev", "story", "audio"] },
   { title: "Core Course", hint: "Main pass-first sections and high-yield comparisons", ids: ["quickfacts", "nations", "timeline", "wars", "confuse", "figures"] },
   { title: "Culture & Reference", hint: "Religion, places, inventors, sport, arts, symbols, world organisations", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
-  { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
+  { title: "Review", hint: "Short drills, mistakes, and final checks", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker", "progress"] },
+  { title: "About", hint: "Trust, how the app works, and exam-day guidance", ids: ["about", "guide", "testday"] },
 ];
 const MOBILE_MORE_GROUPS = [
-  { title: "Study Now", hint: "Best next actions", ids: ["testday", "examtopics", "quickrev", "audio", "story", "confuse"] },
+  { title: "Study Now", hint: "Best next actions", ids: ["mock", "quiz", "examtopics", "quickrev", "audio", "story", "confuse"] },
   { title: "Core Course", hint: "Finish the course in strong exam order", ids: ["quickfacts", "nations", "timeline", "wars", "figures"] },
   { title: "Culture & Reference", hint: "Browse the lower-priority fact sections", ids: ["religion", "landmarks", "inventors", "sports", "arts", "anthem", "international"] },
-  { title: "Review", hint: "Short drills and mistake work", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker"] },
+  { title: "Review", hint: "Short drills and mistake work", ids: ["datesdrill", "daily10", "sprint", "rapidfire", "revise", "cram", "tracker", "progress"] },
+  { title: "About", hint: "Trust, guidance, and exam-day info", ids: ["about", "guide", "testday"] },
 ];
 const COVERAGE_AREAS = [
   { title: "History and timeline", detail: "Ancient Britain to modern Britain", tab: "timeline", icon: "📅" },
@@ -1606,6 +1617,22 @@ const buildMockProgress = (history = []) =>
   }, {});
 
 const loadMockHistory = () => normalizeMockHistory(readStore(STORAGE_KEYS.mockHistory, []));
+const loadQuizHistory = () =>
+  readStore(STORAGE_KEYS.quizHistory, [])
+    .filter((entry) => entry && typeof entry.score === "number" && typeof entry.total === "number")
+    .map((entry) => ({
+      at: entry.at || new Date().toISOString(),
+      score: entry.score,
+      total: entry.total,
+      percent: typeof entry.percent === "number" ? entry.percent : Math.round((entry.score / entry.total) * 100),
+      passed: typeof entry.passed === "boolean" ? entry.passed : Math.round((entry.score / entry.total) * 100) >= 75,
+      wrong: typeof entry.wrong === "number" ? entry.wrong : Math.max(0, entry.total - entry.score),
+      filter: entry.filter || "all",
+    }));
+const saveQuizHistoryEntry = (entry) => {
+  const next = [entry, ...loadQuizHistory()].slice(0, 24);
+  writeStore(STORAGE_KEYS.quizHistory, next);
+};
 
 const loadMockProgress = () => {
   const saved = readStore(STORAGE_KEYS.mockProgress, {});
@@ -2067,19 +2094,21 @@ const SettingGroup = ({ label, options, value, onChange }) => (
 
 const getPrimaryNavKey = (tabId) => {
   if (["home"].includes(tabId)) return "home";
-  if (["quickrev", "story", "daily10", "sprint", "cram", "tracker"].includes(tabId)) return "revise";
-  if (["quiz", "rapidfire", "revise"].includes(tabId)) return "quiz";
-  if (["mock"].includes(tabId)) return "mock";
-  return "menu";
+  if (["mock"].includes(tabId)) return "practice";
+  if (["progress", "revise", "tracker"].includes(tabId)) return "progress";
+  if (["about", "guide", "testday"].includes(tabId)) return "about";
+  if (["quiz", "rapidfire", "examtopics", "audio", "quickrev", "story", "datesdrill", "daily10", "sprint", "cram", "timeline", "wars", "nations", "confuse", "inventors", "sports", "figures", "religion", "landmarks", "international", "arts", "anthem", "quickfacts"].includes(tabId)) return "topics";
+  return "topics";
 };
 
 const BottomNav = ({ active, setActive, openQuickPanel }) => {
   const primaryActive = getPrimaryNavKey(active);
   const items = [
-    { id: "home", icon: "🏠", label: "Home" },
-    { id: "quickrev", icon: "↔️", label: "Revise" },
-    { id: "quiz", icon: "🧠", label: "Quiz" },
-    { id: "mock", icon: "📝", label: "Mock" },
+    { id: "home", icon: "🏠", label: "Home", tab: "home" },
+    { id: "practice", icon: "📝", label: "Practice", tab: "mock" },
+    { id: "topics", icon: "🗂️", label: "Topics", action: openQuickPanel },
+    { id: "progress", icon: "📈", label: "Progress", tab: "progress" },
+    { id: "about", icon: "ℹ️", label: "About", tab: "about" },
   ];
 
   return (
@@ -2088,7 +2117,7 @@ const BottomNav = ({ active, setActive, openQuickPanel }) => {
         <button
           key={item.id}
           className="focus-ring mobile-nav-item"
-          onClick={() => setActive(item.id)}
+          onClick={() => (item.action ? item.action() : setActive(item.tab))}
           data-active={primaryActive === item.id ? "true" : "false"}
           style={{ border: "none", cursor: "pointer" }}
         >
@@ -2096,15 +2125,6 @@ const BottomNav = ({ active, setActive, openQuickPanel }) => {
           <span>{item.label}</span>
         </button>
       ))}
-      <button
-        className="focus-ring mobile-nav-item mobile-nav-menu"
-        onClick={openQuickPanel}
-        data-active={primaryActive === "menu" ? "true" : "false"}
-        style={{ cursor: "pointer" }}
-      >
-        <span style={{ fontSize: 18 }}>☰</span>
-        <span>Menu</span>
-      </button>
     </div>
   );
 };
@@ -2144,16 +2164,16 @@ const getHashTab = () => {
   return TABS.some((tab) => tab.id === hash) ? hash : null;
 };
 
-const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack }) => {
-  const quickActions = ["examtopics", "quickrev", "audio", "mock", "story"];
+const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack, onForceRefresh, offlineReady, isOffline }) => {
+  const quickActions = ["mock", "quiz", "examtopics", "quickrev"];
   const currentTab = TABS.find((tab) => tab.id === active);
   const currentGroup = MOBILE_MORE_GROUPS.find((group) => group.ids.includes(active));
   return (
     <Sheet open={open} onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <SheetContent side="bottom" hideClose className="mobile-sheet overflow-y-auto p-4">
         <SheetHeader className="mb-3 pr-14">
-          <SheetTitle>Study menu</SheetTitle>
-          <SheetDescription>Open a study mode quickly or jump to a topic when you need it.</SheetDescription>
+          <SheetTitle>Topics</SheetTitle>
+          <SheetDescription>Resume where you are, move between the main routes, or jump to a specific topic.</SheetDescription>
         </SheetHeader>
         <div className="grid gap-3">
           <div className="study-menu-hero">
@@ -2165,7 +2185,38 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
                   {currentGroup ? `${currentGroup.title} section` : "Main study mode"}
                 </div>
               </div>
-              <Badge text="Open now" color="#3b82f6" />
+              <button
+                className="focus-ring rounded-full bg-blue-600 px-3 py-2 text-xs font-extrabold text-white"
+                onClick={() => onClose()}
+                style={{ border: "none", cursor: "pointer" }}
+              >
+                Resume
+              </button>
+            </div>
+          </div>
+
+          <div className="study-menu-section">
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Primary navigation</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">The main routes for moving around the app.</div>
+            <div className="study-menu-topic-grid" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+              {[
+                { id: "home", label: "Home", icon: "🏠" },
+                { id: "mock", label: "Practice", icon: "📝" },
+                { id: "progress", label: "Progress", icon: "📈" },
+                { id: "about", label: "About", icon: "ℹ️" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  className="focus-ring study-menu-topic"
+                  data-active={active === item.id ? "true" : "false"}
+                  onClick={() => { setActive(item.id); onClose(); }}
+                >
+                  <div className="flex flex-col items-center gap-1 text-center">
+                    <span className="text-lg">{item.icon}</span>
+                    <span>{item.label}</span>
+                  </div>
+                </button>
+              ))}
             </div>
           </div>
 
@@ -2187,8 +2238,8 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
           </div>
 
           <div className="study-menu-section">
-            <div className="mb-1 text-xs font-bold text-muted-foreground">Start studying</div>
-            <div className="mb-2 text-[11px] text-muted-foreground">Best actions when you want to learn or test yourself right away.</div>
+            <div className="mb-1 text-xs font-bold text-muted-foreground">Start fast</div>
+            <div className="mb-2 text-[11px] text-muted-foreground">Best actions when you want to study right now.</div>
             <div className="study-menu-primary-grid">
               {quickActions.map((id) => {
                 const item = TABS.find((tab) => tab.id === id);
@@ -2208,9 +2259,9 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
                     <div className="mt-1 text-[11px] text-muted-foreground">
                       {item.id === "quickrev" ? "Fresh facts quickly" :
                         item.id === "examtopics" ? "Learn by exam category" :
+                        item.id === "quiz" ? "Flexible quiz practice" :
                         item.id === "mock" ? "Closest to the real test" :
-                          item.id === "quiz" ? "Flexible practice mode" :
-                            "Learn the course in order"}
+                        "Learn the course in order"}
                     </div>
                   </button>
                 );
@@ -2242,6 +2293,21 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
               </div>
             </div>
           ))}
+          <div className="study-menu-section">
+            <div className="mb-1 text-xs font-bold text-muted-foreground">App status</div>
+            <div className="rounded-2xl border border-border bg-card/80 p-4">
+              <div className="mb-3 flex flex-wrap gap-2">
+                <Badge text={`Release ${APP_VERSION}`} color="#64748b" />
+                <Badge text={isOffline ? "Offline now" : offlineReady ? "Offline ready" : "Online only"} color={isOffline ? "#f59e0b" : offlineReady ? "#22c55e" : "#64748b"} />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button variant="secondary" className="rounded-xl text-xs font-extrabold" onClick={onForceRefresh}>↻ Check Update</Button>
+                <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" className="inline-flex items-center rounded-xl border border-border px-3 py-2 text-xs font-bold text-muted-foreground no-underline">
+                  Open Source
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
@@ -2251,10 +2317,13 @@ const MobileQuickPanel = ({ open, active, setActive, onClose, onBack, canGoBack 
 const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
   <>
     <Card className="question-shell">
-      <div className="text-[17px] font-extrabold leading-7 text-foreground">{question.q}</div>
-      <div className="mt-3"><Badge text={inferTopic(question)} color="#60a5fa" /></div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Badge text={inferTopic(question)} color="#60a5fa" />
+        <div className="text-xs font-semibold text-muted-foreground">Choose one answer</div>
+      </div>
+      <div className="mt-4 text-[19px] font-extrabold leading-8 text-foreground sm:text-[21px]">{question.q}</div>
     </Card>
-    <div className="grid gap-2">
+    <div className="grid gap-3">
       {question.opts.map((opt, oi) => {
         let bg = "color-mix(in srgb, var(--card-bg) 92%, var(--secondary))";
         let border = "var(--card-border)";
@@ -2267,16 +2336,51 @@ const QuestionCard = ({ question, selected, confirmed, onSelect }) => (
           bg = "color-mix(in srgb, #3b82f6 12%, var(--card-bg))"; border = "#3b82f6"; color = "var(--text-strong)";
         }
         return (
-          <button key={oi} className="focus-ring option-button" onClick={() => onSelect(oi)}
-            style={{ border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer", background: bg, color }}>
-            <span className="mr-2 font-bold opacity-70">{["A", "B", "C", "D"][oi]}.</span>{opt}
-            {confirmed && oi === question.a && " ✓"}
-            {confirmed && oi === selected && oi !== question.a && " ✗"}
+          <button
+            key={oi}
+            className="focus-ring option-button"
+            onClick={() => onSelect(oi)}
+            disabled={confirmed}
+            aria-pressed={selected === oi}
+            aria-disabled={confirmed}
+            style={{ border: `2px solid ${border}`, cursor: confirmed ? "default" : "pointer", background: bg, color, minHeight: 76 }}
+          >
+            <span className="mr-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-current/20 bg-background/40 text-xs font-black">{["A", "B", "C", "D"][oi]}</span>
+            <span className="flex-1 text-left text-base leading-6">{opt}</span>
+            <span aria-hidden="true" className="ml-3 text-base font-black">
+              {confirmed && oi === question.a ? "✓" : confirmed && oi === selected && oi !== question.a ? "✕" : ""}
+            </span>
           </button>
         );
       })}
     </div>
   </>
+);
+
+const QuestionFeedbackPanel = ({ correct, correctAnswer, chosenAnswer, explanation, tip }) => (
+  <Card
+    role="status"
+    aria-live="polite"
+    className="border"
+    style={{
+      borderColor: correct ? "color-mix(in srgb, #22c55e 35%, var(--card-border))" : "color-mix(in srgb, #ef4444 35%, var(--card-border))",
+      background: correct ? "color-mix(in srgb, #22c55e 8%, var(--card-bg))" : "color-mix(in srgb, #ef4444 8%, var(--card-bg))",
+    }}
+  >
+    <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+      <div className="text-base font-extrabold" style={{ color: correct ? "#16a34a" : "#dc2626" }}>
+        {correct ? "Correct answer" : "Incorrect answer"}
+      </div>
+      <Badge text={correct ? "Correct" : "Needs review"} color={correct ? "#22c55e" : "#ef4444"} />
+    </div>
+    {!correct && <div className="mb-2 text-sm text-muted-foreground">Your answer: {chosenAnswer || "No answer selected"}</div>}
+    <div className="mb-3 text-sm font-semibold text-foreground">Correct answer: {correctAnswer}</div>
+    <div className="rounded-2xl border border-border bg-card/70 p-3">
+      <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Explanation</div>
+      <div className="text-sm leading-7 text-muted-foreground">{explanation}</div>
+      {tip ? <MemoryHook text={tip} /> : null}
+    </div>
+  </Card>
 );
 
 const MOCK_TOTAL = 24;
@@ -2864,7 +2968,7 @@ const buildSectionMockProgress = (history = []) =>
   }, {});
 
 // ── TAB BAR ──────────────────────────────────────────────────
-const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel, isMobile }) => {
+const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, openQuickPanel, isMobile, onBack, canGoBack }) => {
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === "Escape") setMenuOpen(false);
@@ -2880,6 +2984,10 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
 
   const handleMenuButton = () => {
     if (isMobile) {
+      if (active !== "home" && canGoBack) {
+        onBack();
+        return;
+      }
       openQuickPanel();
       return;
     }
@@ -2890,8 +2998,8 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
     <>
       <div className="sticky top-0 z-[100] border-b border-border bg-background/85 backdrop-blur-xl">
         <div className="flex items-center gap-2 px-4 py-3">
-        <button aria-label={isMobile ? "Open quick panel" : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring rounded-xl border border-border bg-card px-3 py-2 text-lg text-foreground shadow-sm" onClick={handleMenuButton}>
-          ☰
+        <button aria-label={isMobile ? (active !== "home" && canGoBack ? "Go back" : "Open topics") : menuOpen ? "Close topics menu" : "Open topics menu"} className="focus-ring rounded-xl border border-border bg-card px-3 py-2 text-lg text-foreground shadow-sm" onClick={handleMenuButton}>
+          {isMobile && active !== "home" && canGoBack ? "←" : "☰"}
         </button>
         <button aria-label="Go to home" className="focus-ring rounded-xl bg-transparent px-0 text-lg font-extrabold text-primary" onClick={() => setActive("home")} style={{ border: "none", cursor: "pointer" }}>
           🇬🇧 Life in the UK
@@ -2908,28 +3016,21 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
         </div>
         <div className="desktop-nav-panel desktop-only">
           <div className="desktop-nav-group">
-            <div className="desktop-nav-label">Main</div>
+            <div className="desktop-nav-label">Navigate</div>
             <div className="desktop-nav-row">
-              {TABS.filter((tab) => PRIMARY_DESKTOP_TABS.includes(tab.id)).map((tab) => (
+              {TOP_LEVEL_NAV.map((tab) => (
                 <button
                   key={tab.id}
                   className="focus-ring desktop-nav-chip"
-                  onClick={() => setActive(tab.id)}
-                  data-active={active === tab.id ? "true" : "false"}
+                  onClick={() => (tab.id === "topics" ? setMenuOpen(true) : setActive(tab.tab))}
+                  data-active={(tab.id === "topics" ? menuOpen : getPrimaryNavKey(active) === tab.id) ? "true" : "false"}
                 >
                   {tab.icon} {tab.label}
                 </button>
               ))}
-              <button
-                className="focus-ring desktop-nav-chip"
-                onClick={() => setMenuOpen(true)}
-                data-active={menuOpen ? "true" : "false"}
-              >
-                ☰ All Topics
-              </button>
             </div>
           </div>
-          {NAV_GROUPS.slice(1).map((group) => (
+          {NAV_GROUPS.slice(1, 3).map((group) => (
             <div key={group.title} className="desktop-nav-group">
               <div className="desktop-nav-label">{group.title}</div>
               <div style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>{group.hint}</div>
@@ -2986,7 +3087,8 @@ const TabBar = ({ active, setActive, menuOpen, setMenuOpen, isDark, toggleDark, 
   );
 };
 
-const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
+const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline, isMobile }) => (
+  isMobile ? null : (
   <div className="px-4 pb-[max(18px,env(safe-area-inset-bottom))] pt-2">
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-background/88 px-3 py-3 shadow-soft backdrop-blur-xl">
       <div className="flex flex-wrap items-center gap-2">
@@ -3004,7 +3106,7 @@ const AppFooterBar = ({ onForceRefresh, offlineReady, isOffline }) => (
       </Button>
     </div>
   </div>
-);
+));
 
 // ── HOME ─────────────────────────────────────────────────────
 const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
@@ -3038,6 +3140,8 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
   const [factOrder, setFactOrder] = useState(() => shuffleList(TOP_TESTED_FACTS));
   const [factPage, setFactPage] = useState(0);
   const [expandedPhase, setExpandedPhase] = useState(null);
+  const [showFacts, setShowFacts] = useState(false);
+  const [showTopics, setShowTopics] = useState(false);
   const visibleFacts = useMemo(() => {
     const start = factPage * 10;
     const slice = factOrder.slice(start, start + 10);
@@ -3096,16 +3200,14 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
 
   return (
     <div className="page-stack">
-
-      {/* ── HERO ── */}
       <Card className="hero-panel">
         <CardHeader className="pb-3">
-          <div className="eyebrow mb-2">Free · ILR &amp; British citizenship</div>
+          <div className="eyebrow mb-2">TODAY&apos;S NEXT STEP</div>
           <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">
-            Life in the UK Test Practice
+            Life in the UK Test practice that stays focused on passing
           </CardTitle>
           <CardDescription className="mt-2 max-w-xl text-sm leading-7">
-            Everything you need to pass — quick-revision cards, common mix-ups, mock papers, and a Test Day checklist.
+            Practice full tests, revise by topic, review mistakes, and keep your progress on this device. No account required and no official affiliation claimed.
           </CardDescription>
           <div className="section-strip mt-3">
             <Badge text="24 questions" color="#3b82f6" />
@@ -3114,33 +3216,47 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
           </div>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="support-card-strong">
-            <div className="eyebrow mb-1">Your next step</div>
-            <div className="text-base font-extrabold text-foreground">{nextBestAction.title}</div>
-            <div className="mt-1 mb-3 text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
-            <div className="flex flex-wrap gap-2">
-              <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive(nextBestAction.tab)}>
-                {isNewUser ? "Start here →" : "Open now →"}
-              </Button>
-              <Button variant="secondary" onClick={() => setActive("testday")}>📋 Test Day info</Button>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => setActive("mock")}>
+              Start Practice Test →
+            </Button>
+            <Button variant="secondary" onClick={() => setActive("examtopics")}>Browse Topics</Button>
+            <Button variant="secondary" onClick={() => setActive("progress")}>Open Progress</Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* ── CRAM PLAN — neutral checklist, for the 1-3 day user ── */}
-      <Card style={{ border: "1px solid var(--card-border)" }}>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <button className="focus-ring rounded-[22px] border border-primary/20 bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive(nextBestAction.tab)}>
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-primary">Recommended next move</div>
+          <div className="mb-1 text-lg font-extrabold text-foreground">{nextBestAction.title}</div>
+          <div className="text-sm leading-6 text-muted-foreground">{nextBestAction.detail}</div>
+        </button>
+        <button className="focus-ring rounded-[22px] border border-border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive("story")}>
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Learn the course</div>
+          <div className="mb-1 text-lg font-extrabold text-foreground">Continue Story Mode</div>
+          <div className="text-sm leading-6 text-muted-foreground">{nextStoryChapter ? `${nextStoryChapter.title} is your next chapter.` : "Start with the history course."}</div>
+        </button>
+        <button className="focus-ring rounded-[22px] border border-border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive("examtopics")}>
+          <div className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Study by exam area</div>
+          <div className="mb-1 text-lg font-extrabold text-foreground">Next topic block</div>
+          <div className="text-sm leading-6 text-muted-foreground">{nextExamTopic ? nextExamTopic.title : "Open the exam topics course."}</div>
+        </button>
+      </div>
+
+      <Card style={{ border: "1px solid color-mix(in srgb, #10b981 35%, var(--card-border))" }}>
         <div className="mb-4">
+          <div className="eyebrow mb-1 text-emerald-600 dark:text-emerald-300">Urgent plan</div>
           <div className="text-lg font-extrabold text-foreground">If your test is in 1–3 days</div>
-          <div className="text-sm text-muted-foreground">Do these in order. Skip anything you have already covered.</div>
+          <div className="text-sm text-muted-foreground">Do these in order. Skip anything you already know well.</div>
         </div>
         <div style={{ display: "grid", gap: 8 }}>
           {[
-            { step: 1, label: "Quick Revise", detail: "Swipe through facts — mark what you know and what you don't", tab: "quickrev", color: "#f97316" },
-            { step: 2, label: "4 Nations", detail: "Capitals, saints, parliaments, flowers — appears on almost every paper", tab: "nations", color: "#10b981" },
-            { step: 3, label: "Common Mix-Ups", detail: "UK vs GB, dates, church comparisons — the most common lost marks", tab: "confuse", color: "#7c3aed" },
-            { step: 4, label: "Mock Test", detail: "Full 24-question paper — see your actual score under exam conditions", tab: "mock", color: "#ef4444" },
-            { step: 5, label: "Cram Sheet", detail: "One-page summary the night before — not for learning, for confirming", tab: "cram", color: "#f59e0b" },
+            { step: 1, label: "Quick Revise", detail: "Fast card recall first", tab: "quickrev", color: "#f97316" },
+            { step: 2, label: "4 Nations", detail: "Capitals, saints, parliaments, flowers", tab: "nations", color: "#10b981" },
+            { step: 3, label: "Common Mix-Ups", detail: "UK vs GB and high-confusion comparisons", tab: "confuse", color: "#7c3aed" },
+            { step: 4, label: "Mock Test", detail: "Check your real pass score under test conditions", tab: "mock", color: "#ef4444" },
+            { step: 5, label: "Cram Sheet", detail: "Final night confirmation only", tab: "cram", color: "#f59e0b" },
           ].map((item) => (
             <button key={item.step} className="focus-ring" onClick={() => setActive(item.tab)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 14px", border: "1px solid var(--card-border)", borderRadius: 14, background: "var(--surface-strong)", cursor: "pointer", textAlign: "left" }}>
               <span style={{ background: item.color, color: "#fff", fontWeight: 900, fontSize: 13, borderRadius: "50%", width: 28, height: 28, display: "grid", placeItems: "center", flexShrink: 0 }}>{item.step}</span>
@@ -3207,163 +3323,355 @@ const HomeTab = ({ setActive, wrongQuestions, mockHistory, mockProgress }) => {
         );
       })()}
 
-      {/* ── CRITICAL TOPICS ── */}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <button className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" style={{ borderColor: "#10b981", background: "color-mix(in srgb, #10b981 8%, transparent)", cursor: "pointer" }} onClick={() => setActive("nations")}>
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className="text-2xl">🏴</div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#10b981" }}>Critical topic</span>
-          </div>
-          <div className="mb-1 text-base font-extrabold text-foreground">4 Nations — don't skip this</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">Capitals, patron saints, saint's days, parliaments, flowers — each nation separately. On almost every real paper.</div>
-          <div className="flex flex-wrap gap-1.5 text-xs">
-            {["Capitals", "Patron saints", "Saint's days", "Parliaments", "Member counts", "National flowers"].map((tag) => (
-              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#10b98150" }}>{tag}</span>
-            ))}
-          </div>
-        </button>
-        <button className="focus-ring rounded-[20px] border-2 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" style={{ borderColor: "#7c3aed", background: "color-mix(in srgb, #7c3aed 8%, transparent)", cursor: "pointer" }} onClick={() => setActive("confuse")}>
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className="text-2xl">⚠️</div>
-            <span className="rounded-full px-2 py-0.5 text-xs font-black text-white" style={{ background: "#7c3aed" }}>Critical topic</span>
-          </div>
-          <div className="mb-1 text-base font-extrabold text-foreground">Common Mix-Ups — where marks are lost</div>
-          <div className="mb-3 text-sm leading-6 text-muted-foreground">GB vs UK, Commons vs Lords, 1807 vs 1833, 1603 vs 1707, Church of England vs Church of Scotland — study them side by side.</div>
-          <div className="flex flex-wrap gap-1.5 text-xs">
-            {["GB vs UK", "Commons vs Lords", "1807 vs 1833", "1603 vs 1707", "Caesar vs Claudius", "Church comparison"].map((tag) => (
-              <span key={tag} className="rounded-full border px-2 py-0.5 font-semibold text-muted-foreground" style={{ borderColor: "#7c3aed50" }}>{tag}</span>
-            ))}
-          </div>
-        </button>
-      </div>
-
-      {/* ── TOP 10 MOST-TESTED FACTS ── */}
-      <Card className="border-emerald-500/25 bg-emerald-500/5">
+      {/* ── PROGRESS DASHBOARD (returning users only) ── */}
+      <Card className="quiet-tint">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">🎯 Top 10 Most-Tested Facts</div>
-            <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">The facts that come up most on the real test.</div>
+            <div className="text-lg font-extrabold text-foreground">Continue learning</div>
+            <div className="text-sm text-muted-foreground">Keep the next move obvious and small.</div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh</Button>
-            <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
-          </div>
+          <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
         </div>
-        {visibleFacts.map((fact, index) => (
-          <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
-            <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
-            <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
-          </div>
-        ))}
+        <div className="grid gap-3 sm:grid-cols-2">
+          <button className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })} style={{ borderColor: "#f9731630", cursor: "pointer" }}>
+            <div className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">Weakest area</div>
+            <div className="mb-1 text-lg font-extrabold text-foreground">{weakestTopic}</div>
+            <div className="text-sm leading-6 text-muted-foreground">Run a short weak-areas session now.</div>
+          </button>
+          <button className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive("mock")} style={{ borderColor: "#8b5cf630", cursor: "pointer" }}>
+            <div className="mb-1 text-sm font-bold uppercase tracking-[0.14em] text-muted-foreground">Mock status</div>
+            <div className="mb-1 text-lg font-extrabold text-foreground">{latestMock ? `Best: ${bestPaperScore}%` : "No paper yet"}</div>
+            <div className="text-sm leading-6 text-muted-foreground">{latestMock ? `${nextPaper.title} is next.` : "Start when you want exam-format practice."}</div>
+          </button>
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
+            <div className="text-sm font-semibold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} Continue ${lastActiveTab.label}` : "↔️ Start Quick Revise"}</div>
+            <div className="mt-1 text-xs leading-5 text-muted-foreground">{lastActiveTab ? "Jump back into the last section you used." : "Fastest route into revision."}</div>
+          </button>
+          <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
+            <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length} saved facts · {bookmarks.questions.length} saved questions</div>
+            <div className="mt-1 text-xs leading-5 text-muted-foreground">Open your bookmarked material.</div>
+          </button>
+        </div>
       </Card>
 
-      {/* ── PROGRESS DASHBOARD (returning users only) ── */}
-      {!isNewUser && (
-        <Card className="quiet-tint">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="text-lg font-extrabold text-foreground">Your progress</div>
-              <div className="text-sm text-muted-foreground">Saved on this device.</div>
-            </div>
-            <Badge text={`${readiness}% readiness`} color={readiness >= 75 ? "#22c55e" : readiness >= 55 ? "#f59e0b" : "#ef4444"} />
-          </div>
-          <div className="metric-grid mb-4">
-            <StatTile label="Wrong answers saved" value={wrongQuestions.length} color="#ef4444" />
-            <StatTile label="Mock papers done" value={completedPapers} color="#8b5cf6" />
-            <StatTile label="Best paper result" value={completedPapers ? `${bestPaperScore}%` : "—"} color="#f59e0b" />
-            <StatTile label="Hard cards" value={hardCardCount} color="#f97316" />
-          </div>
-          <div className="continue-learning-grid mb-4">
-            <button className="focus-ring continue-learning-card" onClick={() => setActive(lastActiveTab?.id || "quickrev")}>
-              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">{lastActiveTab ? "Continue" : "Start"}</div>
-              <div className="mb-1 text-base font-extrabold text-foreground">{lastActiveTab ? `${lastActiveTab.icon} ${lastActiveTab.label}` : "↔️ Quick Revise"}</div>
-              <div className="text-sm leading-6 text-muted-foreground">{lastActiveTab ? "Jump back into the last section you used." : "Start with the fastest study mode."}</div>
-            </button>
-            <button className="focus-ring continue-learning-card" onClick={() => setActive("mock")}>
-              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Mock tests</div>
-              <div className="mb-1 text-base font-extrabold text-foreground">{latestMock ? `📝 Last: ${latestMock.score}/24` : "📝 No paper yet"}</div>
-              <div className="text-sm leading-6 text-muted-foreground">{latestMock ? `${nextPaper.title} is next.` : "Start when you want exam-format practice."}</div>
-            </button>
-            <button className="focus-ring continue-learning-card" onClick={() => setActive("revise")}>
-              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Mistakes</div>
-              <div className="mb-1 text-base font-extrabold text-foreground">🧩 {wrongQuestions.length} wrong answers</div>
-              <div className="text-sm leading-6 text-muted-foreground">{wrongQuestions.length > 0 ? "Clear these before your next mock." : "Clean slate — no mistakes saved."}</div>
-            </button>
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2">
-            <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "weak", sessionType: "short", topic: "All topics" })}>
-              <div className="text-sm font-semibold text-foreground">Weakest area: {weakestTopic}</div>
-              <div className="mt-1 text-xs leading-5 text-muted-foreground">Run a short weak-areas session now.</div>
-            </button>
-            <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => launchQuickRevision(setActive, { focus: "saved", sessionType: "short", topic: "All topics" })}>
-              <div className="text-sm font-semibold text-foreground">{bookmarks.cards.length} saved facts · {bookmarks.questions.length} saved questions</div>
-              <div className="mt-1 text-xs leading-5 text-muted-foreground">Open your bookmarked material.</div>
-            </button>
-          </div>
-        </Card>
-      )}
-
-      {/* ── STUDY PATH — collapsed by default, each phase expandable ── */}
       <Card className="quiet-tint">
         <div className="mb-4">
-          <div className="text-lg font-extrabold text-foreground">Study path</div>
-          <div className="text-sm text-muted-foreground">Learn → Drill → Check → Test. Tap a phase to see the tools in it.</div>
+          <div className="text-lg font-extrabold text-foreground">Browse topics</div>
+          <div className="text-sm text-muted-foreground">Keep the home screen light. Open only the section you need.</div>
         </div>
-        <div style={{ display: "grid", gap: 6 }}>
-          {STUDY_PHASES.map((phase) => {
-            const isOpen = expandedPhase === phase.n;
-            return (
-              <div key={phase.n} style={{ border: `1px solid ${isOpen ? phase.color + "50" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden", transition: "border-color 0.2s" }}>
-                <button className="focus-ring" onClick={() => setExpandedPhase(isOpen ? null : phase.n)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: isOpen ? `${phase.color}0e` : "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
-                  <span style={{ background: phase.color, color: "#fff", fontWeight: 900, fontSize: 13, borderRadius: "50%", width: 28, height: 28, display: "grid", placeItems: "center", flexShrink: 0 }}>{phase.n}</span>
-                  <span style={{ flex: 1 }}>
-                    <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{phase.label}</span>
-                    <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>{phase.hint} · {phase.items.length} tools</span>
-                  </span>
-                  <span style={{ color: "var(--text-muted)", fontSize: 14, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
-                </button>
-                {isOpen && (
-                  <div style={{ padding: "0 12px 12px", background: `${phase.color}06` }}>
-                    <div className="feature-grid" style={{ paddingTop: 12 }}>
-                      {phase.items.map((item) => (
-                        <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive(item.id)} style={{ borderColor: `${phase.color}30`, cursor: "pointer" }}>
-                          <div className="mb-2 flex items-center justify-between">
-                            <div className="text-[22px]">{item.icon}</div>
-                            <Badge text={item.when} color={phase.color} />
+        <div style={{ display: "grid", gap: 8 }}>
+          <div style={{ border: `1px solid ${expandedPhase ? "#3b82f650" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+            <button className="focus-ring" onClick={() => setExpandedPhase(expandedPhase ? null : 1)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>Study path</span>
+                <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>4 clear phases. Tap to expand only what you need.</span>
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 14, transform: expandedPhase ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+            </button>
+            {expandedPhase && (
+              <div style={{ padding: "12px", background: "color-mix(in srgb, #3b82f6 4%, var(--card-bg))", display: "grid", gap: 6 }}>
+                {STUDY_PHASES.map((phase) => {
+                  const isOpen = expandedPhase === phase.n;
+                  return (
+                    <div key={phase.n} style={{ border: `1px solid ${isOpen ? phase.color + "50" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+                      <button className="focus-ring" onClick={() => setExpandedPhase(isOpen ? null : phase.n)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: isOpen ? `${phase.color}0e` : "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+                        <span style={{ background: phase.color, color: "#fff", fontWeight: 900, fontSize: 13, borderRadius: "50%", width: 28, height: 28, display: "grid", placeItems: "center", flexShrink: 0 }}>{phase.n}</span>
+                        <span style={{ flex: 1 }}>
+                          <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>{phase.label}</span>
+                          <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>{phase.hint} · {phase.items.length} tools</span>
+                        </span>
+                        <span style={{ color: "var(--text-muted)", fontSize: 14, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+                      </button>
+                      {isOpen && (
+                        <div style={{ padding: "0 12px 12px", background: `${phase.color}06` }}>
+                          <div className="feature-grid" style={{ paddingTop: 12 }}>
+                            {phase.items.map((item) => (
+                              <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft" onClick={() => setActive(item.id)} style={{ borderColor: `${phase.color}30`, cursor: "pointer" }}>
+                                <div className="mb-2 flex items-center justify-between">
+                                  <div className="text-[22px]">{item.icon}</div>
+                                  <Badge text={item.when} color={phase.color} />
+                                </div>
+                                <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
+                                <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
+                              </button>
+                            ))}
                           </div>
-                          <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
-                          <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
-                        </button>
-                      ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  );
+                })}
               </div>
-            );
-          })}
+            )}
+          </div>
+
+          <div style={{ border: `1px solid ${showFacts ? "#10b98150" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+            <button className="focus-ring" onClick={() => setShowFacts((v) => !v)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>Top tested facts</span>
+                <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>Collapsed by default. Open when you want a quick scan.</span>
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 14, transform: showFacts ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+            </button>
+            {showFacts && (
+              <div className="border-t border-border bg-emerald-500/5 p-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <div className="text-base font-extrabold text-emerald-800 dark:text-emerald-200">Top tested facts</div>
+                    <div className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">The facts that come up most on the real test.</div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={refreshFacts} className="bg-emerald-700 hover:bg-emerald-700/90">Refresh</Button>
+                    <Button variant="secondary" onClick={nextFacts}>Next 10</Button>
+                  </div>
+                </div>
+                {visibleFacts.map((fact, index) => (
+                  <div key={fact} className="flex gap-3 border-b border-emerald-500/10 py-2 last:border-b-0">
+                    <div className="min-w-[22px] font-extrabold text-emerald-600 dark:text-emerald-300">{index + 1}.</div>
+                    <div className="text-sm leading-6 text-emerald-900 dark:text-emerald-100">{fact}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div style={{ border: `1px solid ${showTopics ? "#7c3aed50" : "var(--card-border)"}`, borderRadius: 16, overflow: "hidden" }}>
+            <button className="focus-ring" onClick={() => setShowTopics((v) => !v)} style={{ width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "var(--surface-strong)", cursor: "pointer", border: "none", textAlign: "left" }}>
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontWeight: 800, color: "var(--text-strong)", fontSize: 15 }}>Topic sections</span>
+                <span style={{ display: "block", fontSize: 12, color: "var(--text-muted)" }}>Deep-dive sections for specific gaps.</span>
+              </span>
+              <span style={{ color: "var(--text-muted)", fontSize: 14, transform: showTopics ? "rotate(90deg)" : "none", transition: "transform 0.2s" }}>›</span>
+            </button>
+            {showTopics && (
+              <div className="feature-grid border-t border-border bg-purple-500/5 p-4">
+                {MENU_HIGHLIGHTS.map((item) => (
+                  <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
+                    <div className="mb-2 text-[22px]">{item.icon}</div>
+                    <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
+                    <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </Card>
 
-      {/* ── MENU HIGHLIGHTS — top 5 topic sections ── */}
       <Card className="quiet-tint">
-        <div className="mb-3">
-          <div className="text-base font-extrabold text-foreground">Topic sections (☰ menu)</div>
-          <div className="text-sm text-muted-foreground">Deep-dive sections for specific gaps. Open the menu for the full list.</div>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-lg font-extrabold text-foreground">Trust and about</div>
+            <div className="text-sm text-muted-foreground">Clear about what this app is, how it works, and where your progress is stored.</div>
+          </div>
+          <Badge text="Unofficial study app" color="#f59e0b" />
         </div>
-        <div className="feature-grid">
-          {MENU_HIGHLIGHTS.map((item) => (
-            <button key={item.id} className="focus-ring rounded-[20px] border bg-card/90 p-4 text-left shadow-soft transition-transform hover:-translate-y-0.5" onClick={() => setActive(item.id)} style={{ borderColor: `${item.color}30`, cursor: "pointer" }}>
-              <div className="mb-2 text-[22px]">{item.icon}</div>
-              <div className="mb-1 text-sm font-extrabold text-foreground">{item.title}</div>
-              <div className="text-xs leading-6 text-muted-foreground">{item.desc}</div>
-            </button>
-          ))}
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="subtle-panel p-4">
+            <div className="mb-1 text-sm font-extrabold text-foreground">Independent</div>
+            <div className="text-sm leading-6 text-muted-foreground">This is an unofficial revision app and does not claim government or official-test status.</div>
+          </div>
+          <div className="subtle-panel p-4">
+            <div className="mb-1 text-sm font-extrabold text-foreground">Progress stays local</div>
+            <div className="text-sm leading-6 text-muted-foreground">Scores, mistakes, and bookmarks are stored in your browser on this device.</div>
+          </div>
+          <div className="subtle-panel p-4">
+            <div className="mb-1 text-sm font-extrabold text-foreground">Open source</div>
+            <div className="text-sm leading-6 text-muted-foreground">You can inspect the code and follow updates, which makes the app easier to trust and improve.</div>
+          </div>
+        </div>
+        <div className="mt-3">
+          <Button variant="secondary" onClick={() => setActive("about")}>Read About this app</Button>
         </div>
       </Card>
 
     </div>
   );
 };
+
+const ProgressTab = ({ setActive }) => {
+  const mockHistory = useMemo(() => loadMockHistory(), []);
+  const quizHistory = useMemo(() => loadQuizHistory(), []);
+  const wrongQuestions = useMemo(() => readStore(STORAGE_KEYS.wrongQuestions, []), []);
+  const trackerProgress = useMemo(() => readStore(STORAGE_KEYS.topicTracker, {}), []);
+  const examTopicsProgress = useMemo(() => readStore(STORAGE_KEYS.examTopicsMode, []), []);
+  const bookmarks = useMemo(() => loadBookmarks(), []);
+  const quickRevRatings = useMemo(() => readStore(STORAGE_KEYS.quickRevRatings, {}), []);
+  const completedTracker = TRACKER_SECTIONS.filter((item) => trackerProgress[item.id]).length;
+  const bestMock = mockHistory.length ? Math.max(...mockHistory.map((item) => item.percent)) : 0;
+  const lastMock = mockHistory[0];
+  const lastQuiz = quizHistory[0];
+  const averageQuiz = quizHistory.length ? Math.round(quizHistory.reduce((sum, item) => sum + item.percent, 0) / quizHistory.length) : 0;
+  const hardCards = Object.values(quickRevRatings).filter((item) => (item?.hard || 0) > (item?.easy || 0)).length;
+  const weakestTopic = wrongQuestions.length ? buildRevisionBuckets(wrongQuestions)[0]?.topic || "General" : "None saved";
+  const readiness = Math.max(0, Math.min(100, Math.round((bestMock * 0.6) + (completedTracker / TRACKER_SECTIONS.length) * 25 + (quizHistory.length ? averageQuiz * 0.15 : 8))));
+
+  return (
+    <div className="page-stack">
+      <SectionTitle icon="📈" meta="Progress saved only on this device. Use it to decide your next best study move.">Progress</SectionTitle>
+      <Card className="hero-panel">
+        <CardHeader className="pb-3">
+          <div className="eyebrow mb-2">Local progress dashboard</div>
+          <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">See what is strong, weak, and worth doing next</CardTitle>
+          <CardDescription className="mt-2 max-w-2xl text-sm leading-7">
+            Your quiz runs, mock papers, saved mistakes, bookmarks, and topic completion are stored in your browser on this device.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="metric-grid">
+            <StatTile label="Readiness" value={`${readiness}%`} color="#3b82f6" />
+            <StatTile label="Best mock" value={mockHistory.length ? `${bestMock}%` : "—"} color="#22c55e" />
+            <StatTile label="Quiz average" value={quizHistory.length ? `${averageQuiz}%` : "—"} color="#8b5cf6" />
+            <StatTile label="Saved mistakes" value={wrongQuestions.length} color="#ef4444" />
+            <StatTile label="Hard cards" value={hardCards} color="#f59e0b" />
+          </div>
+        </CardContent>
+      </Card>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="dashboard-card">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="text-lg font-extrabold text-foreground">Practice history</div>
+              <div className="text-sm text-muted-foreground">Mock tests are closest to the real exam. Quiz runs are better for volume.</div>
+            </div>
+            <Badge text={`${mockHistory.length + quizHistory.length} sessions`} color="#64748b" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="subtle-panel p-4">
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Practice test</div>
+              <div className="text-xl font-black text-foreground">{lastMock ? `${lastMock.score}/24` : "No paper yet"}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{lastMock ? `${lastMock.percent}% on the last paper` : "Start with a full timed paper."}</div>
+            </div>
+            <div className="subtle-panel p-4">
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Quiz practice</div>
+              <div className="text-xl font-black text-foreground">{lastQuiz ? `${lastQuiz.percent}%` : "No quiz yet"}</div>
+              <div className="mt-1 text-sm text-muted-foreground">{lastQuiz ? `${lastQuiz.score}/${lastQuiz.total} on the last run` : "Use quiz mode for fast targeted correction."}</div>
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button onClick={() => setActive("mock")}>Open Practice Test</Button>
+            <Button variant="secondary" onClick={() => setActive("quiz")}>Open Quiz</Button>
+          </div>
+        </Card>
+        <Card className="dashboard-card">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <div className="text-lg font-extrabold text-foreground">Revision health</div>
+              <div className="text-sm text-muted-foreground">Track what still needs attention before the next full paper.</div>
+            </div>
+            <Badge text={`Weakest: ${weakestTopic}`} color="#f97316" />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="subtle-panel p-4">
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Topic completion</div>
+              <div className="mb-2 text-xl font-black text-foreground">{completedTracker}/{TRACKER_SECTIONS.length}</div>
+              <Progress value={(completedTracker / TRACKER_SECTIONS.length) * 100} className="h-2.5" />
+            </div>
+            <div className="subtle-panel p-4">
+              <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Exam topics completed</div>
+              <div className="mb-2 text-xl font-black text-foreground">{examTopicsProgress.length}/{EXAM_TOPIC_MODE_GROUPS.length}</div>
+              <Progress value={(examTopicsProgress.length / EXAM_TOPIC_MODE_GROUPS.length) * 100} className="h-2.5" />
+            </div>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive("revise")}>
+              <div className="text-sm font-semibold text-foreground">{wrongQuestions.length} saved mistakes</div>
+              <div className="mt-1 text-xs leading-5 text-muted-foreground">Review mistakes before your next paper.</div>
+            </button>
+            <button className="focus-ring rounded-xl border border-border bg-secondary/60 px-3 py-3 text-left" onClick={() => setActive("quickrev")}>
+              <div className="text-sm font-semibold text-foreground">{hardCards} hard quick-revision cards</div>
+              <div className="mt-1 text-xs leading-5 text-muted-foreground">Clear hard cards with a short revision run.</div>
+            </button>
+          </div>
+        </Card>
+      </div>
+      <Card className="dashboard-card">
+        <div className="mb-3 text-lg font-extrabold text-foreground">Saved on this device</div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="subtle-panel p-4">
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Bookmarked questions</div>
+            <div className="text-xl font-black text-foreground">{bookmarks.questions.length}</div>
+          </div>
+          <div className="subtle-panel p-4">
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Saved fact cards</div>
+            <div className="text-xl font-black text-foreground">{bookmarks.cards.length}</div>
+          </div>
+          <div className="subtle-panel p-4">
+            <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Recent sessions</div>
+            <div className="text-xl font-black text-foreground">{Math.min(mockHistory.length + quizHistory.length, 24)}</div>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+const AboutTab = ({ setActive }) => (
+  <div className="page-stack">
+    <SectionTitle icon="ℹ️" meta="A transparent overview of what this app is, what it is not, and how your data is stored.">About</SectionTitle>
+    <Card className="hero-panel">
+      <CardHeader className="pb-3">
+        <div className="eyebrow mb-2">Trust and transparency</div>
+        <CardTitle className="text-2xl font-black tracking-tight text-foreground sm:text-[2rem]">An unofficial study app for the Life in the UK Test</CardTitle>
+        <CardDescription className="mt-2 max-w-2xl text-sm leading-7">
+          This is an independent revision tool. It is not an official government service, not affiliated with the Home Office, and it does not claim to be the official test.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="flex flex-wrap gap-2">
+          <Badge text="Unofficial practice app" color="#f59e0b" />
+          <Badge text="GitHub Pages friendly" color="#3b82f6" />
+          <Badge text="Works offline after first load" color="#22c55e" />
+        </div>
+      </CardContent>
+    </Card>
+    <div className="grid gap-4 lg:grid-cols-2">
+      <Card className="dashboard-card">
+        <div className="mb-2 text-lg font-extrabold text-foreground">What this app does</div>
+        <div className="space-y-2 text-sm leading-7 text-muted-foreground">
+          <div>Provides practice questions, mock papers, topic revision, and mistake review.</div>
+          <div>Explains answers with short memory cues and context so recall improves faster.</div>
+          <div>Keeps your study progress in local browser storage on this device.</div>
+        </div>
+      </Card>
+      <Card className="dashboard-card">
+        <div className="mb-2 text-lg font-extrabold text-foreground">What this app does not do</div>
+        <div className="space-y-2 text-sm leading-7 text-muted-foreground">
+          <div>It does not register you for the test or issue any official result.</div>
+          <div>It does not claim official status or guarantee the exact wording of real questions.</div>
+          <div>It does not send your revision data to a server account system.</div>
+        </div>
+      </Card>
+    </div>
+    <Card className="dashboard-card">
+      <div className="mb-3 text-lg font-extrabold text-foreground">Privacy and data</div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <div className="subtle-panel p-4">
+          <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Stored locally</div>
+          <div className="text-sm leading-7 text-muted-foreground">Mistakes, quiz history, mock scores, bookmarks, and progress stay in your browser storage.</div>
+        </div>
+        <div className="subtle-panel p-4">
+          <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">No account needed</div>
+          <div className="text-sm leading-7 text-muted-foreground">You can use the app without creating an account or handing over personal profile data.</div>
+        </div>
+        <div className="subtle-panel p-4">
+          <div className="mb-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Open source</div>
+          <div className="text-sm leading-7 text-muted-foreground">The code is public, which makes the behaviour and content easier to inspect and improve.</div>
+        </div>
+      </div>
+    </Card>
+    <Card className="dashboard-card">
+      <div className="mb-3 text-lg font-extrabold text-foreground">Helpful next steps</div>
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={() => setActive("mock")}>Start Practice Test</Button>
+        <Button variant="secondary" onClick={() => setActive("progress")}>Open Progress</Button>
+        <Button variant="secondary" onClick={() => setActive("testday")}>Read Test Day info</Button>
+      </div>
+    </Card>
+  </div>
+);
 
 const DatesDrillTab = () => {
   const [mode, setMode] = useState("mixed");
@@ -4331,7 +4639,10 @@ const QuickRevisionTab = ({ setActive }) => {
 
   const moveCard = (direction) => {
     if (!session.length) return;
-    setIndex((v) => direction === "next" ? (v + 1) % session.length : (v - 1 + session.length) % session.length);
+    setIndex((v) => {
+      if (direction === "prev") return Math.max(0, v - 1);
+      return Math.min(session.length, v + 1);
+    });
   };
 
   const toggleCurrentBookmark = () => {
@@ -4339,20 +4650,22 @@ const QuickRevisionTab = ({ setActive }) => {
     setBookmarks(toggleBookmarkEntry("card", current.id));
   };
 
-  // Swipe: left = next card (okay), right = previous card
+  const skipCard = () => moveCard("next");
+
+  // Swipe: left = hard, right = easy
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0]?.clientX ?? null; };
   const handleTouchEnd = (e) => {
     if (touchStartX.current == null) return;
     const delta = (e.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
     touchStartX.current = null;
     if (Math.abs(delta) < 48) return;
-    if (delta < 0) markCard("okay");
-    else moveCard("prev");
+    if (delta < 0) markCard("hard");
+    else markCard("easy");
   };
 
   return (
     <div className="page-stack">
-      <SectionTitle icon="↔️" meta="Swipe through facts one at a time. Hard cards come back automatically.">Quick Revision</SectionTitle>
+      <SectionTitle icon="↔️" meta="Rate cards quickly. Swipe left for Hard, swipe right for Easy, or tap Okay.">Quick Revision</SectionTitle>
 
       {isFinished ? (
         <>
@@ -4399,62 +4712,58 @@ const QuickRevisionTab = ({ setActive }) => {
         </>
       ) : current && (
         <>
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <Badge text={`${index + 1} / ${session.length}`} color={current.color} />
-            <Badge text={`${remaining} left`} color="#64748b" />
-            {completed > 0 && <Badge text={`${completed} done`} color="#22c55e" />}
-            {hardCount > 0 && <Badge text={`${hardCount} hard`} color="#f59e0b" />}
-            <div className="ml-auto flex gap-2">
-              <Button variant="secondary" onClick={() => startSession("fresh", 20)}>New mix</Button>
+          <Card className="mb-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <div>
+                <div className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Session</div>
+                <div className="text-lg font-extrabold text-foreground">{sessionMeta.reviewCount > 0 ? "Weak-areas run" : "Fresh revision run"}</div>
+              </div>
+              <div className="ml-auto flex flex-wrap gap-2">
+                <Badge text={`${index + 1} / ${session.length}`} color="#3b82f6" />
+                <Badge text={`${remaining} left`} color="#64748b" />
+                {completed > 0 && <Badge text={`${completed} rated`} color="#22c55e" />}
+                {hardCount > 0 && <Badge text={`${hardCount} hard`} color="#f59e0b" />}
+              </div>
             </div>
-          </div>
+          </Card>
 
-          {/* ── FACT CARD — styled like Common Mix-Ups ── */}
           <Card
-            style={{ border: "1px solid #374151", userSelect: "none" }}
+            style={{ border: "1px solid #27577A", userSelect: "none" }}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
           >
-            {/* Header row */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontWeight: 800, color: "var(--text-strong)", fontSize: 17 }}>{current.front}</div>
-                <div style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 4 }}>{current.topic} · {current.bucket}</div>
+                <div style={{ fontWeight: 800, color: current.color, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>{current.topic}</div>
+                <div style={{ fontWeight: 900, color: "var(--text-strong)", fontSize: 32, lineHeight: 1.2 }}>{current.front}</div>
+                <div style={{ color: "var(--text-muted)", fontSize: 14, marginTop: 10 }}>{current.back}</div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                <Badge text={current.topic} color={current.color} />
                 <button className="focus-ring" onClick={toggleCurrentBookmark} style={{ border: "1px solid var(--card-border)", background: bookmarks.cards.includes(current.id) ? "color-mix(in srgb, #14b8a6 12%, var(--card-bg))" : "var(--panel-bg)", color: bookmarks.cards.includes(current.id) ? "#0f766e" : "var(--text)", borderRadius: 999, padding: "7px 11px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
                   {bookmarks.cards.includes(current.id) ? "★ Saved" : "☆ Save"}
                 </button>
               </div>
             </div>
 
-            {/* Answer block */}
-            <div style={{ background: `${current.color}11`, border: `1px solid ${current.color}44`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
-              <div style={{ fontWeight: 800, color: current.color, marginBottom: 8, fontSize: 13 }}>ANSWER</div>
-              <div style={{ fontSize: 18, fontWeight: 900, color: "var(--text-strong)", lineHeight: 1.5 }}>{current.back}</div>
-            </div>
-
-            {/* Context block */}
-            <div style={{ background: "var(--surface-strong)", border: "1px solid var(--card-border)", borderRadius: 14, padding: 14, marginBottom: 10 }}>
-              <div style={{ fontWeight: 800, color: "var(--text-muted)", fontSize: 11, marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.1em" }}>Why this matters</div>
-              <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.7 }}>{current.context}</div>
+            <div style={{ background: `${current.color}11`, border: `1px solid ${current.color}44`, borderRadius: 18, padding: 16, marginBottom: 10 }}>
+              <div style={{ fontWeight: 800, color: current.color, marginBottom: 8, fontSize: 13 }}>Why it matters</div>
+              <div style={{ fontSize: 15, color: "var(--text-strong)", lineHeight: 1.6 }}>{current.context}</div>
             </div>
 
             <MemoryHook text={current.memory} />
 
-            {/* Navigation */}
             <div style={{ marginTop: 14, display: "grid", gap: 8 }}>
               <div style={{ display: "flex", gap: 8 }}>
-                <Button variant="secondary" className="flex-1" onClick={() => moveCard("prev")}>← Prev</Button>
-                <Button variant="secondary" className="flex-1" onClick={() => moveCard("next")}>Next →</Button>
+                <Button variant="secondary" className="flex-1" onClick={() => moveCard("prev")} disabled={index === 0}>← Prev</Button>
+                <Button variant="secondary" className="flex-1" onClick={skipCard}>Skip →</Button>
+                <Button variant="secondary" onClick={() => startSession("fresh", 20)}>New mix</Button>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
                 <Button variant="secondary" className="min-w-[100px] flex-1 border-amber-500/30 bg-amber-500/10 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300" onClick={() => markCard("hard")}>Hard</Button>
                 <Button variant="secondary" className="min-w-[100px] flex-1 border-sky-500/30 bg-sky-500/10 text-sky-700 hover:bg-sky-500/15 dark:text-sky-300" onClick={() => markCard("okay")}>Okay</Button>
                 <Button variant="secondary" className="min-w-[100px] flex-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300" onClick={() => markCard("easy")}>Easy</Button>
               </div>
-              <div style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Swipe left to mark Okay · Swipe right to go back</div>
+              <div style={{ textAlign: "center", fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>Swipe left = Hard · Swipe right = Easy · Tap Okay if it is already in memory</div>
             </div>
           </Card>
         </>
@@ -7085,7 +7394,7 @@ const QuickFactsTab = ({ setActive }) => {
 };
 
 // ── QUIZ ─────────────────────────────────────────────────────
-const QuizTab = () => {
+const QuizTab = ({ setActive }) => {
   const [started, setStarted] = useState(false);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -7141,16 +7450,6 @@ const QuizTab = () => {
       setConfirmed(true);
       if (oi === questions[current].a) setScore((s) => s + 1);
       else setWrong((w) => [...w, { ...questions[current], chosen: oi }]);
-      if (advanceRef.current) clearTimeout(advanceRef.current);
-      advanceRef.current = setTimeout(() => {
-        if (current + 1 >= questions.length) {
-          setFinished(true);
-          return;
-        }
-        setCurrent((c) => c + 1);
-        setSelected(null);
-        setConfirmed(false);
-      }, 2200);
     }
   };
 
@@ -7159,8 +7458,19 @@ const QuizTab = () => {
   }, []);
 
   useEffect(() => {
-    if (finished) saveWrongQuestions(wrong);
-  }, [finished, wrong]);
+    if (finished && questions.length) {
+      saveWrongQuestions(wrong);
+      saveQuizHistoryEntry({
+        at: new Date().toISOString(),
+        score,
+        total: questions.length,
+        percent: Math.round((score / questions.length) * 100),
+        passed: Math.round((score / questions.length) * 100) >= 75,
+        wrong: wrong.length,
+        filter,
+      });
+    }
+  }, [finished, wrong, score, questions, filter]);
 
   const skipToNext = () => {
     if (advanceRef.current) clearTimeout(advanceRef.current);
@@ -7185,8 +7495,8 @@ const QuizTab = () => {
         <SectionTitle icon="🧠" meta="Use this for broad recall with instant feedback.">Quiz Me</SectionTitle>
         <Card className="setup-card text-center">
               <div className="mb-2 text-[40px]">🎯</div>
-              <div className="mb-2 text-[22px] font-extrabold text-foreground">Test your knowledge</div>
-              <div className="mb-5 text-sm leading-6 text-muted-foreground">{pool.length} questions available in this current filter.</div>
+              <div className="mb-2 text-[22px] font-extrabold text-foreground">Practice quiz with answer feedback</div>
+              <div className="mb-5 text-sm leading-6 text-muted-foreground">{pool.length} questions available in this current filter. Use this mode for fast correction, explanation, and mistake capture.</div>
               <div className="mb-4">
                 <div className="mb-2 text-sm text-muted-foreground">Filter by frequency</div>
                 <div className="flex flex-wrap justify-center gap-2">
@@ -7230,7 +7540,7 @@ const QuizTab = () => {
                 </div>
               </div>
               <div className="mb-3 text-xs text-muted-foreground">
-                `Show now` is better for learning. `Show at end` is better if you want a paper-style review.
+                `Show now` is better for learning. `Show at end` is better if you want a cleaner self-test before reviewing.
               </div>
               <Button onClick={startQuiz} className="h-12 px-8 text-base font-extrabold">
                 Start Quiz
@@ -7253,9 +7563,12 @@ const QuizTab = () => {
       <div className="page-stack">
         <Card className="result-shell text-center" style={{ borderColor: pass ? "#22c55e55" : "#ef444455" }}>
           <div className="mb-2 text-[56px]">{pass ? "🎉" : "📚"}</div>
-          <div className="mb-1 text-2xl font-black" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Strong recall" : "Revision needed"}</div>
+          <div className="mb-1 text-2xl font-black" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pass ? "Pass-level quiz result" : "More revision needed"}</div>
           <div className="big-number">{score}/{questions.length}</div>
           <div className="mb-4 text-lg" style={{ color: pass ? "#4ade80" : "#f87171" }}>{pct}%</div>
+          <div className="mb-4 text-sm leading-6 text-muted-foreground">
+            {pass ? "You are at or above the 75% target for this quiz run." : `You need ${Math.max(1, Math.ceil((questions.length * 0.75) - score))} more correct answers to hit 75% on this run.`}
+          </div>
           <div className="mb-4 grid gap-3 sm:grid-cols-2">
             <div className="subtle-panel p-3">
               <div className="mb-1 text-xs font-extrabold uppercase tracking-[0.14em] text-emerald-500">Correct</div>
@@ -7269,8 +7582,10 @@ const QuizTab = () => {
             </div>
           </div>
           <div className="flex flex-wrap justify-center gap-2">
-            <Button onClick={startQuiz}>Try Again</Button>
-            <Button variant="secondary" onClick={() => setStarted(false)}>Back</Button>
+            <Button onClick={startQuiz}>Retake Quiz</Button>
+            <Button variant="secondary" onClick={() => setReviewFilter("wrong")}>Review Mistakes</Button>
+            <Button variant="secondary" onClick={() => setActive("progress")}>Open Progress</Button>
+            <Button variant="secondary" onClick={() => setActive("revise")}>Mistake Review</Button>
           </div>
         </Card>
         <Card>
@@ -7311,7 +7626,7 @@ const QuizTab = () => {
   return (
     <div className="page-stack">
       <div className="mb-3 flex flex-wrap justify-between gap-2">
-        <Badge text={`${current + 1} / ${questions.length}`} color="#64748b" />
+        <Badge text={`Question ${current + 1} of ${questions.length}`} color="#64748b" />
         <Badge text={`Score: ${score}`} color="#22c55e" />
       </div>
       <div className="mb-3 flex flex-wrap gap-2">
@@ -7320,11 +7635,26 @@ const QuizTab = () => {
           {bookmarks.questions.includes(q.q) ? "★ Saved question" : "☆ Save question"}
         </Button>
       </div>
-      <Progress value={((current + 1) / questions.length) * 100} className="mb-4 h-2.5" />
+      <Card className="mb-4">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Quiz progress</div>
+            <div className="text-sm font-semibold text-foreground">Question {current + 1} of {questions.length}</div>
+          </div>
+          <div className="text-sm font-semibold text-muted-foreground">{Math.round(((current + 1) / questions.length) * 100)}%</div>
+        </div>
+        <Progress value={((current + 1) / questions.length) * 100} className="h-3" />
+      </Card>
       <QuestionCard question={q} selected={selected} confirmed={confirmed} onSelect={handleSelect} />
       {confirmed && answerMode === "instant" && (
         <>
-          {showContext && <MemoryHook text={q.tip} />}
+          <QuestionFeedbackPanel
+            correct={selected === q.a}
+            correctAnswer={q.opts[q.a]}
+            chosenAnswer={selected !== null ? q.opts[selected] : null}
+            explanation={showContext ? q.tip : "Use the correct answer and topic label to reinforce the fact before moving on."}
+            tip={showContext ? q.tip : ""}
+          />
           <Button variant="secondary" className="mt-3 w-full border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300" onClick={skipToNext}>
             {current + 1 < questions.length ? "Next" : "See Results"}
           </Button>
@@ -7592,6 +7922,7 @@ const MockExamTab = ({ setActive }) => {
           </div>
           <div className="flex flex-wrap justify-center gap-2">
             <Button className="bg-orange-500 hover:bg-orange-500/90" onClick={() => startPaper(selectedPaper.id)}>Retake same paper</Button>
+            <Button variant="secondary" onClick={() => setActive("progress")}>Open Progress</Button>
             <Button variant="secondary" onClick={() => { setStarted(false); setFinished(false); }}>Back to paper list</Button>
           </div>
         </Card>
@@ -8745,6 +9076,8 @@ const App = () => {
     switch (active) {
       case "guide": return <UserGuideTab setActive={navigateTo} />;
       case "home": return <HomeTab setActive={navigateTo} wrongQuestions={wrongQuestions} mockHistory={mockHistory} mockProgress={mockProgress} />;
+      case "progress": return <ProgressTab setActive={navigateTo} />;
+      case "about": return <AboutTab setActive={navigateTo} />;
       case "examtopics": return <ExamTopicsModeTab setActive={navigateTo} />;
       case "quickrev": return <QuickRevisionTab setActive={navigateTo} />;
       case "audio": return <AudioModeTab setActive={navigateTo} />;
@@ -8818,7 +9151,7 @@ const App = () => {
       case "arts": return <ArtsTab setActive={navigateTo} />;
       case "anthem": return <AnthemTab />;
       case "quickfacts": return <QuickFactsTab setActive={navigateTo} />;
-      case "quiz": return <QuizTab />;
+      case "quiz": return <QuizTab setActive={navigateTo} />;
       case "mock": return <MockExamTab setActive={navigateTo} />;
       case "revise": return <ReviseTab setActive={navigateTo} />;
       case "rapidfire": return <RapidFireTab />;
@@ -8830,9 +9163,9 @@ const App = () => {
   return (
     <div className="app-shell" style={{ minHeight: "100vh" }}>
     <div className="mx-auto max-w-[1120px]" style={{ paddingBottom: isMobile ? 112 : 12 }}>
-      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} isMobile={isMobile} />
+      <TabBar active={active} setActive={navigateTo} menuOpen={menuOpen} setMenuOpen={setMenuOpen} isDark={isDark} toggleDark={toggleDark} openQuickPanel={() => setQuickPanelOpen(true)} isMobile={isMobile} onBack={handleBack} canGoBack={tabHistory.length > 0} />
       <div className="tabcontent">{renderTab()}</div>
-      <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />
+      <AppFooterBar onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} isMobile={isMobile} />
       <div className="border-t border-border px-4 py-6 text-center text-xs text-muted-foreground">
         Open Source — Share Freely ·{" "}
         <a href="https://github.com/kanwalnainsingh/KNS-Life-In-UK-Test" target="_blank" rel="noopener" className="text-primary no-underline">
@@ -8842,7 +9175,7 @@ const App = () => {
       {isMobile && <BottomNav active={active} setActive={navigateTo} openQuickPanel={() => setQuickPanelOpen(true)} />}
       {isMobile && <ScrollTopButton visible={showScrollTop} />}
       {isMobile && <ScrollBottomButton visible={showScrollBottom} />}
-      {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} />}
+      {isMobile && <MobileQuickPanel open={quickPanelOpen} active={active} setActive={navigateTo} onClose={() => setQuickPanelOpen(false)} onBack={handleBack} canGoBack={tabHistory.length > 0} onForceRefresh={forceLatestAppReload} offlineReady={offlineReady} isOffline={isOffline} />}
     </div>
     </div>
   );

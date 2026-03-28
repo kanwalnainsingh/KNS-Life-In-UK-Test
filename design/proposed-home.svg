@@ -1,0 +1,42 @@
+<svg width="420" height="780" viewBox="0 0 420 780" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="420" height="780" rx="44" fill="#060A16" stroke="#334155" stroke-width="4"/>
+  <rect x="130" y="18" width="160" height="20" rx="10" fill="#111827"/>
+  <text x="26" y="74" fill="#E5E7EB" font-family="Georgia, serif" font-size="16" font-weight="700">Home proposal</text>
+  <rect x="24" y="96" width="372" height="76" rx="20" fill="#0F172A" stroke="#243244"/>
+  <text x="44" y="124" fill="#7DD3FC" font-family="Arial, sans-serif" font-size="12" font-weight="700">TODAY'S NEXT STEP</text>
+  <text x="44" y="150" fill="#F8FAFC" font-family="Georgia, serif" font-size="24" font-weight="700">Quick Revise for 10 minutes</text>
+  <rect x="278" y="118" width="96" height="34" rx="17" fill="#F97316"/>
+  <text x="304" y="140" fill="#FFF7ED" font-family="Arial, sans-serif" font-size="14" font-weight="700">Start</text>
+  <rect x="24" y="188" width="372" height="112" rx="22" fill="#0B1325" stroke="#1F7A62"/>
+  <text x="44" y="216" fill="#6EE7B7" font-family="Arial, sans-serif" font-size="12" font-weight="700">URGENT PLAN</text>
+  <text x="44" y="242" fill="#F8FAFC" font-family="Georgia, serif" font-size="22" font-weight="700">Test in 1 to 3 days</text>
+  <text x="44" y="268" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="15">1. Quick Revise  2. 4 Nations  3. Common Mix-Ups</text>
+  <text x="44" y="290" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="15">4. Mock Test  5. Cram Sheet</text>
+  <text x="24" y="336" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">CONTINUE LEARNING</text>
+  <rect x="24" y="352" width="178" height="124" rx="20" fill="#151C31" stroke="#243244"/>
+  <text x="42" y="384" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Weakest area</text>
+  <text x="42" y="412" fill="#FB923C" font-family="Arial, sans-serif" font-size="16" font-weight="700">4 Nations</text>
+  <text x="42" y="436" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Short focused session</text>
+  <rect x="42" y="448" width="120" height="28" rx="14" fill="#1D4ED8"/>
+  <text x="68" y="467" fill="#EFF6FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Open now</text>
+  <rect x="218" y="352" width="178" height="124" rx="20" fill="#151C31" stroke="#243244"/>
+  <text x="236" y="384" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Mock status</text>
+  <text x="236" y="412" fill="#A78BFA" font-family="Arial, sans-serif" font-size="16" font-weight="700">Best: 18 / 24</text>
+  <text x="236" y="436" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Next suggested paper: #4</text>
+  <rect x="236" y="448" width="120" height="28" rx="14" fill="#312E81"/>
+  <text x="268" y="467" fill="#EEF2FF" font-family="Arial, sans-serif" font-size="13" font-weight="700">Resume</text>
+  <text x="24" y="512" fill="#94A3B8" font-family="Arial, sans-serif" font-size="12" font-weight="700">BROWSE TOPICS</text>
+  <rect x="24" y="528" width="372" height="66" rx="18" fill="#151C31" stroke="#243244"/>
+  <text x="44" y="553" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Study path</text>
+  <text x="44" y="576" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">4 clear phases. Tap to expand only what you need.</text>
+  <text x="360" y="567" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24">›</text>
+  <rect x="24" y="608" width="372" height="66" rx="18" fill="#151C31" stroke="#243244"/>
+  <text x="44" y="633" fill="#F8FAFC" font-family="Georgia, serif" font-size="20" font-weight="700">Top tested facts</text>
+  <text x="44" y="656" fill="#B8C4DA" font-family="Arial, sans-serif" font-size="14">Collapsed by default. Open when you want a quick scan.</text>
+  <text x="360" y="647" fill="#94A3B8" font-family="Arial, sans-serif" font-size="24">›</text>
+  <rect x="24" y="694" width="372" height="62" rx="24" fill="#0F172A" stroke="#243244"/>
+  <text x="58" y="733" fill="#F8FAFC" font-family="Arial, sans-serif" font-size="15" font-weight="700">Home</text>
+  <text x="150" y="733" fill="#7C8AA5" font-family="Arial, sans-serif" font-size="15">Revise</text>
+  <text x="240" y="733" fill="#7C8AA5" font-family="Arial, sans-serif" font-size="15">Mock</text>
+  <text x="324" y="733" fill="#7C8AA5" font-family="Arial, sans-serif" font-size="15">Menu</text>
+</svg>
