@@ -125,7 +125,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
   # ── VERIFY ───────────────────────────────────────────────────────────────────
   # Hit the live URL after deploy. Retries every 10 s (up to ~90 s total) to
@@ -194,4 +194,4 @@ jobs:
 
       - name: Deploy previous stable version
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
